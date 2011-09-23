@@ -52,6 +52,7 @@ public class WSProviderConfigurator extends Configurator {
 	
 	public final static String CMPID = "eu.linksmart.security.core";
 	public final static String CORE_SECURITY_CONFIG = "linksmart.security.core.config";
+	public final static String CONFIGURATION_FILE = "/resources/WS.properties";
 	
 	/**
 	 * Constructor
@@ -60,7 +61,7 @@ public class WSProviderConfigurator extends Configurator {
 	 */
 	public WSProviderConfigurator(BundleContext context) {
 		super(context, Logger.getLogger(WSProviderConfigurator.class.getName()),
-			CMPID, null);
+			CMPID, CONFIGURATION_FILE);
 	}
 	
 	/**
@@ -92,11 +93,12 @@ public class WSProviderConfigurator extends Configurator {
 	 * 
 	 * @return the default configuration loaded
 	 */
-	@Override
+	//commenting out because implemented via properties file
+	/*@Override
 	public Dictionary loadDefaults() {
 		Hashtable h = new Hashtable();
 		h.put(CORE_SECURITY_CONFIG, Short.toString(SecurityLibrary.CONF_ENC));
 		return h;
-	}
+	}*/
 
 }

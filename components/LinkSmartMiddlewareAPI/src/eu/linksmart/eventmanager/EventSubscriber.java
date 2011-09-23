@@ -49,7 +49,7 @@ public interface EventSubscriber extends java.rmi.Remote {
 	 * @return true or false depending on the result of the notification.
 	 * @throws java.rmi.RemoteException
 	 */
-	public boolean notify(java.lang.String topic, 
+	 public java.lang.Boolean notify(java.lang.String topic, 
 		eu.linksmart.eventmanager.Part[] parts) throws java.rmi.RemoteException;
 
 }

@@ -149,14 +149,13 @@ public abstract class Configurator implements ManagedService{
 			else {
 				// If the configuration admin is not yet available, just use the 
 				// default configuration from the Jar
-				System.out.println("Configuration=" + pid
+				logger.warn("Configuration=" + pid
 					+ " - ConfigurationAdmin not found... loading defaults...");
 				configuration = loadDefaults();
 			}
-		} catch (Exception e) {
-			logger.error("Error during configuration load: "
-				+ e.getLocalizedMessage());
-			e.printStackTrace();
+		} catch (IOException e) {
+			logger.error("Error during configuration load!", e);
+			// TODO: What should we do here? Can we also load the defaults?
 		}
 	}
 	

@@ -112,15 +112,20 @@ public class GetConfigurationServlet extends HttpServlet {
 				JSONWriter jsonWriter = new JSONWriter(writer);
 				
 				try {
-					jsonWriter.array().object().key("name").value(configName).
-						key("parameters").array();
+//					jsonWriter.array().object().key("name").value(configName).
+//						key("parameters").array();
+					jsonWriter.object().key("name").value(configName).
+					key("parameters").object();
+
 					while (keys.hasMoreElements()) {
 						String key = (String) keys.nextElement();
 						String value = (String) configuration.get(key);
-						jsonWriter.object().key("name").value(key).key("value").
-							value(value).endObject();
+						//jsonWriter.object().key("name").value(key).key("value").value(value).endObject();
+						jsonWriter.key(key).value(value);
 					}
-					jsonWriter.endArray().endObject().endArray();
+//					jsonWriter.endArray().endObject().endArray();
+					jsonWriter.endObject().endObject();
+
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -139,6 +144,7 @@ public class GetConfigurationServlet extends HttpServlet {
 				} catch (JSONException e1) {
 					e1.printStackTrace();
 				}
+				
 				
 				try {
 					Dictionary d = new Hashtable();
@@ -180,8 +186,14 @@ public class GetConfigurationServlet extends HttpServlet {
 				}
 				
 				try {
-					Dictionary d = new Hashtable();
 					String configName = (String) json.getJSONObject(0).get("name");
+
+					//Dictionary d = new Hashtable();
+					Dictionary d = this.config.getConfiguration(configName); //so that values are overwritten from existing configuration
+					//the problem is that cfgadmin deletes any value that is not given to the configure method. BUT, all the ParamDescription parameters do not come from the 
+					//webpage doing the POST, so we need to put them somehow in the dictionary, then overwrite the values that were indeed changed on the config page 
+					//that is why we init the dictionary with the existing config rather than an empty one
+
 					JSONArray parameters = json.getJSONObject(0).getJSONArray("parameters");
 					for (int i = 0; i < parameters.length(); i++) {
 						JSONObject jobj = parameters.getJSONObject(i);

@@ -65,7 +65,13 @@ public interface TrustManagerConfiguration {
 	 * 
 	 * @return List of identifiers of the supported and loaded Trust Models
 	 */
-
 	public String[] getSupportedTrustModels();
+	
+	/**
+	 * Returns configurator of loaded trust model, which
+	 * can be used to configure the trust model settings.
+	 * @return Class which can be used to get OSGi configuration service
+	 */
+	public Class getTrustModelConfigurator();
 
 }

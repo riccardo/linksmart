@@ -46,6 +46,8 @@ import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
+import eu.linksmart.security.trustmanager.impl.TrustManagerImpl;
+
 /**
  * This is just a temporary class which holds the storage paths to certificates,
  * config files etc. This should be replaced by a properties file.
@@ -61,16 +63,10 @@ public class Util {
 	// Path to files, and OS specific stuff
 	public static final String FILE_SEPERATOR =
 			System.getProperty("file.separator");
-	public static final String PATH_ROOT = "TrustManager";
-	public static final String PATH_CONFIG = PATH_ROOT + FILE_SEPERATOR + "config" + FILE_SEPERATOR;
-	public static final String FILE_CONFIG = PATH_CONFIG + "config.xml";
+	public static final String PATH_ROOT = TrustManagerImpl.TRUST_MANAGER_PATH;
+	public static final String PATH_CONFIG = TrustManagerImpl.CONFIGFOLDERPATH;
+	public static final String FILE_CONFIG = PATH_CONFIG + FILE_SEPERATOR + "config.xml";
 	public static final String PATH_CERT = "cert" + FILE_SEPERATOR;
-
-	/** Database Scripts. */
-	public static final String CLEAR_DB_SCRIPT =
-			PATH_CONFIG + "x509" + FILE_SEPERATOR + "drop_tables_mysql.sql";
-	public static final String POPULATE_DB_SCRIPT =
-			PATH_CONFIG + "x509" + FILE_SEPERATOR + "certvalidation_mysql.sql";
 
 	/**
 	 * Extracts a file from the Jar archive to a local directory.

@@ -24,74 +24,76 @@ import java.rmi.Remote;
 
 public interface ApplicationOntologyManager extends Remote {
 
+	public String sparql(String query) throws java.rmi.RemoteException;
+
 	public String createDeviceTemplate(String scpd) throws java.rmi.RemoteException;
 
-  public String resolveDevice(String disco) throws java.rmi.RemoteException;
+	public String resolveDevice(String disco) throws java.rmi.RemoteException;
 
-  public String assignPID(String deviceURI, String pid) throws java.rmi.RemoteException;
+	public String assignPID(String deviceURI, String pid) throws java.rmi.RemoteException;
 
-  public String removeDevice(String deviceURI) throws java.rmi.RemoteException;
+	public String removeDevice(String deviceURI) throws java.rmi.RemoteException;
 
-  public boolean assignDiscoveryInfo(String deviceURI, String discovery)
-			throws java.rmi.RemoteException;
+	public boolean assignDiscoveryInfo(String deviceURI, String discovery)
+	throws java.rmi.RemoteException;
 
 	public boolean assignEventModel(String deviceURI, String eventModel)
-			throws java.rmi.RemoteException;
+	throws java.rmi.RemoteException;
 
 	public boolean assignEnergyProfile(String deviceURI, String energyProfile)
-			throws java.rmi.RemoteException;
+	throws java.rmi.RemoteException;
 
 	public boolean assignConfiguration(String deviceURI, String configuration)
-			throws java.rmi.RemoteException;
+	throws java.rmi.RemoteException;
 
 	public String getConfigurations() throws java.rmi.RemoteException;
-	
-  public String getDeviceTypes() throws java.rmi.RemoteException;
 
-  public String getDevicesWithServices(String serviceQuery, String deviceQuery, String deviceRequirements, String serviceRequirements) throws java.rmi.RemoteException;
+	public String getDeviceTypes() throws java.rmi.RemoteException;
 
-  public String getDevices(String deviceQuery, String deviceRequirements) throws java.rmi.RemoteException;
+	public String getDevicesWithServices(String serviceQuery, String deviceQuery, String deviceRequirements, String serviceRequirements) throws java.rmi.RemoteException;
 
-// ================================================================
-// METHODS USED IN AOM IDE
-// ================================================================
+	public String getDevices(String deviceQuery, String deviceRequirements) throws java.rmi.RemoteException;
+
+	// ================================================================
+	// METHODS USED IN AOM IDE
+	// ================================================================
 
 	public String getPropertyAnnotationModel() throws java.rmi.RemoteException;
 
-  public String getDeviceTree() throws java.rmi.RemoteException;
+	public String getDeviceTree() throws java.rmi.RemoteException;
 
-  public String getTree(String classURI, boolean includeInstances) throws java.rmi.RemoteException;
+	public String getTree(String classURI, boolean includeInstances) throws java.rmi.RemoteException;
 
-  public String getInstanceTree(String instanceURI) throws java.rmi.RemoteException;
-  
-  public String getClassLiterals(String classURI) throws java.rmi.RemoteException;
+	public String getInstanceTree(String instanceURI) throws java.rmi.RemoteException;
 
-  public String addValue(String sURI, String pURI, String value, String dataType, boolean append) throws java.rmi.RemoteException;
+	public String getClassLiterals(String classURI) throws java.rmi.RemoteException;
 
-  public String addValue(String sURI, String pURI, String oURI, boolean append) throws java.rmi.RemoteException;
+	public String addValue(String sURI, String pURI, String value, String dataType, boolean append) throws java.rmi.RemoteException;
 
-  public String addFormData(String xml, boolean append) throws java.rmi.RemoteException;
-  
-  public String remove(String sURI, String pURI, String oURI) throws java.rmi.RemoteException;
-  
-  public String remove(String sURI, String pURI, String value, String dataTypeURI) throws java.rmi.RemoteException;
-  
-  public String getDevicesWithServices(String serviceQuery) throws java.rmi.RemoteException;
+	public String addValue(String sURI, String pURI, String oURI, boolean append) throws java.rmi.RemoteException;
 
-  public String getDevices(String deviceQuery) throws java.rmi.RemoteException;
+	public String addFormData(String xml, boolean append) throws java.rmi.RemoteException;
 
-  public String getSCPD(String deviceURI) throws java.rmi.RemoteException;
+	public String remove(String sURI, String pURI, String oURI) throws java.rmi.RemoteException;
 
-  public String dump() throws java.rmi.RemoteException;
+	public String remove(String sURI, String pURI, String value, String dataTypeURI) throws java.rmi.RemoteException;
 
-  public boolean clean() throws java.rmi.RemoteException;
+	public String getDevicesWithServices(String serviceQuery) throws java.rmi.RemoteException;
 
-  public boolean update(String xml) throws java.rmi.RemoteException;
+	public String getDevices(String deviceQuery) throws java.rmi.RemoteException;
 
-  public boolean createTestingRuntimeClone(String templateURI, String pid) throws java.rmi.RemoteException;
+	public String getSCPD(String deviceURI) throws java.rmi.RemoteException;
 
-  public boolean updateValue(String deviceURI, String path) throws java.rmi.RemoteException;
-  
-  public boolean removeRunTimeDevices() throws java.rmi.RemoteException;  
+	public String dump() throws java.rmi.RemoteException;
+
+	public boolean clean() throws java.rmi.RemoteException;
+
+	public boolean update(String xml) throws java.rmi.RemoteException;
+
+	public boolean createTestingRuntimeClone(String templateURI, String pid) throws java.rmi.RemoteException;
+
+	public boolean updateValue(String deviceURI, String path) throws java.rmi.RemoteException;
+
+	public boolean removeRunTimeDevices() throws java.rmi.RemoteException;  
 }
-  
+

@@ -91,7 +91,7 @@ function printEventManagerSubscriptions(){
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
 		
-	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
+/*	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
 		document.getElementById("tableContainer").style.width = "98%";
 		document.getElementById("infoContentwrap").style.width = "98%";
 		text = document.getElementById("infoContent").innerHTML;
@@ -119,6 +119,7 @@ function printEventManagerSubscriptions(){
 		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
 		scrollBarUpdate (handled, handlerer, tracker);
 	}
+	*/
 }
 
 function printEventManagerSearch() {
@@ -140,7 +141,8 @@ function printEventManagerSearch() {
 	}
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
-		
+
+	/*
 	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
 		document.getElementById("tableContainer").style.width = "98%";
 		document.getElementById("infoContentwrap").style.width = "98%";
@@ -171,5 +173,5 @@ function printEventManagerSearch() {
 	}
 	else {
 		document.getElementById("infoContentwrap").scrollTop = 0;
-	}
+	}*/
 }

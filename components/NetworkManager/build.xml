@@ -144,7 +144,6 @@
 		<echo message="Cleaning" />
 		<!-- files in build directory -->
 		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
-		<delete dir="${lib.dir}" includeEmptyDirs="true" failonerror="false" />
 		<!-- files in distribution directory -->
 		<delete dir="${dist.dir}" includeEmptyDirs="true" failonerror="false" />
 		<delete file="${rootDistributionDir}/${moduleName}-${revision}.jar" failonerror="false" />

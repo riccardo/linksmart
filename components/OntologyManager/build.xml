@@ -21,6 +21,9 @@ Local build file for the LinkSmart Ontology Manager
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar" />
 		</fileset>
+		<fileset dir="${targetPlatform.dir}">
+			<include name="**/*.jar" />
+		</fileset>
 		<pathelement path="${build.dir}" />
 	</path>
 
@@ -28,8 +31,11 @@ Local build file for the LinkSmart Ontology Manager
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar" />
 		</fileset>
+		<fileset dir="${targetPlatform.dir}">
+			<include name="**/*.jar" />
+		</fileset>
 		<pathelement path="${build.dir}" />
-		<pathelement path="${test.dir}" />
+		<pathelement path="${test.build.dir}" />
 	</path>
 
 	<target name="make" depends="jar">
@@ -64,16 +70,15 @@ Local build file for the LinkSmart Ontology Manager
 	<!-- Local versions -->
 
 	<target name="resolve">
+		<echo message="Setting up build environment" />
 		<ivy:resolve transitive="true" />
-		<ivy:retrieve transitive="true" type="jar" pattern="${lib.dir}/[artifact]-[revision].[ext]" />
-		<ivy:retrieve transitive="true" type="jars" pattern="${lib.dir}/[artifact]-[revision].[ext]" />
-		<ivy:retrieve transitive="true" type="pom" pattern="${lib.dir}/[artifact]-[revision].[ext]" />
-		<ivy:retrieve transitive="true" type="bundle" pattern="${lib.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="jar" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="jars" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="bundle" pattern="${targetPlatform}/[artifact]-[revision].[ext]" />
 	</target>
 
 	<target name="clean">
 		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
-		<delete dir="${lib.dir}" includeEmptyDirs="true" failonerror="false" />
 	</target>
 
 	<target name="build" depends="resolve">
@@ -92,9 +97,12 @@ Local build file for the LinkSmart Ontology Manager
 			<fileset dir="${basedir}">
 				<patternset>
 					<include name="lib/org.openrdf.sesame-2.3.1.jar" />
+					<include name="lib/slf4j-api-1.5.10.jar" />
+					<include name="lib/slf4j-jdk14-1.5.10.jar" />
 				</patternset>
 			</fileset>
 			<fileset dir="${basedir}" includes="OSGi-INF/" />
+			<fileset dir="${basedir}" includes="resources/**,LICENSE*,NOTICE*" />
 		</jar>
 	</target>
 

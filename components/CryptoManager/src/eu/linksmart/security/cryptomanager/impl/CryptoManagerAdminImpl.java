@@ -41,6 +41,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.security.cryptomanager.CryptoManagerAdmin;
+import eu.linksmart.security.cryptomanager.cryptoprocessor.impl.CryptoFactory;
+import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
 
 public class CryptoManagerAdminImpl implements CryptoManagerAdmin {
 
@@ -64,7 +66,7 @@ public class CryptoManagerAdminImpl implements CryptoManagerAdmin {
 		this.context = context.getBundleContext();
 
 		keyManager = CryptoFactory.getKeyManagerInstance();
-		System.out.println("CryptoManager Admin activated");
+		logger.info("CryptoManager Admin activated");
 
 	}
 

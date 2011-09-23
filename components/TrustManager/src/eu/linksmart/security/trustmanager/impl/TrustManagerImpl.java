@@ -74,8 +74,9 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 	 * Logger.
 	 */
 	private final static Logger LOG = Logger.getLogger(TrustManagerImpl.class.getName());
-	public final static String CONFIGFOLDERPATH = "TrustManager/config";
+	public final static String CONFIGFOLDERPATH = "TrustManager/configuration";
 	public final static String TRUSTMANAGERFOLDERPATH = "TrustManager";
+	public final static String TRUSTMANAGER_RESOURCE_FOLDERPATH = TRUSTMANAGERFOLDERPATH + "/resources/";
 	public static final String TRUST_MANAGER_PATH = "/axis/services/TrustManager";
 	public static final String NETWORK_MANAGER_PATH = "/axis/services/NetworkManagerApplication"; 
 	//can be any string from the config.xml class name
@@ -106,8 +107,8 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		if(success && TrustModelRegistry.getInstance().getCurrentTrustModel().getConfigurator() != null){
 			try {
 				trustModelConfigService = this.context.registerService(
-						TrustModelRegistry.getInstance().getCurrentTrustModel().getConfigurator().getInterfaces()[0].getName(),
-						TrustModelRegistry.getInstance().getCurrentTrustModel().getConfigurator().getConstructor().newInstance(),
+						TrustModelRegistry.getInstance().getCurrentTrustModel().getConfigurator().getName(),
+						TrustModelRegistry.getInstance().getCurrentTrustModel().getConfiguratorClass().getConstructor().newInstance(),
 						null);
 			} catch (Exception e) {
 				LOG.error("Cannot register configuration serivce for trust model", e);
@@ -265,7 +266,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		//create configuration files
 		Hashtable<String, String> HashFilesExtract = new Hashtable<String, String>();
 		LOG.debug("Deploying TrustManager config files");
-		HashFilesExtract.put(CONFIGFOLDERPATH + "/config.xml", "conf/config.xml");
+		HashFilesExtract.put(CONFIGFOLDERPATH + "/config.xml", "configuration/config.xml");
 		
 		Util.createFolder(CONFIGFOLDERPATH);
 		Util.extractFilesJar(HashFilesExtract);	
@@ -389,5 +390,10 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 				"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH);
 		configurator.setConfiguration(TrustManagerConfigurator.CERTIFICATE_REF, result.getCertRef());
 		return result.getHID();
+	}
+	
+	@Override
+	public Class getTrustModelConfigurator(){
+		return TrustModelRegistry.getInstance().getCurrentTrustModel().getConfigurator();
 	}
 }

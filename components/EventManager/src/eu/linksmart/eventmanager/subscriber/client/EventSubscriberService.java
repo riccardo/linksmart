@@ -13,7 +13,7 @@
  * stipulating liability clauses corresponding to German law.
  */
 /**
- * Copyright (C) 2006-2010 
+ * Copyright (C) 2006-2010 [Fraunhofer FIT]
  *                         the HYDRA consortium, EU project IST-2005-034891
  *
  * This file is part of LinkSmart.
@@ -30,6 +30,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * EventSubscriberService.java
  *
@@ -40,9 +41,9 @@
 package eu.linksmart.eventmanager.subscriber.client;
 
 public interface EventSubscriberService extends javax.xml.rpc.Service {
-    public java.lang.String getEventSubscriberAddress();
+    public java.lang.String getBasicHttpBinding_EventSubscriberAddress();
 
-    public eu.linksmart.eventmanager.EventSubscriber getEventSubscriber() throws javax.xml.rpc.ServiceException;
+    public eu.linksmart.eventmanager.EventSubscriber getBasicHttpBinding_EventSubscriber() throws javax.xml.rpc.ServiceException;
 
-    public eu.linksmart.eventmanager.EventSubscriber getEventSubscriber(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
+    public eu.linksmart.eventmanager.EventSubscriber getBasicHttpBinding_EventSubscriber(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
 }

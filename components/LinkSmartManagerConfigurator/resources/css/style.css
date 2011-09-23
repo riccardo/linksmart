@@ -21,6 +21,49 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 .logotext strong { color:#FFCD59; }
 .logotext2 { font-size:14px; }
 
+
+.paramform {
+	display: block;
+	font-family: 'Trebuchet MS', Verdana, Helvetica, Arial, sans-serif;
+	font-size: 9pt;
+	line-height: 1.3em;
+	text-align: left;
+	width:95%; 
+	margin:5px; 
+	padding:6px; 
+	border:1px solid #D4D4D4;
+	position: relative;
+}
+
+.paramform label {
+	display:block;
+	margin: 5px 0 5px 0;
+}
+
+.postinfoodd { background-color:#EFEFEF;  }
+.postinfoeven { background-color:#FEFEFE; }
+.range {
+	display:block;
+	font-size: 7pt;
+	line-height: 1.3em;
+}
+
+.errormsg {
+	display:none;
+}
+
+.in-error {
+	background: #ffeeee;
+}
+.in-error .errormsg {
+	display:block;
+	font-size: 8pt;
+	color: red;
+	background: url(../images/attention.png) center left no-repeat;
+	padding-left: 20px;
+}
+
+
 #nav { width:100%; overflow:auto; padding:1px; margin:0; background-color:#D2D2D2; }
 #nav ul { margin:0; padding:0; }
 #nav ul li { float:left; list-style:none; padding:0; }
@@ -39,8 +82,7 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 #left ul li ul li a { padding:5px; background-color:#EFEFEF; }
 
 #right { float:left; width:70%; }
-#right .postinfoodd { display:block; width:95%; margin:5px; padding:6px; background-color:#EFEFEF; border:1px solid #D4D4D4; }
-#right .postinfoeven { display:block; width:95%; margin:5px; padding:6px; background-color:#FEFEFE; border:1px solid #D4D4D4; }
+
 #right p a { color:#FFCD59; font-weight:bold; text-decoration:underline; }
 
 .propertyleft { float:left; width:30%; }
@@ -74,9 +116,9 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 
 #optionsContainer{
 	width:95%;
-	max-height:420px;
+/*	max-height:420px;
 	overflow: hidden;
-	margin-bottom:5px;
+*/	margin-bottom:5px;
 }
 
 .normal-tab {
@@ -282,7 +324,7 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 }
 
 input.text {
-width: 100%;
+width: 640px;
 } 
 
 input.btn { 

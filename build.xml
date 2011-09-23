@@ -20,7 +20,7 @@
 <!--
   This is the root build file of the LinkSmart software.
 -->
-<project name="hydra" default="make-all" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="LinkSmart" default="make-all" xmlns:ivy="antlib:org.apache.ivy.ant">
  
  <property name="antlib.dir" value="${basedir}/antlibs"/>
  <property name="javaLibDir" value="${basedir}/libraries/java"/>
@@ -38,8 +38,7 @@
  <taskdef resource="aQute/bnd/ant/taskdef.properties" classpathref="antlib.path"/> 
 	
 	<!-- Define Ivy settings file which defines your repositories -->
-	<ivy:configure file="ivysettings.xml" />
-	<!-- <ivy:settings file="ivysettings.xml"/> -->
+	<ivy:settings file="ivysettings.xml"/>
 
  <!-- Define the msbuild task -->
  <taskdef resource="org/apache/ant/dotnet/antlib.xml" classpathref="antlib.path"/>
@@ -61,7 +60,13 @@
  <target name="clean">
   <delete dir="distribution"/>
   <delete dir="build"/>
+  <ant dir="components" target="clean"/>
  </target>
+	
+  <target name="realclean" depends="clean">
+    <ant dir="components" target="realclean"/>
+  </target>
+	
  
  <target name="make-dirs">
   <mkdir dir="${rootBuildDir}"/>

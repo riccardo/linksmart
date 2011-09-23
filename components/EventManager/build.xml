@@ -93,7 +93,6 @@ Local build file for the Event Manager
   
   <target name="clean">
     <delete dir="${build.dir}" includeEmptyDirs="true"  failonerror="false"/>
-    <delete dir="${lib.dir}" includeEmptyDirs="true"  failonerror="false"/>
     <!-- FIXME: Eclipse output -->
     <delete dir="example/WaterMeter/bin/" includeEmptyDirs="true"  failonerror="false"/>
     <delete dir="example/TrendDisplay/bin/" includeEmptyDirs="true"  failonerror="false"/>

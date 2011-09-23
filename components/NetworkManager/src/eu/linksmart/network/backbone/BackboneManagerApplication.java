@@ -148,12 +148,12 @@ public class BackboneManagerApplication
 		hidManager = nm.getHIDManagerApplication();
 
 		// This constructor is private in order to act as a singleton.
-		String logs = (String) nm.getConfiguration().get(NetworkManagerConfigurator.JXTA_LOGS);
+		boolean logs = Boolean.parseBoolean((String) nm.getConfiguration().get(NetworkManagerConfigurator.JXTA_LOGS));
 				
-		if (logs.equals("OFF")) {
+		if (!logs) {
 			System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.OFF.toString()); 
 		}
-		else if (logs.equals("ON")) {
+		else if (logs) {
 			System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.ALL.toString()); 
 		}
 		
@@ -264,8 +264,7 @@ public class BackboneManagerApplication
 		URI uri = new File("NetworkManager/config/seeds.txt").toURI();
 		
 		configurator.addRdvSeedingURI(uri);
-		if (((String) nm.getConfiguration().get(
-				NetworkManagerConfigurator.RELAYED)).equals("True")) {
+		if (Boolean.parseBoolean((String) nm.getConfiguration().get(NetworkManagerConfigurator.RELAYED))) {
 			configurator.addRelaySeedingURI(uri);
 		}
 		else if ((String) nm.getConfiguration().get(
@@ -277,8 +276,7 @@ public class BackboneManagerApplication
 		}
 		
 		logger.debug(uri.toString());
-		if (((String) nm.getConfiguration().get(
-				NetworkManagerConfigurator.MULTICAST)).equals("ON")) {
+		if (Boolean.parseBoolean( (String) nm.getConfiguration().get(NetworkManagerConfigurator.MULTICAST))) {
 			configurator.setUseMulticast(true);
 		}
 		else {
@@ -774,11 +772,15 @@ public class BackboneManagerApplication
 			String sw;
 			PeerID id;
 			while (running) {
-				try {
 					buffer =  new byte[64000];
 					receivedData = new DatagramPacket(buffer, buffer.length);
 					
-					m.receive(receivedData);
+					try {
+						m.receive(receivedData);
+					} catch (IOException e2) {
+						logger.error(getName() + ": Unable to receive data in " + m.toString(), e2);
+					}
+					
 					sw = new String(receivedData.getData(), 0, receivedData.getLength());
 					
 					String[] token = sw.split("@&");
@@ -895,9 +897,6 @@ public class BackboneManagerApplication
 							}
 						}
 					}
-				} catch (Exception e) {
-					logger.error(e);
-				}
 			}
 		}
 		

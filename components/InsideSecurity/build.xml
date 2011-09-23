@@ -65,7 +65,6 @@ Local build file for the Linksmart InsideSecurity
 
 	<target name="clean">
 		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
-		<delete dir="${lib.dir}" includeEmptyDirs="true" failonerror="false" />
 	</target>
 
 	<target name="build" depends="resolve">

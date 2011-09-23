@@ -108,7 +108,9 @@ public class LinkSmartStatus extends HttpServlet {
 		if(stream != null) {
 			/* Set headers. */
 			response.setHeader("Content-Type", contentType);
-			response.setHeader("Cache-Control", "max-age=604800");
+			response.setHeader("Expires", "0" );
+			response.setHeader("Cache-Control", "no-cache, max-age=0, private" );
+//			response.setHeader("Cache-Control", "max-age=604800");
 			
 			/* Send response header with Content-Length. */
 			response.setStatus(200);

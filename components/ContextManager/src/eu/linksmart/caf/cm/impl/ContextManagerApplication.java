@@ -942,7 +942,7 @@ public class ContextManagerApplication implements ContextManager {
 	}
 
 	@Override
-	public boolean notify(String topic, Part[] parts) throws RemoteException {
+	public Boolean notify(String topic, Part[] parts) throws RemoteException {
 		return ctxEventManager.handleEvent(topic, parts);
 	}
 

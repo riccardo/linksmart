@@ -16,3 +16,6 @@ Bundle-ClassPath: .,
  lib/bcpg-jdk16-146.jar,
  lib/bcprov-jdk16-138.jar
 Service-Component: OSGI-INF/component.xml
+Export-Package: eu.linksmart.security.trustmanager.trustmodel.openpgp.config,
+ eu.linksmart.security.trustmanager.trustmodel.password.config,
+ eu.linksmart.security.trustmanager.trustmodel.x509.config

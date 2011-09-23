@@ -1205,7 +1205,7 @@ public class ContextManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public boolean notify(java.lang.String in0, eu.linksmart.eventmanager.Part[] in1) throws java.rmi.RemoteException {
+    public java.lang.Boolean notify(java.lang.String in0, eu.linksmart.eventmanager.Part[] in1) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1221,22 +1221,21 @@ public class ContextManagerSoapBindingStub extends org.apache.axis.client.Stub i
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {in0, in1});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return ((java.lang.Boolean) _resp).booleanValue();
-            } catch (java.lang.Exception _exception) {
-                return ((java.lang.Boolean) org.apache.axis.utils.JavaUtils.convert(_resp, boolean.class)).booleanValue();
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-  throw axisFaultException;
-}
+        try {        
+        	java.lang.Object _resp = _call.invoke(new java.lang.Object[] {in0, in1});
+        	if (_resp instanceof java.rmi.RemoteException) {
+        		throw (java.rmi.RemoteException)_resp;
+        	}else {
+	            extractAttachments(_call);
+	            try {
+	                return (java.lang.Boolean) _resp;
+	            } catch (java.lang.Exception _exception) {
+	                return (java.lang.Boolean) org.apache.axis.utils.JavaUtils.convert(_resp, boolean.class);
+	            }
+        	}
+		  } catch (org.apache.axis.AxisFault axisFaultException) {
+			  throw axisFaultException;
+		  }
     }
 
     public java.lang.String DACcallback(java.lang.String in0, java.lang.String in1) throws java.rmi.RemoteException {

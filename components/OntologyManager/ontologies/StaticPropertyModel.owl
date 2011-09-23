@@ -17,7 +17,6 @@
   You should have received a copy of the GNU Lesser General Public
   License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<?xml version="1.0"?>
 <rdf:RDF
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns="http://localhost/ontologies/StaticPropertyModel.owl#"

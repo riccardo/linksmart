@@ -82,4 +82,10 @@ public class NullTrustModel implements TrustModel {
 		// No configuration
 		return null;
 	}
+
+	@Override
+	public Class getConfiguratorClass() {
+		// No configuration
+		return null;
+	}
 }

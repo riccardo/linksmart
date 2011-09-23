@@ -171,7 +171,9 @@ function printNetworkManagers(){
 	}
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
-		
+
+	/*
+	
 	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
 		document.getElementById("tableContainer").style.width = "98%";
 		document.getElementById("infoContentwrap").style.width = "98%";
@@ -200,6 +202,7 @@ function printNetworkManagers(){
 		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
 		scrollBarUpdate (handled, handlerer, tracker);
 	}
+	*/
 }
 
 function printLocalHids() {
@@ -223,6 +226,7 @@ function printLocalHids() {
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
 		
+/*
 	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
 		document.getElementById("tableContainer").style.width = "98%";
 		document.getElementById("infoContentwrap").style.width = "98%";
@@ -251,6 +255,7 @@ function printLocalHids() {
 		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
 		scrollBarUpdate (handled, handlerer, tracker);
 	}
+	*/
 }
 
 function printRemoteHids() {
@@ -273,7 +278,8 @@ function printRemoteHids() {
 	}
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
-		
+	
+	/*
 	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
 		document.getElementById("tableContainer").style.width = "98%";
 		document.getElementById("infoContentwrap").style.width = "98%";
@@ -302,6 +308,7 @@ function printRemoteHids() {
 		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
 		scrollBarUpdate (handled, handlerer, tracker);
 	}
+	*/
 }
 
 function printNetworkManagerSearch() {
@@ -333,6 +340,7 @@ function printNetworkManagerSearch() {
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
 		
+	/*
 	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
 		document.getElementById("tableContainer").style.width = "98%";
 		document.getElementById("infoContentwrap").style.width = "98%";
@@ -362,6 +370,7 @@ function printNetworkManagerSearch() {
 		scrollBarUpdate (handled, handlerer, tracker);
 
 	}
+	*/
 }
 
 /*function getNetworkManagers(){

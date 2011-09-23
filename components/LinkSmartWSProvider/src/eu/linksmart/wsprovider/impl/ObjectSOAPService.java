@@ -110,6 +110,10 @@ public class ObjectSOAPService {
 		this.classNames = classNames;
 		this.security = coreSecurity;
 		
+		if (serviceObject == null) {
+			log.error("Unable to create SOAP Service for " + serviceName);
+		}
+		
 		if(allowedMethods == null) {
 			this.allowedMethods = getMethodNames(classNames);
 		}

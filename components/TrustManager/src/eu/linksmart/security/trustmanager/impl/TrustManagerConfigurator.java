@@ -75,6 +75,7 @@ public class TrustManagerConfigurator extends Configurator {
 		super(context, Logger.getLogger(TrustManagerConfigurator.class.getName()),
 			TM_PID, CONFIGURATION_FILE);
 		this.trustManager = trustManager;
+		trustManager.setCurrentTrustModel(this.get(TM_TRUST_MODEL));
 	}
 	
 	/**

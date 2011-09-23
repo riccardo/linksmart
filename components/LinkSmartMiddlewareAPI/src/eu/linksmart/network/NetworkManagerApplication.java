@@ -507,4 +507,6 @@ public interface NetworkManagerApplication extends java.rmi.Remote {
 		String requesterAttributes, String query, long maxTime,
 		int maxResponses) throws java.rmi.RemoteException;
 
+	public String getHIDByAttributesAsString(String requesterHID, 
+			String requesterAttributes, String query, long maxTime, int maxHIDs) throws java.rmi.RemoteException;
 }

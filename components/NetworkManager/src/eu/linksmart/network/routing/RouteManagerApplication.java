@@ -89,8 +89,7 @@ public class RouteManagerApplication {
 	 */
 	public RouteManagerApplication(NetworkManagerApplicationSoapBindingImpl nm) {
 		this.nm = nm;
-		defaultToDeny = Boolean.valueOf(
-				NetworkManagerConfigurator.DEFAULT_TO_DENY_ON_PEP_RESPONSE).booleanValue();
+		defaultToDeny = Boolean.parseBoolean((String)NetworkManagerConfigurator.DEFAULT_TO_DENY_ON_PEP_RESPONSE);
 	}
 
 	/**

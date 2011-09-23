@@ -185,6 +185,8 @@ implements eu.linksmart.network.NetworkManagerApplication {
 		} catch (Exception e) {
 			logger.error("Error registering servlets", e);
 		}
+		
+		createSecureSession();
 	}
 
 	/**
@@ -235,12 +237,8 @@ implements eu.linksmart.network.NetworkManagerApplication {
 		this.trustManager = trustManagerService;
 		this.trustManagerOsgi = true;
 
-		if(!SecureSessionControllerImpl.instanceCreated() && cryptoManager != null && trustManager != null){
-			SecureSessionControllerImpl.createInstance(this, 
-					this.cryptoManager, this.trustManager);
-		}
-		//initialize securitylibrary
-		getCryptoManager();
+		//initialize inside security
+		createSecureSession();
 	}
 
 	/**
@@ -280,12 +278,8 @@ implements eu.linksmart.network.NetworkManagerApplication {
 	protected void cryptoBind(CryptoManager cryptoManagerService) {
 		this.cryptoManager = cryptoManagerService;
 
-		if(!SecureSessionControllerImpl.instanceCreated() && cryptoManager != null && trustManager != null){
-			SecureSessionControllerImpl.createInstance(this, 
-					this.cryptoManager, this.trustManager);
-		}
-		//initialize securitylibrary
-		getCryptoManager();
+		//initialize inside security
+		createSecureSession();
 	}
 
 	/**
@@ -1601,9 +1595,47 @@ implements eu.linksmart.network.NetworkManagerApplication {
 
 		return (String[]) res.toArray(new String[res.size()]);
 	}
+	/**
+	 * This method searches the LinkSmart Network for the HIDs that contain 
+	 * attributes matching the query.
+	 * The format of the queries is as follows:<br><p>
+	 * <code>(key1=cond1)&&(key2=cond2*)...</code>
+	 * <p>
+	 * The developer can also use the magic caracter (*) for unexact queries. 
+	 * Due to this, the number of HIDs mathing the query might be greater than 
+	 * one. Thus, the developer can specify the number of HIDs that will be 
+	 * returned and the maximun time to wait for resolving the query. 
+	 * For example, if <code>maxTime = 60000 ms</code> and <code>maxHIDs = 4</code> 
+	 * the result of the query will be returned when the Network Manager gets 4 
+	 * (or more) HIDs that match the query or when maxTime expires.
+	 * <p>
+	 * The allowed values for maxTime are 0 (search only locally) - 60000 (ms) 
+	 * and for maxHIDs 0 (best effort) - maxInt
+	 * 	 *  
+	 * @param requesterHID Your own HID.
+	 * @param requesterAttributes The target's HID.
+	 * @param query Query for HID attributes: <code>(key1=cond1) && 
+	 * (key2=cond2*)...</code>  * = non-exact match
+	 * @param maxTime Maximum time to wait for query resolution in ms
+	 * @param maxHIDs Maximum number of HIDs to return
+	 * @return a String, with the resulting HID separated by blank spaces 
+	 * (0.0.0.1 0.0.0.2 ...)
+	 */
+	public String getHIDByAttributesAsString(String requesterHID, 
+			String requesterAttributes, String query, long maxTime, int maxHIDs) {
+
+		String[] result =  getHIDByAttributes(requesterHID, requesterAttributes, query, maxTime, maxHIDs);
+		String ret = "";
+		for(String s : result){
+			ret += s + " ";			
+		} 
+		return ret;
+	}
 
 	protected void setTrustThreshold(double trustth){
-		SecureSessionControllerImpl.getInstance().setTrustThreshold(trustth);
+		if(SecureSessionControllerImpl.getInstance() != null){
+			SecureSessionControllerImpl.getInstance().setTrustThreshold(trustth);
+		}
 	}
 
 	protected void setTrustManager(String url){
@@ -1628,16 +1660,28 @@ implements eu.linksmart.network.NetworkManagerApplication {
 		}else{
 			if(this.trustManagerOsgi){
 				//if there is OSGi bundle TrustManager then switching to external TM is not allowed
-				logger.error("There is a local TrustManager available. Change to external is not allowed!");
+				logger.warn("There is a local TrustManager available. Change to external is not allowed!");
 			}else{
 				//get trustmanager service over url
 				try {
 					this.trustManager = (TrustManager)this.wsclientProvider.getRemoteWSClient(TrustManager.class.getName(), 
 							(String)configurator.get(NetworkManagerConfigurator.TRUSTMANAGER_URL), false);
+					createSecureSession();
 				} catch (Exception e) {
-					logger.error("Error getting TrustManager service.", e);
+					logger.error("Error getting TrustManager service.");
 				}
 			}
+		}
+	}
+	
+	private void createSecureSession(){
+		if(!SecureSessionControllerImpl.instanceCreated() && cryptoManager != null && trustManager != null && configurator != null){
+			SecureSessionControllerImpl.createInstance(this, 
+					this.cryptoManager, this.trustManager);
+			//set trust threshold
+			SecureSessionControllerImpl.getInstance().setTrustThreshold(
+					Double.valueOf(
+					(String)configurator.get(NetworkManagerConfigurator.TRUSTMANAGER_TRUST_THRESHOLD)));
 		}
 	}
 }

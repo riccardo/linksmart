@@ -260,7 +260,7 @@ public class DAqCApplication implements DataAcquisitionComponent {
 		return protocolHub.cancelSubscription(protocol, subscriberHid, dataId);
 	}
 
-	public boolean notify(String topic, Part[] parts) {
+	public Boolean notify(String topic, Part[] parts) {
 		DAqCProtocol protocol =
 				protocolHub.getProtocol(PushProtocol.PROTOCOL_ID);
 		if (protocol == null)

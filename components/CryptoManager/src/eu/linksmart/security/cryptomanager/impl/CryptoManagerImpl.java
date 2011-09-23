@@ -53,9 +53,14 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.security.cryptomanager.CryptoManager;
+import eu.linksmart.security.cryptomanager.SecurityLevel;
+import eu.linksmart.security.cryptomanager.cryptoprocessor.CryptoMessageFormatProcessor;
+import eu.linksmart.security.cryptomanager.cryptoprocessor.impl.CryptoFactory;
+import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
 
 /**
  * Facade class that provides all public methods from different
@@ -64,32 +69,19 @@ import eu.linksmart.security.cryptomanager.CryptoManager;
  * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * 
  */
-public class CryptoManagerImpl implements CryptoManager {
+public class CryptoManagerImpl implements CryptoManager{
 
 	private static Logger logger = Logger.getLogger(CryptoManagerImpl.class);
 
-	final static public String CONFIGFOLDERPATH = "CryptoManager/conf";
+	final static public String CONFIGFOLDERPATH = "CryptoManager/configuration";
 	final static public String RESOURCEFOLDERPATH = "CryptoManager/resources";
-	public static BundleContext context;
 
+	private static BundleContext context;
 	private CryptoMessageFormatProcessor cryptoProcessor;
 	private KeyManager keyManager;
+	private CryptoManagerConfigurator configurator;
+	private boolean activated = false;
 
-//	static {
-//		// Use this bundle's classloader to initialise the bouncycastle crypto
-//		// provider
-//		logger.debug("Loading bouncycastle crypto provider");
-//		try {
-//			ClassLoader sysloader =
-//					Thread.currentThread().getContextClassLoader();
-//			Class<?> loaded =
-//					sysloader.loadClass(BouncyCastleProvider.class.getName());
-//			Provider provider = (Provider) loaded.newInstance();
-//			Security.addProvider(provider);
-//		} catch (Throwable t) {
-//			logger.error(t);
-//		}
-//	}
 
 	/**
 	 * Constructor.
@@ -108,16 +100,16 @@ public class CryptoManagerImpl implements CryptoManager {
 		// Extract all configuration files from the bundle's jar file to the
 		// filesystem
 		Hashtable<String, String> HashFilesExtract =
-				new Hashtable<String, String>();
+			new Hashtable<String, String>();
 		logger.debug("Deploying CryptoManager config files");
 		HashFilesExtract.put(CONFIGFOLDERPATH + "/cryptomanager-config.xml",
-				"cryptomanager-config.xml");
-		HashFilesExtract.put(CONFIGFOLDERPATH + "/create_cryptomanager_db.sql",
-				"create_cryptomanager_db.sql");
-		HashFilesExtract.put(CONFIGFOLDERPATH + "/delete_cryptomanager_db.sql",
-				"delete_cryptomanager_db.sql");
+		"configuration/cryptomanager-config.xml");
+		HashFilesExtract.put(RESOURCEFOLDERPATH + "/create_cryptomanager_db.sql",
+		"resources/create_cryptomanager_db.sql");
+		HashFilesExtract.put(RESOURCEFOLDERPATH + "/delete_cryptomanager_db.sql",
+		"resources/delete_cryptomanager_db.sql");
 		HashFilesExtract
-				.put(CONFIGFOLDERPATH + "/keystore.bks", "keystore.bks");
+		.put(RESOURCEFOLDERPATH + "/keystore.bks", "resources/keystore.bks");
 		try {
 			JarUtil.createFolder(CONFIGFOLDERPATH);
 			JarUtil.createFolder(RESOURCEFOLDERPATH);
@@ -131,9 +123,9 @@ public class CryptoManagerImpl implements CryptoManager {
 		logger.debug("Loading bouncycastle crypto provider");
 		try {
 			ClassLoader sysloader =
-					Thread.currentThread().getContextClassLoader();
+				Thread.currentThread().getContextClassLoader();
 			Class<?> loaded =
-					sysloader.loadClass(BouncyCastleProvider.class.getName());
+				sysloader.loadClass(BouncyCastleProvider.class.getName());
 			Provider provider = (Provider) loaded.newInstance();
 			Security.addProvider(provider);
 		} catch (Throwable t) {
@@ -142,19 +134,19 @@ public class CryptoManagerImpl implements CryptoManager {
 
 		keyManager = CryptoFactory.getKeyManagerInstance();
 		cryptoProcessor = CryptoFactory.getProcessorInstance("XMLEnc");
-		System.out.println("CryptoManager Activated");
+		configurator = new CryptoManagerConfigurator(this, context.getBundleContext());
+		configurator.registerConfiguration();
+		activated = true;
+
+		logger.debug("CryptoManager Activated");
 	}
 
 	/**
 	 * Clean up work when bundle is stopped
 	 */
 	protected void deactivate(ComponentContext context) {
-
-		try {
-			DBmanagement.getInstance().close();
-		} catch (Exception e) {
-			logger.warn(e.getMessage(), e);
-		}
+		activated = false;
+		keyManager.close();
 	}
 
 	/*
@@ -166,6 +158,19 @@ public class CryptoManagerImpl implements CryptoManager {
 	 */
 	public String decrypt(String encryptedData) {
 		return cryptoProcessor.decrypt(encryptedData);
+	}
+
+	protected void configurationBind(ConfigurationAdmin ca){
+		if (configurator != null) {
+			configurator.bindConfigurationAdmin(ca);
+			if (activated == true) {
+				configurator.registerConfiguration();
+			}
+		}
+	}
+
+	protected void configurationUnbind(ConfigurationAdmin ca){
+		configurator.unbindConfigurationAdmin(ca);
 	}
 
 	/*
@@ -201,7 +206,7 @@ public class CryptoManagerImpl implements CryptoManager {
 	 * getEncodedPublicKeyByIdentifier(java.lang.String)
 	 */
 	public byte[] getEncodedPublicKeyByIdentifier(String identifier)
-			throws KeyStoreException {
+	throws KeyStoreException {
 		return keyManager.getEncodedPublicKeyByIdentifier(identifier);
 	}
 
@@ -212,7 +217,7 @@ public class CryptoManagerImpl implements CryptoManager {
 	 * getCertificateByIdentifier(java.lang.String)
 	 */
 	public Certificate getCertificateByIdentifier(String identifier)
-			throws KeyStoreException {
+	throws KeyStoreException {
 		return keyManager.getCertificateByIdentifier(identifier);
 	}
 
@@ -266,6 +271,17 @@ public class CryptoManagerImpl implements CryptoManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#storePublicKeyWithFriendlyName
+	 * (java.lang.String, java.lang.String, java.lang.String)
+	 */
+	public boolean storePublicKeyWithFriendlyName(String friendlyName, String encodedCert, String algorithm_id) throws SQLException {
+		return keyManager.storePublicKey(friendlyName, encodedCert, algorithm_id);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#verify(java.lang
 	 * .String)
 	 */
@@ -285,7 +301,7 @@ public class CryptoManagerImpl implements CryptoManager {
 			InvalidKeyException, SecurityException, SignatureException,
 			IllegalStateException, NoSuchProviderException {
 		String certRef =
-				keyManager.generateCertificateWithAttributes(xmlAttributes);
+			keyManager.generateCertificateWithAttributes(xmlAttributes);
 
 		keyManager.addPrivateKeyForHID(hid, certRef);
 		keyManager.addCertificateForHID(hid, certRef);
@@ -293,50 +309,7 @@ public class CryptoManagerImpl implements CryptoManager {
 				+ ". Available by ref " + certRef);
 		return certRef;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#generateSymmetricKey
-	 * ()
-	 */
-	public String generateSymmetricKey() throws SQLException,
-			NoSuchAlgorithmException, IOException, KeyStoreException,
-			CertificateException, InvalidKeyException, SecurityException,
-			SignatureException, IllegalStateException, NoSuchProviderException {
-		return keyManager.generateSymmetricKey();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#generateSymmetricKey
-	 * (java.lang.String)
-	 */
-	public String generateSymmetricKey(String algo) throws SQLException,
-			NoSuchAlgorithmException, IOException, KeyStoreException,
-			CertificateException, InvalidKeyException, SecurityException,
-			SignatureException, IllegalStateException, NoSuchProviderException {
-		return keyManager.generateSymmetricKey();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#storeSymmetricKey
-	 * (java.lang.String, java.lang.String)
-	 */
-	public String storeSymmetricKey(String algo, String key)
-			throws SQLException, NoSuchAlgorithmException, IOException,
-			KeyStoreException, CertificateException, InvalidKeyException,
-			SecurityException, SignatureException, IllegalStateException,
-			NoSuchProviderException {
-		return keyManager.storeSymmetricKey(algo, key);
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -344,8 +317,8 @@ public class CryptoManagerImpl implements CryptoManager {
 	 * getAttributesFromCertificate(java.lang.String)
 	 */
 	public Properties getAttributesFromCertificate(String identifier)
-			throws SQLException, KeyStoreException,
-			CertificateEncodingException {
+	throws SQLException, KeyStoreException,
+	CertificateEncodingException {
 		return keyManager.getAttributesFromCertificate(identifier);
 	}
 
@@ -359,20 +332,152 @@ public class CryptoManagerImpl implements CryptoManager {
 		return keyManager.getPrivateKeyByIdentifier(identifier);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
+	 * generateKeyFromPasswordWithFriendlyName(java.lang.String, java.lang.String, int, java.lang.String)
+	 */
+	public boolean generateKeyFromPasswordWithFriendlyName(String friendlyName, String password, int keyLength, String algo) throws SQLException, KeyStoreException{
+		return keyManager.generateKeyFromPassword(friendlyName, password, keyLength, algo);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
+	 * generateKeyFromPassword(java.lang.String, int, java.lang.String)
+	 */
+	public String generateKeyFromPassword(String password, int keyLength, String algo){
+		return keyManager.generateKeyFromPassword(password, keyLength, algo);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#generateSymmetricKey
+	 * ()
+	 */
+	public String generateSymmetricKey() throws SQLException,
+	NoSuchAlgorithmException, IOException, KeyStoreException,
+	CertificateException, InvalidKeyException, SecurityException,
+	SignatureException, IllegalStateException, NoSuchProviderException {
+		return keyManager.generateSymmetricKey(getKeySize(SecurityLevel.MIDDLE, "AES"), "AES");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
+	 * generateSymmetricKey(java.lang.String)
+	 */
+	public String generateSymmetricKey(String algo) throws SQLException,
+			NoSuchAlgorithmException, IOException, KeyStoreException,
+			CertificateException, InvalidKeyException, SecurityException,
+			SignatureException, IllegalStateException, NoSuchProviderException {
+		return generateSymmetricKey(getKeySize(SecurityLevel.MIDDLE, algo), algo);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#generateSymmetricKey
+	 * (java.lang.String)
+	 */
+	public String generateSymmetricKey(int keySize, String algo) throws SQLException,
+	NoSuchAlgorithmException, IOException, KeyStoreException,
+	CertificateException, InvalidKeyException, SecurityException,
+	SignatureException, IllegalStateException, NoSuchProviderException {
+		return keyManager.generateSymmetricKey(keySize, algo);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#generateSymmetricKeyWithFriendlyName
+	 * (java.lang.String, int, java.lang.String)
+	 */
+	public boolean generateSymmetricKeyWithFriendlyName(String friendlyName, int keysize, String algo) throws InvalidKeyException, NoSuchAlgorithmException, KeyStoreException, CertificateException, SecurityException, SignatureException, IllegalStateException, NoSuchProviderException, SQLException, IOException
+	{
+		return keyManager.generateSymmetricKey(friendlyName, keysize, algo);		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#storeSymmetricKey
+	 * (java.lang.String, java.lang.String)
+	 */
+	public String storeSymmetricKey(String algo, String key)
+	throws SQLException, NoSuchAlgorithmException, IOException,
+	KeyStoreException, CertificateException, InvalidKeyException,
+	SecurityException, SignatureException, IllegalStateException,
+	NoSuchProviderException {
+		return keyManager.storeSymmetricKey(algo, key);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.linksmart.security.cryptomanager.impl.CryptoManager#storeSymmetricKeyWithFriendlyName
+	 * (java.lang.String, java.lang.String, java.lang.String)
+	 */
+	public boolean storeSymmetricKeyWithFriendlyName(String friendlyName, String algo, String key) throws SQLException{
+		return keyManager.storeSymmetricKey(friendlyName, algo, key);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
+	 * addCertificateForHID(java.lang.String, java.lang.String)
+	 */
 	public boolean addCertificateForHID(String hid, String certRef) {
 		return keyManager.addCertificateForHID(hid, certRef);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
+	 * addPrivateKeyForHID(java.lang.String, java.lang.String)
+	 */
 	public boolean addPrivateKeyForHID(String hid, String certRef) {
 		return keyManager.addPrivateKeyForHID(hid, certRef);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
+	 * getCertificateReference(java.lang.String)
+	 */
 	public String getCertificateReference(String hid) {
 		return keyManager.getCertRefByHID(hid);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
+	 * getPrivateKeyReference(java.lang.String)
+	 */
 	public String getPrivateKeyReference(String hid) {
 		return keyManager.getPrivateKeyRefByHID(hid);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
+	 * getKeySize(eu.linksmart.security.cryptomanager.SecurityLevel, java.lang.String)
+	 */
+	public int getKeySize(SecurityLevel level, String algo){
+		return configurator.getKeySize(level, algo);
+	}
 }

@@ -13,7 +13,7 @@
  * stipulating liability clauses corresponding to German law.
  */
 /**
- * Copyright (C) 2006-2010 
+ * Copyright (C) 2006-2010 [Fraunhofer FIT]
  *                         the HYDRA consortium, EU project IST-2005-034891
  *
  * This file is part of LinkSmart.
@@ -30,6 +30,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * EventSubscriberServiceLocator.java
  *
@@ -39,7 +40,6 @@
 
 package eu.linksmart.eventmanager.subscriber.client;
 
-@SuppressWarnings("serial")
 public class EventSubscriberServiceLocator extends org.apache.axis.client.Service implements eu.linksmart.eventmanager.subscriber.client.EventSubscriberService {
 
     public EventSubscriberServiceLocator() {
@@ -54,39 +54,39 @@ public class EventSubscriberServiceLocator extends org.apache.axis.client.Servic
         super(wsdlLoc, sName);
     }
 
-    // Use to get a proxy class for EventSubscriber
-    private java.lang.String EventSubscriber_address = "http://localhost:8082/axis/services/EventSubscriber";
+    // Use to get a proxy class for BasicHttpBinding_EventSubscriber
+    private java.lang.String BasicHttpBinding_EventSubscriber_address = "http://localhost:8000/SubscriberService";
 
-    public java.lang.String getEventSubscriberAddress() {
-        return EventSubscriber_address;
+    public java.lang.String getBasicHttpBinding_EventSubscriberAddress() {
+        return BasicHttpBinding_EventSubscriber_address;
     }
 
     // The WSDD service name defaults to the port name.
-    private java.lang.String EventSubscriberWSDDServiceName = "EventSubscriber";
+    private java.lang.String BasicHttpBinding_EventSubscriberWSDDServiceName = "BasicHttpBinding_EventSubscriber";
 
-    public java.lang.String getEventSubscriberWSDDServiceName() {
-        return EventSubscriberWSDDServiceName;
+    public java.lang.String getBasicHttpBinding_EventSubscriberWSDDServiceName() {
+        return BasicHttpBinding_EventSubscriberWSDDServiceName;
     }
 
-    public void setEventSubscriberWSDDServiceName(java.lang.String name) {
-        EventSubscriberWSDDServiceName = name;
+    public void setBasicHttpBinding_EventSubscriberWSDDServiceName(java.lang.String name) {
+        BasicHttpBinding_EventSubscriberWSDDServiceName = name;
     }
 
-    public eu.linksmart.eventmanager.EventSubscriber getEventSubscriber() throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.eventmanager.EventSubscriber getBasicHttpBinding_EventSubscriber() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
-            endpoint = new java.net.URL(EventSubscriber_address);
+            endpoint = new java.net.URL(BasicHttpBinding_EventSubscriber_address);
         }
         catch (java.net.MalformedURLException e) {
             throw new javax.xml.rpc.ServiceException(e);
         }
-        return getEventSubscriber(endpoint);
+        return getBasicHttpBinding_EventSubscriber(endpoint);
     }
 
-    public eu.linksmart.eventmanager.EventSubscriber getEventSubscriber(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.eventmanager.EventSubscriber getBasicHttpBinding_EventSubscriber(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
-            eu.linksmart.eventmanager.subscriber.client.EventSubscriberSoapBindingStub _stub = new eu.linksmart.eventmanager.subscriber.client.EventSubscriberSoapBindingStub(portAddress, this);
-            _stub.setPortName(getEventSubscriberWSDDServiceName());
+            eu.linksmart.eventmanager.subscriber.client.BasicHttpBinding_EventSubscriberStub _stub = new eu.linksmart.eventmanager.subscriber.client.BasicHttpBinding_EventSubscriberStub(portAddress, this);
+            _stub.setPortName(getBasicHttpBinding_EventSubscriberWSDDServiceName());
             return _stub;
         }
         catch (org.apache.axis.AxisFault e) {
@@ -94,8 +94,8 @@ public class EventSubscriberServiceLocator extends org.apache.axis.client.Servic
         }
     }
 
-    public void setEventSubscriberEndpointAddress(java.lang.String address) {
-        EventSubscriber_address = address;
+    public void setBasicHttpBinding_EventSubscriberEndpointAddress(java.lang.String address) {
+        BasicHttpBinding_EventSubscriber_address = address;
     }
 
     /**
@@ -106,8 +106,8 @@ public class EventSubscriberServiceLocator extends org.apache.axis.client.Servic
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (eu.linksmart.eventmanager.EventSubscriber.class.isAssignableFrom(serviceEndpointInterface)) {
-                eu.linksmart.eventmanager.subscriber.client.EventSubscriberSoapBindingStub _stub = new eu.linksmart.eventmanager.subscriber.client.EventSubscriberSoapBindingStub(new java.net.URL(EventSubscriber_address), this);
-                _stub.setPortName(getEventSubscriberWSDDServiceName());
+                eu.linksmart.eventmanager.subscriber.client.BasicHttpBinding_EventSubscriberStub _stub = new eu.linksmart.eventmanager.subscriber.client.BasicHttpBinding_EventSubscriberStub(new java.net.URL(BasicHttpBinding_EventSubscriber_address), this);
+                _stub.setPortName(getBasicHttpBinding_EventSubscriberWSDDServiceName());
                 return _stub;
             }
         }
@@ -122,13 +122,13 @@ public class EventSubscriberServiceLocator extends org.apache.axis.client.Servic
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
-	public java.rmi.Remote getPort(javax.xml.namespace.QName portName, Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
+    public java.rmi.Remote getPort(javax.xml.namespace.QName portName, Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         if (portName == null) {
             return getPort(serviceEndpointInterface);
         }
         java.lang.String inputPortName = portName.getLocalPart();
-        if ("EventSubscriber".equals(inputPortName)) {
-            return getEventSubscriber();
+        if ("BasicHttpBinding_EventSubscriber".equals(inputPortName)) {
+            return getBasicHttpBinding_EventSubscriber();
         }
         else  {
             java.rmi.Remote _stub = getPort(serviceEndpointInterface);
@@ -146,7 +146,7 @@ public class EventSubscriberServiceLocator extends org.apache.axis.client.Servic
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://eventmanager.linksmart.eu", "EventSubscriber"));
+            ports.add(new javax.xml.namespace.QName("http://eventmanager.linksmart.eu", "BasicHttpBinding_EventSubscriber"));
         }
         return ports.iterator();
     }
@@ -156,8 +156,8 @@ public class EventSubscriberServiceLocator extends org.apache.axis.client.Servic
     */
     public void setEndpointAddress(java.lang.String portName, java.lang.String address) throws javax.xml.rpc.ServiceException {
         
-if ("EventSubscriber".equals(portName)) {
-            setEventSubscriberEndpointAddress(address);
+if ("BasicHttpBinding_EventSubscriber".equals(portName)) {
+            setBasicHttpBinding_EventSubscriberEndpointAddress(address);
         }
         else 
 { // Unknown Port Name

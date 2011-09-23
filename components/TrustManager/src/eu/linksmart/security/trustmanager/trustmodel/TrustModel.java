@@ -67,7 +67,14 @@ public interface TrustModel {
 	void initialize();
 	
 	/**
-	 * Returns the configurator class
+	 * Returns the configurator class interface
+	 * @return Interface which can be used to get service reference
 	 */
 	Class getConfigurator();
+	
+	/**
+	 * The specific configurator object of the trust model
+	 * @return Class which should be instantiated as configurator
+	 */
+	Class getConfiguratorClass();
 }

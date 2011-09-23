@@ -88,8 +88,7 @@ public class NetworkManagerConfigurator extends Configurator {
 	//TODO Currently this functionality is not provided
 //	public static final String USE_CORE_SECURITY = "Security.UseCoreSecurity";
 	
-	public static final String DEFAULT_TO_DENY_ON_PEP_RESPONSE
-			= "Security.Access.DefaultDeny";
+	public static final String DEFAULT_TO_DENY_ON_PEP_RESPONSE = "Security.Access.DefaultDeny";
 	
 	private NetworkManagerApplicationSoapBindingImpl nm;
 	
@@ -105,6 +104,9 @@ public class NetworkManagerConfigurator extends Configurator {
 		super(context, Logger.getLogger(NetworkManagerConfigurator.class.getName()),
 			NM_PID, CONFIGURATION_FILE);
 		this.nm = nm;
+		//set initial configurations
+		this.nm.setTrustThreshold(Double.valueOf((String)this.getConfiguration().get(TRUSTMANAGER_TRUST_THRESHOLD)));
+		this.nm.setTrustManager((String)this.getConfiguration().get(TRUSTMANAGER_URL));
 	}
 	
 	/**

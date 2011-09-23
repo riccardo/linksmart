@@ -166,7 +166,7 @@ public class LocalSubscription {
 	public EventSubscriber _getPort() {
 		if (port == null) {
 			try {
-				port =new EventSubscriberServiceLocator().getEventSubscriber(getURL());
+				port =new EventSubscriberServiceLocator().getBasicHttpBinding_EventSubscriber(getURL());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
