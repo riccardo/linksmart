@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<energypolicy>
+  <name>Disco Ball Policy</name>
+  <id>1</id>
+  <device>Disco Ball</device>
+
+  <disable>
+    <service name="SwitchServices" action="TurnOn" type="time">
+      <starttime>00:00:00</starttime>
+      <endtime>06:00:00</endtime>
+      <message>Action not enabled between 00:00-06:00</message>
+    </service>
+    <service name="SwitchServices" action="TurnOn" type="energy">
+      <maxenergyexceeded/>
+      <message>Action not enabled because the maximum energy consumption for one day has been exceeded</message>
+    </service>
+    <service name="SwitchServices" action="TurnOn" type="operation">
+      <maxoperationsexceeded/>
+      <message>Action not enabled because the maximum number of uses per day has been exceeded</message>
+    </service>
+  </disable>
+
+  <standby type="time">
+    <starttime>60</starttime>
+    <endtime></endtime>
+  </standby>
+
+  <standby type="energy">
+    <energyconsumption>60</energyconsumption>
+  </standby>
+
+  <operation>
+    <maxswitchonperday>30</maxswitchonperday>
+    <maxenergyperday>600</maxenergyperday>
+    <maxperweek>3000</maxperweek>
+  </operation>
+
+</energypolicy>

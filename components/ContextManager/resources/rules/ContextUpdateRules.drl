@@ -1,0 +1,50 @@
+package eu.linksmart.caf.cm.rules.drl
+
+
+import eu.linksmart.caf.cm.action.*;
+import eu.linksmart.caf.cm.managers.*;
+import eu.linksmart.caf.cm.engine.*;
+import eu.linksmart.caf.cm.engine.contexts.*;
+import eu.linksmart.caf.cm.engine.event.*;
+import eu.linksmart.caf.cm.engine.members.*;
+import eu.linksmart.caf.cm.engine.environment.*;
+import java.util.*;
+
+global eu.linksmart.caf.cm.action.ActionManager actionManager;
+
+declare Event 
+ 	@role( event )
+ end
+ 	
+/**
+	When ThenAction objects are published into the Working Memory, they
+	are picked up here, processed by the ActionManager, and retracted.
+*/
+rule "Process Action with ActionManager"
+salience 100
+no-loop true
+	when
+		$todoAction : ThenAction()
+	then 
+		actionManager.processAction($todoAction);
+		retract($todoAction);
+		
+end
+
+/**	
+	After an EventInstance has been processed by all rules, the associated 
+	"historical" Event is created, inheriting all values from it, and inserted 
+	into the WorkingMemory, and the EventInstance retracted
+*/
+rule "When EventInstance processed"
+salience -100000000000
+	when
+		$instance : EventInstance()
+	then
+		Event event = new Event($instance.getTopic(), $instance.getSource());
+		event.inherit($instance);
+		retract($instance);
+		insert(event);
+end
+
+

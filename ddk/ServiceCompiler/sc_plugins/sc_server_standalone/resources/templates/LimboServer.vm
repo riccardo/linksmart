@@ -1,0 +1,33 @@
+package $package;
+
+
+public class $class {
+
+	private int port;
+	private static String endpoint; 
+	private static $serverThread st;
+	private ServerProtocol protocol; 
+
+	public $class(ServerProtocol protocol, int thePort) {
+		this.port = thePort;
+		this.protocol = protocol;
+	}
+
+	public void runServer(){
+		st = new $serverThread(this.protocol, this.port);
+		st.start();
+		endpoint = st.getServerURL();		
+	}
+
+	public static void stopServer() {
+		st.setStopped(true);
+		st.interrupt();
+		st = null;	
+	}
+	
+	public static String getEndpoint() {
+		return endpoint;
+	}
+
+}
+

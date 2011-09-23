@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ResultList xmlns="http://qosmanager.linksmart.eu">
+<Rank>
+<Position Validness="qualified">1</Position>
+<DevicePID>Siemens 44</DevicePID>
+<DeviceURI>http://localhost/ontologies/Device.owl#Thermometer_47151208_96f7_4f50_ad76_fcc76a2d8f5b/RUNTIME_f1c308bf_1a9f_416b_bb64_ed65b9aed0c6</DeviceURI>
+<ServiceOperation>GetIndoorTemperature,Siemens 44.</ServiceOperation>
+<Rate>5</Rate>
+<AveragePercentage>50.0%</AveragePercentage>
+<Details>
+<Detail>
+<Property>device:hasEnergyProfile/energy:lifeTime/energy:startCost</Property>
+<Value>99.0</Value>
+<Unit>Not_Specified</Unit>
+</Detail>
+<Detail>
+<Property>device:hasHardware/hardware:hasSpeaker/hardware:maxVolumeLevel</Property>
+<Value>80.0</Value>
+<Unit>Not_Specified</Unit>
+</Detail>
+<Detail>
+<Property>service:serviceCost</Property>
+<Value>7.0</Value>
+<Unit>unit:EUR</Unit>
+</Detail>
+<Detail>
+<Property>service:hasOutput/service:parameterUnit</Property>
+<Value>unit:Celsius</Value>
+<Unit>Not_Specified</Unit>
+</Detail>
+</Details>
+</Rank>
+<Rank>
+<Position Validness="qualified">2</Position>
+<DevicePID>TX 123</DevicePID>
+<DeviceURI>http://localhost/ontologies/Device.owl#Thermometer_6a77f56e_c3ab_409d_8d0f_b8fd27416a1f/RUNTIME_084abb1f_e2d3_4c25_b24f_07ff9e6592fc</DeviceURI>
+<ServiceOperation>GetIndoorTemperature,TX 123.</ServiceOperation>
+<Rate>4</Rate>
+<AveragePercentage>25.0%</AveragePercentage>
+<Details>
+<Detail>
+<Property>device:hasEnergyProfile/energy:lifeTime/energy:startCost</Property>
+<Value>34.0</Value>
+<Unit>Not_Specified</Unit>
+</Detail>
+<Detail>
+<Property>device:hasHardware/hardware:hasSpeaker/hardware:maxVolumeLevel</Property>
+<Value>30.0</Value>
+<Unit>Not_Specified</Unit>
+</Detail>
+<Detail>
+<Property>service:serviceCost</Property>
+<Value>20.0</Value>
+<Unit>Not_Specified</Unit>
+</Detail>
+<Detail>
+<Property>service:hasOutput/service:parameterUnit</Property>
+<Value>unit:Celsius</Value>
+<Unit>Not_Specified</Unit>
+</Detail>
+</Details>
+</Rank>
+</ResultList>

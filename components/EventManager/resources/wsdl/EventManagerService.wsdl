@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions targetNamespace="http://eventmanager.linksmart.eu" name="EventManagerService" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:impl="http://eventmanager.linksmart.eu" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://eventmanager.linksmart.eu" schemaLocation="EventManagerService_schema1.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="subscribe">
+    <part name="topic" type="xsd:string"/>
+    <part name="subscriber" type="xsd:anyURI"/>
+  </message>
+  <message name="subscribeResponse">
+    <part name="result" type="xsd:boolean"/>
+  </message>
+  <message name="subscribeWithHID">
+    <part name="topic" type="xsd:string"/>
+    <part name="hid" type="xsd:string"/>
+  </message>
+  <message name="subscribeWithHIDResponse">
+    <part name="result" type="xsd:boolean"/>
+  </message>
+  <message name="unsubscribe">
+    <part name="topic" type="xsd:string"/>
+    <part name="subscriber" type="xsd:anyURI"/>
+  </message>
+  <message name="unsubscribeResponse">
+    <part name="result" type="xsd:boolean"/>
+  </message>
+  <message name="unsubscribeWithHID">
+    <part name="topic" type="xsd:string"/> 
+    <part name="hid" type="xsd:string"/>
+  </message>
+  <message name="unsubscribeWithHIDResponse">
+    <part name="result" type="xsd:boolean"/>
+  </message> 
+  <message name="getSubscriptions"/>
+  <message name="getSubscriptionsResponse">
+    <part name="result" type="impl:subscriptions"/>
+  </message>
+  <message name="clearSubscriptions">
+    <part name="subscriber" type="xsd:anyURI"/>
+  </message>
+  <message name="clearSubscriptionsResponse">
+    <part name="result" type="xsd:boolean"/>
+  </message>
+  <message name="clearSubscriptionsWithHID">
+    <part name="hid" type="xsd:string"/>
+  </message>
+  <message name="clearSubscriptionsWithHIDResponse">
+    <part name="result" type="xsd:boolean"/>
+  </message>
+  <message name="publish">
+    <part name="topicPattern" type="xsd:string"/>
+    <part name="event" type="impl:event"/>
+  </message>
+  <message name="publishResponse">
+    <part name="result" type="xsd:boolean"/>
+  </message>
+  <message name="setPriority">
+    <part name="topic" type="xsd:string"/>
+    <part name="priority" type="xsd:int"/>
+  </message>
+  <message name="setPriorityResponse">
+    <part name="result" type="xsd:boolean"/>
+  </message>
+  <portType name="EventManager">
+    <operation name="subscribe" parameterOrder="topic subscriber">
+      <input message="impl:subscribe" name="subscribe"/>
+      <output message="impl:subscribeResponse" name="subscribeResponse"/>
+    </operation>
+    <operation name="subscribeWithHID" parameterOrder="topic hid">
+      <input message="impl:subscribeWithHID" name="subscribeWithHID"/>
+      <output message="impl:subscribeWithHIDResponse" name="subscribeWithHIDResponse"/>
+    </operation>
+    <operation name="unsubscribe" parameterOrder="topic subscriber">
+      <input message="impl:unsubscribe" name="unsubscribe"/>
+      <output message="impl:unsubscribeResponse" name="unsubscribeResponse"/>
+    </operation>
+    <operation name="unsubscribeWithHID" parameterOrder="topic hid">
+      <input message="impl:unsubscribeWithHID" name="unsubscribeWithHID"/>
+      <output message="impl:unsubscribeWithHIDResponse" name="unsubscribeWithHIDResponse"/>
+    </operation>
+    <operation name="getSubscriptions" parameterOrder="">
+      <input message="impl:getSubscriptions" name="getSubscriptions"/>
+      <output message="impl:getSubscriptionsResponse" name="getSubscriptionsResponse"/>
+    </operation>
+    <operation name="clearSubscriptions" parameterOrder="subscriber">
+      <input message="impl:clearSubscriptions" name="clearSubscriptions"/>
+      <output message="impl:clearSubscriptionsResponse" name="clearSubscriptionsResponse"/>
+    </operation>
+    <operation name="clearSubscriptionsWithHID" parameterOrder="hid">
+      <input message="impl:clearSubscriptionsWithHID" name="clearSubscriptionsWithHID"/>
+      <output message="impl:clearSubscriptionsWithHIDResponse" name="clearSubscriptionsWithHIDResponse"/>
+    </operation>
+    <operation name="publish" parameterOrder="topicPattern event">
+      <input message="impl:publish" name="publish"/>
+      <output message="impl:publishResponse" name="publishResponse"/>
+    </operation>
+    <operation name="setPriority" parameterOrder="topic priority">
+      <input message="impl:setPriority" name="setPriority"/>
+      <output message="impl:setPriorityResponse" name="setPriorityResponse"/>
+    </operation>  
+  </portType>
+  <binding name="EventManagerPortBinding" type="impl:EventManager">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc"/>
+    <operation name="subscribe">
+      <soap:operation soapAction="subscribe"/>
+      <input name="subscribe">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="subscribeResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="subscribeWithHID">
+    <soap:operation soapAction="subscribeWithHID"/>
+      <input name="subscribeWithHID">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="subscribeWithHIDResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="unsubscribe">
+      <soap:operation soapAction="unsubscribe"/>
+      <input name="unsubscribe">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="unsubscribeResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="unsubscribeWithHID">
+      <soap:operation soapAction="unsubscribeWithHID"/>
+      <input name="unsubscribeWithHID">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="unsubscribeWithHIDResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="getSubscriptions">
+      <soap:operation soapAction="getSubscriptions"/>
+      <input name="getSubscriptions">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="getSubscriptionsResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="clearSubscriptions">
+      <soap:operation soapAction="clearSubscriptions"/>
+      <input name="clearSubscriptions">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="clearSubscriptionsResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="clearSubscriptionsWithHID">
+      <soap:operation soapAction="clearSubscriptionsWithHID"/>
+      <input name="clearSubscriptionsWithHID">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="clearSubscriptionsWithHIDResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="publish">
+      <soap:operation soapAction="publish"/>
+      <input name="publish">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="publishResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="setPriority">
+      <soap:operation soapAction="setPriority"/>
+      <input name="setPriority">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </input>
+      <output name="setPriorityResponse">
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="EventManagerService">
+    <port name="EventManagerPort" binding="impl:EventManagerPortBinding">
+      <soap:address location="http://localhost"/>
+    </port>
+  </service>
+</definitions>
+

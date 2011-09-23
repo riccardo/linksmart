@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://ws.upnp.linksmart.tid.es" xmlns:linksmart="http://linksmart.eu/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://ws.upnp.linksmart.tid.es" xmlns:intf="http://ws.upnp.linksmart.tid.es" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+
+
+   <wsdl:message name="SwitchOnRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="SwitchOnResponse">
+   
+       <wsdl:part name="switchstatus" type="soapenc:string"/>
+
+   </wsdl:message>
+   
+   <wsdl:message name="SwitchOffRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="SwitchOffResponse">
+   
+       <wsdl:part name="switchstatus" type="soapenc:string"/>
+
+   </wsdl:message>
+    <wsdl:message name="GetSwitchStatusRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="GetSwitchStatusResponse">
+   
+       <wsdl:part name="switchstatus" type="soapenc:string"/>
+
+   </wsdl:message>
+   
+    <wsdl:message name="SetSwitchStatusRequest">
+    	<wsdl:part name="switchstatus" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="SetSwitchStatusResponse">
+   
+       <wsdl:part name="setswitchstatusresult" type="soapenc:string"/>
+
+   </wsdl:message>
+   
+   
+
+   <wsdl:portType name="ZWSwitch">
+
+      <wsdl:operation name="SwitchOn">
+
+         <wsdl:input message="impl:SwitchOnRequest" name="SwitchOnRequest"/>
+
+         <wsdl:output message="impl:SwitchOnResponse" name="SwitchOnResponse"/>
+
+      </wsdl:operation>
+      <wsdl:operation name="SwitchOff">
+
+         <wsdl:input message="impl:SwitchOffRequest" name="SwitchOffRequest"/>
+
+         <wsdl:output message="impl:SwitchOffResponse" name="SwitchOffResponse"/>
+
+      </wsdl:operation>
+      <wsdl:operation name="GetSwitchStatus">
+
+         <wsdl:input message="impl:GetSwitchStatusRequest" name="GetSwitchStatusRequest"/>
+
+         <wsdl:output message="impl:GetSwitchStatusResponse" name="GetSwitchStatusResponse"/>
+
+      </wsdl:operation>
+      <wsdl:operation name="SetSwitchStatus">
+
+         <wsdl:input message="impl:SetSwitchStatusRequest" name="SetSwitchStatusRequest"/>
+
+         <wsdl:output message="impl:SetSwitchStatusResponse" name="SetSwitchStatusResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="ZWSwitchSoapBinding" type="impl:ZWSwitch">
+	
+	<linksmart:binding device="file:./resources/Device.owl#HomeProZWSwitch1"/>
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="SwitchOn">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="SwitchOnRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://ws.upnp.linksmart.tid.es" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="SwitchOnResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://ws.upnp.linksmart.tid.es" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+      
+      <wsdl:operation name="SwitchOff">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="SwitchOffRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://ws.upnp.linksmart.tid.es" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="SwitchOffResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://ws.upnp.linksmart.tid.es" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+      <wsdl:operation name="GetSwitchStatus">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="GetSwitchStatusRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://ws.upnp.linksmart.tid.es" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="GetSwitchStatusResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://ws.upnp.linksmart.tid.es" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+      <wsdl:operation name="SetSwitchStatus">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="SetSwitchStatusRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://ws.upnp.linksmart.tid.es" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="SetSwitchStatusResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://ws.upnp.linksmart.tid.es" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="SwitchService">
+
+      <wsdl:port binding="impl:ZWSwitchSoapBinding" name="ZWSwitch">
+
+         <wsdlsoap:address location="http://localhost:8082/axis/services/ZWSwitch"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

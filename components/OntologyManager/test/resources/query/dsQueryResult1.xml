@@ -1,0 +1,61 @@
+<response>
+  <device pid="pid 2" uri="http://device.uri/2">
+    <deviceProperties>
+      <property name="service:serviceOperation">
+        <value>http://service.uri/21/operation</value>
+        <value>http://service.uri/22/operation</value>
+      </property>
+      <property name="rdf:type">
+        <value>device:PhysicalDevice</value>
+      </property>
+      <property name="device:clonedFromTemplate">
+        <value>http://device.uri/2/template</value>
+      </property>
+    </deviceProperties>
+    <service operation="http://service.uri/22/operation">
+      <serviceProperties>
+        <property name="service:serviceOperation">
+          <value>http://service.uri/22/operation</value>
+        </property>
+        <property name="service:parameterUnit">
+          <value>unit:Celsius</value>
+        </property>
+      </serviceProperties>
+    </service>
+  </device>
+  <device pid="pid 1" uri="http://device.uri/1">
+    <deviceProperties>
+      <property name="service:serviceOperation">
+        <value>http://service.uri/11/operation</value>
+        <value>http://service.uri/13/operation</value>
+        <value>http://service.uri/12/operation</value>
+      </property>
+      <property name="rdf:type">
+        <value>device:PhysicalDevice</value>
+      </property>
+      <property name="device:clonedFromTemplate">
+        <value>http://device.uri/1/template</value>
+      </property>
+    </deviceProperties>
+    <service operation="http://service.uri/11/operation">
+      <serviceProperties>
+        <property name="service:serviceOperation">
+          <value>http://service.uri/11/operation</value>
+        </property>
+        <property name="service:parameterUnit">
+          <value>unit:Celsius</value>
+        </property>
+      </serviceProperties>
+    </service>
+    <service operation="http://service.uri/13/operation">
+      <serviceProperties>
+        <property name="service:serviceOperation">
+          <value>http://service.uri/13/operation</value>
+        </property>
+        <property name="service:parameterUnit">
+          <value>unit:Celsius</value>
+        </property>
+      </serviceProperties>
+    </service>
+  </device>
+</response>

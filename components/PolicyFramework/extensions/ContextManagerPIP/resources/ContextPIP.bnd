@@ -1,0 +1,20 @@
+# ContextPIP bnd instructions
+# 
+# Note that we are currently still using a separate MANIFEST.MF and 
+# declarative services activation file; this will change in a future 
+# version. Changes in this file will not directly change the 
+# MANIFEST.MF until then.
+#
+# author Marco Tiemann
+#
+-manifest= ../META-INF/MANIFEST.MF
+version=1.0.0
+Include-Resource: OSGI-INF/DSActivation.xml=../OSGI-INF/DSActivation.xml
+Export-Package: eu.linksmart.caf.policy.attribute.*;version=${version}
+Service-Component: OSGI-INF/DSActivation.xml
+Bundle-Version: ${version}
+Bundle-Name: LinkSmart Context PIP
+Bundle-Description: eu.linksmart.caf.policy.attribute
+Bundle-Vendor: University of Reading
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

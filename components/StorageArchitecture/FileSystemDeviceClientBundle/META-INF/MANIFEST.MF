@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FileSystemDeviceClientBundle Plug-in
+Bundle-SymbolicName: FileSystemDeviceClientBundle
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: eu.linksmart.storage.helper,
+ org.apache.log4j
+Bundle-ClassPath: lib/commons-lang-2.4.jar,
+ lib/jdom.jar,
+ lib/NetworkManagerClient.jar,
+ .
+Export-Package: eu.linksmart.limbo.filesystemdevice.client

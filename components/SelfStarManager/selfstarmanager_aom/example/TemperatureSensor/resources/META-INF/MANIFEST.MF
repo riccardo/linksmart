@@ -1,0 +1,7 @@
+MIDlet-Name: HydraTemperatureSensor
+MIDlet-Version: 1.0.0
+MIDlet-Vendor: Oracle
+MIDlet-1: TemperatureSampler, , eu.linksmart.TemperatureSampler
+MicroEdition-Profile: IMP-1.0
+MicroEdition-Configuration: CLDC-1.1
+Event-Manager: http://127.0.0.1:8000

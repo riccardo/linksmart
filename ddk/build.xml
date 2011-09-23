@@ -1,0 +1,28 @@
+<project name="hydra.ddk" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+ <target name="fail">
+  <fail message="please use the ant build file in the parent directory"/>
+ </target>
+
+ <target name="make-all" depends="make-java,make-dotnet" description="make Java and .NET">
+ </target>
+ 
+ <target name="make-java">
+   <ant dir="ServiceCompiler" target="make"/>
+ </target>
+ 
+
+ <target name="make-dotnet">
+ </target>
+ 
+ <target name="test-all" depends="test-java,test-dotnet">
+ </target>
+ 
+ <target name="test-java" depends="make-java">
+  <ant dir="ServiceCompiler" target="test"/>
+ </target>
+ 
+ <target name="test-dotnet" depends="make-dotnet">
+ </target>
+ 
+</project>

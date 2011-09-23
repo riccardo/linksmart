@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="CryptoManagerAdmin">
+   <implementation class="eu.linksmart.security.cryptomanager.impl.CryptoManagerAdminImpl"/>
+    <property name="service.remote.registration" type="String" value="true"/>
+    <service>
+       <provide interface="eu.linksmart.security.cryptomanager.CryptoManagerAdmin"/>
+    </service>
+</scr:component>

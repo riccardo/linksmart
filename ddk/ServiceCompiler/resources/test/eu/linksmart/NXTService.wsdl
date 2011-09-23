@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions targetNamespace="http://nxtservice.linksmart.eu" name="NXTService" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:impl="http://nxtservice.linksmart.eu" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:rest="http://linksmart.eu/rest/">
+
+  <types>
+  	<xsd:schema>
+      <xsd:import namespace="http://nxtservice.linksmart.eu" schemaLocation="NXTService_schema.xsd"/>
+    </xsd:schema>
+  </types>
+  
+  <message name="lightsensorRequest"/>
+  <message name="lightsensorResponse">
+    <part name="result" type="impl:lightsensor"/>
+  </message>
+
+  <message name="touchsensorRequest"/>
+  <message name="touchsensorResponse">
+    <part name="result" type="impl:touchsensor"/>
+  </message>
+
+  <portType name="NXTServicePort">
+    <operation name="lightsensor">
+      <input message="impl:lightsensorRequest" name="lightsensorRequest"/>
+      <output message="impl:lightsensorResponse" name="lightsensorResponse"/>
+    </operation>
+    <operation name="touchsensor">
+      <input message="impl:touchsensorRequest" name="touchsensorRequest"/>
+      <output message="impl:touchsensorResponse" name="touchsensorResponse"/>
+    </operation>
+  </portType>
+
+  <binding name="NXTServiceBinding" type="impl:NXTServicePort">
+    <operation name="lightsensor">
+      <rest:operation location="/sensor/light" method="GET"/>
+      <input name="lightsensorRequest"/>
+      <output name="lightsensorResponse"/>
+    </operation>
+    <operation name="touchsensor">
+      <rest:operation location="/sensor/touch" method="GET"/>
+      <input name="touchsensorRequest"/>
+      <output name="touchsensorResponse"/>
+    </operation>
+  </binding>
+
+  <service name="NXTService">
+    <port name="NXTServicePort" binding="impl:NXTServiceBinding"/>
+    <rest:address location="/"/>
+  </service>
+</definitions>
+

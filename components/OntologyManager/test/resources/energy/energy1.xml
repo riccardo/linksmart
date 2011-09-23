@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<energyprofile>
+  <energyclassification>
+    <system>ABC</system>
+    <value>D</value>
+  </energyclassification>
+
+  <energyconsumption>
+    
+    <effect>
+      <mode name="sitting">
+        <max>0</max>
+        <average>1</average>
+        <start>2</start>
+        <shutdown>3</shutdown>
+      </mode>
+    </effect>
+  </energyconsumption>
+
+  <energygeneration>
+    <effect>
+    <mode name="standby">
+      <max>3</max>
+      <average>2</average>
+      <start>1</start>
+      <shutdown>0</shutdown>
+    </mode>
+    </effect>
+  </energygeneration>
+
+  <operation>
+    <minimumruntime unit="minutes">1</minimumruntime>
+  </operation>
+  <lifetime>
+    <expected unit="minutes">1</expected>
+    <startcost unit="minutes">2</startcost>
+    <shutdowncost unit="minutes">3</shutdowncost>
+  </lifetime>
+
+
+</energyprofile>

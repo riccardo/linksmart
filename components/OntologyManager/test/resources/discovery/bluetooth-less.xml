@@ -1,0 +1,74 @@
+<bluetoothdevice>
+  <name>Z600</name>
+  <majordevicetype>Phone</majordevicetype>
+  <deviceclass>CellPhonePhone</deviceclass>
+  <bluetoothservices>
+    <bluetoothservice>
+      <servicename>Dial-up Networking</servicename>
+      <serviceID>00000000-0000-0000-0000-000000000000</serviceID>
+      <servicetypes>
+        <servicetype>Dialup Networking</servicetype>
+        <servicetype>Generic Networking</servicetype>
+      </servicetypes>
+      <securityPolicy>0</securityPolicy>
+    </bluetoothservice>
+    <bluetoothservice>
+      <servicename>Voice gateway</servicename>
+      <serviceID>00000000-0000-0000-0000-000000000000</serviceID>
+      <servicetypes>
+        <servicetype>Headset Audio Gateway</servicetype>
+        <servicetype>Generic Audio</servicetype>
+      </servicetypes>
+      <securityPolicy>0</securityPolicy>
+    </bluetoothservice>
+    <bluetoothservice>
+      <servicename>Serial Port 1</servicename>
+      <serviceID>00000000-0000-0000-0000-000000000000</serviceID>
+      <servicetypes>
+        <servicetype>Serial Port</servicetype>
+      </servicetypes>
+      <securityPolicy>0</securityPolicy>
+    </bluetoothservice>
+    <bluetoothservice>
+      <servicename>Serial Port 2</servicename>
+      <serviceID>00000000-0000-0000-0000-000000000000</serviceID>
+      <servicetypes>
+        <servicetype>Serial Port</servicetype>
+      </servicetypes>
+      <securityPolicy>0</securityPolicy>
+    </bluetoothservice>
+    <bluetoothservice>
+      <servicename>OBEX Object Push</servicename>
+      <serviceID>00000000-0000-0000-0000-000000000000</serviceID>
+      <servicetypes>
+        <servicetype>OBEX Object Push</servicetype>
+      </servicetypes>
+      <securityPolicy>889992452</securityPolicy>
+    </bluetoothservice>
+    <bluetoothservice>
+      <servicename>IrMC Synchronization</servicename>
+      <serviceID>00000000-0000-0000-0000-000000000000</serviceID>
+      <servicetypes>
+        <servicetype>IrMC Sync</servicetype>
+      </servicetypes>
+      <securityPolicy>0</securityPolicy>
+    </bluetoothservice>
+    <bluetoothservice>
+      <servicename>HF Voice gateway</servicename>
+      <serviceID>00000000-0000-0000-0000-000000000000</serviceID>
+      <servicetypes>
+        <servicetype>Handsfree Audio Gateway</servicetype>
+        <servicetype>Generic Audio</servicetype>
+      </servicetypes>
+      <securityPolicy>0</securityPolicy>
+    </bluetoothservice>
+    <bluetoothservice>
+      <servicename>OBEX Basic Imaging</servicename>
+      <serviceID>00000000-0000-0000-0000-000000000000</serviceID>
+      <servicetypes>
+        <servicetype>Imaging Responder</servicetype>
+      </servicetypes>
+      <securityPolicy>0</securityPolicy>
+    </bluetoothservice>
+  </bluetoothservices>
+</bluetoothdevice>

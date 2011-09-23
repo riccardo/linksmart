@@ -1,0 +1,30 @@
+package $package;
+
+$imports
+
+public class $class implements BundleActivator {
+
+	static BundleContext context;
+
+
+	private $device device;
+
+	private void doServiceRegistration() {
+
+		this.device = new $device(context);
+		this.device.doServiceRegistration();
+
+	}
+
+	
+	public void start(BundleContext context) throws Exception {
+		${class}.context = context;
+		doServiceRegistration();
+	}
+
+	
+	public void stop(BundleContext context) throws Exception {
+		this.device.doServiceUnregistration();
+		this.device = null;
+	}
+}

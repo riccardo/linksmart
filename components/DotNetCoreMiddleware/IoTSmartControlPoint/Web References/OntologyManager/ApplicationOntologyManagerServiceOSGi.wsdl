@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:intf="http://aom.IoT.eu.com" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:impl="http://aom.IoT.eu.com" targetNamespace="http://aom.IoT.eu.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types />
+  <wsdl:message name="getConfigurationsRequest" />
+  <wsdl:message name="getDevicesWithServicesResponse">
+    <wsdl:part name="getDevicesWithServicesReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getDeviceTreeResponse">
+    <wsdl:part name="getDeviceTreeReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getPropertyAnnotationModelRequest" />
+  <wsdl:message name="removeRequest1">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+    <wsdl:part name="in2" type="xsd:string" />
+    <wsdl:part name="in3" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getClassLiteralsResponse">
+    <wsdl:part name="getClassLiteralsReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="assignDiscoveryInfoRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="createTestingRuntimeCloneResponse">
+    <wsdl:part name="createTestingRuntimeCloneReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getDevicesRequest1">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="addValueResponse1">
+    <wsdl:part name="addValueReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getPropertyAnnotationModelResponse">
+    <wsdl:part name="getPropertyAnnotationModelReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="dumpRequest" />
+  <wsdl:message name="getDeviceTypesRequest" />
+  <wsdl:message name="assignPIDResponse">
+    <wsdl:part name="assignPIDReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="removeResponse1">
+    <wsdl:part name="removeReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="createDeviceTemplateRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="createDeviceTemplateResponse">
+    <wsdl:part name="createDeviceTemplateReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="assignDiscoveryInfoResponse">
+    <wsdl:part name="assignDiscoveryInfoReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="assignEventModelResponse">
+    <wsdl:part name="assignEventModelReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getDevicesResponse1">
+    <wsdl:part name="getDevicesReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getInstanceTreeRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="dumpResponse">
+    <wsdl:part name="dumpReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="createTestingRuntimeCloneRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="assignEnergyProfileRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="removeDeviceResponse">
+    <wsdl:part name="removeDeviceReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getSCPDResponse">
+    <wsdl:part name="getSCPDReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="addValueRequest1">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+    <wsdl:part name="in2" type="xsd:string" />
+    <wsdl:part name="in3" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getDevicesWithServicesResponse1">
+    <wsdl:part name="getDevicesWithServicesReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="cleanResponse">
+    <wsdl:part name="cleanReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="assignConfigurationRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getSCPDRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getTreeResponse">
+    <wsdl:part name="getTreeReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getDevicesWithServicesRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+    <wsdl:part name="in2" type="xsd:string" />
+    <wsdl:part name="in3" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="addValueResponse">
+    <wsdl:part name="addValueReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="resolveDeviceResponse">
+    <wsdl:part name="resolveDeviceReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="assignEventModelRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getTreeRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getClassLiteralsRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="addFormDataRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getDevicesRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="removeResponse">
+    <wsdl:part name="removeReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getDeviceTreeRequest" />
+  <wsdl:message name="assignConfigurationResponse">
+    <wsdl:part name="assignConfigurationReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="resolveDeviceRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="removeRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+    <wsdl:part name="in2" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="assignEnergyProfileResponse">
+    <wsdl:part name="assignEnergyProfileReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="cleanRequest" />
+  <wsdl:message name="getDevicesResponse">
+    <wsdl:part name="getDevicesReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="addFormDataResponse">
+    <wsdl:part name="addFormDataReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="updateResponse">
+    <wsdl:part name="updateReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="removeDeviceRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getInstanceTreeResponse">
+    <wsdl:part name="getInstanceTreeReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="addValueRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+    <wsdl:part name="in2" type="xsd:string" />
+    <wsdl:part name="in3" type="xsd:string" />
+    <wsdl:part name="in4" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getDeviceTypesResponse">
+    <wsdl:part name="getDeviceTypesReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getConfigurationsResponse">
+    <wsdl:part name="getConfigurationsReturn" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="updateRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getDevicesWithServicesRequest1">
+    <wsdl:part name="in0" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="assignPIDRequest">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:portType name="ApplicationOntologyManager">
+    <wsdl:operation name="getTree" parameterOrder="in0 in1">
+      <wsdl:input name="getTreeRequest" message="impl:getTreeRequest" />
+      <wsdl:output name="getTreeResponse" message="impl:getTreeResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="addValue" parameterOrder="in0 in1 in2 in3 in4">
+      <wsdl:input name="addValueRequest" message="impl:addValueRequest" />
+      <wsdl:output name="addValueResponse" message="impl:addValueResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="addValue" parameterOrder="in0 in1 in2 in3">
+      <wsdl:input name="addValueRequest1" message="impl:addValueRequest1" />
+      <wsdl:output name="addValueResponse1" message="impl:addValueResponse1" />
+    </wsdl:operation>
+    <wsdl:operation name="createDeviceTemplate" parameterOrder="in0">
+      <wsdl:input name="createDeviceTemplateRequest" message="impl:createDeviceTemplateRequest" />
+      <wsdl:output name="createDeviceTemplateResponse" message="impl:createDeviceTemplateResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="assignPID" parameterOrder="in0 in1">
+      <wsdl:input name="assignPIDRequest" message="impl:assignPIDRequest" />
+      <wsdl:output name="assignPIDResponse" message="impl:assignPIDResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="removeDevice" parameterOrder="in0">
+      <wsdl:input name="removeDeviceRequest" message="impl:removeDeviceRequest" />
+      <wsdl:output name="removeDeviceResponse" message="impl:removeDeviceResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="resolveDevice" parameterOrder="in0">
+      <wsdl:input name="resolveDeviceRequest" message="impl:resolveDeviceRequest" />
+      <wsdl:output name="resolveDeviceResponse" message="impl:resolveDeviceResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="createTestingRuntimeClone" parameterOrder="in0 in1">
+      <wsdl:input name="createTestingRuntimeCloneRequest" message="impl:createTestingRuntimeCloneRequest" />
+      <wsdl:output name="createTestingRuntimeCloneResponse" message="impl:createTestingRuntimeCloneResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="assignDiscoveryInfo" parameterOrder="in0 in1">
+      <wsdl:input name="assignDiscoveryInfoRequest" message="impl:assignDiscoveryInfoRequest" />
+      <wsdl:output name="assignDiscoveryInfoResponse" message="impl:assignDiscoveryInfoResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="assignEventModel" parameterOrder="in0 in1">
+      <wsdl:input name="assignEventModelRequest" message="impl:assignEventModelRequest" />
+      <wsdl:output name="assignEventModelResponse" message="impl:assignEventModelResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="assignEnergyProfile" parameterOrder="in0 in1">
+      <wsdl:input name="assignEnergyProfileRequest" message="impl:assignEnergyProfileRequest" />
+      <wsdl:output name="assignEnergyProfileResponse" message="impl:assignEnergyProfileResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="assignConfiguration" parameterOrder="in0 in1">
+      <wsdl:input name="assignConfigurationRequest" message="impl:assignConfigurationRequest" />
+      <wsdl:output name="assignConfigurationResponse" message="impl:assignConfigurationResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getDevices" parameterOrder="in0">
+      <wsdl:input name="getDevicesRequest" message="impl:getDevicesRequest" />
+      <wsdl:output name="getDevicesResponse" message="impl:getDevicesResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getDevices" parameterOrder="in0 in1">
+      <wsdl:input name="getDevicesRequest1" message="impl:getDevicesRequest1" />
+      <wsdl:output name="getDevicesResponse1" message="impl:getDevicesResponse1" />
+    </wsdl:operation>
+    <wsdl:operation name="getDeviceTypes">
+      <wsdl:input name="getDeviceTypesRequest" message="impl:getDeviceTypesRequest" />
+      <wsdl:output name="getDeviceTypesResponse" message="impl:getDeviceTypesResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getDevicesWithServices" parameterOrder="in0 in1 in2 in3">
+      <wsdl:input name="getDevicesWithServicesRequest" message="impl:getDevicesWithServicesRequest" />
+      <wsdl:output name="getDevicesWithServicesResponse" message="impl:getDevicesWithServicesResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getDevicesWithServices" parameterOrder="in0">
+      <wsdl:input name="getDevicesWithServicesRequest1" message="impl:getDevicesWithServicesRequest1" />
+      <wsdl:output name="getDevicesWithServicesResponse1" message="impl:getDevicesWithServicesResponse1" />
+    </wsdl:operation>
+    <wsdl:operation name="addFormData" parameterOrder="in0 in1">
+      <wsdl:input name="addFormDataRequest" message="impl:addFormDataRequest" />
+      <wsdl:output name="addFormDataResponse" message="impl:addFormDataResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getDeviceTree">
+      <wsdl:input name="getDeviceTreeRequest" message="impl:getDeviceTreeRequest" />
+      <wsdl:output name="getDeviceTreeResponse" message="impl:getDeviceTreeResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getInstanceTree" parameterOrder="in0">
+      <wsdl:input name="getInstanceTreeRequest" message="impl:getInstanceTreeRequest" />
+      <wsdl:output name="getInstanceTreeResponse" message="impl:getInstanceTreeResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getClassLiterals" parameterOrder="in0">
+      <wsdl:input name="getClassLiteralsRequest" message="impl:getClassLiteralsRequest" />
+      <wsdl:output name="getClassLiteralsResponse" message="impl:getClassLiteralsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getPropertyAnnotationModel">
+      <wsdl:input name="getPropertyAnnotationModelRequest" message="impl:getPropertyAnnotationModelRequest" />
+      <wsdl:output name="getPropertyAnnotationModelResponse" message="impl:getPropertyAnnotationModelResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getSCPD" parameterOrder="in0">
+      <wsdl:input name="getSCPDRequest" message="impl:getSCPDRequest" />
+      <wsdl:output name="getSCPDResponse" message="impl:getSCPDResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="remove" parameterOrder="in0 in1 in2">
+      <wsdl:input name="removeRequest" message="impl:removeRequest" />
+      <wsdl:output name="removeResponse" message="impl:removeResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="remove" parameterOrder="in0 in1 in2 in3">
+      <wsdl:input name="removeRequest1" message="impl:removeRequest1" />
+      <wsdl:output name="removeResponse1" message="impl:removeResponse1" />
+    </wsdl:operation>
+    <wsdl:operation name="clean">
+      <wsdl:input name="cleanRequest" message="impl:cleanRequest" />
+      <wsdl:output name="cleanResponse" message="impl:cleanResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="update" parameterOrder="in0">
+      <wsdl:input name="updateRequest" message="impl:updateRequest" />
+      <wsdl:output name="updateResponse" message="impl:updateResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="dump">
+      <wsdl:input name="dumpRequest" message="impl:dumpRequest" />
+      <wsdl:output name="dumpResponse" message="impl:dumpResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getConfigurations">
+      <wsdl:input name="getConfigurationsRequest" message="impl:getConfigurationsRequest" />
+      <wsdl:output name="getConfigurationsResponse" message="impl:getConfigurationsResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ApplicationOntologyManagerServiceOSGiSoapBinding" type="impl:ApplicationOntologyManager">
+    <wsdlsoap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" />
+    <wsdl:operation name="getTree">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getTreeRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getTreeResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addValue">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="addValueRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="addValueResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addValue">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="addValueRequest1">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="addValueResponse1">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createDeviceTemplate">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="createDeviceTemplateRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="createDeviceTemplateResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="assignPID">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="assignPIDRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="assignPIDResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="removeDevice">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="removeDeviceRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="removeDeviceResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="resolveDevice">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="resolveDeviceRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="resolveDeviceResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createTestingRuntimeClone">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="createTestingRuntimeCloneRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="createTestingRuntimeCloneResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="assignDiscoveryInfo">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="assignDiscoveryInfoRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="assignDiscoveryInfoResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="assignEventModel">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="assignEventModelRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="assignEventModelResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="assignEnergyProfile">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="assignEnergyProfileRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="assignEnergyProfileResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="assignConfiguration">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="assignConfigurationRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="assignConfigurationResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDevices">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getDevicesRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getDevicesResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDevices">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getDevicesRequest1">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getDevicesResponse1">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDeviceTypes">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getDeviceTypesRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getDeviceTypesResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDevicesWithServices">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getDevicesWithServicesRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getDevicesWithServicesResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDevicesWithServices">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getDevicesWithServicesRequest1">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getDevicesWithServicesResponse1">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addFormData">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="addFormDataRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="addFormDataResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDeviceTree">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getDeviceTreeRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getDeviceTreeResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInstanceTree">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getInstanceTreeRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getInstanceTreeResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getClassLiterals">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getClassLiteralsRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getClassLiteralsResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPropertyAnnotationModel">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getPropertyAnnotationModelRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getPropertyAnnotationModelResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSCPD">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getSCPDRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getSCPDResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="remove">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="removeRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="removeResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="remove">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="removeRequest1">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="removeResponse1">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clean">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="cleanRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="cleanResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="update">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="updateRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="updateResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="dump">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="dumpRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="dumpResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getConfigurations">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="getConfigurationsRequest">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:input>
+      <wsdl:output name="getConfigurationsResponse">
+        <wsdlsoap:body use="literal" namespace="http://aom.IoT.eu.com" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ApplicationOntologyManagerService">
+    <wsdl:port name="ApplicationOntologyManagerServiceOSGi" binding="impl:ApplicationOntologyManagerServiceOSGiSoapBinding">
+      <wsdlsoap:address location="http://127.0.0.1:8082/axis/services/ApplicationOntologyManagerServiceOSGi" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

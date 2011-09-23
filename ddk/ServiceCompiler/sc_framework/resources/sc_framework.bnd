@@ -1,0 +1,3 @@
+Export-Package: eu.linksmart.limbo.backend,eu.linksmart.limbo.constants,eu.linksmart.limbo.frontend,eu.linksmart.limbo.generator,eu.linksmart.limbo.repository,,eu.linksmart.limbo.library   
+Private-Package: eu.linksmart.limbo.impl
+Service-Component=eu.linksmart.limbo.impl.*

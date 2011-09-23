@@ -1,0 +1,884 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns="file:./resources/Hardware.owl#"
+  xml:base="file:./resources/Hardware.owl">
+  <owl:Ontology rdf:about="file:./resources/Hardware.owl"/>
+  <owl:Class rdf:ID="DeviceHardware">
+    <rdfs:subClassOf>
+      <rdf:Description rdf:ID="Hardware">
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >This is the base class for the entities that define the delivery context.</rdfs:comment>
+      </rdf:Description>
+    </rdfs:subClassOf>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents the hardware in a device</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="MemoryUnit">
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents some memory used in a device. It might, for example, be built-in memory that is part of the device, or it might be removable memory on some form of storage card.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="BluetoothProfile">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class describes a specific Bluetooth profile used to support a particular user scenario.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+  </owl:Class>
+  <owl:Class rdf:ID="DeviceName">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents the name of a device</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Bluetooth">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents Bluetooth support.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+  </owl:Class>
+  <owl:Class rdf:ID="NetworkBearer">
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents a network bearer in a delivery context.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Battery">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents a battery in a device</rdfs:comment>
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Power"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="WorkingMode">
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Camera">
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents a camera in a device.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Display">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents a visual display on a device.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Device">
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents a device in the delivery context</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Network">
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents the network in a delivery context</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="CPU">
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class describes a central processing unit associated with a device.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Hardware.owl#Power">
+    <rdfs:subClassOf rdf:resource="file:./resources/Hardware.owl#Hardware"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:ID="display">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#Display"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents a display associated with a device.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="powerSupply">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Device"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#Power"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="supportedNetworkBearers">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property holds the set of network bearers supported by the device.</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#NetworkBearer"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="tactileInputType">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property specifies the type of tactile input supported by a device.</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="extensionMemory">
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#MemoryUnit"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property identifies additional memory that is provided to a device, typically in the form of removable memory cards</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="supportedBluetoothProfiles">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property defines the Bluetooth profiles supported by the device.</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Bluetooth"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#BluetoothProfile"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="textInputType">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property specifies the type of text input type supported by the device.</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="camera">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#Camera"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents a camera associated with a device</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:ID="displayHeight">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Display"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The total height of the display as a linear measure.</rdfs:comment>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="batteryCapacity">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The capacity of a battery, as an amount of electric charge that it can store.</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Battery"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="networkPowerUsed">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="file:./resources/Hardware.owl#NetworkBearer"/>
+          <owl:Class rdf:about="file:./resources/Hardware.owl#Bluetooth"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="displayWidth">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The total width of the display as a linear measure.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Display"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="powerUse">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#WorkingMode"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >in different working mode</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:FunctionalProperty rdf:ID="dataRateMax">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="file:./resources/Hardware.owl#NetworkBearer"/>
+          <owl:Class rdf:about="file:./resources/Hardware.owl#Bluetooth"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="supportsImages">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property specifies whether or not a display supports image output.</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Display"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="numberOfSoftKeys">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the number of input keys on the device whose function can be controlled programatically. It is related to the UAProf NumberOfSoftKeys attribute.</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="activeNetworkBearer">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the currently active network bearer on a device</rdfs:comment>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#NetworkBearer"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="bluetoothSupport">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the support for Bluetooth available on the device</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#Bluetooth"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="powerCurrent">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Power"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="cpuName">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#CPU"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The name of a central processing unit.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="networkType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#NetworkBearer"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property identifies the type of network for a bearer</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="supportsAudioOutput">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property defines whether or not the device supports the ability to output audio beyond the basic capability for supporting voice calls.</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="bluetoothClass">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Class1-100m, Class2-20m, Class3-10m</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Bluetooth"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="activeBluetoothProfile">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Bluetooth"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#BluetoothProfile"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents a Bluetooth profile currently active on the device.</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="bandwidth">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="file:./resources/Hardware.owl#NetworkBearer"/>
+          <owl:Class rdf:about="file:./resources/Hardware.owl#Bluetooth"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="deviceHardware">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the hardware associated with a device</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Device"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="bluetoothProfileName">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The name of the Bluetooth profile.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#BluetoothProfile"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="networkBearer">
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#NetworkBearer"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Network"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="removableMemory">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#MemoryUnit"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property indicates whether or not the memory unit can be removed from the device by the user in normal operation.</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="primaryBattery">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#Battery"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the primary battery for a device</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="builtInMemory">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the memory built into the device and which is not removable during normal operation.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#MemoryUnit"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="totalMemorySize">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#MemoryUnit"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the total size of the memory in bytes.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="addressType">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#NetworkBearer"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property identifies the type of address associated with a bearer.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="dataRateTypical">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="file:./resources/Hardware.owl#NetworkBearer"/>
+          <owl:Class rdf:about="file:./resources/Hardware.owl#Bluetooth"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="primaryCPU">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#DeviceHardware"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#CPU"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This class represents the main CPU for a device.</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="bearerType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property holds the name of the network bearer.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#NetworkBearer"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="textInputTypeName">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This is the property that holds the name of the text input type associated with a device.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="deviceName">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The name assigned to a device</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Device"/>
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#DeviceName"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="availableMemorySize">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the amount of memory available for use, in bytes.</rdfs:comment>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#MemoryUnit"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="powerVoltage">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Power"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="defaultDisplayOrientation">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Display"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the default orientation of a display.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="bluetoothVersion">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Bluetooth"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the version of Bluetooth supported.</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="powerFrequencey">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Power"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="batteryLevel">
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Battery"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property holds the fraction of the battery capacity that remains available.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="network">
+    <rdfs:range rdf:resource="file:./resources/Hardware.owl#Network"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the network in a delivery context.</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="supportsColor">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain rdf:resource="file:./resources/Hardware.owl#Display"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property defines whether or not a display supports color output.</rdfs:comment>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="keyboardTypeName">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >This property represents the name of the keyboard type associated with a device.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:FunctionalProperty>
+  <DeviceHardware rdf:ID="PicoTh03_hardware">
+    <primaryCPU>
+      <CPU rdf:ID="PIC16C54C">
+        <cpuName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >PIC16C54C</cpuName>
+      </CPU>
+    </primaryCPU>
+  </DeviceHardware>
+  <NetworkBearer rdf:ID="TETRA_PACKET_IPV4">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Packet Data</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TETRA</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="IS-195_CDMA_CSD">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDMA CSD</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >IS-95</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="IDEN_SMS_MSISDN">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >IDEN</networkType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >SMS</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >IDEN_MSISDN</addressType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="GSM_CSD_IPV4">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM</networkType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CSD</bearerType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="GSM_GPRS_IPV4">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GPRS</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="PDC_CSD_IPV4">
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CSD</bearerType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PDC</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="ANSI-136_CSD_IPV4">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ANSI-136</networkType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CSD</bearerType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="GSM_USSD_SERVICE_CODE">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM</networkType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM_Service_Code</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >USSD</bearerType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="PAGING_FLEX_MSISDN">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >FLEX</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >FLEX_MSISDN</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Paging Network</networkType>
+  </NetworkBearer>
+  <CPU rdf:ID="LegoCPU">
+    <cpuName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >RCX</cpuName>
+  </CPU>
+  <CPU rdf:ID="NoCPU">
+    <cpuName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >No</cpuName>
+  </CPU>
+  <Display rdf:ID="Display_SonyEricsson_P910">
+    <supportsColor rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</supportsColor>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The display for the Sony Ericsson P910 device</rdfs:comment>
+    <supportsImages rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</supportsImages>
+  </Display>
+  <BluetoothProfile rdf:ID="BluetoothProfile_genericAccess">
+    <bluetoothProfileName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Generic Access</bluetoothProfileName>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The Bluetooth profile that defines the basic level of function that all devices must implement.</rdfs:comment>
+  </BluetoothProfile>
+  <Power rdf:ID="Power_Eu">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Eu standard</rdfs:comment>
+  </Power>
+  <NetworkBearer rdf:ID="ANSI-136_GHOST_MSISDN">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ANSI-136</networkType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM_MSISDN</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GHOST/R_DATA</bearerType>
+  </NetworkBearer>
+  <owl:DataRange>
+    <owl:oneOf rdf:parseType="Resource">
+      <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+      >none</rdf:first>
+      <rdf:rest rdf:parseType="Resource">
+        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >virtual</rdf:first>
+        <rdf:rest rdf:parseType="Resource">
+          <rdf:rest rdf:parseType="Resource">
+            <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >numeric</rdf:first>
+            <rdf:rest rdf:parseType="Resource">
+              <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+              >full</rdf:first>
+              <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:rest>
+          </rdf:rest>
+          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+          >keypad</rdf:first>
+        </rdf:rest>
+      </rdf:rest>
+    </owl:oneOf>
+  </owl:DataRange>
+  <owl:DataRange>
+    <owl:oneOf rdf:parseType="Resource">
+      <rdf:rest rdf:parseType="Resource">
+        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >portrait</rdf:first>
+        <rdf:rest rdf:parseType="Resource">
+          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+          >square</rdf:first>
+          <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+        </rdf:rest>
+      </rdf:rest>
+      <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+      >landscape</rdf:first>
+    </owl:oneOf>
+  </owl:DataRange>
+  <NetworkBearer rdf:ID="GSM_USSD_MSISDN">
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM_MSISDN</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >USSD</bearerType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM</networkType>
+  </NetworkBearer>
+  <owl:DataRange>
+    <owl:oneOf rdf:parseType="Resource">
+      <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+      >examples</rdf:first>
+      <rdf:rest rdf:parseType="Resource">
+        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >normative</rdf:first>
+        <rdf:rest rdf:parseType="Resource">
+          <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+          >extensible</rdf:first>
+        </rdf:rest>
+      </rdf:rest>
+    </owl:oneOf>
+  </owl:DataRange>
+  <NetworkBearer rdf:ID="MOBITEK_MPAK_MAN">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >MPAK</bearerType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Mobitek</networkType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >MAN</addressType>
+  </NetworkBearer>
+  <DeviceHardware rdf:ID="DeviceHardware_SonyEricsson_P910">
+    <supportedNetworkBearers>
+      <NetworkBearer rdf:ID="GSM_SMS_MSISDN">
+        <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GSM</networkType>
+        <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >SMS</bearerType>
+        <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >GSM_MSISDN</addressType>
+      </NetworkBearer>
+    </supportedNetworkBearers>
+    <extensionMemory>
+      <MemoryUnit rdf:ID="MemoryUnit_P910_Card">
+        <removableMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</removableMemory>
+        <totalMemorySize rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >32000</totalMemorySize>
+        <availableMemorySize rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >29800</availableMemorySize>
+      </MemoryUnit>
+    </extensionMemory>
+    <bluetoothSupport>
+      <Bluetooth rdf:ID="Bluetooth_Sony_Ericsson_P910i">
+        <supportedBluetoothProfiles>
+          <BluetoothProfile rdf:ID="BluetoothProfile_dialup">
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >The Bluetooth profile that defines how devices provide modem services.</rdfs:comment>
+            <bluetoothProfileName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Dialup Networking</bluetoothProfileName>
+          </BluetoothProfile>
+        </supportedBluetoothProfiles>
+        <dataRateMax rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >2000.0</dataRateMax>
+        <supportedBluetoothProfiles>
+          <BluetoothProfile rdf:ID="BluetoothProfile_headSet">
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >The Bluetooth profile that defines how headsets communicate with devices.</rdfs:comment>
+            <bluetoothProfileName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Head Set</bluetoothProfileName>
+          </BluetoothProfile>
+        </supportedBluetoothProfiles>
+        <supportedBluetoothProfiles>
+          <BluetoothProfile rdf:ID="BluetoothProfile_fileTransfer">
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >The Bluetooth profile that defines how devices perform file transfer.</rdfs:comment>
+            <bluetoothProfileName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >File Transfer</bluetoothProfileName>
+          </BluetoothProfile>
+        </supportedBluetoothProfiles>
+        <supportedBluetoothProfiles>
+          <BluetoothProfile rdf:ID="BluetoothProfile_serialPort">
+            <bluetoothProfileName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Serial Port</bluetoothProfileName>
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >The Bluetooth profile that defines how devices provide serial port emulation for communication.</rdfs:comment>
+          </BluetoothProfile>
+        </supportedBluetoothProfiles>
+        <activeBluetoothProfile rdf:resource="file:./resources/Hardware.owl#BluetoothProfile_headSet"/>
+        <bluetoothVersion rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >1.0</bluetoothVersion>
+        <bluetoothClass rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >2</bluetoothClass>
+        <supportedBluetoothProfiles>
+          <BluetoothProfile rdf:ID="BluetoothProfile_objectPush">
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >The Bluetooth profile that defines how predefined standard objects, such as virtual business cards, are pushed to another device.</rdfs:comment>
+            <bluetoothProfileName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Object Push</bluetoothProfileName>
+          </BluetoothProfile>
+        </supportedBluetoothProfiles>
+        <supportedBluetoothProfiles>
+          <BluetoothProfile rdf:ID="BluetoothProfile_genericObjExch">
+            <bluetoothProfileName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Generic Object Exchange</bluetoothProfileName>
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >The Bluetooth profile that defines how the Infra Red Data Association's OBEX object exchange protocol is used to allow devices to exchange objects.</rdfs:comment>
+          </BluetoothProfile>
+        </supportedBluetoothProfiles>
+        <networkPowerUsed rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.05</networkPowerUsed>
+        <supportedBluetoothProfiles rdf:resource="file:./resources/Hardware.owl#BluetoothProfile_genericAccess"/>
+      </Bluetooth>
+    </bluetoothSupport>
+    <display rdf:resource="file:./resources/Hardware.owl#Display_SonyEricsson_P910"/>
+    <supportedNetworkBearers rdf:resource="file:./resources/Hardware.owl#GSM_GPRS_IPV4"/>
+    <activeNetworkBearer rdf:resource="file:./resources/Hardware.owl#GSM_GPRS_IPV4"/>
+    <primaryCPU>
+      <CPU rdf:ID="ARM9">
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >The ARM ARM9 central processing unit</rdfs:comment>
+        <cpuName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ARM9</cpuName>
+      </CPU>
+    </primaryCPU>
+    <numberOfSoftKeys rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
+    >0</numberOfSoftKeys>
+    <supportsAudioOutput rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</supportsAudioOutput>
+    <camera>
+      <Camera rdf:ID="Camera_Sony_Ericsson_P910i">
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >This represents the camera on a Sony Ericsson P910i</rdfs:comment>
+      </Camera>
+    </camera>
+    <builtInMemory>
+      <MemoryUnit rdf:ID="MemoryUnit_P910_Internal">
+        <availableMemorySize rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >45900</availableMemorySize>
+        <totalMemorySize rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >64000</totalMemorySize>
+        <removableMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >false</removableMemory>
+      </MemoryUnit>
+    </builtInMemory>
+    <primaryBattery>
+      <Battery rdf:ID="Battery_P910i">
+        <batteryLevel rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.14</batteryLevel>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >The battery in a Sony Ericsson P910i</rdfs:comment>
+      </Battery>
+    </primaryBattery>
+  </DeviceHardware>
+  <DeviceHardware rdf:ID="Flowmeter_hardware">
+    <primaryCPU rdf:resource="file:./resources/Hardware.owl#NoCPU"/>
+  </DeviceHardware>
+  <NetworkBearer rdf:ID="IS-195_CDMA_PACKET">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDMA Packet data</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >IS-95</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="IDEN_PACKET_Ipv4">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Packet Data</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >IDEN</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="TETRA_SDS_ITSI">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TETRA</networkType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >SDS</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TETRA_ITSI</addressType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="PDC_PACKET_IPV4">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Packet Data</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PDC</networkType>
+  </NetworkBearer>
+  <DeviceName rdf:ID="DeviceName_SonyEricssonP910i">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The name of the Sony Ericsson P910 device</rdfs:comment>
+  </DeviceName>
+  <NetworkBearer rdf:ID="ANSI-136_GUTS_MSISDN">
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ANSI_136_MSISDN</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GUTS/R-Data</bearerType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ANSI-136</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="PHS_CSD_IPV4">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CSD</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PHS</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="PHS_SMS_MSISDN">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >SMS</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PHS_MSISDN</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PHS</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="PAGING_REFLEX_MSISDN">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ReFLEX</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ReFLEX_MSISDN</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Paging network</networkType>
+  </NetworkBearer>
+  <Bluetooth rdf:ID="LegoBluetooth">
+    <bluetoothVersion rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >1.2</bluetoothVersion>
+    <supportedBluetoothProfiles rdf:resource="file:./resources/Hardware.owl#BluetoothProfile_fileTransfer"/>
+    <supportedBluetoothProfiles rdf:resource="file:./resources/Hardware.owl#BluetoothProfile_serialPort"/>
+    <bluetoothClass rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+    >0</bluetoothClass>
+    <activeBluetoothProfile rdf:resource="file:./resources/Hardware.owl#BluetoothProfile_fileTransfer"/>
+  </Bluetooth>
+  <NetworkBearer rdf:ID="GSM_USSD_IPV4">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM</networkType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >USSD</bearerType>
+  </NetworkBearer>
+  <Device rdf:ID="Sony_Ericsson_P910i">
+    <deviceHardware rdf:resource="file:./resources/Hardware.owl#DeviceHardware_SonyEricsson_P910"/>
+    <deviceName rdf:resource="file:./resources/Hardware.owl#DeviceName_SonyEricssonP910i"/>
+  </Device>
+  <DeviceHardware rdf:ID="LegoRobot">
+    <builtInMemory>
+      <MemoryUnit rdf:ID="MemoryUnit_LegoRobot">
+        <availableMemorySize rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >32000</availableMemorySize>
+        <totalMemorySize rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >32000</totalMemorySize>
+        <removableMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >false</removableMemory>
+      </MemoryUnit>
+    </builtInMemory>
+    <primaryCPU rdf:resource="file:./resources/Hardware.owl#LegoCPU"/>
+    <camera>
+      <Camera rdf:ID="LegoCamera"/>
+    </camera>
+    <bluetoothSupport rdf:resource="file:./resources/Hardware.owl#LegoBluetooth"/>
+  </DeviceHardware>
+  <NetworkBearer rdf:ID="AMPS_CDPD_IPV4">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >AMPS</networkType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDPD</bearerType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+  </NetworkBearer>
+  <rdf:Description rdf:about="http://www.w3.org/2002/07/owl#Thing">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></rdfs:comment>
+  </rdf:Description>
+  <NetworkBearer rdf:ID="IDEN_CSD_Ipv4">
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >IDEN</networkType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CSD</bearerType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="IS-195_CDMA_SMS">
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >IS_637_MSISDN</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >CDMA SMS</bearerType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >IS-95</networkType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="TETRA_SDS_MSISDN">
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TETRA_MSISDN</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >SDS</bearerType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TETRA</networkType>
+  </NetworkBearer>
+  <owl:DataRange>
+    <owl:oneOf rdf:parseType="Resource">
+      <rdf:rest rdf:parseType="Resource">
+        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >examples</rdf:first>
+        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+      </rdf:rest>
+      <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+      >normative</rdf:first>
+    </owl:oneOf>
+  </owl:DataRange>
+  <NetworkBearer rdf:ID="ANSI-136_PACKET_IPV4">
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Packet Data</bearerType>
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ANSI-136</networkType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ipv4</addressType>
+  </NetworkBearer>
+  <NetworkBearer rdf:ID="GSM_USSD">
+    <networkType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM</networkType>
+    <addressType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Any</addressType>
+    <bearerType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >USSD</bearerType>
+  </NetworkBearer>
+</rdf:RDF>
+
+<!-- Created with Protege (with OWL Plugin 3.4, Build 110)  http://protege.stanford.edu -->

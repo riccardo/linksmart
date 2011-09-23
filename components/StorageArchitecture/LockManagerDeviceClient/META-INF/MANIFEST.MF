@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: LockManagerDeviceClient
+Bundle-SymbolicName: LockManagerDeviceClient
+Bundle-Version: 1.0.0
+Bundle-ClassPath: LockManagerDeviceClient.jar,
+ lib/commons-lang-2.4.jar
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: eu.linksmart.storage.helper
+Export-Package: eu.linksmart.limbo.lockmanager.client

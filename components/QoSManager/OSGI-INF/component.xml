@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2006-2010 Fraunhofer FIT, Amro Al-Akkad
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<component name="QoSManager" immediate="true">
+<!--  service and its implementation-->
+ <service>
+<provide interface="eu.linksmart.qos.QoSManager"/>
+ </service>
+ <implementation class="eu.linksmart.qos.impl.QoSManagerImpl"/>
+ <!--  dependencies -->
+ <reference bind="bindClientProvider" cardinality="0..1" 
+  interface="eu.linksmart.clients.RemoteWSClientProvider" 
+  name="RemoteWSClientProvider" policy="dynamic" unbind="unbindClientProvider"/>
+ <reference bind="bindNM" cardinality="0..1" 
+  interface="eu.linksmart.network.NetworkManagerApplication" 
+  name="NetworkManagerApplication" policy="dynamic" unbind="unbindNM"/>
+ <reference bind="bindConfiguration" cardinality="1..1" 
+  interface="org.osgi.service.cm.ConfigurationAdmin" 
+  name="ConfigurationAdmin" policy="dynamic" unbind="unbindConfiguration"/>
+ <reference bind="bindOntology" cardinality="1..1" 
+  interface="eu.linksmart.aom.ApplicationOntologyManager" 
+  name="ApplicationOntologyManager" policy="dynamic" unbind="unbindOntology"/>
+<!--  whitepattern property for deploying web service -->
+<property name="SOAP.service.name" type="String" value="QoSManagerPort"/>   
+</component>

@@ -1,0 +1,115 @@
+package $package;
+
+$imports
+
+public class $class implements $interface {
+	
+	private ServerSocketConnection ssc;
+	private int port;
+	private String url;
+	private SocketConnection sc;
+	private InputStream is;
+	private OutputStream cos;
+	private String clientHost;
+	
+	public TCPProtocol() {
+		super();
+	}
+	public TCPProtocol(int port) {
+		this.port = port;
+		this.url = "socket://:"+this.port;
+		try {
+			ssc = (ServerSocketConnection)Connector.open(url);
+		} catch (IOException e) {
+		  e.printStackTrace();
+		}
+	}
+	
+	public void createConnectors(int port) {
+	   if (this.port != port) {
+		this.port = port;
+		this.url = "socket://:"+this.port;
+		try {
+			ssc = (ServerSocketConnection)Connector.open(url);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		}
+		this.clientHost = "";
+
+	}
+
+	public String getServerURL() {
+		return this.url;
+	}
+
+	public String getClientHost() {
+		return this.clientHost;
+	}
+
+	public String receive() {
+		String request = "";
+		try {
+			sc = (SocketConnection) ssc.acceptAndOpen();
+			this.cos = sc.openDataOutputStream();
+			this.is = sc.openInputStream();
+			
+			int n ;
+			int ch = 0;
+			int chCount = 0;
+			boolean condition = true;
+			int content = -1;
+        		StringBuffer sb = new StringBuffer();
+			StringBuffer auxiliar = new StringBuffer();
+			while(condition){
+				ch = this.is.read();
+				sb.append((char)ch);
+				auxiliar.append((char)ch);
+				if((char)ch == '\n'){
+					String line = auxiliar.toString();
+					if(line.toLowerCase().startsWith("content-length")){
+						line = line.substring(0,line.length()-2);
+						StringTokenizer st = new StringTokenizer(line,": ");
+						st.nextToken();
+						content = Integer.parseInt(st.nextToken());
+					}
+					else if(line.equalsIgnoreCase("\r\n"))
+						condition = false;
+					auxiliar = new StringBuffer();
+				}
+			}
+			while(chCount<content){
+				ch = this.is.read();
+				sb.append((char)ch);
+				chCount++;
+			}
+			request = sb.toString();
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+		if(request == "")
+			return null;
+		return request;
+	}
+
+	public void send(String result) {
+		try {
+			this.cos.write(result.getBytes());
+			this.cos.flush();
+			this.cos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void closeConnection() {
+		try {
+			this.is.close();
+			this.sc.close();
+			this.ssc.close();	
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	
+}

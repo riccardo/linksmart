@@ -1,0 +1,106 @@
+package eu.linksmart.limbo;
+
+import java.util.Hashtable;
+#if($language != "jme")
+import java.io.File;
+import java.io.FileInputStream;
+#end
+
+public class $class {
+
+	private String linksmartId;
+	private String status;
+	private Hashtable properties;
+	private boolean hasError;
+	private String errorMessage;
+	private String physicalInfo;
+	private String dacEndpoint;
+	private String wsEndpoint;
+	private String linksmartWsEndpoint;
+#if($language != "jme")
+	private File deviceWSDL = new File("$deviceWSDLFile");
+#end
+	
+	public $class(){
+		this.properties = new Hashtable();
+		this.properties.put("Protocol","${protocol}");
+		this.hasError = false;
+		this.physicalInfo = "Limbo Generated WS Code";
+	}
+
+	public String GetLinkSmartID(){return this.linksmartId;}
+
+	public String CreateWS() {
+
+		this.linksmartWsEndpoint = LinkSmartServicePort${server}.getEndpoint();	
+		this.wsEndpoint = ${serviceName}${server}.getEndpoint();
+		return this.wsEndpoint;
+	}
+
+	public String GetStatus(){return this.status;}
+
+	public String GetProperty(String property){return this.properties.get(property).toString();}
+
+	public boolean GetHasError(){return this.hasError;}
+
+	public String GetErrorMessage(){return this.errorMessage;}
+
+	public String GetDiscoveryInfo() {
+		return this.physicalInfo;
+	}
+
+	public String GetDACEndpoint() {return this.dacEndpoint;}	
+
+	public String GetWSEndpoint() {
+		return this.wsEndpoint;
+	} 
+
+	public String GetLinkSmartWSEndpoint() {
+		return this.linksmartWsEndpoint;
+	}
+
+	public String GetWSDL() {
+#if($language != "jme")
+		byte[] content = new byte[(int)deviceWSDL.length()];
+		try {
+			FileInputStream fis = new FileInputStream(this.deviceWSDL);
+			fis.read(content, 0, content.length);
+		}catch(Exception e) {e.printStackTrace();}
+		String wsdl = new String(content);
+		wsdl = wsdl.replace("<","[");
+		wsdl = wsdl.replace(">", "]");
+#else
+		String wsdl = "not supported";
+#end
+		return wsdl;
+	}
+
+	public void SetDACEndpoint(String endpoint ){this.dacEndpoint = endpoint;}
+
+	public void SetLinkSmartID(String linksmartid ){this.linksmartId = linksmartid;}
+
+	public void SetProperty(String property, String value ){this.properties.put(property, value);}
+	
+	public void SetStatus(String status ){this.status = status;}
+
+	public void Stop() {
+		this.StopWS();
+		this.StopLinkSmartWS();
+	}
+
+	public void StopWS() {
+#if($serverType!="osgi")
+		${serviceName}LimboServer.stopServer();
+#end
+		this.wsEndpoint = null;
+	
+	}
+	
+	public void StopLinkSmartWS() {
+#if($serverType!="osgi")
+		LinkSmartServicePortLimboServer.stopServer();
+#end
+		this.linksmartWsEndpoint = null;
+	}  
+
+}

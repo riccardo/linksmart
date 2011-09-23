@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="linksmart.components.StorageArchitecture.LockManagerDeviceServer"
+	default="build" basedir=".">
+	<property name="moduleName" value="LockManagerDeviceServer" />
+	<property name="rootBuildDir" value="${basedir}/../../../build" />
+	<property name="rootDistributionDir" value="${basedir}/../../../distribution" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="test.dir" value="${basedir}/test" />
+	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
+	<property name="lib.dir" value="${rootBuildDir}/${moduleName}/lib" />
+	<property name="lib.dir.local" value="${basedir}/lib" />
+	<property name="distribution.dir" value="${rootDistributionDir}/StorageArchitecture" />
+	<property name="revision" value="1.0" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement location="${distribution.dir}/StorageManagerCommonBundle.jar" />
+		<pathelement
+			path="${basedir}/../requiredBundles/javax.servlet_2.5.0.v200806031605.jar" />
+		<pathelement
+			path="${basedir}/../requiredBundles/org.apache.felix.upnp.extra-0.3.0.jar" />
+		<pathelement
+			path="${basedir}/../requiredBundles/org.apache.log4j_1.2.13.v200903072027.jar" />
+		<pathelement
+			path="${basedir}/../requiredBundles/org.eclipse.osgi.services_3.2.0.v20090520-1800.jar" />
+		<pathelement
+			path="${basedir}/../requiredBundles/org.eclipse.osgi_3.5.2.R35x_v20100126.jar" />
+		<pathelement path="${build.dir}" />
+	</path>
+
+	<target name="jar" depends="build">
+		<echo message="Building jar ${moduleName}" />
+		<mkdir dir="${distribution.dir}" />
+		<mkdir dir="${build.dir}/lib" />
+		<mkdir dir="${build.dir}/META-INF" />
+		<copy file="${basedir}/LMconfig.xml" todir="${build.dir}" />
+		<copy todir="${build.dir}/lib">
+			<fileset dir="${lib.dir}" includes="*.jar" />
+		</copy>
+		<mkdir dir="${build.dir}/resources" />
+		<copy todir="${build.dir}/resources">
+			<fileset dir="${basedir}/resources" includes="*.wsdl" />
+		</copy>
+		<copy file="${basedir}/META-INF/MANIFEST.MF" todir="${build.dir}/META-INF" />
+		<jar destfile="${distribution.dir}/${moduleName}.jar" basedir="${build.dir}"
+			manifest="${build.dir}/META-INF/MANIFEST.MF" />
+		<delete dir="${build.dir}/lib" includeEmptyDirs="true"
+			failonerror="false" />
+		<delete dir="${build.dir}/META-INF" includeEmptyDirs="true"
+			failonerror="false" />
+		<delete file="${build.dir}/LMconfig.xml" failonerror="false" />
+	</target>
+
+	<target name="build" depends="resolve-dependencies">
+		<echo message="Building LockManagerDeviceServer" />
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" classpathref="classpath">
+			<src path="${src.dir}" />
+		</javac>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
+	</target>
+
+	<target name="resolve-dependencies">
+		<copy todir="${lib.dir}">
+			<fileset dir="${lib.dir.local}" includes="*.jar" />
+		</copy>
+	</target>
+
+</project>

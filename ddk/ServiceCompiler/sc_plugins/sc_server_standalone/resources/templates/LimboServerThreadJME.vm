@@ -1,0 +1,65 @@
+package $package;
+
+$imports
+
+public class $class extends Thread {
+	
+	private int port;
+	private String serverURL; 
+	private boolean stopped;
+	private int count;
+	private ServerProtocol p;
+	
+	
+	public $class(ServerProtocol protocol, int thePort) {
+		this.port = thePort;
+		this.stopped = false;
+		try {
+			this.p = protocol;
+			this.p.createConnectors(thePort);
+			this.serverURL = this.p.getServerURL();
+			count = 0;
+			${endPoint}.createEndPoints(this.serverURL, this.port);
+		} catch (Exception e1) {
+
+			e1.printStackTrace();
+		}		
+	}
+	
+	public void setStopped(boolean stopped){
+		this.stopped = stopped;
+	}
+
+	public String getServerURL() {
+		return this.serverURL;
+	}
+
+	public void run() {
+		try{
+			while(!stopped){
+				LimboServer.textBox.setString("Waiting for Connections..."+count);
+				count++;
+				String request = this.p.receive();
+				String clientHost = this.p.getClientHost(); 
+				LimboServer.textBox.setString("Request Received. Attendance in progress...");
+				String result = "";
+				for(int i=0; i<${endPoint}.getEndPoints().size(); i++){
+					result = ((${endPoint})${endPoint}.getEndPoints().elementAt(i)).handleRequest(request,clientHost);
+					if(result != null){
+						this.p.send(result);
+						i = ${endPoint}.getEndPoints().size();
+					}
+				}
+				if(result == null){
+					result = "HTTP/1.1 403 Inexistent Operation\r\n\r\n";
+					this.p.send(result);
+				}
+			}
+		
+		}catch(Exception e) {
+			e.printStackTrace();
+
+		}
+		this.p.closeConnection();
+		}
+	}

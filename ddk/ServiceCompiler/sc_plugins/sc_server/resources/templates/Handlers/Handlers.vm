@@ -1,0 +1,68 @@
+package $package;
+
+import java.io.OutputStream;
+import java.util.Vector;
+import $import
+
+public class $class implements ${handlerService}{
+
+	private $handlerService serviceInt;
+	private $handler handler;
+	private $service service;
+	private String request;
+	private String response;
+	private String clientHost;	
+
+	public $class($service service) {
+		this.service = service;
+#set($i = 0)
+#foreach ($handlerType in $handlers)
+		${fileName}$handlerType ${handlersNames.get(${i})} = new ${fileName}$handlerType(this);		
+#if($handlerType == "ProbeHandler")
+#if($i == 0)
+		${handlersNames.get(${i})}.setSource("servicebegin");
+#else
+		${handlersNames.get(${i})}.setSource("serviceend");
+#end
+#end
+#set($i=$i+1)
+#end
+		this.handler = ${handlersNames.getFirst()};
+#set($i = 1)
+#set($n = $handlersNames.size())
+#foreach ($handlerName in $handlersNames)
+#if($i < $n)
+		${handlerName}.setLinkedHandler(${handlersNames.get($i)});
+#set($i=$i+1)
+#end
+#end
+	}
+
+	public void handle(String request, String clientHost) {
+		this.request = request;
+		this.response = "";
+		this.clientHost = clientHost;
+		this.handler.handle();
+	}
+
+	public $service getService() {
+		return this.service;
+	}
+
+	public String getRequest() {
+		return this.request;
+	}
+
+	public String getResponse() {
+		return this.response;
+	}
+
+	public void setResponse(String response) {
+		this.response = response;
+	}
+
+	public String getClientHost() {
+		return this.clientHost;
+	}
+
+}

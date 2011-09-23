@@ -1,0 +1,28 @@
+package $package;
+
+
+public class $class {
+
+
+	public static void main(String[] args) {
+#if($protocol == "BTProtocol")
+#foreach($PortType in $portTypes)
+		BTProtocol ${PortType.getQName().getLocalPart().toLowerCase()}Protocol = new BTProtocol();
+		${PortType.getQName().getLocalPart().toLowerCase()}Protocol.setServiceName("${PortType.getQName().getLocalPart()}"); 
+		new ${PortType.getQName().getLocalPart()}LimboServer(${PortType.getQName().getLocalPart().toLowerCase()}Protocol,-1).runServer();
+#end
+#else
+		try {
+			int portNumber = 8080;
+			if (args.length != 0) {
+				portNumber = Integer.parseInt(args[0]);
+			}
+#foreach($PortType in $portTypes)
+			new ${PortType.getQName().getLocalPart()}LimboServer(new ${protocol}(), portNumber++).runServer();
+#end
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+#end
+	}
+}

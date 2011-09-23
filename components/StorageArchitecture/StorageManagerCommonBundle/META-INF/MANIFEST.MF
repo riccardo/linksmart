@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: StorageManagerCommonBundle Plug-in
+Bundle-SymbolicName: StorageManagerCommonBundle
+Bundle-Version: 1.0.0
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: eu.linksmart.storage.helper
+Bundle-ClassPath: lib/jdom.jar,
+ .
+Import-Package: org.apache.log4j

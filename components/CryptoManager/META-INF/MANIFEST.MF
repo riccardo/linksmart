@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CryptoManager
+Bundle-SymbolicName: CryptoManager
+Bundle-Version: 1.0.0.qualifier
+Service-Component: OSGI-INF/component.xml, OSGI-INF/component_admin.xml
+Import-Package: eu.linksmart.security.cryptomanager,
+ org.apache.commons.configuration;version="1.5.0",
+ org.apache.commons.lang.exception,
+ org.apache.commons.logging;version="1.1.1",
+ org.apache.log4j;version="1.2.13",
+ org.apache.xml.security;version="1.4.4",
+ org.apache.xml.security.encryption,
+ org.apache.xml.security.keys,
+ org.apache.xml.security.signature,
+ org.apache.xml.security.transforms,
+ org.apache.xml.security.utils,
+ org.osgi.framework;version="1.5.0",
+ org.osgi.service.component;version="1.1.0"
+Bundle-ClassPath: resources/,
+ .,
+ lib/bcprov-jdk16-138.jar
+Export-Package: eu.linksmart.security.cryptomanager.impl
+Require-Bundle: com.springsource.org.apache.derby;bundle-version="10.5.1000001",
+ com.springsource.org.apache.derby.client;bundle-version="10.5.1000001"

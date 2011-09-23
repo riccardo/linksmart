@@ -1,0 +1,43 @@
+package $package;
+
+public class $class {
+	
+	private String totalRequest;
+	
+	private String header;
+	
+	private String request;
+	
+	private String postLine;
+	
+	
+	public HeaderParser(String total){
+		this.totalRequest = total;
+		StringTokenizer st = new StringTokenizer(this.totalRequest,"<");
+		this.header = st.nextToken();
+		st = new StringTokenizer(header,"\r");
+		String line = st.nextToken();
+		this.postLine = line;
+		this.request = total.substring(header.length());
+		
+	}
+	
+	public String getPostLine(){
+		return this.postLine;
+	}
+	
+	public String getHeader(){
+		return this.header;
+	}
+	
+	public String getRequest(){
+		return this.request;
+	}
+	
+	public boolean parseHeader(){
+		if((this.postLine.startsWith("POST")&&(this.postLine.endsWith(" HTTP/1.0")))||(this.postLine.startsWith("POST")&&(this.postLine.endsWith(" HTTP/1.1"))))
+			return true;
+		return false;
+	}
+
+}

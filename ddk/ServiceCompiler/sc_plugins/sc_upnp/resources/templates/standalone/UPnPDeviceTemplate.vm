@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+	<specVersion>
+		<major>1</major>
+		<minor>0</minor>
+	</specVersion>
+	<device>
+		<deviceType>urn:schemas-upnp-org:device:$device.getDeviceType():1</deviceType>
+		<friendlyName>$device.getFriendlyName()</friendlyName>
+		<manufacturer>$device.getManufacturer()</manufacturer>
+		<manufacturerURL>$device.getManufacturerURL()</manufacturerURL>
+		<modelDescription>$device.getModelDescription()</modelDescription>
+		<modelName>$device.getModelName()</modelName>
+		<modelNumber>$device.getModelNumber()</modelNumber>
+		<UDN>$device.getUDN()</UDN>
+		<serviceList>
+#foreach($UPnPServiceImpl in $services)
+		<service>
+			<serviceType>${UPnPServiceImpl.getType()}</serviceType>
+			<serviceId>${UPnPServiceImpl.getId()}</serviceId>
+			<SCPDURL>${UPnPServiceImpl.getSCPDURL()}</SCPDURL>
+			<controlURL>${UPnPServiceImpl.getControlUrl()}</controlURL>
+			<eventSubURL>${UPnPServiceImpl.getEventSubUrl()}</eventSubURL>
+		</service>
+#end
+		</serviceList>
+	</device>
+</root>

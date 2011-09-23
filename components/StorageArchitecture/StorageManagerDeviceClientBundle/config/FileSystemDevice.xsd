@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.linksmart.eu/Storage/FileSystemDevice" xmlns:tns="http://www.linksmart.eu/Storage/FileSystemDevice" elementFormDefault="qualified">
+
+	<complexType name="FileSystemDeviceType">
+    	<attribute name="Name" type="string" use="required"></attribute>
+    	<attribute name="ID" type="string" use="optional"></attribute>
+    	<attribute name="SystemID" type="string" use="optional"></attribute>
+    </complexType>
+    
+    <complexType name="LocalFileSystemDeviceType">
+    	<complexContent>
+    		<extension base="tns:FileSystemDeviceType">
+    			<attribute name="Path" type="string" use="required"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <element name="LocalFileSystemDevice"
+    	type="tns:LocalFileSystemDeviceType">
+    </element>
+    
+
+    <complexType name="ReplicatedFileSystemDeviceType">
+    	<complexContent>
+    		<extension base="tns:FileSystemDeviceType">
+    			<sequence>
+    				<element name="BackendDevice" type="tns:BackendDeviceType" minOccurs="1" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="BackendDeviceType">
+    	<attribute name="id" type="string" use="required"></attribute>
+    </complexType>
+
+    <element name="ReplicatedFileSystemDevice"
+    	type="tns:ReplicatedFileSystemDeviceType">
+    </element>
+
+    <complexType name="StripedFileSystemDeviceType">
+    	<complexContent>
+    		<extension base="tns:FileSystemDeviceType">
+    			<sequence>
+    				<element name="BackendDevice"
+    					type="tns:BackendDeviceType" minOccurs="1" maxOccurs="unbounded">
+    				</element>
+    			</sequence>
+    			<attribute name="stripesize" use="optional">
+    				<simpleType>
+    					<restriction base="unsignedInt">
+    						<maxExclusive value="2147483647"></maxExclusive>
+    					</restriction>
+    				</simpleType>
+    			</attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+    
+    <element name="StripedFileSystemDevice"
+    	type="tns:StripedFileSystemDeviceType">
+    </element>
+</schema>

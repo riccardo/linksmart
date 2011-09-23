@@ -1,0 +1,48 @@
+<project name="linksmart.components.StorageArchitecture" default="fail"
+	xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<macrodef name="forall">
+		<attribute name="target" />
+		<sequential>
+			<subant target="@{target}">
+				<fileset dir="." includes="*/build.xml" />
+			</subant>
+		</sequential>
+	</macrodef>
+
+	<target name="fail">
+		<fail message="please use the ant build file in the root directory" />
+	</target>
+
+	<target name="make" depends="make-all" description="make everything">
+	</target>
+
+	<target name="make-all" depends="make-java" description="make everything">
+	</target>
+
+	<target name="make-java">
+		<ant dir="NetworkManagerApplicationClient" target="jar" />
+		<ant dir="StorageManagerCommonBundle" target="jar" />
+		<ant dir="CookieDeviceClientBundle" target="jar" />
+		<ant dir="FileSystemDeviceClientBundle" target="jar" />
+		<ant dir="StorageManagerDeviceClientBundle" target="jar" />
+		<ant dir="CookieDeviceServer" target="jar" />
+		<ant dir="FileSystemDeviceServer" target="jar" />
+		<ant dir="StorageManagerDeviceServer" target="jar" />
+		<ant dir="LockManagerDeviceClient" target="jar" />
+		<ant dir="LockManagerDeviceServer" target="jar" />
+	</target>
+
+	<target name="test-all" depends="test-java">
+	</target>
+	
+	<target name="test" depends="test-java" />
+
+	<target name="test-java" depends="make-java">
+	</target>
+
+	<target name="printenv">
+		<echo message="Build directory:  ${build.dir}" />
+		<echo message="Distribution dir: ${distribution.dir}" />
+	</target>
+</project>

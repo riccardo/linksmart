@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:application="http://localhost/ontologies/Application.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:unit="http://localhost/ontologies/Unit.owl#"
+    xmlns="http://localhost/ontologies/StaticTaxonomyModel.owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://localhost/ontologies/StaticTaxonomyModel.owl">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://localhost/ontologies/Application.owl"/>
+    <owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+  </owl:Ontology>
+  <owl:Class rdf:ID="StaticTaxonomy">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <rdf:Description rdf:about="http://localhost/ontologies/Application.owl#Person">
+    <rdfs:subClassOf rdf:resource="#StaticTaxonomy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://localhost/ontologies/Application.owl#Location">
+    <rdfs:subClassOf rdf:resource="#StaticTaxonomy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://localhost/ontologies/Application.owl#Application">
+    <rdfs:subClassOf rdf:resource="#StaticTaxonomy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://localhost/ontologies/Unit.owl#Unit">
+    <rdfs:subClassOf rdf:resource="#StaticTaxonomy"/>
+  </rdf:Description>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

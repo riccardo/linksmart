@@ -1,0 +1,908 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://eu.linksmart/ontology/device-ontology.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://eu.linksmart/ontology/device-ontology.owl">
+  <owl:Ontology rdf:about=""/>
+  <owl:Class rdf:ID="memory_description">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="available"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="maximum"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="RAM">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="amount"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="#memory_description"/>
+  </owl:Class>
+  <owl:Class rdf:ID="linksmart_device">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="info"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="agent_compliancy"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >0</owl:minCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="has_error"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="deviceId"/>
+        </owl:onProperty>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="hw_properties"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="sw_properties"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="resolution_description">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="bpp"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="height"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="graphics"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="width"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="screen_description">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="#height"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="color"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="#width"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="ap_description"/>
+  <owl:Class rdf:ID="OS">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="sw_description"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#sw_description">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="os"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="agent_platform"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="utility_capability">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="capability_description"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Serial_connection">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="connection_description"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="info_description">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="name"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="version"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >0</owl:minCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="www"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="vendor"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="channel_description"/>
+  <owl:Class rdf:ID="hw_description">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="cpu"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <owl:Class rdf:ID="ROM">
+    <rdfs:subClassOf rdf:resource="#memory_description"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="#amount"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="measurement_capability">
+    <rdfs:subClassOf rdf:resource="#capability_description"/>
+  </owl:Class>
+  <owl:Class rdf:ID="quos"/>
+  <owl:Class rdf:ID="ui_description">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="audio_input"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="screen"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="audio_output"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="device_error">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="fault_name"/>
+        </owl:onProperty>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >0</owl:minCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="has_cause"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="error_cause">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="remedy"/>
+        </owl:onProperty>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="cause"/>
+        </owl:onProperty>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="device_status">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="status"/>
+        </owl:onProperty>
+        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >0</owl:minCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Bluetooth">
+    <rdfs:subClassOf rdf:resource="#connection_description"/>
+  </owl:Class>
+  <owl:Class rdf:ID="GSM">
+    <rdfs:subClassOf rdf:resource="#connection_description"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Communication_capability">
+    <rdfs:subClassOf rdf:resource="#capability_description"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="#available">
+    <rdfs:range rdf:resource="#RAM"/>
+    <rdfs:domain rdf:resource="#memory_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#has_error">
+    <rdfs:domain rdf:resource="#linksmart_device"/>
+    <rdfs:range rdf:resource="#device_error"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#hw_properties">
+    <rdfs:range rdf:resource="#hw_description"/>
+    <rdfs:domain rdf:resource="#linksmart_device"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="hasCapability">
+    <rdfs:range rdf:resource="#capability_description"/>
+    <rdfs:domain rdf:resource="#linksmart_device"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="memory">
+    <rdfs:domain rdf:resource="#hw_description"/>
+    <rdfs:range rdf:resource="#memory_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="channelProperties">
+    <rdfs:range>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="#hw_description"/>
+          <owl:Class rdf:about="#sw_description"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:range>
+    <rdfs:domain rdf:resource="#channel_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#screen">
+    <rdfs:range rdf:resource="#screen_description"/>
+    <rdfs:domain rdf:resource="#ui_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#has_cause">
+    <rdfs:range rdf:resource="#error_cause"/>
+    <rdfs:domain rdf:resource="#device_error"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#agent_platform">
+    <rdfs:domain rdf:resource="#sw_description"/>
+    <rdfs:range rdf:resource="#ap_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#info">
+    <rdfs:domain rdf:resource="#linksmart_device"/>
+    <rdfs:range rdf:resource="#info_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="ui">
+    <rdfs:range rdf:resource="#ui_description"/>
+    <rdfs:domain rdf:resource="#hw_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="connection">
+    <rdfs:domain rdf:resource="#hw_description"/>
+    <rdfs:range rdf:resource="#connection_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#os">
+    <rdfs:range rdf:resource="#info_description"/>
+    <rdfs:domain rdf:resource="#sw_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="information">
+    <rdfs:range rdf:resource="#info_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="quos_information">
+    <rdfs:range rdf:resource="#quos"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#sw_properties">
+    <rdfs:range rdf:resource="#sw_description"/>
+    <rdfs:domain rdf:resource="#linksmart_device"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="resolution">
+    <rdfs:range rdf:resource="#resolution_description"/>
+    <rdfs:domain rdf:resource="#screen_description"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#maximum">
+    <rdfs:domain rdf:resource="#memory_description"/>
+    <rdfs:range rdf:resource="#RAM"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="#fault_name">
+    <rdfs:domain rdf:resource="#device_error"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#audio_input">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain rdf:resource="#ui_description"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="measurementAccuracy">
+    <rdfs:domain rdf:resource="#measurement_capability"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#width">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="#resolution_description"/>
+          <owl:Class rdf:about="#screen_description"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#remedy">
+    <rdfs:domain rdf:resource="#error_cause"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="numOfChannels">
+    <rdfs:domain rdf:resource="#hw_description"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#agent_compliancy">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain rdf:resource="#linksmart_device"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#cpu">
+    <rdfs:domain rdf:resource="#hw_description"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#www">
+    <rdfs:domain rdf:resource="#info_description"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#name">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#info_description"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="type">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#linksmart_device"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#version">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="#info_description"/>
+          <owl:Class rdf:about="#connection_description"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#cause">
+    <rdfs:domain rdf:resource="#error_cause"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="thirdG">
+    <rdfs:domain rdf:resource="#Communication_capability"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#height">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="#resolution_description"/>
+          <owl:Class rdf:about="#screen_description"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#deviceId">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#linksmart_device"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#bpp">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#resolution_description"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#graphics">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain rdf:resource="#resolution_description"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="utility_description">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#utility_capability"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#vendor">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#info_description"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#amount">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#memory_description"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="connectionType">
+    <rdfs:domain rdf:resource="#connection_description"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="brand">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#info_description"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#status">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#device_status"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#color">
+    <rdfs:domain rdf:resource="#screen_description"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="#audio_output">
+    <rdfs:domain rdf:resource="#ui_description"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </owl:DatatypeProperty>
+  <device_error rdf:ID="noise_in_the_pump_grundfos">
+    <fault_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Noise in the pump</fault_name>
+    <has_cause>
+      <error_cause rdf:ID="error_cause_7_grundfos">
+        <cause rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Air in the pump</cause>
+        <remedy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Vent the pump</remedy>
+      </error_cause>
+    </has_cause>
+    <has_cause>
+      <error_cause rdf:ID="error_cause_8_grundfos">
+        <cause rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Inlet pressure too low</cause>
+        <remedy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Increase the inlet pressure or check the air volume in the expansion tank (if installed).</remedy>
+      </error_cause>
+    </has_cause>
+  </device_error>
+  <GSM rdf:ID="GSM_850">
+    <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM850</version>
+    <connectionType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM</connectionType>
+  </GSM>
+  <linksmart_device rdf:ID="NokiaN80">
+    <agent_compliancy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</agent_compliancy>
+    <info>
+      <info_description rdf:ID="info_description_NokiaN80">
+        <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >N80</name>
+        <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >1</version>
+        <vendor rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Nokia</vendor>
+        <brand rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        ></brand>
+      </info_description>
+    </info>
+    <type rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >mobilephone</type>
+    <hw_properties>
+      <hw_description rdf:ID="hw_description_NokiaN80">
+        <cpu rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ARM4 206M</cpu>
+        <connection>
+          <Bluetooth rdf:ID="Bluetooth_6">
+            <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            ></version>
+            <connectionType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            ></connectionType>
+          </Bluetooth>
+        </connection>
+        <connection>
+          <GSM rdf:ID="GSM_900">
+            <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >GSM900</version>
+            <connectionType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >GSM</connectionType>
+          </GSM>
+        </connection>
+        <connection>
+          <GSM rdf:ID="GSM_1800">
+            <connectionType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >GSM</connectionType>
+            <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >GSM1800</version>
+          </GSM>
+        </connection>
+        <connection rdf:resource="#GSM_850"/>
+        <connection>
+          <GSM rdf:ID="GSM_1900">
+            <connectionType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >GSM</connectionType>
+            <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >GSM1900</version>
+          </GSM>
+        </connection>
+        <memory>
+          <RAM rdf:ID="RAM_1">
+            <amount rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+            >40</amount>
+            <available>
+              <RAM rdf:ID="RAM_2">
+                <amount rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+                >40</amount>
+              </RAM>
+            </available>
+          </RAM>
+        </memory>
+      </hw_description>
+    </hw_properties>
+    <sw_properties>
+      <OS rdf:ID="OS_Symbian">
+        <os>
+          <info_description rdf:ID="info_description_Symbian9_1">
+            <vendor rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Symbian</vendor>
+            <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >9.1</version>
+            <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Symbian</name>
+            <brand rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            ></brand>
+          </info_description>
+        </os>
+      </OS>
+    </sw_properties>
+    <hasCapability>
+      <Communication_capability rdf:ID="Communication_capability_3gEnabled">
+        <thirdG rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</thirdG>
+      </Communication_capability>
+    </hasCapability>
+  </linksmart_device>
+  <error_cause rdf:ID="error_cause_1_grundfos">
+    <remedy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Check fuses and possible loose electrical connections.</remedy>
+    <cause rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Supply failure</cause>
+  </error_cause>
+  <info_description rdf:ID="info_description_picoTh03">
+    <vendor rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Pico</vendor>
+    <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >01</version>
+    <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PicoTh03</name>
+    <www rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></www>
+  </info_description>
+  <error_cause rdf:ID="error_cause_2_grundfos">
+    <remedy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Replace the capacitor.</remedy>
+    <cause rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Capacitor is defective</cause>
+  </error_cause>
+  <info_description rdf:ID="info_description_grundfos_pump_UPS">
+    <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >USP Series 100</name>
+    <vendor rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Grundfos Ltd.</vendor>
+    <www rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >http://www.grundfos.com</www>
+    <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >100</version>
+  </info_description>
+  <device_error rdf:ID="noise_in_the_system_grundfos">
+    <has_cause>
+      <error_cause rdf:ID="error_cause_6_grundfos">
+        <remedy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Vent the system</remedy>
+        <cause rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Air in the system</cause>
+      </error_cause>
+    </has_cause>
+    <has_cause>
+      <error_cause rdf:ID="error_cause_5_grundfos">
+        <cause rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Pump flow setting is too high</cause>
+        <remedy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Change over to lower speed.</remedy>
+      </error_cause>
+    </has_cause>
+    <fault_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Noise in the system</fault_name>
+  </device_error>
+  <ap_description rdf:ID="ap_description_5"/>
+  <device_error rdf:ID="pump_fails_to_start_grundfos">
+    <fault_name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Pump fails to start</fault_name>
+    <has_cause>
+      <error_cause rdf:ID="error_cause_3_grundfos">
+        <cause rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Pump blocked due to furred bearings</cause>
+        <remedy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Change over to maximum speed for a short period of free the rotor with a screwdriver inserted in the slot of the shaft end.</remedy>
+      </error_cause>
+    </has_cause>
+    <has_cause>
+      <error_cause rdf:ID="error_cause_4_grundfos">
+        <cause rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Impurities in the pump</cause>
+        <remedy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Dismantle and clean the pump.</remedy>
+      </error_cause>
+    </has_cause>
+    <has_cause rdf:resource="#error_cause_1_grundfos"/>
+    <has_cause rdf:resource="#error_cause_2_grundfos"/>
+  </device_error>
+  <linksmart_device rdf:ID="AbloyLock">
+    <hw_properties>
+      <hw_description rdf:ID="hw_description_AbloyLock">
+        <connection>
+          <Serial_connection rdf:ID="Serial_connection_1">
+            <connectionType rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Serial</connectionType>
+            <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            ></version>
+          </Serial_connection>
+        </connection>
+        <cpu rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ATMEGA8L-8PL</cpu>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CPU is extened</rdfs:comment>
+      </hw_description>
+    </hw_properties>
+    <agent_compliancy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</agent_compliancy>
+    <info>
+      <info_description rdf:ID="info_description_AbloyLock">
+        <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Lock</name>
+        <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >01</version>
+        <www rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        ></www>
+        <vendor rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Abloy</vendor>
+        <brand rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >EL582</brand>
+      </info_description>
+    </info>
+    <hasCapability>
+      <utility_capability rdf:ID="utility_capability_lock">
+        <utility_description rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        ></utility_description>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >lock extended with serial connection</rdfs:comment>
+      </utility_capability>
+    </hasCapability>
+    <type rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></type>
+  </linksmart_device>
+  <info_description rdf:ID="info_description_mio_os">
+    <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >5</version>
+    <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >WIndows Mobile 5 for PC Phone Edition</name>
+    <vendor rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Microsoft</vendor>
+  </info_description>
+  <info_description rdf:ID="info_description_GSM">
+    <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >GSM module</name>
+  </info_description>
+  <ui_description rdf:ID="ui_description_mio">
+    <audio_input rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</audio_input>
+    <screen>
+      <screen_description rdf:ID="screen_description_mio">
+        <color rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >true</color>
+        <resolution>
+          <resolution_description rdf:ID="resolution_description_mio_screen">
+            <width rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+            >240</width>
+            <graphics rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</graphics>
+            <height rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+            >320</height>
+          </resolution_description>
+        </resolution>
+      </screen_description>
+    </screen>
+    <audio_output rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</audio_output>
+  </ui_description>
+  <info_description rdf:ID="info_description_1">
+    <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >searilport</name>
+  </info_description>
+  <linksmart_device rdf:ID="pico_th03">
+    <info rdf:resource="#info_description_picoTh03"/>
+    <agent_compliancy rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</agent_compliancy>
+    <hw_properties>
+      <hw_description rdf:ID="hw_description_pico">
+        <numOfChannels rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >3</numOfChannels>
+        <connection rdf:resource="#Serial_connection_1"/>
+        <cpu rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >PIC16C54C</cpu>
+      </hw_description>
+    </hw_properties>
+    <channelProperties>
+      <channel_description rdf:ID="channel_description_1_pico"/>
+    </channelProperties>
+    <hasCapability>
+      <measurement_capability rdf:ID="picoTh03Temperature">
+        <measurementAccuracy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >0.003</measurementAccuracy>
+      </measurement_capability>
+    </hasCapability>
+  </linksmart_device>
+  <hw_description rdf:ID="hw_description_mio">
+    <ui rdf:resource="#ui_description_mio"/>
+    <cpu rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Intel XScale PXA270 520MHz</cpu>
+  </hw_description>
+  <linksmart_device rdf:ID="linksmart_device_grundfos_pump">
+    <info rdf:resource="#info_description_grundfos_pump_UPS"/>
+    <has_error rdf:resource="#noise_in_the_system_grundfos"/>
+    <has_error rdf:resource="#noise_in_the_pump_grundfos"/>
+    <has_error rdf:resource="#pump_fails_to_start_grundfos"/>
+  </linksmart_device>
+  <linksmart_device rdf:ID="linksmart_device_mio_ppc_phone">
+    <type rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></type>
+    <hw_properties rdf:resource="#hw_description_mio"/>
+    <sw_properties>
+      <sw_description rdf:ID="sw_description_mio">
+        <os rdf:resource="#info_description_mio_os"/>
+      </sw_description>
+    </sw_properties>
+    <info>
+      <info_description rdf:ID="info_description_mitac_mio">
+        <vendor rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Mio Technology Limited</vendor>
+        <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Mitac MIO A701</name>
+        <version rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >A701</version>
+        <www rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >http://www.mio-tech.be/</www>
+      </info_description>
+    </info>
+  </linksmart_device>
+  <info_description rdf:ID="info_description_SiRF">
+    <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >SiRF InstantFix</name>
+  </info_description>
+  <resolution_description rdf:ID="resolution_description_measurement"/>
+  <info_description rdf:ID="info_description_Bluetooth">
+    <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Bluetooth connection</name>
+  </info_description>
+</rdf:RDF>
+
+<!-- Created with Protege (with OWL Plugin 3.3, Build 414)  http://protege.stanford.edu -->

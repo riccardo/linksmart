@@ -1,0 +1,157 @@
+package $package;
+
+$imports 
+
+public class $class implements $interface {
+
+	
+	protected String UUID;
+	private String url;
+	private StreamConnectionNotifier notifier;
+	private OutputStream cos;
+	private InputStream is;
+	private StreamConnection sc;
+	private boolean acknowledge;
+	private String serviceName;
+	private String clientHost;
+	private static int UUIDstatic = 1104;
+	
+	public void createConnectors(int port) {
+		LocalDevice device;
+		try {
+			device = LocalDevice.getLocalDevice();
+				String UUIDString = new Integer(UUIDstatic).toString();
+			UUIDstatic++;
+			UUID = new UUID(UUIDString, true).toString();
+			device.setDiscoverable(DiscoveryAgent.GIAC);
+		} catch (BluetoothStateException e) {
+			e.printStackTrace();
+		}
+		this.url = "btspp://localhost:"+UUID+";name="+this.serviceName;
+		try {
+			this.notifier = (StreamConnectionNotifier) Connector.open(url);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.clientHost = "";
+
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
+	public String getServerURL() {
+		return this.url;
+	}
+
+	public String getClientHost() {
+		return this.clientHost;
+	}
+
+	public String receive() {
+	
+		this.is = null;
+		String request = "";
+		try {
+			sc = (StreamConnection) notifier.acceptAndOpen();
+			is = sc.openInputStream();
+			this.cos = sc.openDataOutputStream();
+			int ch = 0;
+		int chCount = 0;
+		boolean condition = true;
+		int content = -1;
+		String connection = "close";
+        	StringBuffer sb = new StringBuffer();
+		StringBuffer auxiliar = new StringBuffer();
+		while(condition){
+			ch = is.read();
+			sb.append((char)ch);
+			auxiliar.append((char)ch);
+			if((char)ch == '\n'){
+				String line = auxiliar.toString();
+				if(line.toLowerCase().startsWith("content-length")){
+					line = line.substring(0,line.length()-2);
+					StringTokenizer st = new StringTokenizer(line,": ");
+					st.nextToken();
+					content = Integer.parseInt(st.nextToken());
+				}
+				if(line.toLowerCase().startsWith("connection")) {
+					line = line.substring(0,line.length()-2);
+					StringTokenizer st = new StringTokenizer(line,": ");
+					st.nextToken();
+					connection = st.nextToken();
+				}
+				else if(line.equalsIgnoreCase("\r\n"))
+						condition = false;
+				auxiliar = new StringBuffer();
+			}
+		}
+		while(chCount<content){
+			ch = is.read();
+			sb.append((char)ch);
+			chCount++;
+		}
+		request = sb.toString();
+		if(!connection.equals("close"))
+			this.acknowledge = true;
+		
+		else
+			this.acknowledge = false;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return request;
+	}
+
+	public void send(String result) {
+		if(this.acknowledge == true)
+			sendWithAcknowledge(result);
+		else
+			sendWithoutAcknowledge(result);
+		
+	}
+	
+	private void sendWithAcknowledge(String result) {
+		try {
+			this.cos.write(result.getBytes());
+			this.cos.flush();
+			int bytesRead = 0;
+			String response = "";
+			byte[] buffer = new byte[1024];
+			do {
+	            		bytesRead = is.read(buffer);
+	            		if (bytesRead > 0)
+	                		response = response.concat(new String(buffer, 0, bytesRead));
+	        	} while(!response.endsWith("$OK"));
+			is.close();
+			cos.close();
+			sc.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	private void sendWithoutAcknowledge(String result) {
+		try {
+			this.cos.write(result.getBytes());
+			this.cos.flush();
+			is.close();
+			cos.close();
+			sc.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+
+	public void closeConnection() {
+		try {
+			sc.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+	}
+
+}

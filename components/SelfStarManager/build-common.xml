@@ -1,0 +1,135 @@
+<!--
+  Copyright (C) 2006-2010 
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+Common build file for SelfStarManager bundles
+-->
+<project name="Common" basedir="." default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
+  <target name="fail">
+    <fail message="please use the root ant build file"/>
+  </target>
+ 
+  <property name="rootBuildDir" value="${basedir}/../../../build/SelfStarManager"/>
+  <property name="rootDistributionDir" value="${basedir}/../../../distribution/SelfStarManager"/>
+  <property name="src.dir" value="${basedir}/src"/>
+  <property name="test.dir" value="${basedir}/test"/>
+  <property name="build.dir" value="${rootBuildDir}/${moduleName}/bin"/>
+  <property name="lib.dir" value="${basedir}/lib"/>
+  <property name="distribution.dir" value="${rootDistributionDir}/${moduleName}"/>
+  <property name="bnd.file" value="${basedir}/resources/${moduleName}.bnd"/>
+  <property name="revision" value="1.0"/>
+  
+  <path id="classpath">
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <pathelement path="${build.dir}"/>
+  </path>
+  
+  <target name="make" depends="jar,publish">
+    <echo message="Compiling source from ${basedir} to ${build.dir} and then distribute to ${distribution.dir}"/>
+  </target>
+
+  <!-- Local versions of targets, setting properties so it may be called from this directory -->
+  <target name="local">
+    <property name="antlib.dir" value="${basedir}/../../../antlibs"/>
+    
+    <path id="antlib.path">
+      <fileset dir="${antlib.dir}" includes="*.jar"/>
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="antlib.path"/>
+    <taskdef resource="aQute/bnd/ant/taskdef.properties" classpathref="antlib.path"/> 
+  </target>
+
+  <target name="make-local" depends="local">
+    <antcall target="make"/>
+  </target>
+
+  <target name="clean-local" depends="local">
+	<antcall target="clean"/>
+  </target>
+	
+  <target name="test-local" depends="local">
+    <antcall target="test"/>
+  </target>
+  <!-- Local versions -->
+
+
+  <target name="publish" depends="jar">
+    <ivy:publish pubrevision="${revision}"
+		   resolver="local"
+		   forcedeliver="true"
+		   overwrite="true">
+      <artifacts pattern="${distribution.dir}/[artifact].[ext]"/>
+    </ivy:publish>
+  </target>
+  
+  <target name="resolve">
+    <echo message="basedir = ${basedir}, project = ${ant.project.name}, ${ant.file}"/>
+    <ivy:resolve transitive="false"/>	
+    <ivy:retrieve transitive="false" type="jar" pattern="${lib.dir}/[artifact]-[revision].[ext]"/>
+    <ivy:retrieve transitive="false" type="jars" pattern="${lib.dir}/[artifact]-[revision].[ext]"/>
+    <ivy:retrieve transitive="false" type="bundle" pattern="${lib.dir}/[artifact]-[revision].[ext]"/>
+    <copy file="${basedir}/../resources/eu.linksmart.bundleinspector-1.0.0.jar" todir="${lib.dir}"/>
+    <copy file="${antlib.dir}/bnd-0.0.384.jar" todir="${lib.dir}"/>
+    <echo message="DONE"/>
+  </target>
+  
+  <target name="clean">
+    <delete dir="${build.dir}" includeEmptyDirs="true"  failonerror="false"/>
+    <delete dir="${lib.dir}" includeEmptyDirs="true"  failonerror="false"/>
+    <delete dir="fw-cache" includeEmptyDirs="true"  failonerror="false"/>
+    <!-- FIXME: Eclipse output -->
+    <delete dir="bin" includeEmptyDirs="true"  failonerror="false"/>
+  </target>
+  
+  <target name="build" depends="resolve">
+    <mkdir dir="${build.dir}"/>
+    <javac destdir="${build.dir}" classpathref="classpath">   
+      <src path="${src.dir}"/>
+      <src path="${test.dir}"/>
+    </javac>
+  </target>
+  
+  <target name="jar" depends="build">
+    <mkdir dir="${distribution.dir}"/>
+    <bnd 
+	 classpath="${build.dir}" 
+	 eclipse="false" 
+	 failok="false" 
+	 exceptions="true"
+	 output="${distribution.dir}/${moduleName}.jar"
+	 files="${bnd.file}"/>
+  </target>
+
+  <target name="test" depends="make">
+    <junit fork="yes" haltonfailure="yes">
+      <sysproperty key="lib.dir" 
+		     value="${basedir}/lib"/>
+      <classpath>
+	 <path refid="classpath"/>
+      </classpath>
+      <formatter type="brief" usefile="false"/>
+      <batchtest fork="yes">
+	 <fileset dir="${test.dir}">
+	   <include name="**/*Test*.java"/>
+	 </fileset>
+      </batchtest>
+    </junit>
+  </target>
+</project>

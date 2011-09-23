@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2006-2010 Technical University of Kosice
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:property="http://localhost/ontologies/StaticPropertyModel.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:unit="http://localhost/ontologies/Unit.owl#"
+    xmlns="http://localhost/ontologies/Energy.owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://localhost/ontologies/Energy.owl">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+  </owl:Ontology>
+  <owl:Class rdf:ID="EnergyClassification"/>
+  <owl:Class rdf:ID="EnergyOperation"/>
+  <owl:Class rdf:ID="EnergyProfile"/>
+  <owl:Class rdf:ID="EnergyLifeTime"/>
+  <owl:Class rdf:ID="EnergyMode"/>
+  <owl:DatatypeProperty rdf:ID="modeMax">
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="modeShutdown">
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="modeAverage">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="modeStart">
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="classificationSystem">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EnergyClassification"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="modeName">
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="classificationValue">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EnergyClassification"/>
+  </owl:DatatypeProperty>
+  <property:SingleValueAnnotationProperty rdf:ID="modeUnit">
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#Power"/>
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+  </property:SingleValueAnnotationProperty>
+  <property:SingleValueFormProperty rdf:ID="shutDownCost">
+    <rdfs:domain rdf:resource="#EnergyLifeTime"/>
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+  </property:SingleValueFormProperty>
+  <property:MultiValueFormProperty rdf:ID="generation">
+    <rdfs:range rdf:resource="#EnergyMode"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </property:MultiValueFormProperty>
+  <property:SingleValueFormProperty rdf:ID="startCost">
+    <rdfs:domain rdf:resource="#EnergyLifeTime"/>
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+  </property:SingleValueFormProperty>
+  <property:MultiValueFormProperty rdf:ID="lifeTime">
+    <rdfs:range rdf:resource="#EnergyLifeTime"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </property:MultiValueFormProperty>
+  <property:SingleValueFormProperty rdf:ID="classification">
+    <rdfs:range rdf:resource="#EnergyClassification"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </property:SingleValueFormProperty>
+  <property:MultiValueFormProperty rdf:ID="operation">
+    <rdfs:range rdf:resource="#EnergyOperation"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </property:MultiValueFormProperty>
+  <property:SingleValueFormProperty rdf:ID="minimumRunTime">
+    <rdfs:domain rdf:resource="#EnergyOperation"/>
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+  </property:SingleValueFormProperty>
+  <property:SingleValueFormProperty rdf:ID="expected">
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+    <rdfs:domain rdf:resource="#EnergyLifeTime"/>
+  </property:SingleValueFormProperty>
+  <property:MultiValueFormProperty rdf:ID="consumption">
+    <rdfs:range rdf:resource="#EnergyMode"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </property:MultiValueFormProperty>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

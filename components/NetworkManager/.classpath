@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="eu/linksmart/network/ws/NetworkManagerApplication.java|eu/linksmart/network/ws/CryptoHIDResult.java|eu/linksmart/network/ws/NMResponse.java|eu/linksmart/network/backbone/StdPeerGroupParamAdvertisement.java|eu/linksmart/network/backbone/LinkSmartGroupCreator.java|eu/linksmart/network/impl/NetworkManagerConfigurator_old.java" kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/jxta.jar"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

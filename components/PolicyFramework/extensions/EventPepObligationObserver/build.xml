@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2006-2010 University of Reading,
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+	<!--
+		Build file for LinkSmart EventPepObligationObserver author: Marco Tiemann
+	-->
+
+	<!--
+		The following properties must be pre-defined in the parent ant script:
+		- javaLibDir directory containing 3rd party Java libraries -
+		rootBuildDir base directory for all intermediate outputs -
+		rootDistributionDir directory for compiled bundles
+	-->
+
+<project name="EventPepObligationObserver" default="fail"
+	xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<!-- properties -->
+
+	<property name="moduleName" value="EventPepObligationObserver" />
+	<property name="revision" value="1.0.0" />
+
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="test.dir" value="${basedir}/test" />
+	<property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test" />
+	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
+	<property name="lib.dir" value="${rootBuildDir}/${moduleName}/lib" />
+	<property name="dist.dir" value="${rootDistributionDir}/${moduleName}" />
+	<property name="bnd.file" value="${basedir}/resources/${moduleName}.bnd" />
+
+	<!-- paths -->
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
+	</path>
+
+	<path id="test-classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
+		<pathelement path="${test.build.dir}" />
+	</path>
+
+	<!-- targets -->
+
+	<!--
+		default target fails to encourage using the distribution build file
+	-->
+	<target name="fail">
+		<fail message="please use the root ant build file" />
+	</target>
+
+	<!-- set up local build environment -->
+	<target name="setup-local">
+		<echo message="Setting up local build environment" />
+		<property name="antlib.dir" value="${basedir}/../antlibs" />
+		<path id="antlib.path">
+			<fileset dir="${antlib.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant"
+			classpathref="antlib.path" />
+		<taskdef resource="aQute/bnd/ant/taskdef.properties"
+			classpathref="antlib.path" />
+	</target>
+
+	<!-- local make -->
+	<target name="make-local" depends="setup-local">
+		<echo message="Calling make locally" />
+		<antcall target="make" />
+	</target>
+
+	<!-- local test -->
+	<target name="test-local" depends="setup-local">
+		<echo message="Calling test locally" />
+		<antcall target="test" />
+	</target>
+
+	<!-- set up build environment -->
+	<target name="resolve">
+		<echo message="Setting up build environment" />
+		<ivy:resolve transitive="false" />
+		<ivy:retrieve transitive="false" type="jar"
+			pattern="${lib.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="false" type="jars"
+			pattern="${lib.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="false" type="bundle"
+			pattern="${lib.dir}/[artifact]-[revision].[ext]" />
+	</target>
+
+	<!-- build -->
+	<target name="build" depends="resolve">
+		<echo message="Compiling" />
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" classpathref="classpath">
+			<src path="${src.dir}" />
+		</javac>
+	</target>
+
+	<!-- package -->
+	<target name="jar" depends="build">
+		<echo message="Packaging" />
+		<mkdir dir="${dist.dir}" />
+		<bnd classpath="${build.dir}" eclipse="false" failok="false"
+			exceptions="true" output="${dist.dir}/${moduleName}-${revision}.jar"
+			files="${bnd.file}" />
+	</target>
+
+	<!-- publish -->
+	<target name="publish" depends="jar">
+		<echo message="Publishing" />
+		<ivy:publish pubrevision="${revision}" resolver="local"
+			forcedeliver="true" overwrite="true">
+			<artifacts pattern="${dist.dir}/[artifact]-${revision}.[ext]" />
+		</ivy:publish>
+	</target>
+
+	<!-- make -->
+	<target name="make" depends="jar,publish">
+		<echo message="Compiled from: ${basedir}" />
+		<echo message="Compiled to: ${build.dir}" />
+		<echo message="Published as: ${rootDistributionDir}/${moduleName}.jar" />
+	</target>
+
+	<!-- test -->
+	<target name="test" depends="make">
+		<echo message="Testing" />
+		<mkdir dir="${test.build.dir}" />
+		<javac destdir="${test.build.dir}" classpathref="classpath">
+			<src path="${test.dir}" />
+		</javac>
+		<junit fork="yes" haltonfailure="yes">
+			<classpath>
+				<path refid="test-classpath" />
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<batchtest fork="yes">
+				<fileset dir="${test.dir}">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<!-- clean -->
+	<target name="clean">
+		<echo message="Cleaning" />
+		<!-- files in build directory -->
+		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
+		<delete dir="${lib.dir}" includeEmptyDirs="true" failonerror="false" />
+		<!-- files in distribution directory -->
+		<delete dir="${dist.dir}" includeEmptyDirs="true" failonerror="false" />
+		<delete file="${rootDistributionDir}/${moduleName}.jar"
+			failonerror="false" />
+		<!-- files in test directory -->
+		<delete dir="${test.build.dir}" includeEmptyDirs="true"
+			failonerror="false" />
+	</target>
+
+</project>

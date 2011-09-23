@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:impl="http://linksmart.eu" targetNamespace="http://linksmart.eu" xmlns:linksmart="http://linksmart.eu/">
+	<message name="getTemperatureValueRequest">
+	</message>
+	<message name="getTemperatureValueResponse">
+		<part name="temperatureResponse" type="xs:double"/>
+	</message>
+	<portType name="SunSpotThermometerPort">
+		<operation name="getTemperatureValue">
+			<input message="impl:getTemperatureValueRequest" name="getTemperatureValueRequest"/>
+			<output message="impl:getTemperatureValueResponse" name="getTemperatureValueResponse"/>
+		</operation>
+	</portType>
+	<binding name="SunSpotThermometerBinding" type="impl:SunSpotThermometerPort">
+		<linksmart:binding device="file:./resources/Device.owl#SunSpot"/>
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="getTemperatureValue">
+			<soap:operation soapAction="getTemperatureValue" style="rpc"/>
+			<input name="getTemperatureValueRequest">
+				<soap:body use="literal" namespace="http://linksmart.eu"/>
+			</input>
+			<output name="getTemperatureValueResponse">
+				<soap:body use="literal" namespace="http://linksmart.eu"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="SunSpotThermometerService">
+		<port name="SunSpotThermometerPort" binding="impl:SunSpotThermometerBinding">
+			<soap:address location="http://localhost:8082/services/SunSpotThermometerService"/>
+		</port>
+	</service>
+</definitions>
+

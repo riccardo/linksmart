@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="HYDRA/antlibs/bnd-0.0.384.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_framework/lib/velocity-1.5.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_framework/lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_framework/lib/org.osgi.core-1.4.0.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_framework/lib/org.apache.felix.shell-1.4.2.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_framework/lib/org.apache.felix.shell.tui-1.4.1.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_framework/lib/org.osgi.compendium-1.4.0.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_framework/lib/wsdl4j-1.6.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

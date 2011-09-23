@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		Copyright (C) 2006-2010 University of Reading, the HYDRA consortium,
+		EU project IST-2005-034891 This file is part of LinkSmart. LinkSmart
+		is free software: you can redistribute it and/or modify it under the
+		terms of the GNU LESSER GENERAL PUBLIC LICENSE version 3 as published
+		by the Free Software Foundation. LinkSmart is distributed in the hope
+		that it will be useful, but WITHOUT ANY WARRANTY; without even the
+		implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+		PURPOSE. See the GNU Lesser General Public License for more details.
+
+		You should have received a copy of the GNU Lesser General Public
+		License along with LinkSmart. If not, see
+		<http://www.gnu.org/licenses/>.
+	-->
+<ivy-module version="2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+	<info organisation="eu.linksmart" module="XmlDbPolicyRepository" />
+
+	<publications>
+		<artifact name="XmlDbPolicyRepository" type="jar" />
+	</publications>
+
+	<dependencies>
+		<dependency org="antlr" name="antlr" rev="2.7.6" />
+		<dependency org="asm" name="asm" rev="3.2" />
+		<dependency org="cglib" name="cglib-nodep" rev="2.2" />
+		<dependency org="commons-collections" name="commons-collections"
+			rev="3.1" />
+		<dependency org="commons-logging" name="commons-logging"
+			rev="1.0.4" />
+		<dependency org="commons-pool" name="commons-pool" rev="1.4" />
+		<dependency org="org.easymock" name="easymock" rev="3.0" />
+		<dependency org="exist" name="exist" rev="1.2.5" />
+		<dependency org="exist" name="exist-modules" rev="1.2.5" />
+		<dependency org="jgroups" name="jgroups-all" rev="2.4.1" />
+		<dependency org="javax.transaction" name="jta" rev="1.1" />
+		<dependency org="junit" name="junit" rev="4.8.1" />
+		<dependency org="log4j" name="log4j" rev="1.2.16" />
+		<dependency org="org.objenesis" name="objenesis" rev="1.2" />
+		<dependency org="org.osgi" name="org.osgi.compendium" rev="4.2.0" />
+		<dependency org="org.osgi" name="org.osgi.core" rev="4.2.0" />
+		<dependency org="org.opensymphony.quartz" name="quartz"
+			rev="1.6.1" />
+		<dependency org="xalan" name="serializer" rev="2.7.1" />
+		<dependency org="sunxacml" name="sunxacml" rev="1.2" />
+		<dependency org="org.apache.ws.commons" name="ws-commons-util"
+			rev="1.0.1" />
+		<dependency org="xalan" name="xalan" rev="2.7.1" />
+		<dependency org="xerces" name="xercesImpl" rev="2.9.1" />
+		<dependency org="xml-resolver" name="xml-resolver" rev="1.2" />
+		<dependency org="xmldb" name="xmldb" rev="1.0.0" />
+		<dependency org="org.apache.xmlrpc" name="xmlrpc-client"
+			rev="3.1.3" />
+		<dependency org="org.apache.xmlrpc" name="xmlrpc-common"
+			rev="3.1.1" />
+		<!-- LinkSmart development dependencies -->
+		<dependency org="LinkSmartMiddlewareAPI" name="LinkSmartMiddlewareAPI"
+			rev="latest.integration" changing="true" />
+		<dependency org="eu.linksmart" name="LinkSmartXMLDatabase" rev="latest.integration"
+			changing="true" />
+		<dependency org="eu.linksmart" name="PolicyDecisionPoint"
+			rev="latest.integration" changing="true" />
+	</dependencies>
+
+</ivy-module> 

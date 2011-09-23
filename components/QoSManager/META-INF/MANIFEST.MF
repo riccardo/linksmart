@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: QoSManagerBundle Plug-in
+Bundle-SymbolicName: QoSManagerBundle
+Bundle-Version: 1.0.0
+Bundle-Vendor: Fraunhofer FIT
+Service-Component: OSGI-INF/component.xml
+Bundle-ClassPath: .
+Import-Package: eu.linksmart.aom,
+ eu.linksmart.clients,
+ eu.linksmart.network,
+ eu.linksmart.qos,
+ eu.linksmart.utils,
+ org.apache.log4j,
+ org.osgi.framework,
+ org.osgi.service.cm,
+ org.osgi.service.component;version="1.1.0"
+Export-Package: eu.linksmart.qos.client.request,
+ eu.linksmart.qos.client.response,
+ eu.linksmart.qos.impl

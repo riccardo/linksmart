@@ -1,0 +1,618 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="file:./resources/StateMachine.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="file:./resources/StateMachine.owl">
+  <owl:Ontology rdf:about="file:./resources/StateMachine.owl"/>
+  <owl:Class rdf:ID="StateMachinePart"/>
+  <owl:Class rdf:ID="Junction">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Pseudostate"/>
+    </rdfs:subClassOf>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="Branch"/>
+    </owl:disjointWith>
+  </owl:Class>
+  <owl:Class rdf:ID="Join">
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Branch"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="History"/>
+    </owl:disjointWith>
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#Junction"/>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Pseudostate"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Simple">
+    <owl:disjointWith>
+      <owl:Class rdf:ID="SynchState"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="Composite"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="Initial"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="Final"/>
+    </owl:disjointWith>
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="State"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#Pseudostate">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#State"/>
+    </rdfs:subClassOf>
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#Simple"/>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Final"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#SynchState"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Initial"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Composite"/>
+    </owl:disjointWith>
+  </owl:Class>
+  <owl:Class rdf:ID="Guard">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >must be true in order for event to happen</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#StateMachinePart"/>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="Action"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="StateMachine"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#State"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="Event"/>
+    </owl:disjointWith>
+  </owl:Class>
+  <owl:Class rdf:ID="Split">
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#Join"/>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#History"/>
+    </owl:disjointWith>
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#Junction"/>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Branch"/>
+    </owl:disjointWith>
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#Pseudostate"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#Composite">
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#SynchState"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Final"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Initial"/>
+    </owl:disjointWith>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#State"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#Event">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >event to cause the transition</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#StateMachinePart"/>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#State"/>
+    </owl:disjointWith>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Action"/>
+    </owl:disjointWith>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#Action">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >action to be performed once the transition has been triggered</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#StateMachinePart"/>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#State"/>
+    </owl:disjointWith>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#State">
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#StateMachinePart"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#History">
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Branch"/>
+    </owl:disjointWith>
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#Junction"/>
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#Pseudostate"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >can be used for history state</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#SynchState">
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#State"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#Initial">
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#State"/>
+    <owl:disjointWith>
+      <owl:Class rdf:about="file:./resources/StateMachine.owl#Final"/>
+    </owl:disjointWith>
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#SynchState"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Transition">
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#State"/>
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#StateMachinePart"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#StateMachine">
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#StateMachinePart"/>
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#Event"/>
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#Action"/>
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#State"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#Final">
+    <owl:disjointWith rdf:resource="file:./resources/StateMachine.owl#SynchState"/>
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#State"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/StateMachine.owl#Branch">
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#Pseudostate"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Region">
+    <rdfs:subClassOf rdf:resource="file:./resources/StateMachine.owl#Composite"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:ID="hasStates">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="file:./resources/StateMachine.owl#StateMachine"/>
+          <owl:Class rdf:about="file:./resources/StateMachine.owl#Composite"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#State"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="HasTransitions">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="file:./resources/StateMachine.owl#StateMachine"/>
+          <owl:Class rdf:about="file:./resources/StateMachine.owl#Transition"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#Transition"/>
+  </owl:ObjectProperty>
+  <owl:FunctionalProperty rdf:ID="isRegion">
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Composite"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="doActivity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#Action"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Simple"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="isConcurrent">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Composite"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="TransitAction">
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Transition"/>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#Action"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="Label">
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#StateMachinePart"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="StateName">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#State"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="Source">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#State"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Transition"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="TransitionName">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Transition"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="Exit">
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#State"/>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#Action"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="Target">
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Transition"/>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#State"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="isCurrent">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#State"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="Count">
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#SynchState"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="TransitionGuard">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Transition"/>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#Guard"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="Entry">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#State"/>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#Action"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="Body">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="GuardCondition">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Guard"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="actionResult">
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Action"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="TransitEvent">
+    <rdfs:domain rdf:resource="file:./resources/StateMachine.owl#Transition"/>
+    <rdfs:range rdf:resource="file:./resources/StateMachine.owl#Event"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <Action rdf:ID="idling"/>
+  <StateMachine rdf:ID="VentilatorMY0193_sm"/>
+  <Simple rdf:ID="on">
+    <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >false</isCurrent>
+    <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >on</StateName>
+    <doActivity>
+      <Action rdf:ID="detect">
+        <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >detect</Label>
+      </Action>
+    </doActivity>
+  </Simple>
+  <Action rdf:ID="FlowMeterStop">
+    <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</actionResult>
+  </Action>
+  <Simple rdf:ID="processingImage">
+    <doActivity>
+      <Action rdf:ID="validImage">
+        <Body rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >validImage(image)</Body>
+        <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ture</actionResult>
+        <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >validImage</Label>
+      </Action>
+    </doActivity>
+    <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >processingImage</StateName>
+    <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >t</isCurrent>
+  </Simple>
+  <Event rdf:ID="start">
+    <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >start</Label>
+  </Event>
+  <Transition rdf:ID="T_turnrIdle">
+    <TransitAction rdf:resource="file:./resources/StateMachine.owl#idling"/>
+    <TransitEvent>
+      <Event rdf:ID="noJob">
+        <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >noJob</Label>
+      </Event>
+    </TransitEvent>
+    <TransitionName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >T_tunrIdle</TransitionName>
+    <Source rdf:resource="file:./resources/StateMachine.owl#processingImage"/>
+    <Target>
+      <Simple rdf:ID="idle">
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >idle</StateName>
+        <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >false</isCurrent>
+      </Simple>
+    </Target>
+  </Transition>
+  <Action rdf:ID="getTemperatureOutdoor">
+    <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >getTemperature</Label>
+    <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >36.0</actionResult>
+  </Action>
+  <Action rdf:ID="PicoTH03_Outdoor_stop">
+    <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</actionResult>
+  </Action>
+  <Simple rdf:ID="FlowMeterMeauring">
+    <doActivity>
+      <Action rdf:ID="getFlowValue">
+        <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#double"
+        >2.0</actionResult>
+        <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >getFlowValue</Label>
+      </Action>
+    </doActivity>
+    <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >FlowMeterMeauring</StateName>
+  </Simple>
+  <Transition rdf:ID="T_stop">
+    <TransitAction>
+      <Action rdf:ID="turnOff"/>
+    </TransitAction>
+    <Source>
+      <Composite rdf:ID="CamerOn">
+        <hasStates>
+          <Simple rdf:ID="initializing">
+            <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >false</isCurrent>
+            <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >initializing</StateName>
+          </Simple>
+        </hasStates>
+        <hasStates>
+          <Simple rdf:ID="takingPicture">
+            <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >false</isCurrent>
+            <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >takingPicture</StateName>
+          </Simple>
+        </hasStates>
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >CamerOn</StateName>
+        <HasTransitions>
+          <Transition rdf:ID="T_ProcessingImage">
+            <TransitAction rdf:resource="file:./resources/StateMachine.owl#validImage"/>
+            <Target rdf:resource="file:./resources/StateMachine.owl#processingImage"/>
+            <Source rdf:resource="file:./resources/StateMachine.owl#takingPicture"/>
+            <TransitionName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >T_ProcessingImage</TransitionName>
+          </Transition>
+        </HasTransitions>
+        <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >flase</isCurrent>
+      </Composite>
+    </Source>
+    <Target>
+      <Initial rdf:ID="Off">
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Off</StateName>
+        <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >false</isCurrent>
+      </Initial>
+    </Target>
+    <TransitionName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >T_stop</TransitionName>
+    <TransitEvent>
+      <Event rdf:ID="stop">
+        <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >stop</Label>
+      </Event>
+    </TransitEvent>
+  </Transition>
+  <Action rdf:ID="PicoTH03_Outdoor_Initialize">
+    <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</actionResult>
+  </Action>
+  <Simple rdf:ID="ThermometerStarting">
+    <doActivity>
+      <Action rdf:ID="ThermometerStart"/>
+    </doActivity>
+    <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ThermometerStarting</StateName>
+  </Simple>
+  <StateMachine rdf:ID="TRENDnet_TVIP200W">
+    <HasTransitions rdf:resource="file:./resources/StateMachine.owl#T_ProcessingImage"/>
+    <HasTransitions rdf:resource="file:./resources/StateMachine.owl#T_stop"/>
+    <HasTransitions>
+      <Transition rdf:ID="T_TakePticture">
+        <TransitAction>
+          <Action rdf:ID="takePicture">
+            <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >takePicture</Label>
+          </Action>
+        </TransitAction>
+        <Source rdf:resource="file:./resources/StateMachine.owl#initializing"/>
+        <Target rdf:resource="file:./resources/StateMachine.owl#takingPicture"/>
+        <TransitionName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >T_TakePticture</TransitionName>
+        <TransitEvent>
+          <Event rdf:ID="startTakePicture">
+            <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >startTakePicture</Label>
+          </Event>
+        </TransitEvent>
+      </Transition>
+    </HasTransitions>
+    <HasTransitions>
+      <Transition rdf:ID="T_turnon">
+        <TransitAction>
+          <Action rdf:ID="turnOn">
+            <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >turnOn</Label>
+          </Action>
+        </TransitAction>
+        <Source rdf:resource="file:./resources/StateMachine.owl#Off"/>
+        <TransitionName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >T_turnon</TransitionName>
+        <TransitEvent rdf:resource="file:./resources/StateMachine.owl#start"/>
+        <Target rdf:resource="file:./resources/StateMachine.owl#CamerOn"/>
+      </Transition>
+    </HasTransitions>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#Off"/>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#CamerOn"/>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#processingImage"/>
+  </StateMachine>
+  <StateMachine rdf:ID="FlowMeter_sm">
+    <hasStates>
+      <Simple rdf:ID="FlowMeterStopping">
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >FlowMeterStopping</StateName>
+        <doActivity rdf:resource="file:./resources/StateMachine.owl#FlowMeterStop"/>
+      </Simple>
+    </hasStates>
+    <hasStates>
+      <Simple rdf:ID="FlowMeterStarting">
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >FlowMeterStarting</StateName>
+        <doActivity>
+          <Action rdf:ID="FlowMeterStart">
+            <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+            >true</actionResult>
+          </Action>
+        </doActivity>
+      </Simple>
+    </hasStates>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#FlowMeterMeauring"/>
+  </StateMachine>
+  <Simple rdf:ID="ThermometerMeauring">
+    <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >ThermometerMeauring</StateName>
+    <doActivity>
+      <Action rdf:ID="getTemperature">
+        <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >getTemperature</Label>
+      </Action>
+    </doActivity>
+  </Simple>
+  <Simple rdf:ID="PicoTH03_Indoor_Starting">
+    <doActivity>
+      <Action rdf:ID="PicoTH03_Indoor_Initialize">
+        <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+        >false</actionResult>
+      </Action>
+    </doActivity>
+    <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PicoTH03_Indoor_Starting</StateName>
+  </Simple>
+  <Simple rdf:ID="stopping">
+    <doActivity>
+      <Action rdf:ID="r">
+        <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >result</Label>
+        <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >12.0</actionResult>
+      </Action>
+    </doActivity>
+  </Simple>
+  <Simple rdf:ID="PicoTH03_Outdoor_measuring">
+    <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >measuring</Label>
+    <doActivity rdf:resource="file:./resources/StateMachine.owl#getTemperatureOutdoor"/>
+    <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >true</isCurrent>
+  </Simple>
+  <StateMachine rdf:ID="PIcoTh03_Outdoor_sm">
+    <hasStates>
+      <Simple rdf:ID="PicoTH03_Outdoor_stoped">
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >PicoTH03_Outdoor_stoped</StateName>
+        <doActivity rdf:resource="file:./resources/StateMachine.owl#PicoTH03_Outdoor_stop"/>
+      </Simple>
+    </hasStates>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#PicoTH03_Outdoor_measuring"/>
+    <hasStates>
+      <Simple rdf:ID="PicoTH03_Outdoor_Starting">
+        <doActivity rdf:resource="file:./resources/StateMachine.owl#PicoTH03_Outdoor_Initialize"/>
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >PicoTH03_Outdoor_Starting</StateName>
+      </Simple>
+    </hasStates>
+    <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PIcoTh03_Outdoor</Label>
+  </StateMachine>
+  <Simple rdf:ID="PicoTH03_Indoor_measuring">
+    <doActivity>
+      <Action rdf:ID="getTemperatureIndoor">
+        <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >getTemperature</Label>
+        <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >39.0</actionResult>
+      </Action>
+    </doActivity>
+    <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >true</isCurrent>
+    <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >measuring</Label>
+  </Simple>
+  <Simple rdf:ID="starting"/>
+  <StateMachine rdf:ID="Thermometer_sm">
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#ThermometerMeauring"/>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#ThermometerStarting"/>
+    <hasStates>
+      <Simple rdf:ID="ThermometerStopping">
+        <doActivity>
+          <Action rdf:ID="ThermometerStop"/>
+        </doActivity>
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >ThermometerStopping</StateName>
+      </Simple>
+    </hasStates>
+  </StateMachine>
+  <Initial rdf:ID="sensorOff">
+    <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >sensorOff</StateName>
+    <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >true</isCurrent>
+  </Initial>
+  <Transition rdf:ID="T_measureToStop">
+    <Source rdf:resource="file:./resources/StateMachine.owl#initializing"/>
+    <Target>
+      <Simple rdf:ID="measuring">
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >detecting</StateName>
+        <isCurrent rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >false</isCurrent>
+      </Simple>
+    </Target>
+  </Transition>
+  <Action rdf:ID="PicoTH03_Indoor_stop">
+    <actionResult rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</actionResult>
+  </Action>
+  <Event rdf:ID="startImageProcessing">
+    <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >startImageProcessing</Label>
+    <Body rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></Body>
+  </Event>
+  <StateMachine rdf:ID="MS13E">
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#on"/>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#sensorOff"/>
+  </StateMachine>
+  <StateMachine rdf:ID="PIcoTh03_Indoor_sm">
+    <Label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PIcoTh03_Indoor</Label>
+    <hasStates>
+      <Simple rdf:ID="PicoTH03_Indoor_stoped">
+        <doActivity rdf:resource="file:./resources/StateMachine.owl#PicoTH03_Indoor_stop"/>
+        <StateName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >PicoTH03_Indoor_stoped</StateName>
+      </Simple>
+    </hasStates>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#PicoTH03_Indoor_measuring"/>
+    <hasStates rdf:resource="file:./resources/StateMachine.owl#PicoTH03_Indoor_Starting"/>
+  </StateMachine>
+</rdf:RDF>
+
+<!-- Created with Protege (with OWL Plugin 3.4, Build 126)  http://protege.stanford.edu -->

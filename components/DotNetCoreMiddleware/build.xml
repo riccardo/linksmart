@@ -1,0 +1,28 @@
+<!--
+	DotNetManagers build file. Calls MSBuild target
+-->
+
+<project name="IoTs-middleware" basedir="." default="message">
+  <taskdef resource="org/apache/ant/dotnet/antlib.xml">
+	<classpath><pathelement location="../../../libs/ant-dotnet-1.0.jar"/></classpath>
+  </taskdef>
+
+  <target name="message">
+	<echo message="No target specified." />
+  </target>
+
+  <target name="clean">
+	<echo message="nothing defined for cleaning"/>
+  </target>
+
+  <target name="make">
+	<msbuild buildfile="DotNetCoreMiddleware.sln">
+		<target name="IoTSmartControlPoint"/>
+        	<!--<property name="test" value="testvalue"/>-->
+	</msbuild>
+  </target>
+ 
+  <target name="test">
+	<echo message="no tests defined yet"/>
+  </target>
+</project>

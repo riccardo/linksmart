@@ -1,0 +1,3 @@
+Private-Package:eu.linksmart.selfstar.aom.*
+Service-Component=eu.linksmart.selfstar.aom.*
+Include-Resource:web=../example/web/

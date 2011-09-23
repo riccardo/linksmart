@@ -1,0 +1,21 @@
+# EventPepObligationObserver bnd instructions
+# 
+# Note that we are currently still using a separate MANIFEST.MF and 
+# declarative services activation file; this will change in a future 
+# version. Changes in this file will not directly change the 
+# MANIFEST.MF until then.
+#
+# author Marco Tiemann
+#
+-manifest= ../META-INF/MANIFEST.MF
+version=1.0.0
+Include-Resource: resources/eventpepobserver.properties=eventpepobserver.properties,\
+ OSGI-INF/DSActivation.xml=../OSGI-INF/DSActivation.xml
+Export-Package: eu.linksmart.policy.pep.response.bundle.impl.*
+Service-Component: OSGI-INF/DSActivation.xml
+Bundle-Version: ${version}
+Bundle-Name: LinkSmart PEP event obligation handler
+Bundle-Description: eu.linksmart.policy.pep.obl.event
+Bundle-Vendor: University of Reading
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

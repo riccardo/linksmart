@@ -1,0 +1,28 @@
+#Copyright (C) 2006-2010 Fraunhofer FIT, Amro Al-Akkad
+#                        the HYDRA consortium, EU project IST-2005-034891
+#  
+#This file is part of LinkSmart.
+#  
+#LinkSmart is free software: you can redistribute it and/or modify
+#it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+#version 3 as published by the Free Software Foundation.
+#  
+#LinkSmart is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU Lesser General Public License for more details.
+ 
+#You should have received a copy of the GNU Lesser General Public
+#License along with LinkSmart.  If not, see http://www.gnu.org/licenses
+
+Include-Resource: resources/QM.properties=QM.properties, \
+					resources/README.txt=README.txt 
+Private-Package:eu.linksmart.qos.client.request,eu.linksmart.qos.client.response,eu.linksmart.qos.computation,eu.linksmart.qos.impl,eu.linksmart.qos.ontology.request,eu.linksmart.qos.ontology.response,eu.linksmart.qos.util;
+Bundle-ClassPath:.
+Import-Package:eu.linksmart.qos.clients,eu.linksmart.qos.network,eu.linksmart.qos.aom,eu.linksmart.qos,eu.linksmart.qos.utils,org.apache.log4j,org.osgi.framework,org.osgi.service.cm,org.osgi.service.component
+Service-Component=\
+    eu.linksmart.qos.impl.QoSManagerImpl;\
+      immediate:=true;\
+	  provide:=eu.linksmart.qos.QoSManager;\
+	  properties:="SOAP.service.name=QoSManagerPort"
+

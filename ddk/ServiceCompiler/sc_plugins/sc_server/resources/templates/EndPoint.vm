@@ -1,0 +1,25 @@
+package $package;
+
+import java.io.OutputStream;
+import java.util.Vector;
+
+
+public abstract class $class{
+	
+	private static Vector instances;
+	
+	public static void createEndPoints(String serverHost, int serverPort){
+		Vector v = new Vector(1);
+		v.addElement(new $service(serverHost, serverPort));
+		instances = v;
+	}
+	
+	public static Vector getEndPoints(){
+		return instances;
+	}
+	
+	public abstract Vector getOperationsNames();
+	
+	public abstract String handleRequest(String theRequest, String clientHost);
+
+}

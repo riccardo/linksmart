@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>LinkSmart Status and Configuration Tool</title>
+<link rel="stylesheet" href="LinkSmartStatus/css/style.css" type="text/css" media="all" />
+<script type="text/javascript" src="LinkSmartStatus/js/prototype.js"></script>
+<script type="text/javascript" src="LinkSmartStatus/js/configurator.js"></script>
+<script type="text/javascript" src="LinkSmartStatus/js/networkManagerStatus.js"></script>
+<script type="text/javascript" src="LinkSmartStatus/js/eventManagerStatus.js"></script>
+<script type="text/javascript" src="LinkSmartStatus/lib/prototype/prototype.js"></script>
+<script type="text/javascript" src="LinkSmartStatus/lib/scriptaculous/scriptaculous.js"></script>
+<script type="text/javascript" src="LinkSmartStatus/lib/scriptaculous/slider.js"></script>
+<script type="text/javascript" src="LinkSmartStatus/js/scroll.js"></script>
+<script type="text/javascript" src="LinkSmartStatus/js/textwrapper.js"></script>
+</head>
+<body>
+<div id="wrapper">
+  <div id="header">
+  	<p class="logoimage">
+  		<img src="LinkSmartStatus/images/linksmartlogo.gif" width=100/>
+  	</p>
+    <p class="logotext">LinkSmart<strong>Status</strong></p>
+  </div>
+  <div id="options">
+  	<div class="normal-tab" id="configuratorTab" onclick="startConfigurator()" style="position:absolute; left:0px; z-index:5"><h3>LinkSmart Configurator</h3></div>
+  	<div class="normal-tab" id="networkTab" onclick="startNetworkManagerStatus()" style="position:absolute; left:250px; z-index:6"><h3>Network Manager Status</h3></div>
+  	<div class="right-tab" id="eventTab" onclick="startEventManagerStatus()" style="position:absolute; left:500px; z-index:7"><h3>Event Manager Status</h3></div>
+  </div>
+  <div id="nav">
+  </div>
+  <div id="content">
+    <div id="left">
+      <h2>Available Configurations</h2>
+    </div>
+    <div id="right">
+	    <div id="selectedconftitle">
+	    	<h1>No configuration selected yet</h1>
+		</div>	
+		<table class="tabletitle">
+	      		<tr>
+	      			<td class="tabletdleft">
+	      				Property
+	      			</td>
+					<td class="tabletdright">
+						Value
+					</td>
+	      		</tr>
+	      	</table>
+	    <div id="selectedconfcontent">  
+		</div>
+    </div>
+  </div>
+  <br class="clear" />
+  <div id="footer">
+    <p><center>All content copyright &copy; 2009 <strong>LinkSmart project</strong>, all rights reserved.</center></p>
+  </div>
+</div>
+</body>
+<script type="text/javascript" charset="utf-8">	
+	
+var networkManagerInfo;
+var eventManagerInfo;
+var timerOption;
+var previousScroll = 0;
+var loadPrevScroll;
+
+getConfigurations();
+document.getElementById("configuratorTab").innerHTML = "<h4>LinkSmart Configurator</h4>";
+timerOption = setInterval("getConfigurations()",5000);
+
+function startConfigurator() {
+	getConfigurations();
+	clearInterval(timerOption);
+	document.getElementById("configuratorTab").innerHTML = "<h4>LinkSmart Configurator</h4>";
+	document.getElementById("networkTab").innerHTML = "<h3>Network Manager Status</h3>";
+	document.getElementById("eventTab").innerHTML = "<h3>Event Manager Status</h3>";
+	var text = "<div id=\"left\"><h2>Available Configurations</h2></div>";
+    text += "<div id=\"right\"><div id=\"selectedconftitle\"><h1>No configuration selected yet</h1></div>";	
+	text +=	"<table class=\"tabletitle\"><tr><td class=\"tabletdleft\">Property</td><td class=\"tabletdright\">Value</td></tr></table>";
+	text += "<div id=\"selectedconfcontent\"></div></div>";
+	document.getElementById("content").innerHTML = text;
+	timerOption = setInterval("getConfigurations()",5000);
+}
+
+function startNetworkManagerStatus() {
+	clearInterval(timerOption);
+	document.getElementById("configuratorTab").innerHTML = "<h3>LinkSmart Configurator</h3>";
+	document.getElementById("networkTab").innerHTML = "<h4>Network Manager Status</h4>";
+	document.getElementById("eventTab").innerHTML = "<h3>Event Manager Status</h3>";
+	var text = "<div id=\"suboptions\"><div class=\"left-tab-2\" id=\"networkManagers\" onclick=\"showNetworkManagers()\" style=\"position:absolute; left:0px; z-index:7\"><h3>Network Managers</h3></div>";
+	text += "<div class=\"normal-tab-2\" id=\"localHids\" onclick=\"showLocalHids()\" style=\"position:absolute; left:167px; z-index:6\"><h3>Local HIDs</h3></div>";
+	text += "<div class=\"normal-tab-2\" id=\"remoteHids\" onclick=\"showRemoteHids()\" style=\"position:absolute; left:335px; z-index:5\"><h3>Remote HIDs</h3></div></div>";
+	text += "<div id=\"search\"><div style=\"float:left; width:250px\"><h3>Seach Network Manager Entities: </h3></div><input id=\"searchtext\" type=\"text\" value=\"\" onkeypress=\"showNetworkManagerSearch(event)\"/></div>";
+	text += "<div id=\"infoContent\"></div>";
+	document.getElementById("content").innerHTML = text;
+	showNetworkManagers();
+}
+
+function showNetworkManagers() {
+	clearInterval(timerOption);
+	document.getElementById("networkManagers").innerHTML = "<h4>Network Managers</h4>";
+	document.getElementById("localHids").innerHTML = "<h3>Local HIDs</h3>";
+	document.getElementById("remoteHids").innerHTML = "<h3>Remote HIDs</h3>";
+	loadPrevScroll = 0;	
+	getNetworkManagerInfo();
+	timerOption = setInterval("getNetworkManagerInfo()",5000);
+}
+
+function showLocalHids() {
+	clearInterval(timerOption);
+	document.getElementById("networkManagers").innerHTML = "<h3>Network Managers</h3>";
+	document.getElementById("localHids").innerHTML = "<h4>Local HIDs</h4>";
+	document.getElementById("remoteHids").innerHTML = "<h3>Remote HIDs</h3>";	
+	loadPrevScroll = 0;
+	getLocalHidsInfo();
+	timerOption = setInterval("getLocalHidsInfo()",5000);
+}
+
+function showRemoteHids() {
+	clearInterval(timerOption);
+	document.getElementById("networkManagers").innerHTML = "<h3>Network Managers</h3>";
+	document.getElementById("localHids").innerHTML = "<h3>Local HIDs</h3>";
+	document.getElementById("remoteHids").innerHTML = "<h4>Remote HIDs</h4>";
+	loadPrevScroll = 0;
+	getRemoteHidsInfo();
+	timerOption = setInterval("getRemoteHidsInfo()",5000);
+}
+
+
+function showNetworkManagerSearch(event) {
+	document.getElementById("networkManagers").innerHTML = "<h3>Network Managers</h3>";
+	document.getElementById("localHids").innerHTML = "<h3>Local HIDs</h3>";
+	document.getElementById("remoteHids").innerHTML = "<h3>Remote HIDs</h3>";
+	//var keynum = event.which;
+	//if (keynum == 13) {
+		clearInterval(timerOption);
+		loadPrevScroll = 0;
+		getNetworkManagerSearch();
+		timerOption = setInterval("getNetworkManagerSearch()",5000);
+	//}
+}
+
+function startEventManagerStatus() {
+	clearInterval(timerOption);
+	document.getElementById("configuratorTab").innerHTML = "<h3>LinkSmart Configurator</h3>";
+	document.getElementById("networkTab").innerHTML = "<h3>Network Manager Status</h3>";
+	document.getElementById("eventTab").innerHTML = "<h4>Event Manager Status</h4>";
+	var text = "<div id=\"searchEvent\"><div style=\"float:left; width:250px\"><h3>Seach Event Subscriptions: </h3></div><input id=\"searchEventtext\" type=\"text\" value=\"\" onkeypress=\"showEventManagerSearch(event)\"/></div>";
+	text += "<div id=\"infoContent\"></div>";
+	document.getElementById("content").innerHTML = text;
+	loadPrevScroll = 0;
+	getEventManagerInfo();
+	timerOption = setInterval("getEventManagerInfo()",5000);
+}
+
+function showEventManagerSearch(event) {
+	//var keynum = event.which;
+	//if (keynum == 13) {
+		clearInterval(timerOption);
+		loadPrevScroll = 0;
+		getEventManagerSearch();
+		timerOption = setInterval("getEventManagerSearch()",5000);
+	//}
+}
+
+</script>
+</html>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component 
+	name="ContextPIP" immediate="true" >
+		
+	<implementation class="eu.linksmart.caf.policy.attribute.ContextAttributeFinder"/>
+ <reference cardinality="1..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManager" policy="dynamic"/>
+ <service>
+    <provide interface="eu.linksmart.policy.pdp.ext.impl.PipModule"/>
+ </service>
+		
+		
+</component>
+

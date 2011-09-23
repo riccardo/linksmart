@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:impl="http://linksmart.eu/"
+	xmlns:linksmart="http://linksmart.eu/" targetNamespace="http://linksmart.eu/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+	<wsdl:message name="createFileSystemDeviceRequest">
+		<wsdl:part name="name" type="xs:string" />
+		<wsdl:part name="config" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="createFileSystemDeviceResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="createFileSystemDeviceLocalRequest">
+		<wsdl:part name="name" type="xs:string" />
+		<wsdl:part name="config" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="createFileSystemDeviceLocalResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="deleteFileSystemDeviceRequest">
+		<wsdl:part name="name" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="deleteFileSystemDeviceResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="deleteFileSystemDeviceLocalRequest">
+		<wsdl:part name="name" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="deleteFileSystemDeviceLocalResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="getFileSystemDevicesRequest">
+	</wsdl:message>
+	
+	<wsdl:message name="getFileSystemDevicesResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="findFileSystemDeviceRequest">
+		<wsdl:part name="name" type="xs:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="findFileSystemDeviceResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="getSupportedFileSystemDevicesRequest">
+	</wsdl:message>
+	
+	<wsdl:message name="getSupportedFileSystemDevicesResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="updateFileSystemDeviceRequest">
+		<wsdl:part name="name" type="xs:string" />
+		<wsdl:part name="config" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="updateFileSystemDeviceResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="updateFileSystemDeviceLocalRequest">
+		<wsdl:part name="name" type="xs:string" />
+		<wsdl:part name="config" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="updateFileSystemDeviceLocalResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+
+
+	<wsdl:portType name="StorageManager">
+
+		<wsdl:operation name="createFileSystemDevice">
+			<wsdl:input message="impl:createFileSystemDeviceRequest"
+				name="createFileSystemDeviceRequest" />
+			<wsdl:output message="impl:createFileSystemDeviceResponse"
+				name="createFileSystemDeviceResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="createFileSystemDeviceLocal">
+			<wsdl:input message="impl:createFileSystemDeviceLocalRequest"
+				name="createFileSystemDeviceLocalRequest" />
+			<wsdl:output message="impl:createFileSystemDeviceLocalResponse"
+				name="createFileSystemDeviceLocalResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="deleteFileSystemDevice">
+			<wsdl:input message="impl:deleteFileSystemDeviceRequest"
+				name="deleteFileSystemDeviceRequest" />
+			<wsdl:output message="impl:deleteFileSystemDeviceResponse"
+				name="deleteFileSystemDeviceResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="deleteFileSystemDeviceLocal">
+			<wsdl:input message="impl:deleteFileSystemDeviceLocalRequest"
+				name="deleteFileSystemDeviceLocalRequest" />
+			<wsdl:output message="impl:deleteFileSystemDeviceLocalResponse"
+				name="deleteFileSystemDeviceLocalResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="getSupportedFileSystemDevices">
+			<wsdl:input message="impl:getSupportedFileSystemDevicesRequest"
+				name="getSupportedFileSystemDevicesRequest" />
+			<wsdl:output message="impl:getSupportedFileSystemDevicesResponse"
+				name="getSupportedFileSystemDevicesResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="getFileSystemDevices">
+			<wsdl:input message="impl:getFileSystemDevicesRequest"
+				name="getFileSystemDevicesRequest" />
+			<wsdl:output message="impl:getFileSystemDevicesResponse"
+				name="getFileSystemDevicesResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="findFileSystemDevice">
+			<wsdl:input message="impl:findFileSystemDeviceRequest"
+				name="findFileSystemDeviceRequest" />
+			<wsdl:output message="impl:findFileSystemDeviceResponse"
+				name="findFileSystemDeviceResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="updateFileSystemDevice">
+			<wsdl:input message="impl:updateFileSystemDeviceRequest"
+				name="updateFileSystemDeviceRequest" />
+			<wsdl:output message="impl:updateFileSystemDeviceResponse"
+				name="updateFileSystemDeviceResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="updateFileSystemDeviceLocal">
+			<wsdl:input message="impl:updateFileSystemDeviceLocalRequest"
+				name="updateFileSystemDeviceLocalRequest" />
+			<wsdl:output message="impl:updateFileSystemDeviceLocalResponse"
+				name="updateFileSystemDeviceLocalResponse" />
+		</wsdl:operation>
+
+	</wsdl:portType>
+
+
+	<binding name="SMbind" type="impl:StorageManager">
+		<linksmart:binding device="file:./resources/Device.owl#Laptop_1" />
+		<soap:binding style="rpc"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="createFileSystemDevice">
+			<soap:operation soapAction="createFileSystemDevice" />
+			<wsdl:input name="createFileSystemDeviceRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="createFileSystemDeviceResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="createFileSystemDeviceLocal">
+			<soap:operation soapAction="createFileSystemDeviceLocal" />
+			<wsdl:input name="createFileSystemDeviceLocalRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="createFileSystemDeviceLocalResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="deleteFileSystemDevice">
+			<soap:operation soapAction="deleteFileSystemDevice" />
+			<wsdl:input name="deleteFileSystemDeviceRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="deleteFileSystemDeviceResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="deleteFileSystemDeviceLocal">
+			<soap:operation soapAction="deleteFileSystemDeviceLocal" />
+			<wsdl:input name="deleteFileSystemDeviceLocalRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="deleteFileSystemDeviceLocalResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSupportedFileSystemDevices">
+			<soap:operation soapAction="getSupportedFileSystemDevices" />
+			<wsdl:input name="getSupportedFileSystemDevicesRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getSupportedFileSystemDevicesResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getFileSystemDevices">
+			<soap:operation soapAction="getFileSystemDevices" />
+			<wsdl:input name="getFileSystemDevicesRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getFileSystemDevicesResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="findFileSystemDevice">
+			<soap:operation soapAction="findFileSystemDevice" />
+			<wsdl:input name="findFileSystemDeviceRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="findFileSystemDeviceResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="updateFileSystemDevice">
+			<soap:operation soapAction="updateFileSystemDevice" />
+			<wsdl:input name="updateFileSystemDeviceRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="updateFileSystemDeviceResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="updateFileSystemDeviceLocal">
+			<soap:operation soapAction="updateFileSystemDeviceLocal" />
+			<wsdl:input name="updateFileSystemDeviceLocalRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="updateFileSystemDeviceLocalResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+	</binding>
+	<service name="SM">
+		<port name="SMPort" binding="impl:SMbind">
+			<soap:address location="http://localhost:8083/services/storagemanager" />
+		</port>
+	</service>
+</definitions>

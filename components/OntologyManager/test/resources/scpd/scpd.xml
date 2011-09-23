@@ -1,0 +1,755 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+    <specVersion>
+        <major>1</major>
+        <minor>0</minor>
+    </specVersion>
+    <device>
+        <deviceType>upnp:type</deviceType>
+        <deviceClass xmlns="hydra">OntologyDeviceClass</deviceClass>
+        <hydraid xmlns="hydra">0.0.0.1630539671752846959</hydraid>
+        <errormessage xmlns="hydra">deviceservicemanager reporting:Failed to connect remote Bluetooth service</errormessage>
+        <hydraidUPnP xmlns="hydra">0.0.0.2959870125075651451</hydraidUPnP>
+        <wsendpoint xmlns="hydra">http://212.214.80.163:8080/BasicPhoneWS</wsendpoint>
+        <hydrawsendpoint xmlns="hydra">http://212.214.80.163:8080/hydradevice/e08ea9db-cd10-4801-aa11-a4dd0edcb57e</hydrawsendpoint>
+        <status xmlns="hydra">web service initiated</status>
+        <UPnPEndpoint xmlns="hydra">http://212.214.80.163:54894</UPnPEndpoint>
+        <securityinfo xmlns="hydra">&lt;securityInfo xmlns="hydra"&gt;&lt;property name="bluetooth.api.version"&gt;&lt;value&gt;1.1&lt;/value&gt;&lt;/property&gt;&lt;property name="bluetooth.mode"&gt;&lt;value&gt;2&lt;/value&gt;&lt;/property&gt;&lt;property name="EncryptionProtocol"&gt;&lt;value&gt;E0&lt;/value&gt;&lt;/property&gt;&lt;property name="HostMechanism"&gt;&lt;value&gt;plain&lt;/value&gt;&lt;value&gt;AES_256_storage&lt;/value&gt;&lt;/property&gt;&lt;property name="KeystoreTypes"&gt;&lt;value&gt;JKS&lt;/value&gt;&lt;value&gt;BC&lt;/value&gt;&lt;/property&gt;&lt;/securityInfo&gt;</securityinfo>
+        <discoveryinfo xmlns="hydra">&lt;bluetoothdevice&gt;&lt;name&gt;Z600&lt;/name&gt;&lt;majordevicetype&gt;Phone&lt;/majordevicetype&gt;&lt;deviceclass&gt;CellPhonePhone&lt;/deviceclass&gt;&lt;bluetoothservices&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;Dial-up Networking&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;Dialup Networking&lt;/servicetype&gt;&lt;servicetype&gt;Generic Networking&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;0&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;Voice gateway&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;Headset Audio Gateway&lt;/servicetype&gt;&lt;servicetype&gt;Generic Audio&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;0&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;Serial Port 1&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;Serial Port&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;0&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;Serial Port 2&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;Serial Port&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;0&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;OBEX Object Push&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;OBEX Object Push&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;889992452&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;IrMC Synchronization&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;IrMC Sync&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;0&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;HF Voice gateway&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;Handsfree Audio Gateway&lt;/servicetype&gt;&lt;servicetype&gt;Generic Audio&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;0&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;OBEX Basic Imaging&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;Imaging Responder&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;0&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;bluetoothservice&gt;&lt;servicename&gt;OBEX File Transfer&lt;/servicename&gt;&lt;serviceID&gt;00000000-0000-0000-0000-000000000000&lt;/serviceID&gt;&lt;servicetypes&gt;&lt;servicetype&gt;OBEX File Transfer&lt;/servicetype&gt;&lt;/servicetypes&gt;&lt;securityPolicy&gt;0&lt;/securityPolicy&gt;&lt;/bluetoothservice&gt;&lt;/bluetoothservices&gt;&lt;/bluetoothdevice&gt;</discoveryinfo>
+        <gateway xmlns="hydra">Fuglesang</gateway>
+        <DACEndpoint xmlns="hydra" />
+        <dynamicWSEndpoint xmlns="hydra">http://212.214.80.163:54894</dynamicWSEndpoint>
+        <bluetoothwsendpoint xmlns="hydra">http://212.214.80.163:8080/bluetoothdevice/e08ea9db-cd10-4801-aa11-a4dd0edcb57e</bluetoothwsendpoint>
+        <hydraidStaticWS xmlns="hydra">0.0.0.701743547230338614</hydraidStaticWS>
+        <friendlyName>Basic Phone</friendlyName>
+        <manufacturer>CNet</manufacturer>
+        <manufacturerURL>http://www.cnet.se</manufacturerURL>
+        <modelDescription>Basic Phone</modelDescription>
+        <modelName>Z600</modelName>
+        <modelNumber>1</modelNumber>
+        <UDN>uuid:e08ea9db-cd10-4801-aa11-a4dd0edcb57e</UDN>
+        <serviceList>
+            <service>
+                <serviceType>urn:schemas-upnp-org:bluetoothservice::1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:bluetoothservice:1</serviceId>
+                <SCPDURL> 
+                    <scpd xmlns="urn:schemas-upnp-org:service-1-0">
+                        <specVersion>
+                            <major>1</major>
+                            <minor>0</minor>
+                        </specVersion>
+                        <actionList>
+                            <action hydraannotation="">
+                                <name>Bond</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>Pincode</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>Pincode</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>IsBonded</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>IsBonded</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>ConnectToService</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>ServiceChannel</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>ServiceChannel</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>ServiceName</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>ServiceDescription</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>DiscoverServices</name>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetAddress</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>Address</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>Address</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetAllServiceDescription</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>ServiceDescription</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>ServiceDescription</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetDiscoveryPending</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>DiscoveryPending</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>A_ARG_TYPE_GetDiscoveryPending_RetType</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetMajorDeviceClass</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>MajorDeviceClass</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>MajorDeviceClass</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetMinorDeviceClass</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>MinorDeviceClass</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>MinorDeviceClass</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetNumberOfServices</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>NumberOfServices</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>NumberOfServices</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetServiceDescription</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>ServiceNumber</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>NumberOfServices</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>ServiceDescription</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>ServiceDescription</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetSignalStrength</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>SignalStrength</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>SignalStrength</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>Unbond</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>IsBonded</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>IsBonded</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                        </actionList>
+                        <serviceStateTable>
+                            <stateVariable sendEvents="no">
+                                <name>DiscoveryPending</name>
+                                <dataType>boolean</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>ServiceChannel</name>
+                                <dataType>i2</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>MajorDeviceClass</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>Pincode</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>Address</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>ServiceDescription</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>A_ARG_TYPE_GetDiscoveryPending_RetType</name>
+                                <dataType>boolean</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>SignalStrength</name>
+                                <dataType>i2</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>IsBonded</name>
+                                <dataType>boolean</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>MinorDeviceClass</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>NumberOfServices</name>
+                                <dataType>i2</dataType>
+                            </stateVariable>
+                        </serviceStateTable>
+                    </scpd>
+                </SCPDURL>
+                <controlURL>_urn:upnp-org:serviceId:bluetoothservice:1_control</controlURL>
+                <eventSubURL>_urn:upnp-org:serviceId:bluetoothservice:1_event</eventSubURL>
+            </service>
+            <service>
+                <serviceType>urn:schemas-upnp-org:hydraservice::1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:1</serviceId>
+                <SCPDURL> 
+                    <scpd xmlns="urn:schemas-upnp-org:service-1-0">
+                        <specVersion>
+                            <major>1</major>
+                            <minor>0</minor>
+                        </specVersion>
+                        <actionList>
+                            <action hydraannotation="">
+                                <name>CreateWS</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>endpoint</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>WSEndpoint</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>DiscoverDevices</name>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetDACEndpoint</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>endpoint</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>DACEndpoint</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetDiscoveryInfo</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>discoveryinfo</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>DiscoveryInfo</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetErrorMessage</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>ErrorMessage</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>ErrorMessage</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetHasError</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>HasError</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>HasError</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetHydraID</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>HydraID</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>HydraID</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetHydraWSEndpoint</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>endpoint</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>HydraWSEndpoint</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetProperty</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>property</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>Property</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>propertyvalue</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>PropertyValue</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetSecurityInfo</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>SecurityInfo</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>SecurityInfo</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetStatus</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>Status</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>Status</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetWSDL</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>wsdl</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>WSDL</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetWSEndpoint</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>endpoint</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>WSEndpoint</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>ResolveDevice</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>udn</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>UDN</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>resolvemessage</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>ResolveMessage</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>SetDACEndpoint</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>endpoint</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>DACEndpoint</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>SetHydraID</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>HydraID</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>HydraID</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>SetProperty</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>property</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>Property</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>value</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>PropertyValue</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>SetStatus</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>Status</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>Status</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>Stop</name>
+                            </action>
+                            <action hydraannotation="">
+                                <name>StopHydraWS</name>
+                            </action>
+                            <action hydraannotation="">
+                                <name>StopWS</name>
+                            </action>
+                        </actionList>
+                        <serviceStateTable>
+                            <stateVariable sendEvents="no">
+                                <name>ErrorMessage</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>Status</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>WSDL</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>UDN</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>HasError</name>
+                                <dataType>boolean</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>Property</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>HydraID</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>WSEndpoint</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>DiscoveryInfo</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>DACEndpoint</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>HydraWSEndpoint</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>PropertyValue</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>ResolveMessage</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>SecurityInfo</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                        </serviceStateTable>
+                    </scpd>
+                </SCPDURL>
+                <controlURL>_urn:upnp-org:serviceId:1_control</controlURL>
+                <eventSubURL>_urn:upnp-org:serviceId:1_event</eventSubURL>
+            </service>
+            <service>
+                <serviceType>urn:schemas-upnp-org:powerservice::1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:powerservice:1</serviceId>
+                <SCPDURL> 
+                    <scpd xmlns="urn:schemas-upnp-org:service-1-0">
+                        <specVersion>
+                            <major>1</major>
+                            <minor>0</minor>
+                        </specVersion>
+                        <actionList>
+                            <action hydraannotation="">
+                                <name>GetCurrentConsumption</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>CurrentPowerConsumption</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>CurrentPowerConsumption</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetMaxPowerConsumption</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>MaxPowerConsumption</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>MaxPowerConsumption</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetRemainingBatteryLevel</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>ReaminingBatteryLevel</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>RemainingBatteryLevel</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetRemainingBatteryTime</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>RemainingBatteryTime</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>RemainingBatteryTime</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetStandByTime</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>StandByTime</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>StandByTime</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetTimeActive</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>ActiveTime</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>ActiveTime</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>GetTimeUntilStandBy</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>TimeUntilStandBy</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>StandByTime</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>IsBatteryOperated</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>BatteryOperated</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>BatteryOperated</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>SetStandByTime</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>StandByTime</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>StandByTime</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                        </actionList>
+                        <serviceStateTable>
+                            <stateVariable sendEvents="no">
+                                <name>MaxPowerConsumption</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>RemainingBatteryTime</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>RemainingBatteryLevel</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>CurrentPowerConsumption</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>ActiveTime</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>BatteryOperated</name>
+                                <dataType>boolean</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>StandByTime</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                        </serviceStateTable>
+                    </scpd>
+                </SCPDURL>
+                <controlURL>_urn:upnp-org:serviceId:powerservice:1_control</controlURL>
+                <eventSubURL>_urn:upnp-org:serviceId:powerservice:1_event</eventSubURL>
+            </service>
+            <service>
+                <serviceType>urn:schemas-upnp-org:smsservice::1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:smsservice:1</serviceId>
+                <SCPDURL> 
+                    <scpd xmlns="urn:schemas-upnp-org:service-1-0">
+                        <specVersion>
+                            <major>1</major>
+                            <minor>0</minor>
+                        </specVersion>
+                        <actionList>
+                            <action hydraannotation="">
+                                <name>GetNumberOfMessages</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>ReturnNumber</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>NumberOfMessages</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>ReadLatestMessage</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>Message</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>Message</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>ReadMessage</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>status</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>A_ARG_TYPE_ReadMessage_status</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>Position</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>Index</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>Message</name>
+                                        <direction>out</direction>
+                                        <retval />
+                                        <relatedStateVariable>Message</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                            <action hydraannotation="">
+                                <name>SendSMS</name>
+                                <argumentList>
+                                    <argument>
+                                        <name>Message</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>Message</relatedStateVariable>
+                                    </argument>
+                                    <argument>
+                                        <name>phonenumber</name>
+                                        <direction>in</direction>
+                                        <relatedStateVariable>A_ARG_TYPE_SendSMS_phonenumber</relatedStateVariable>
+                                    </argument>
+                                </argumentList>
+                            </action>
+                        </actionList>
+                        <serviceStateTable>
+                            <stateVariable sendEvents="no">
+                                <name>NumberOfMessages</name>
+                                <dataType>i2</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>Message</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>A_ARG_TYPE_ReadMessage_status</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>A_ARG_TYPE_SendSMS_phonenumber</name>
+                                <dataType>string</dataType>
+                            </stateVariable>
+                            <stateVariable sendEvents="no">
+                                <name>Index</name>
+                                <dataType>i2</dataType>
+                            </stateVariable>
+                        </serviceStateTable>
+                    </scpd>
+                </SCPDURL>
+                <controlURL>_urn:upnp-org:serviceId:smsservice:1_control</controlURL>
+                <eventSubURL>_urn:upnp-org:serviceId:smsservice:1_event</eventSubURL>
+            </service>
+        </serviceList>
+    </device>
+</root>

@@ -1,0 +1,3 @@
+Export-Package: eu.linksmart.limbo.frontend.ontology.*
+Include-Resource: resources = ontology
+Service-Component: eu.linksmart.limbo.frontend.ontology.*

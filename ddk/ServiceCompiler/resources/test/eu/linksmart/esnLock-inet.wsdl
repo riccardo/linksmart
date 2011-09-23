@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by Klaus Marius Hansen (Århus Universitet) -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:lock="http://model.euDomain.com/esnlock" targetNamespace="http://model.euDomain.com/esnlock">
+	<import namespace="http://model.euDomain.com/esnlock" location="esnLock-defs.wsdl"/>
+	<types>
+		<xs:schema/>
+	</types>
+	<service name="esnLockService">
+		<port name="EsnLock" binding="lock:EsnLockSOAP">
+			<soap:address location="http://localhost:8080/axis/services/esnlock"/>
+		</port>
+	</service>
+</definitions>

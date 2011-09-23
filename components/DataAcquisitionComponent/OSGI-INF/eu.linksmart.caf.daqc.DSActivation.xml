@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component 
+	name="DataAcquisitionComponentBundle" immediate="true" >
+		
+	<implementation class="eu.linksmart.caf.daqc.impl.DAqCApplication"/>
+		
+		<reference name="NetworkManager"
+		interface="eu.linksmart.network.NetworkManagerApplication"
+		cardinality="1..1"
+		policy="static"/>
+  <property name="SOAP.service.name" type="String" value="DataAcquisitionComponent"/>
+  <reference bind="configurationBind" cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static" unbind="configurationUnbind"/>
+  <service>
+     <provide interface="eu.linksmart.caf.daqc.DataAcquisitionComponent"/>
+  </service>
+  <reference cardinality="1..1" interface="eu.linksmart.eventmanager.EventManagerPort" name="EventManagerPort" policy="dynamic"/>
+		
+</component>
+

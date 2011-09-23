@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <TrustModelRegistry>
+    <TrustModel>
+    	<ClassName>eu.linksmart.security.trustmanager.trustmodel.nullmodel.NullTrustModel</ClassName>
+    </TrustModel>
+    <TrustModel>
+    	<ClassName>eu.linksmart.security.trustmanager.trustmodel.openpgp.OpenPGPTrustModel</ClassName>
+    </TrustModel>
+    <TrustModel>
+    	<ClassName>eu.linksmart.security.trustmanager.trustmodel.x509.X509TrustModel</ClassName>
+    </TrustModel>
+  </TrustModelRegistry>
+</Configuration>

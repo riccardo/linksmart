@@ -1,0 +1,204 @@
+package $package;
+
+$transport_imports
+
+public class $class extends MIDlet implements CommandListener, DiscoveryListener  {
+	
+	static String theHost;
+	static int thePort;
+	Command exitCommand;
+	TextBox textBox;
+#foreach($PortType in $portTypes)
+	private ${PortType.getQName().getLocalPart()}LimboClientPortImpl the${PortType.getQName().getLocalPart().toLowerCase()}Client;
+#end
+	static final boolean DEBUG = false;
+	private static UUID UUID_STRING = new UUID("1101",true);
+	protected int inquiryMode = DiscoveryAgent.GIAC; // no pairing is needed
+	protected int connectionOptions = ServiceRecord.NOAUTHENTICATE_NOENCRYPT;
+	public static Form infoArea = new Form("Bluetooth Client");
+	protected Vector deviceList = new Vector();
+	static final String DEBUG_address = "0013FDC157C8"; // N6630
+
+	public $class() {
+	
+	}
+	
+	
+	protected void destroyApp(boolean unconditional)
+			throws MIDletStateChangeException {
+	}
+
+
+	protected void pauseApp() {
+	}
+
+
+	protected void startApp() throws MIDletStateChangeException {
+		makeInformationAreaGUI();
+		if (DEBUG) // skip inquiry in debug mode
+			startServiceSearch(new RemoteDevice(DEBUG_address) {
+			});
+		else
+			try {
+				startDeviceInquiry();
+			} catch (Throwable t) {
+				log(t);
+			}
+	}
+	
+	private void startDeviceInquiry() {
+		try {
+			log("Start inquiry method - this will take few seconds...");
+			DiscoveryAgent agent = getAgent();
+			agent.startInquiry(inquiryMode, this);
+		} catch (Exception e) {
+			log(e);
+		}
+	}
+	
+	public void commandAction(Command cmd, Displayable disp)
+	 {
+		if (cmd==exitCommand){
+			try{
+				destroyApp(false);
+			} catch (Exception e) {}
+			notifyDestroyed();
+			}
+	  }
+
+
+	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+		log("A device discovered (" + getDeviceStr(btDevice) + ")");
+		deviceList.addElement(btDevice);
+	}
+
+	public void inquiryCompleted(int discType) {
+		log("Inquiry compeleted. Please select device from combo box.");
+		makeDeviceSelectionGUI();
+	}
+
+	/*-
+	 *   -------  Service search section -------
+	 */
+	private void startServiceSearch(RemoteDevice device) {
+		try {
+			log("Start search for Serial Port Profile service from "
+					+ getDeviceStr(device));
+			UUID uuids[] = new UUID[] { UUID_STRING };
+			int[] attrSet = {0x0100}; //service name
+			getAgent().searchServices(attrSet, uuids, device, this);
+		} catch (Exception e) {
+			log(e);
+		}
+	}
+
+	/**
+	 * This method is called when a service(s) are discovered.This method starts
+	 * a thread that handles the data exchange with the server.
+	 */
+	public void servicesDiscovered(int transId, ServiceRecord[] records) {
+		log("Service discovered.");
+		final ServiceRecord[] rec = records;
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i < rec.length; i++) {
+					if (rec[i] != null) {
+					// get the service record's name
+						DataElement servNameElem = rec[i].getAttributeValue(0x0100);
+						String servName = (String)servNameElem.getValue();
+#foreach($PortType in $portTypes)
+						if (servName.equals("${PortType.getQName().getLocalPart()}")) { // check the name
+							handle${PortType.getQName().getLocalPart()}Connection(rec[i].getConnectionURL(connectionOptions, false));
+						}
+#end
+					}
+				}
+			}
+		}).start();
+	}
+	
+#foreach($PortType in $portTypes)
+	public void handle${PortType.getQName().getLocalPart()}Connection(String url) {
+	    String path = "";
+	    this.the${PortType.getQName().getLocalPart().toLowerCase()}Client = new ${PortType.getQName().getLocalPart()}LimboClientPortImpl(new BTProtocol(),url);
+	    //Insert your client code here 
+		
+	}
+#end
+
+	public void serviceSearchCompleted(int transID, int respCode) {
+		String msg = null;
+		switch (respCode) {
+		case SERVICE_SEARCH_COMPLETED:
+			msg = "the service search completed normally";
+			break;
+		case SERVICE_SEARCH_TERMINATED:
+			msg = "the service search request was cancelled by a call to DiscoveryAgent.cancelServiceSearch()";
+			break;
+		case SERVICE_SEARCH_ERROR:
+			msg = "an error occurred while processing the request";
+			break;
+		case SERVICE_SEARCH_NO_RECORDS:
+			msg = "no records were found during the service search";
+			break;
+		case SERVICE_SEARCH_DEVICE_NOT_REACHABLE:
+			msg = "the device specified in the search request could not be reached or the local device could not establish a connection to the remote device";
+			break;
+		}
+		log("Service search completed - " + msg);
+	}
+
+	/*-
+	 *   -------  Graphic User Interface section -------
+	 */
+	private void makeInformationAreaGUI() {
+		infoArea.deleteAll();
+		Display.getDisplay(this).setCurrent(infoArea);
+	}
+
+	private void makeDeviceSelectionGUI() {
+		final List devices = new List("Select the device containing the service", List.IMPLICIT);
+		for (int i = 0; i < deviceList.size(); i++)
+			devices.append(
+					getDeviceStr((RemoteDevice) deviceList.elementAt(i)), null);
+		devices.setCommandListener(new CommandListener() {
+			public void commandAction(Command arg0, Displayable arg1) {
+				makeInformationAreaGUI();
+				startServiceSearch((RemoteDevice) deviceList.elementAt(devices
+						.getSelectedIndex()));
+			}
+		});
+		Display.getDisplay(this).setCurrent(devices);
+	}
+
+	 synchronized public static void log(String msg) {
+		 infoArea.append(msg);
+		 infoArea.append("\n\n");
+	 }
+
+	 private void log(Throwable e) {
+		 log(e.getMessage());
+	 }
+	 
+	 private DiscoveryAgent getAgent() {
+			try {
+				return LocalDevice.getLocalDevice().getDiscoveryAgent();
+			} catch (BluetoothStateException e) {
+				throw new Error(e.getMessage());
+			}
+		}
+
+	private String getDeviceStr(RemoteDevice btDevice) {
+		return getFriendlyName(btDevice) + " - 0x"
+				+ btDevice.getBluetoothAddress();
+	}
+
+	private String getFriendlyName(RemoteDevice btDevice) {
+		try {
+			return btDevice.getFriendlyName(false);
+		} catch (IOException e) {
+			return "no name available";
+		}
+	}
+	
+}

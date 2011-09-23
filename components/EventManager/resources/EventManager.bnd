@@ -1,0 +1,12 @@
+Private-Package:eu.linksmart.tools.*;eu.linksmart.external.*;eu.linksmart.eventmanager.*;
+Include-Resource:properties/log4j.properties,\
+               properties/EM.properties,\
+               resources/=web/
+Service-Component=eu.linksmart.eventmanager.impl.EventManagerPortBindingImpl;\
+	provide:=eu.linksmart.eventmanager.EventManagerPort;\
+	immediate:=true;\
+	properties:="SOAP.service.name=EventManagerPort";\
+	httpService=org.osgi.service.http.HttpService;\
+	configurationAdmin=org.osgi.service.cm.ConfigurationAdmin;\
+	clientProvider=eu.linksmart.clients.RemoteWSClientProvider;\
+	nm = eu.linksmart.network.NetworkManagerApplication?

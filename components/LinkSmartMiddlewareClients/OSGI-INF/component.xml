@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" configuration-policy="optional" immediate="true" name="LinkSmartMiddlewareClients">
+	<implementation class="eu.linksmart.clients.impl.RemoteWSClientProviderImpl"/>
+ <service>
+    <provide interface="eu.linksmart.clients.RemoteWSClientProvider"/>
+ </service>
+</scr:component>
