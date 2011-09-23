@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:property="http://localhost/ontologies/StaticPropertyModel.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:unit="http://localhost/ontologies/Unit.owl#"
+    xmlns="http://localhost/ontologies/Energy.owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://localhost/ontologies/Energy.owl">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+  </owl:Ontology>
+  <owl:Class rdf:ID="EnergyClassification"/>
+  <owl:Class rdf:ID="EnergyOperation"/>
+  <owl:Class rdf:ID="EnergyProfile"/>
+  <owl:Class rdf:ID="EnergyLifeTime"/>
+  <owl:Class rdf:ID="EnergyMode"/>
+  <owl:ObjectProperty rdf:ID="classification">
+    <rdfs:range rdf:resource="#EnergyClassification"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="operation">
+    <rdfs:range rdf:resource="#EnergyOperation"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="shutDownCost">
+    <rdfs:domain rdf:resource="#EnergyLifeTime"/>
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="minimumRunTime">
+    <rdfs:domain rdf:resource="#EnergyOperation"/>
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="generation">
+    <rdfs:range rdf:resource="#EnergyMode"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="consumption">
+    <rdfs:range rdf:resource="#EnergyMode"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="expected">
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+    <rdfs:domain rdf:resource="#EnergyLifeTime"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="startCost">
+    <rdfs:domain rdf:resource="#EnergyLifeTime"/>
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="lifeTime">
+    <rdfs:range rdf:resource="#EnergyLifeTime"/>
+    <rdfs:domain rdf:resource="#EnergyProfile"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:ID="modeMax">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="modeShutdown">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="modeAverage">
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="modeStart">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="classificationSystem">
+    <rdfs:domain rdf:resource="#EnergyClassification"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="modeName">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="classificationValue">
+    <rdfs:domain rdf:resource="#EnergyClassification"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <property:SingleValueAnnotationProperty rdf:ID="modeUnit">
+    <rdfs:domain rdf:resource="#EnergyMode"/>
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#Power"/>
+  </property:SingleValueAnnotationProperty>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

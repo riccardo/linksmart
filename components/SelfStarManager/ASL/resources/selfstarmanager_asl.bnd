@@ -1,0 +1,9 @@
+Import-Package: !org.apache.tools.ant.*,*
+Private-Package: eu.linksmart.selfstar.cc, \
+	eu.linksmart.selfstar.cc.asl.core, \
+	eu.linksmart.selfstar.cc.asl.parser, \
+	eu.linksmart.selfstar.cc.asl.interactive
+Include-Resource: @../lib/java-cup-0.11a.jar
+Service-Component=eu.linksmart.selfstar.cc.ASL;immediate:=true;  \
+	log=org.osgi.service.log.LogService?; \
+	eventAdmin=org.osgi.service.event.EventAdmin?

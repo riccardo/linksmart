@@ -1,0 +1,97 @@
+package $package;
+
+$imports
+
+public class $class implements $interface {
+	
+	private Datagram client;
+	private DatagramConnection ssc;
+	private int port;
+	private String url;
+	private String clientHost;
+	
+	public UDPProtocol() {
+		super();
+	}
+	public UDPProtocol(int port) {
+		this.port = port;
+		this.url = "datagram://:"+this.port;
+		try {
+			ssc = (DatagramConnection)Connector.open(url);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void createConnectors(int port) {
+	  if (this.port != port)
+	  {
+		this.port = port;
+		this.url = "datagram://:"+this.port;
+		try {
+			ssc = (DatagramConnection)Connector.open(url);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	 }
+		this.clientHost = "";
+
+	}
+
+	public String getServerURL() {
+		return this.url;
+	}
+
+	public String getClientHost() {
+		return this.clientHost;
+	}
+
+	public String receive() {
+		byte[] buffer = null;
+		try {
+			buffer = new byte[ssc.getMaximumLength()];
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Datagram dgram = null;
+		try {
+			dgram = ssc.newDatagram(buffer, buffer.length);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			ssc.receive(dgram);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String request = new String(dgram.getData());
+		this.client = dgram;
+		request = new String(buffer);
+		request = request.trim();
+		return request;
+	}
+
+	public void send(String result) {
+		Datagram response = null;
+		try {
+			response = ssc.newDatagram(result.getBytes(), result.length());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		response.setAddress(this.client);
+		try {
+			ssc.send(response);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void closeConnection() {
+		try {
+			ssc.close();	
+			ssc.setReuseAddress(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	
+}

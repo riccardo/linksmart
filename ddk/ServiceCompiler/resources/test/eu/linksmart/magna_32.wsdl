@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2006 sp2 U (http://www.altova.com) by Kim Alster Larsen (private) -->
+<!-- reedited by Per Nielsen -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ns="http://linksmart.eu/magna_32/" targetNamespace="http://linksmart.eu/magna_32/" xmlns:linksmart="http://linksmart.eu/">
+	<types>
+		<xs:schema>
+			<xs:import namespace="http://pump.device.eudomain.au.dk" schemaLocation="magna_32.xsd"/>
+		</xs:schema>  
+	</types>
+	<message name="CompositRequest">
+		<part name="comp" element="ns:RequestCD"/>
+	</message>
+	<message name="PumpRequest1">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest2">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest3">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest4">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest5">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest6">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest7">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest8">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest9">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest10">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest11">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest12">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest13">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest14">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest15">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest16">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest17">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest18">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest19">
+		<part name="pumpId" type="xs:string"/>
+	</message>
+	<message name="PumpRequest20">
+		<part name="parameter" type="xs:string"/>
+	</message>
+	<message name="PumpResponseB1">
+		<part name="result" type="xs:boolean"/>
+	</message>
+	<message name="PumpResponseB2">
+		<part name="result" type="xs:boolean"/>
+	</message>
+	<message name="PumpResponseB3">
+		<part name="result" type="xs:boolean"/>
+	</message>
+	<message name="PumpResponseB4">
+		<part name="result" type="xs:boolean"/>
+	</message>
+	<message name="PumpResponseB5">
+		<part name="result" type="xs:boolean"/>
+	</message>
+	<message name="PumpResponseB6">
+		<part name="result" type="xs:boolean"/>
+	</message>
+	<message name="PumpResponseB7">
+		<part name="result" type="xs:boolean"/>
+	</message>
+	<message name="PumpResponseD1">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD2">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD3">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD4">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD5">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD6">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD7">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD8">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD9">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD10">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD11">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD12">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD13">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseD14">
+		<part name="result" type="xs:double"/>
+	</message>
+	<message name="PumpResponseB8">
+		<part name="running" type="xs:boolean"></part>
+	</message>
+	<message name="PumpRequest21">
+		<part name="PumpId" type="xs:string"></part>
+	</message>
+	<message name="PumpResponseL1">
+		<part name="PumpResponseL1" type="ns:StringList"></part>
+	</message>
+	<message name="PumpRequest22">
+		<part name="pumpId" type="xs:string"></part>
+	</message>
+	<message name="PumpResponseB9">
+		<part name="result" type="xs:boolean"></part>
+	</message>
+	<message name="PumpRequestB9">
+		<part name="pumpId" type="xs:string"></part>
+	</message>
+	<message name="PumpResponseB10">
+		<part name="result" type="xs:boolean"></part>
+	</message>
+	<message name="PumpRequest23">
+		<part name="pumpId" type="xs:string"></part>
+	</message>
+	<message name="PumpResponseD15">
+		<part name="result" type="xs:double"></part>
+	</message>
+	<message name="PumpRequest24">
+		<part name="pumpId" type="xs:string"></part>
+	</message>
+	<portType name="EsnPumpPort">
+		<operation name="start">
+			<input message="ns:PumpRequest1"/>
+			<output message="ns:PumpResponseB1"/>
+		</operation>
+		<operation name="stop">
+			<input message="ns:PumpRequest2"/>
+			<output message="ns:PumpResponseB2"/>
+		</operation>
+		<operation name="setLevelToMax">
+			<input message="ns:PumpRequest3"/>
+			<output message="ns:PumpResponseB3"/>
+		</operation>
+		<operation name="setLevelToMin">
+			<input message="ns:PumpRequest4"/>
+			<output message="ns:PumpResponseB4"/>
+		</operation>
+		<operation name="incrementLevel">
+			<input message="ns:PumpRequest5"/>
+			<output message="ns:PumpResponseB5"/>
+		</operation>
+		<operation name="decrementLevel">
+			<input message="ns:PumpRequest6"/>
+			<output message="ns:PumpResponseB6"/>
+		</operation>
+		<operation name="getControlSource">
+			<input message="ns:PumpRequest7"/>
+			<output message="ns:PumpResponseD1"/>
+		</operation>
+		<operation name="getOperationMode">
+			<input message="ns:PumpRequest8"/>
+			<output message="ns:PumpResponseD2"/>
+		</operation>
+		<operation name="getSpeedLevel">
+			<input message="ns:PumpRequest9"/>
+			<output message="ns:PumpResponseD3"/>
+		</operation>
+		<operation name="getEnergyLevel">
+			<input message="ns:PumpRequest10"/>
+			<output message="ns:PumpResponseD4"/>
+		</operation>
+		<operation name="getHeadLevel">
+			<input message="ns:PumpRequest11"/>
+			<output message="ns:PumpResponseD5"/>
+		</operation>
+		<operation name="getPowerLevel">
+			<input message="ns:PumpRequest12"/>
+			<output message="ns:PumpResponseD6"/>
+		</operation>
+		<operation name="getFlowLevel">
+			<input message="ns:PumpRequest13"/>
+			<output message="ns:PumpResponseD7"/>
+		</operation>
+		<operation name="getMaxFlowLevel">
+			<input message="ns:PumpRequest14"/>
+			<output message="ns:PumpResponseD8"/>
+		</operation>
+		<operation name="getMaxHeadLevel">
+			<input message="ns:PumpRequest15"/>
+			<output message="ns:PumpResponseD9"/>
+		</operation>
+		<operation name="getOperationalHours">
+			<input message="ns:PumpRequest16"/>
+			<output message="ns:PumpResponseD10"/>
+		</operation>
+		<operation name="getWaterTemperature">
+			<input message="ns:PumpRequest17"/>
+			<output message="ns:PumpResponseD11"/>
+		</operation>
+		<operation name="getNumberOfSteps">
+			<input message="ns:PumpRequest18"/>
+			<output message="ns:PumpResponseD12"/>
+		</operation>
+		<operation name="getNumberOfCurrentCurve">
+			<input message="ns:PumpRequest19"/>
+			<output message="ns:PumpResponseD13"/>
+		</operation>
+		<operation name="changeControlMode">
+			<input message="ns:CompositRequest"/>
+			<output message="ns:PumpResponseB7"/>
+		</operation>
+		<operation name="getCurrentControlMode">
+			<input message="ns:PumpRequest20"/>
+			<output message="ns:PumpResponseD14"/>
+		</operation>
+		<operation name="isRunning">
+			<input message="ns:PumpRequest21"></input>
+			<output message="ns:PumpResponseB8"></output>
+		</operation>
+		<operation name="getAlarms">
+			<input message="ns:PumpRequest22"></input>
+			<output message="ns:PumpResponseL1"></output>
+		</operation>
+		<operation name="getNightMode">
+			<input message="ns:PumpRequestB9"></input>
+			<output message="ns:PumpResponseB9"></output>
+		</operation>
+		<operation name="getAlarmPending">
+			<input message="ns:PumpRequest23"></input>
+			<output message="ns:PumpResponseB10"></output>
+		</operation>
+		<operation name="getPerformance">
+			<input message="ns:PumpRequest24"></input>
+			<output message="ns:PumpResponseD15"></output>
+		</operation>
+	</portType>
+	<binding name="EsnPumpSOAP" type="ns:EsnPumpPort">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="start">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/start" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="stop">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/stop" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="setLevelToMax">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/setLevelToMax" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="setLevelToMin">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/setLevelToMin" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="incrementLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/incrementLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="decrementLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/decrementLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getControlSource">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getControlSource" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getOperationMode">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getOperationMode" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getSpeedLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/gtSpeedLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getEnergyLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getEnergyLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getHeadLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getHeadLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getPowerLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getPowerLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getFlowLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getFlowLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getMaxFlowLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getMaxFlowLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getMaxHeadLevel">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getMaxHeadLevel" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getOperationalHours">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getOperationalHours" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getWaterTemperature">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getWaterTemperature" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getNumberOfSteps">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getNumberOfSteps" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getNumberOfCurrentCurve">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getNumberOfCurrentCurve" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="changeControlMode">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/changeControlMode" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getCurrentControlMode">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getCurrentControlMode" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="isRunning">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/isRunning" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getAlarms">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getAlarms" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getAlarmPending">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getAlarmPending" style="rpc"/>
+			<input>
+				<soap:body />
+			</input>
+			<output>
+				<soap:body />
+			</output>
+		</operation>
+		<operation name="getNightMode">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getNightMode" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+		<operation name="getPerformance">
+			<soap:operation soapAction="http://pump.device.eudomain.au.dk/getPerformance" style="rpc"/>
+			<input>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</input>
+			<output>
+				<soap:body namespace="http://pump.device.eudomain.au.dk" use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="EsnPumpService">
+		<port name="esnPump" binding="ns:EsnPumpSOAP">
+			<soap:address location="http://dmz-168.daimi.au.dk:8084/magna_32"/>
+		</port>
+	</service>
+</definitions>

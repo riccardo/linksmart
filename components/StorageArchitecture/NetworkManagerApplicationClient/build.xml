@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="linksmart.components.StorageArchitecture.NetworkManagerApplicationClient" default="jar" basedir=".">
+	<property name="moduleName" value="NetworkManagerClient" />
+	<property name="rootBuildDir" value="${basedir}/../../../build" />
+	<property name="rootDistributionDir" value="${basedir}/../../../distribution" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="test.dir" value="${basedir}/test" />
+    <property name="build.dir" value="${rootBuildDir}/${moduleName}/bin"/>
+	<property name="distribution.dir" value="${rootDistributionDir}/StorageArchitecture"/>
+	<property name="revision" value="1.0" />
+
+	<target name="jar" depends="build">
+		<echo message="Building jar ${moduleName}"/>
+		<mkdir dir="${distribution.dir}"/>
+		<jar destfile="${distribution.dir}/${moduleName}.jar" basedir="${build.dir}"/>
+	</target>
+	
+	<target name="build">
+		<echo message="Building StorageManagerCommonBundle" />
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}">
+			<src path="${src.dir}" />
+		</javac>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
+	</target>
+    
+</project>

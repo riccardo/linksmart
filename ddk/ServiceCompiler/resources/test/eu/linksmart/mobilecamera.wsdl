@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+      xmlns:y="http://linksmart.eu/camera/" xmlns:linksmart="http://linksmart.eu/" targetNamespace="http://linksmart.eu/">
+      <message name="getImageRequest">
+	</message>
+	<message name="getImageResponse">
+		<part name="image" type="xs:string"/>
+	</message>
+	<portType name="Cameraport">
+		<operation name="getImage">
+			<input message="linksmart:getImageRequest" />
+			<output message="linksmart:getImageResponse" />
+		</operation>
+	</portType>
+	<binding name="CameraSOAP" type="linksmart:Cameraport">
+		<soap:binding style="rpc"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="getImage">
+			<soap:operation
+				soapAction="getImage" style="rpc" />
+			<input name="getImageRequest">
+				<soap:body use="literal"
+					namespace="http://linksmart.eu" />
+			</input>
+			<output name="getImageResponse">
+				<soap:body use="literal"
+					namespace="http://linksmart.eu" />
+			</output>
+		</operation>
+	</binding>
+	<service name="CameraService">
+		<port name="CameraService" binding="linksmart:CameraSOAP">
+			<soap:address location="http://localhost:8080/axis/services/bpm" />
+		</port>
+	</service>
+</definitions>
+
+

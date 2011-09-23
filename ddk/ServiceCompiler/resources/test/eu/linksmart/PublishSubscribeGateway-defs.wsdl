@@ -1,0 +1,33 @@
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by Klaus Marius Hansen (Århus Universitet) -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:pubsub="http://model.euDomain.com/publishsubscribe" xmlns:pubsubgw="http://model.euDomain.com/publishsubscribe/gateway" xmlns:eud="http://model.euDomain.com/" targetNamespace="http://model.euDomain.com/publishsubscribe/gateway">
+	<types>
+		<xs:schema>
+			<xs:import namespace="http://model.euDomain.com/publishsubscribe" schemaLocation="PublishSubscribe.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="handleRequest">
+		<part name="handle" type="pubsub:Handle"/>
+	</message>
+	<message name="handleResponse">
+		<part name="status" type="xs:int"/>
+	</message>
+	<portType name="PublishSubscribeGateway">
+		<operation name="handle">
+			<input message="pubsubgw:handleRequest"/>
+			<output message="pubsubgw:handleResponse"/>
+		</operation>
+	</portType>
+	<binding name="PublishSubscribeGatewaySOAP" type="pubsubgw:PublishSubscribeGateway">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="handle">
+			<soap:operation soapAction="http://model.euDomain.com/publishsubscribe/handle" style="rpc"/>
+			<input>
+				<soap:body use="literal" namespace="http://model.euDomain.com/publishsubscribe/gateway"/>
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://model.euDomain.com/publishsubscribe/gateway"/>
+			</output>
+		</operation>
+	</binding>
+	<!-- Handle -->
+</definitions>

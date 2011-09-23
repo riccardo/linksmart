@@ -1,0 +1,144 @@
+<!--
+  Copyright (C) 2006-2010 Fraunhofer FIT, Amro Al-Akkad
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<project name="QoSManager" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
+  <target name="fail">
+    <fail message="please use the root ant build file"/>
+  </target>
+ 
+  <property name="moduleName" value="QoSManager"/>
+  <property name="rootBuildDir" value="${basedir}/../../build"/>
+  <property name="rootDistributionDir" value="${basedir}/../../distribution"/>
+  <property name="src.dir" value="${basedir}/src"/>
+  <property name="resources.dir" value="${moduleName}/resources"/>
+  <property name="test.dir" value="${basedir}/test"/>
+  <property name="build.dir" value="${rootBuildDir}/${moduleName}/bin"/>
+  <property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test"/>
+  <property name="lib.dir" value="${rootBuildDir}/${moduleName}/lib"/>
+  <property name="distribution.dir" value="${rootDistributionDir}/${moduleName}"/>
+  <property name="bnd.file" value="${basedir}/resources/${moduleName}.bnd"/>
+  <property name="revision" value="1.0"/>
+  
+  <path id="classpath">
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <pathelement path="${build.dir}"/>
+  </path>
+	
+	<path id="test-classpath">
+			<fileset dir="${lib.dir}">
+		    	<include name="**/*.jar"/>
+		   	</fileset>
+		   	<pathelement path="${build.dir}"/>
+			<pathelement path="${test.build.dir}"/>
+		</path>
+  
+  <target name="make" depends="jar,publish">
+    <echo message="Compiling source from ${basedir} to ${build.dir} and then distribute to ${distribution.dir}"/>
+  </target>
+
+  <!-- Local versions of targets, setting properties so it may be called from this directory -->
+  <target name="local">
+    <property name="antlib.dir" value="${basedir}/../../antlibs"/>
+    
+    <path id="antlib.path">
+      <fileset dir="${antlib.dir}" includes="*.jar"/>
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="antlib.path"/>
+    <taskdef resource="aQute/bnd/ant/taskdef.properties" classpathref="antlib.path"/> 
+  	<ivy:settings />
+  	
+  </target>
+
+  <target name="make-local" depends="local">
+    <antcall target="make"/>
+  </target>
+	
+	<!-- local test -->
+	<target name="test-local" depends="local">
+		<echo message="Calling test locally"/>
+		<antcall target="test"/>
+	</target>
+  <!-- Local versions -->
+
+
+  <target name="publish" depends="jar">
+    <!--<ivy:publish pubrevision="${revision}"
+		   resolver="local"
+		   forcedeliver="true"
+		   overwrite="true">
+      <artifacts pattern="${distribution.dir}/[artifact].[ext]"/>
+    </ivy:publish>-->
+  </target>
+  
+  <target name="resolve">	
+    <ivy:retrieve transitive="false" type="jar" pattern="${lib.dir}/[artifact]-[revision].[ext]"/>
+    <ivy:retrieve transitive="false" type="jars" pattern="${lib.dir}/[artifact]-[revision].[ext]"/>
+    <ivy:retrieve transitive="false" type="bundle" pattern="${lib.dir}/[artifact]-[revision].[ext]"/>
+  	<copy file="resources/QM.properties" todir="${rootBuildDir}/${moduleName}"/>
+  	<copy file="resources/README.txt" todir="${rootBuildDir}/${moduleName}"/>
+  	<copy file="resources/qosExampleRequest.xml" todir="${rootBuildDir}/${moduleName}"/>
+  	<copy file="resources/qosExampleResponse.xml" todir="${rootBuildDir}/${moduleName}"/>
+  	<copy file="resources/ontologyExampleResponse.xml" todir="${rootBuildDir}/${moduleName}"/>
+  	<copy file="resources/QoS_Manager.launch" todir="${rootBuildDir}/${moduleName}"/>
+  </target>
+  
+  <target name="clean">
+    <delete dir="${build.dir}" includeEmptyDirs="true"  failonerror="false"/>
+    <delete dir="${lib.dir}" includeEmptyDirs="true"  failonerror="false"/>
+  </target>
+  
+  <target name="build" depends="resolve">
+  	<echo message="Build requires Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files"/>
+    <mkdir dir="${build.dir}"/>
+    <javac destdir="${build.dir}" classpathref="classpath">   
+      <src path="${src.dir}"/>
+      <!-- <src path="${test.dir}"/> -->
+    </javac>
+  </target>
+  
+  <target name="jar" depends="build">
+    <bnd 
+	 classpath="${build.dir}" 
+	 eclipse="false" 
+	 failok="true" 
+	 exceptions="true"
+	 output="${rootDistributionDir}/${moduleName}.jar"
+	 files="${bnd.file}"/>
+  </target>
+	
+  <target name="test" depends="make">
+	<echo message="Testing"/>
+  	<mkdir dir="${test.build.dir}"/>
+  			<javac destdir="${test.build.dir}" classpathref="classpath">   
+  				<src path="${test.dir}"/>
+  			</javac>
+  	<junit fork="yes" haltonfailure="yes" dir="${basedir}">
+  				<classpath>
+  					<path refid="test-classpath"/>
+  				</classpath>
+  				<formatter type="brief" usefile="false"/>
+  				<batchtest fork="yes">
+  					<fileset dir="${test.dir}">
+  						<include name="**/*Test*.java"/>
+  					</fileset>
+  		    	</batchtest>
+  		    </junit>
+	</target>
+</project>

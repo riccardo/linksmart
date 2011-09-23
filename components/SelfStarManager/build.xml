@@ -1,0 +1,72 @@
+<!--
+  Copyright (C) 2006-2010 
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<project name="SelfStarManager">
+    <macrodef name="iterate">
+        <attribute name="target"/>
+        <sequential>
+	   <subant target="@{target}">
+	     <fileset dir="${basedir}" includes="*/build.xml"/>
+	   </subant>
+	 </sequential>
+    </macrodef>
+    
+    <target name="make-local">
+      <antcall target="-generic">
+	 <param name="target" value="make-local"/>
+      </antcall>
+    </target>
+    
+    <target name="test-local">
+      <antcall target="-generic">
+	 <param name="target" value="test-local"/>
+      </antcall>
+    </target>
+
+    <target name="clean">
+      <delete dir="fw-cache" includeEmptyDirs="true"  failonerror="false"/>
+      <antcall target="-generic">
+	 <param name="target" value="clean"/>
+      </antcall>
+    </target>
+
+    <target name="make">
+      <antcall target="-generic">
+	 <param name="target" value="make"/>
+      </antcall>
+    </target>
+
+    <target name="test">
+      <antcall target="-generic">
+	 <param name="target" value="test"/>
+      </antcall>
+    </target>
+
+    <!-- Avoid using iterate here since the "ant" task (in the build file our 
+	  parent directories) and "subant" do not go well together... 
+	  (If we could assume Ant 1.8.0, we could use the "useNativeBasedir" on 
+	  "subant")
+    -->
+    <target name="-generic">
+      <ant dir="AQL" target="${target}"/>
+      <ant dir="ASL" target="${target}"/>
+      <ant dir="selfstarmanager_planner" target="${target}"/>
+      <ant dir="selfstarmanager_aom" target="${target}"/>
+    </target>
+
+</project>

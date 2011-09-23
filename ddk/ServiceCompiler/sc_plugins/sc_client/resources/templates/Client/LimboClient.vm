@@ -1,0 +1,14 @@
+package $package;
+
+public class $class {
+
+	public static void main(String argv[]){
+	    String address = "http://localhost:8080";
+	    if (argv.length != 0) {
+				address = argv[0];
+		}
+	
+		$LimboPortImpl theClient = new $LimboPortImpl(new ${protocol}(), address);
+		/*Insert method calls here*/
+	}	
+}

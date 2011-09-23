@@ -1,0 +1,32 @@
+<!--
+  Copyright (C) 2006-2010 
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<component name="eu.linksmart.limbo.backend.project.eclipse.eclipseprojectbackend">
+  <implementation class="eu.linksmart.limbo.backend.project.eclipse.EclipseProjectBackend"/>
+	<service>
+		<provide interface="eu.linksmart.limbo.backend.Backend"/>
+	</service>
+  <reference name="repository" 
+  	interface="eu.linksmart.limbo.repository.Repository" 
+  	cardinality="1..1" 
+  	bind="bindRepository" 
+  	unbind="unbindRepository"/>
+  	 <property name="limbo.platform" value=".*" type="String"/>
+  	 <property name="limbo.generates" value="project" type="String"/>
+  	 <property name="limbo.language" value="jse,jme" type="String"/>
+</component>

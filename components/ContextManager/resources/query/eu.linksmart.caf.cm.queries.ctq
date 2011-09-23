@@ -1,0 +1,120 @@
+<QuerySet pkgName="eu.linksmart.caf.cm.queries">
+<Imports>
+</Imports>
+<Functions>
+</Functions>
+<Queries>
+<ContextQuery name="ContextManager.CoreQuery.GetContextByCtxId">
+<Arguments>
+<Attribute id="String"><![CDATA[ctxId]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[BaseContext]]></Attribute>
+</Output>
+<Query><![CDATA[result : BaseContext( contextId == ctxId )]]></Query>
+</ContextQuery>
+<ContextQuery name="ContextManager.CoreQuery.GetMemberValue">
+<Arguments>
+<Attribute id="String"><![CDATA[ctxId]]></Attribute>
+<Attribute id="String"><![CDATA[memId]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[String]]></Attribute>
+</Output>
+<Query><![CDATA[ContextMember( contextId == ctxId, key == memId, result : strValue )]]></Query>
+</ContextQuery>
+<ContextQuery name="ContextManager.CoreQuery.GetDeviceContext">
+<Arguments>
+<Attribute id="String"><![CDATA[theHid]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[Device]]></Attribute>
+</Output>
+<Query><![CDATA[result : Device( hid == theHid )]]></Query>
+</ContextQuery>
+<ContextQuery name="ContextManager.CoreQuery.GetContextEnvironment">
+<Arguments>
+<Attribute id="String"><![CDATA[theHid]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[Environment]]></Attribute>
+</Output>
+<Query><![CDATA[result : Environment ( envLoc : location )
+$base : BaseContext( hid == theHid, hasLocations contains envLoc )
+
+]]></Query>
+</ContextQuery>
+<ContextQuery name="ContextManager.CoreQuery.GetLocationsOfContext">
+<Arguments>
+<Attribute id="String"><![CDATA[theHid]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[Collection]]></Attribute>
+</Output>
+<Query><![CDATA[BaseContext( hid == theHid, result : hasLocations )]]></Query>
+</ContextQuery>
+<ContextQuery name="GetAllLocations">
+<Arguments>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[Location]]></Attribute>
+</Output>
+<Query><![CDATA[result : Location()]]></Query>
+</ContextQuery>
+<ContextQuery name="GetAllEnvironments">
+<Arguments>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[Environment]]></Attribute>
+</Output>
+<Query><![CDATA[result : Environment()]]></Query>
+</ContextQuery>
+<ContextQuery name="GetAllDevices">
+<Arguments>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[Device]]></Attribute>
+</Output>
+<Query><![CDATA[result : Device()]]></Query>
+</ContextQuery>
+<ContextQuery name="GetEverythingWithLoc">
+<Arguments>
+<Attribute id="String"><![CDATA[locId]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[BaseContext]]></Attribute>
+</Output>
+<Query><![CDATA[$loc : Location( contextId == locId )
+result : BaseContext( hasLocations contains $loc)]]></Query>
+</ContextQuery>
+<ContextQuery name="ContextManager.CoreQuery.GetMember">
+<Arguments>
+<Attribute id="String"><![CDATA[ctxId]]></Attribute>
+<Attribute id="String"><![CDATA[memId]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[ContextMember]]></Attribute>
+</Output>
+<Query><![CDATA[$ctx : BaseContext( contextId == ctxId )
+result : ContextMember( context == $ctx, key == memId)]]></Query>
+</ContextQuery>
+<ContextQuery name="ContextManager.CoreQuery.GetContextByHID">
+<Arguments>
+<Attribute id="String"><![CDATA[theHid]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[BaseContext]]></Attribute>
+</Output>
+<Query><![CDATA[result : BaseContext( hid == theHid )]]></Query>
+</ContextQuery>
+<ContextQuery name="ContextManager.CoreQuery.GetApplicationByName">
+<Arguments>
+<Attribute id="String"><![CDATA[theName]]></Attribute>
+</Arguments>
+<Output>
+<Attribute id="result"><![CDATA[Application]]></Attribute>
+</Output>
+<Query><![CDATA[result : Application( name == theName )]]></Query>
+</ContextQuery>
+</Queries>
+</QuerySet>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ApplicationOntologyManager">
+  <implementation class="eu.linksmart.aom.impl.ApplicationOntologyManagerSoapBindingImpl"/>
+  <service>
+    <provide interface="eu.linksmart.aom.ApplicationOntologyManager"/>
+  </service>
+  <property name="service.remote.registration" type="String" value="true"/>
+  <property name="SOAP.service.name" type="String" value="ApplicationOntologyManagerServiceOSGi"/>
+  <reference bind="bindEventAdmin" cardinality="0..1" interface="org.osgi.service.event.EventAdmin" name="EventAdmin" policy="dynamic" unbind="unbindEventAdmin"/>
+</scr:component>

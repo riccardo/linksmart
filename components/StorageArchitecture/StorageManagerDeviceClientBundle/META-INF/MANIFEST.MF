@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: StorageManagerDeviceClientBundle Plug-in
+Bundle-SymbolicName: StorageManagerDeviceClientBundle
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: eu.linksmart.storage.helper
+Bundle-ClassPath: lib/commons-lang-2.4.jar,
+ lib/jdom.jar,
+ .
+Export-Package: eu.linksmart.limbo.storagemanagerdevice.client

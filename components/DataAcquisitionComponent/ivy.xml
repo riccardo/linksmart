@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+	<info organisation="DataAcquisitionComponent" 
+			module="DataAcquisitionComponent" />
+
+	<publications>
+		<artifact name="DataAcquisitionComponent" type="jar" />
+	</publications>
+
+	<dependencies>
+		<dependency org="log4j" name="log4j" rev="1.2.16" />
+		<dependency org="org.osgi" name="org.osgi.compendium" rev="4.2.0" />
+		<dependency org="org.osgi" name="org.osgi.core" rev="4.2.0" />
+		<dependency org="axis" name="axis-jaxrpc" rev="1.4" />
+		<dependency org="axis" name="axis" rev="1.4" />
+		<dependency org="LinkSmartMiddlewareAPI" name="LinkSmartMiddlewareAPI"
+			rev="latest.integration" changing="true"  />
+		<dependency org="LinkSmartMiddlewareClients" name="LinkSmartMiddlewareClients"
+			rev="latest.integration" changing="true"  />
+	</dependencies>
+
+</ivy-module>

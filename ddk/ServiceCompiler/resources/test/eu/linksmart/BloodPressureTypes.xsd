@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://server.bpm.hydra.clab.sis.sag.com/xsd" xmlns:impl="http://server.bpm.hydra.clab.sis.sag.com/xsd" xmlns:xsd="http://server.bpm.hydra.clab.sis.sag.com/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:complexType name="connectDevice">
+		<xs:sequence>
+			<xs:element name="macadress" type="xs:string" nillable="false" minOccurs="0"/>
+			<xs:element name="pincode" type="xs:string" nillable="true" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Option">
+		<xs:sequence>
+			<xs:element name="key" type="xs:string" minOccurs="0"/>
+			<xs:element name="value" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="configureDevice">
+		<xs:sequence>
+			<xs:element name="configuration" type="impl:Option" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

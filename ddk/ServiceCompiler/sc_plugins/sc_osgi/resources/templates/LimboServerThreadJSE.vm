@@ -1,0 +1,65 @@
+package $package;
+
+import java.util.logging.Logger;
+
+public class $class extends Thread {
+	
+	private int port;
+	private String serverURL; 
+	private boolean stopped;
+	private int count;
+	private ServerProtocol p;
+	private Logger log;
+	
+	public $class(ServerProtocol protocol, int thePort) {
+		this.log = Logger.getLogger(${class}.class.getName());
+		this.port = thePort;
+		this.stopped = false;
+		try {
+			this.p = protocol;
+			this.p.createConnectors(thePort);
+			this.serverURL = this.p.getServerURL();
+			count = 0;
+			${endPoint}.createEndPoints(this.serverURL, this.port);
+		} catch (Exception e1) {
+
+			e1.printStackTrace();
+		}
+	}
+	
+	public void setStopped(boolean stopped){
+		this.stopped = stopped;
+	}
+
+	public String getServerURL() {
+		return this.serverURL;
+	}
+
+	public void run() {
+		try{
+			while(!stopped){
+				log.info("Waiting for Connections..."+count);
+				count++;
+				String request = this.p.receive();
+				log.info("Request Received. Attendance in progress...");
+				String result = "";
+				for(int i=0; i<${endPoint}.getEndPoints().size(); i++){
+					result = ((${endPoint})${endPoint}.getEndPoints().elementAt(i)).handleRequest(request,null);
+					if(result != null){
+						this.p.send(result);
+						i = ${endPoint}.getEndPoints().size();
+					}
+				}
+				if(result == null){
+					result = "HTTP/1.1 403 Inexistent Operation\r\n\r\n";
+					this.p.send(result);
+				}
+			}
+		
+		}catch(Exception e) {
+			e.printStackTrace();
+
+		}
+		this.p.closeConnection();
+		}
+	}

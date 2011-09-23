@@ -1,0 +1,128 @@
+package $package;
+
+import eu.linksmart.limbo.client.StringTokenizer;
+
+public class $class {
+
+#foreach ($Types in $sequence)
+	private $Types.getPresentationLine() $Types.getTypeName();
+#end
+
+	private String SOAPMessageLine;
+	
+
+	public $class(){
+		this.SOAPMessageLine = "";
+#foreach ($Types in $sequence)
+#if ($Types.isArray())
+		this.$Types.getTypeName() = new java.util.Vector();
+#end
+#end
+	}
+	
+	public $class($Types2.getArgumentLine()){
+		this.SOAPMessageLine = "";
+#foreach ($Types in $sequence)
+		$Types.getTypeName() = the$Types.getTypeName();
+#end
+	}
+	
+	public boolean convertStringToBoolean(String target){
+		if(target.equalsIgnoreCase("true"))
+			return true;
+		return false;
+	}
+	
+#foreach ($Types in $sequence)
+#if ($Types.isArray())
+	public java.util.Vector get$Types.getTypeName()(){
+		return this.$Types.getTypeName();
+	}
+	
+	public int $Types.getTypeName()_getElements(){
+		return this.${Types.getTypeName()}.size();
+	}
+	
+	public $Types.getType() $Types.getTypeName()_getElement(int position){
+		return (($Types.getType())this.${Types.getTypeName()}.elementAt(position));
+	}
+#else
+	public $Types.getType() get$Types.getTypeName()(){
+		return this.$Types.getTypeName();
+	}
+#end
+#end
+	
+#foreach ($Types in $sequence)
+#if ($Types.isArray())
+	public void $Types.getTypeName()_add($Types.getType() new$Types.getTypeName()){
+		${Types.getTypeName()}.addElement(new$Types.getTypeName());
+	}
+#end
+#end
+
+	public $class getFromSOAPLine(String SOAPLine){
+		String begin = "";
+		String end = "";
+		String before;
+		StringTokenizer st;
+		int last;
+#foreach ($Types in $sequence)
+#if ($Types.isArray())
+		begin = "<$Types.getTypeName()>";
+		end = "</$Types.getTypeName()>";
+		last = SOAPLine.indexOf(end);
+		while(last <= SOAPLine.length()-end.length()){
+			String part = SOAPLine.substring(SOAPLine.indexOf(">")+1, SOAPLine.indexOf(end));
+#if ($Types.isBasicType())
+			this.$Types.getTypeName()_add(part);
+#else
+			this.$Types.getTypeName()_add(new $Types.getType()().getFromSOAPLine(part));
+#end
+			SOAPLine = SOAPLine.substring(last+end.length());
+			last = SOAPLine.indexOf(end);
+		}
+#else
+		begin = "<$Types.getTypeName()>";
+		end = "</$Types.getTypeName()>";
+		st = new StringTokenizer(SOAPLine,">");
+		before = st.nextToken();
+		before = before.concat(">");
+#if ($Types.isBasicType())
+		$Types.getSOAPMessageLine();
+#else
+		this.$Types.getTypeName() = new $Types.getType()().getFromSOAPLine(SOAPLine.substring(before.length(), SOAPLine.indexOf(end)));
+#end
+		SOAPLine = SOAPLine.substring(SOAPLine.indexOf(end)+end.length());
+#end
+#end
+		return this;
+	}
+	
+	public String getSOAPMessageLine(){return this.SOAPMessageLine;}
+	
+	public String setSOAPMessageLine(){
+#foreach ($Types in $sequence)
+#if ($Types.isArray())
+		this.SOAPMessageLine = "";
+		for(int i=0; i<$Types.getTypeName()_getElements();i++){
+			this.SOAPMessageLine = this.SOAPMessageLine.concat("<$Types.getTypeName()>");
+#if (!$Types.isBasicType())
+			this.SOAPMessageLine = this.SOAPMessageLine.concat(((${Types.getType()})${Types.getTypeName()}.elementAt(i)).setSOAPMessageLine());
+#else
+			this.SOAPMessageLine = this.SOAPMessageLine.concat(${Types.getTypeName()}.elementAt(i).toString());
+#end
+			this.SOAPMessageLine = this.SOAPMessageLine.concat("</$Types.getTypeName()>");
+		}
+#else
+#if ($Types.isBasicType() == "false")
+		this.SOAPMessageLine = this.SOAPMessageLine.concat("<$Types.getTypeName()>"+($Types.getTypeName()).setSOAPMessageLine()+"</$Types.getTypeName()>");
+#else
+		this.SOAPMessageLine = this.SOAPMessageLine.concat("<$Types.getTypeName()>"+$Types.getTypeName()+"</$Types.getTypeName()>");		
+#end
+#end
+#end
+		return this.SOAPMessageLine;
+	}
+
+}

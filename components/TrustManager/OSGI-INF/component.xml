@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="TrustManager"  immediate="true">
+   <implementation class="eu.linksmart.security.trustmanager.impl.TrustManagerImpl"/>
+   <property name="SOAP.service.name" type="String" value="TrustManager"/>
+   <reference bind="bindWSProvider" cardinality="1..1" interface="eu.linksmart.clients.RemoteWSClientProvider" name="RemoteWSClientProvider" policy="static" unbind="unbindWSProvider"/>
+   <service>
+      <provide interface="eu.linksmart.security.trustmanager.TrustManager"/>
+   </service>
+   <reference bind="configurationBind" cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="dynamic" unbind="configurationUnbind"/>
+   <reference bind="bindNM" cardinality="0..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="dynamic" unbind="unbindNM"/>
+   
+</scr:component>

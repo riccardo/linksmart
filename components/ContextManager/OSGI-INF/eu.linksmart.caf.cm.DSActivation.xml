@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component 
+	name="ContextManager" immediate="true" >
+		
+	<implementation class="eu.linksmart.caf.cm.impl.ContextManagerApplication"/>
+		
+		<reference name="NetworkManager"
+		interface="eu.linksmart.network.NetworkManagerApplication"
+		cardinality="1..1"
+		policy="dynamic"/>
+  <reference bind="configurationBind" cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="dynamic" unbind="configurationUnbind"/>
+  <property name="SOAP.service.name" type="String" value="ContextManager"/>
+  <service>
+     <provide interface="eu.linksmart.caf.cm.ContextManager"/>
+  </service>
+  <reference cardinality="1..1" interface="eu.linksmart.eventmanager.EventManagerPort" name="EventManagerPort" policy="static"/>
+  <reference cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="EventAdmin" policy="dynamic"/>
+		
+</component>
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/selfstarmanager_aql"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=ivy.xml&amp;confs=*"/>
+	<classpathentry kind="lib" path="lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/org.apache.felix.eventadmin-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/org.apache.felix.framework-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/org.apache.felix.scr-1.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/org.osgi.compendium-1.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/org.osgi.core-1.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/selfstarmanager_aql-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/selfstarmanager_planner_wrapper-1.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

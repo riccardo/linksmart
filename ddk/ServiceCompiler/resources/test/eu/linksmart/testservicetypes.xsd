@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema version="1.0" targetNamespace="http://www.sun.com/wstest/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.sun.com/wstest/wsdl/">
+			<xsd:element name="echoVoid">
+                <xsd:complexType />
+            </xsd:element>
+            <xsd:element name="echoVoidResponse">
+                <xsd:complexType />
+            </xsd:element>
+            <xsd:element name="echoStruct">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="struct" type="tns:Struct" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:complexType name="ArrayOfStruct">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" maxOccurs="unbounded" name="Struct" nillable="true" type="tns:Struct" />
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="Struct">
+                <xsd:sequence>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="varInt" type="xsd:int" />
+                    <xsd:element minOccurs="1" maxOccurs="1" name="varFloat" type="xsd:float" />
+                    <xsd:element minOccurs="0" maxOccurs="1" name="varString" type="xsd:string" />
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="echoStructResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="struct" type="tns:Struct" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="echoList">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="1" name="s" type="tns:List" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:complexType name="List">
+                <xsd:complexContent mixed="false">
+                    <xsd:extension base="tns:Struct">
+                        <xsd:sequence>
+                            <xsd:element minOccurs="0" maxOccurs="1" name="varNext" type="tns:List" />
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+            <xsd:element name="echoListResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="1" name="echoListResult" type="tns:List" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="echoSynthetic">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="1" name="s" type="xsd:string" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="str" type="tns:Struct" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="bytes" type="xsd:base64Binary" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="echoSyntheticResponse">
+                <xsd:complexType />
+            </xsd:element>
+        </xsd:schema>

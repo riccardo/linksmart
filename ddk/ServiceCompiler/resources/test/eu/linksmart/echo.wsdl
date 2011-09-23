@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+xmlns:y="http://linksmart.eu/"  xmlns:linksmart="http://linksmart.eu/"  targetNamespace="http://linksmart.eu/">
+  <message name="countResponse">
+    <part name="result" type="xs:int"/>
+  </message>
+  <message name="countRequest">
+    <part name="text" type="xs:string"/>
+  </message>
+  <message name="echoResponse">
+    <part name="result" type="xs:string"/>
+  </message>
+  <message name="echoRequest">
+    <part name="text" type="xs:string"/>
+  </message>
+  <portType name="TH03Port">
+    <operation name="count">
+      <input message="y:countRequest" name="countRequest"/>
+      <output message="y:countResponse" name="countResponse"/>
+    </operation>
+    <operation name="echo">
+      <input message="y:echoRequest" name="echoRequest"/>
+      <output message="y:echoResponse" name="echoResponse"/>
+    </operation>
+  </portType>
+  <binding name="TH03SOAP" type="y:TH03Port">
+    <linksmart:binding device="file:./resources/Device.owl#PicoTh03_Indoor"/>
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="count">
+      <soap:operation soapAction="http://linksmart.eu/th03/count" style="rpc"/>
+      <input name="countRequest">
+        <soap:body use="literal" namespace="http://linksmart.eu"/>
+      </input>
+      <output name="countResponse">
+        <soap:body use="literal" namespace="http://linksmart.eu"/>
+      </output>
+    </operation>
+    <operation name="echo">
+      <soap:operation soapAction="http://linksmart.eu/th03/echo" style="rpc"/>
+      <input name="echoRequest">
+        <soap:body use="literal" namespace="http://linksmart.eu"/>
+      </input>
+      <output name="thermResponseBoolean">
+        <soap:body use="literal" namespace="http://linksmart.eu"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="TH03Service">
+    <port name="TH03Port" binding="y:TH03SOAP">
+      <soap:address location="http://dmz-168.daimi.au.dk:8080/axis/services/th03"/>
+    </port>
+  </service>
+</definitions>

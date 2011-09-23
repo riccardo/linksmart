@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sc_http_service"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_udp_protocol/lib/bnd-0.0.384.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_udp_protocol/lib/org.osgi.compendium-1.4.0.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_udp_protocol/lib/org.osgi.core-1.4.0.jar"/>
+	<classpathentry kind="var" path="HYDRA/build/sc_udp_protocol/lib/sc_http_service-1.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

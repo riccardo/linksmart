@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:linksmart="http://linksmart.eu" targetNamespace="http://linksmart.eu">
+
+<message name="sendRequest">
+<part name="number" type="xs:string"/>
+	<part name="message" type="xs:string"></part>
+	<part name="securityToken" type="linksmart:Complex"></part>
+	<part name="send" type="xs:boolean"></part>
+</message>
+
+<message name="sendResponse">
+<part name="report" type="xs:int"/>
+</message>
+
+<portType name="SMSServicePort">
+  <operation name="sendSMS">
+      <input message="linksmart:sendRequest"/>
+      <output message="linksmart:sendResponse"/>
+  </operation>
+</portType>
+
+<binding name="SMSServiceBinding" type="linksmart:SMSServicePort">
+	<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+	<operation name="sendSMS">
+		<soap:operation soapAction="http://linksmart.eu/SMS/sendSMS" style="rpc"/>
+		<input>
+			<soap:body use="literal"/>
+		</input>
+		<output>
+			<soap:body use="literal"/>
+		</output>
+	</operation>
+</binding>
+
+<service name="SMSService">
+	<port name="SMSServicePort" binding="linksmart:SMSServiceBinding">
+		<soap:address location="http://linksmart.eu/SMS"/>
+	</port>
+</service>	
+</definitions>
+

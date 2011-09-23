@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eventList>
+	<event>
+		<eventType>
+			TemperatureChange
+		</eventType>
+		<eventTopic>
+			myTopic
+		</eventTopic>
+		<eventKeyList>
+			<eventKey>
+				<name>HID</name>
+				<dataType>String</dataType>
+			</eventKey>
+			<eventKey>
+				<name>TimeStamp</name>
+				<dataType>Long</dataType>
+			</eventKey>
+			<eventKey>
+				<name>TemperatureValue</name>
+				<dataType>Integer</dataType>
+				<!-- related state var should be defined for the 
+				     keys handling the value -->
+				<relatedStateVariable>Temperature</relatedStateVariable>
+				<!-- allowed val range is used only for number types -->
+				<allowedValueRange>
+					<max>50</max>
+					<min>-30</min>
+				</allowedValueRange>
+				<!-- unit have to be linked to the QoS model -->
+				<unit>Celsius</unit>
+			</eventKey>
+		</eventKeyList>
+		<metaInformation>
+			<frequency>
+				<value>10</value>
+				<unit>Seconds</unit>
+			</frequency>
+			<eventTrigger>TemperatureChange</eventTrigger>
+			<description>Reports change on temperature</description>
+		</metaInformation>
+	</event>
+		<event>
+		<eventType>
+			TemperatureAlarm
+		</eventType>
+		<eventTopic>
+			myTopic2
+		</eventTopic>
+		<eventKeyList>
+			<eventKey>
+				<name>HID</name>
+				<dataType>String</dataType>
+			</eventKey>
+			<eventKey>
+				<name>TimeStamp</name>
+				<dataType>Long</dataType>
+			</eventKey>
+			<eventKey>
+				<name>ErrorCode</name>
+				<dataType>String</dataType>
+				<relatedStateVariable>Temperature</relatedStateVariable>
+				<allowedValueRange>
+					<max>50</max>
+					<min>-30</min>
+				</allowedValueRange>
+				<!-- unit have to be linked to the QoS model -->
+				<unit>Fahrenheit</unit>
+			</eventKey>
+		</eventKeyList>
+		<metaInformation>
+			<frequency>
+				<value>10</value>
+				<unit>Seconds</unit>
+			</frequency>
+			<eventTrigger>Temperature greater 50 || Temperature less -30 </eventTrigger>
+			<description>Reports a malfunction of the device</description>
+		</metaInformation>
+	</event>
+	<event>
+		<eventType>
+			TemperaturePeriodicValue
+		</eventType>
+		<eventTopic>
+			myTopic3
+		</eventTopic>
+		<eventKeyList>
+			<eventKey>
+				<name>HID</name>
+				<dataType>String</dataType>
+			</eventKey>
+			<eventKey>
+				<name>TimeStamp</name>
+				<dataType>Long</dataType>
+			</eventKey>
+			<eventKey>
+				<name>TemperatureValue</name>
+				<dataType>Integer</dataType>
+				<relatedStateVariable>Temperature</relatedStateVariable>
+				<allowedValueRange>
+					<max>50</max>
+					<min>-30</min>
+				</allowedValueRange>
+				<unit>Celsius</unit>
+			</eventKey>
+		</eventKeyList>
+		<metaInformation>
+			<frequency>
+				<value>0</value>
+				<unit>Seconds</unit>
+			</frequency>
+			<eventTrigger></eventTrigger>
+			<description>Periodic temperature report</description>
+		</metaInformation>
+	</event>
+</eventList>
+	

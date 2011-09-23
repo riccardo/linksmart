@@ -1,0 +1,124 @@
+<!--
+Local build file for the Linksmart Crypto Manager
+-->
+<project name="CryptoManager" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<property name="moduleName" value="CryptoManager" />
+	<property name="revision" value="1.0.0" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="test.dir" value="${basedir}/test" />
+	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
+	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="dist.dir" value="${rootDistributionDir}" />
+	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${targetPlatform.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
+	</path>
+
+	<target name="fail">
+		<fail message="please use the root ant build file" />
+	</target>
+
+	<!-- Local versions of targets, setting properties so it may be called from this directory -->
+	<target name="setup-local">
+		<property name="antbuild.lib.dir" value="${basedir}/../antlibs" />
+		<path id="antlib.path">
+			<fileset dir="${antbuild.lib.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="antlib.path" />
+	</target>
+
+
+	<target name="make-local" depends="setup-local">
+		<echo message="Calling make locally" />
+		<antcall target="make" />
+	</target>
+
+	<!-- set up build environment -->
+	<!-- 
+		TODO 	Note that transitive resolution has been turned off because
+				for some unknown reason it does not work for CryptoManager.
+				If someone finds a solution, turn on again. 
+	-->
+	<target name="resolve">
+		<echo message="Setting up build environment" />
+		<ivy:resolve transitive="false" />
+		<ivy:retrieve transitive="false" type="jar" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="false" type="jars" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="false" type="bundle" pattern="${targetPlatform}/[artifact]-[revision].[ext]" />
+	</target>
+
+	<target name="build" depends="resolve">
+		<echo message="Build requires Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files" />
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" classpathref="classpath">
+			<src path="${src.dir}" />
+			<!-- <src path="${test.dir}"/> -->
+		</javac>
+	</target>
+
+	<target name="jar" depends="build">
+		<mkdir dir="${dist.dir}" />
+		<jar jarfile="${dist.dir}/${moduleName}-${revision}.jar" manifest="${basedir}/META-INF/MANIFEST.MF">
+			<fileset dir="${build.dir}">
+				<patternset>
+					<include name="**/*.class" />
+				</patternset>
+			</fileset>
+			<fileset dir="${basedir}">
+				<patternset>
+					<include name="lib/bcprov-jdk16-138.jar" />
+					<include name="OSGI-INF/*" />
+				</patternset>
+			</fileset>
+			<fileset dir="${basedir}" includes="resources/**" />
+		</jar>
+	</target>
+
+	<target name="publish" depends="jar">
+		<echo message="Publishing" />
+		<ivy:publish pubrevision="${revision}" resolver="local" forcedeliver="true" overwrite="true" publishivy="false">
+			<artifacts pattern="${dist.dir}/[artifact]-${revision}.[ext]" />
+		</ivy:publish>
+	</target>
+
+	<!-- make -->
+	<target name="make" depends="jar,publish">
+		<echo message="Compiled from: ${basedir}" />
+		<echo message="Compiled to: ${build.dir}" />
+		<echo message="Published as: ${rootDistributionDir}/${moduleName}-${revision}.jar" />
+	</target>
+
+
+
+
+	<target name="test-local" depends="setup-local">
+		<antcall target="test" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
+		<delete dir="${build.lib.dir}" includeEmptyDirs="true" failonerror="false" />
+	</target>
+
+	<target name="test" depends="make">
+		<!--<junit fork="yes" haltonfailure="yes">
+      <classpath>
+	 <path refid="classpath"/>
+      </classpath>
+      <formatter type="brief" usefile="false"/>
+      <batchtest fork="yes">
+	 <fileset dir="${test.dir}">
+	   <include name="**/*Test*.java"/>
+	 </fileset>
+      </batchtest>
+    </junit>-->
+	</target>
+</project>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<xs:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+		<xs:element name="GetIndoorTemperature">
+			<xs:complexType>
+				<xs:sequence/>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="GetIndoorTemperatureResponse">
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element minOccurs="0" name="GetIndoorTemperatureResult" nillable="true" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="GetOutdoorTemperature">
+			<xs:complexType>
+				<xs:sequence/>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="GetOutdoorTemperatureResponse">
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element minOccurs="0" name="GetOutdoorTemperatureResult" nillable="true" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="LastUpdated">
+			<xs:complexType>
+				<xs:sequence/>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="LastUpdatedResponse">
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element minOccurs="0" name="LastUpdatedResult" nillable="true" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:element>
+	</xs:schema>

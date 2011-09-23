@@ -1,0 +1,1386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:property="http://localhost/ontologies/StaticPropertyModel.owl#"
+	xmlns:unit="http://localhost/ontologies/Unit.owl#"
+	xmlns:rule="http://localhost/ontologies/PIDRuleModel.owl#"
+	xmlns:device="http://localhost/ontologies/Device.owl#"
+	xmlns:security="http://localhost/ontologies/Security.owl#"
+	xmlns:hardware="http://localhost/ontologies/Hardware.owl#"
+	xmlns:event="http://localhost/ontologies/Event.owl#"
+	xmlns:service="http://localhost/ontologies/Service.owl#"
+	xmlns:configuration="http://localhost/ontologies/Configuration.owl#"
+	xmlns:discovery="http://localhost/ontologies/Discovery.owl#"
+	xmlns:energy="http://localhost/ontologies/Energy.owl#"
+	xmlns:application="http://localhost/ontologies/Application.owl#">
+<owl:AnnotationProperty rdf:about="http://www.w3.org/2000/01/rdf-schema#comment"/>
+<owl:Ontology rdf:about="http://localhost/ontologies/Configuration.owl"/>
+<owl:Class rdf:about="http://localhost/ontologies/Configuration.owl#MobilePhoneConfiguration">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Configuration.owl#Configuration"/>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Configuration.owl#SwitchConfiguration">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Configuration.owl#Configuration"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Configuration.owl#ConfigurationFile"/>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Configuration.owl#configurationFile">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Configuration.owl#Configuration"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Configuration.owl#ConfigurationFile"/>
+</owl:ObjectProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Configuration.owl#downloadURL">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Configuration.owl#ConfigurationFile"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Configuration.owl#implementationClass">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Configuration.owl#Configuration"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Configuration.owl#name">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Configuration.owl#Configuration"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Configuration.owl#storageFolder">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Configuration.owl#ConfigurationFile"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:Ontology rdf:about="http://localhost/ontologies/PIDRuleModel.owl"/>
+<owl:Class rdf:about="http://localhost/ontologies/PIDRuleModel.owl#DevicePID">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://www.w3.org/2002/07/owl#Thing"/>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/PIDRuleModel.owl#generatesInverseProperty">
+	<rdfs:domain rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+</owl:ObjectProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/PIDRuleModel.owl#PID">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/PIDRuleModel.owl#DevicePID"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:Ontology rdf:about="http://localhost/ontologies/Unit.owl">
+	<owl:imports>
+		<owl:Ontology rdf:about="http://localhost/ontologies/StaticPropertyModel.owl"/>
+	</owl:imports>
+</owl:Ontology>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Basic">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Unit">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Length">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#Basic"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Temperature">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#Basic"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Time">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#Basic"/>
+	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">time unit</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#DerivedUnit">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#Unit"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Energy">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#DerivedUnit"/>
+	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">energy unit</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Power">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#DerivedUnit"/>
+	<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">power unit</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#MimeType">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#Unit"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Text">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#MimeType"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Video">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#MimeType"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#UnitValue"/>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Audio">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#MimeType"/>
+</owl:Class>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Unit.owl#value">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<unit:Video rdf:about="http://localhost/ontologies/Unit.owl#VideoMpeg"/>
+<unit:Power rdf:about="http://localhost/ontologies/Unit.owl#Watt"/>
+<unit:Temperature rdf:about="http://localhost/ontologies/Unit.owl#Celsius"/>
+<unit:Audio rdf:about="http://localhost/ontologies/Unit.owl#AudioMpeg"/>
+<unit:Video rdf:about="http://localhost/ontologies/Unit.owl#VideoOgg"/>
+<unit:Audio rdf:about="http://localhost/ontologies/Unit.owl#AudioOgg"/>
+<unit:Audio rdf:about="http://localhost/ontologies/Unit.owl#AudioMp3"/>
+<unit:Length rdf:about="http://localhost/ontologies/Unit.owl#Pixel"/>
+<unit:Video rdf:about="http://localhost/ontologies/Unit.owl#VideoMp4"/>
+<unit:Energy rdf:about="http://localhost/ontologies/Unit.owl#Joule"/>
+<unit:Text rdf:about="http://localhost/ontologies/Unit.owl#Plain"/>
+<unit:Energy rdf:about="http://localhost/ontologies/Unit.owl#WattHour"/>
+<unit:Video rdf:about="http://localhost/ontologies/Unit.owl#VideoAvi"/>
+<unit:Text rdf:about="http://localhost/ontologies/Unit.owl#Html"/>
+<unit:Time rdf:about="http://localhost/ontologies/Unit.owl#Milisecond"/>
+<unit:Text rdf:about="http://localhost/ontologies/Unit.owl#Css"/>
+<unit:Length rdf:about="http://localhost/ontologies/Unit.owl#Point"/>
+<unit:Audio rdf:about="http://localhost/ontologies/Unit.owl#AudioMp4"/>
+<unit:Energy rdf:about="http://localhost/ontologies/Unit.owl#KilowattHour"/>
+<unit:Temperature rdf:about="http://localhost/ontologies/Unit.owl#Fahrenheit"/>
+<unit:Power rdf:about="http://localhost/ontologies/Unit.owl#MilliWatt"/>
+<unit:Time rdf:about="http://localhost/ontologies/Unit.owl#Second"/>
+<unit:Text rdf:about="http://localhost/ontologies/Unit.owl#Xml"/>
+<property:SingleValueAnnotationProperty rdf:about="http://localhost/ontologies/Unit.owl#inUnit">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#Unit"/>
+</property:SingleValueAnnotationProperty>
+<owl:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#SingleValueAnnotationProperty">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl#AnnotationProperty"/>
+</owl:Class>
+<owl:Ontology rdf:about="http://localhost/ontologies/Discovery.owl"/>
+<owl:Class rdf:about="http://localhost/ontologies/Discovery.owl#Sensor">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Discovery.owl#DiscoveryInfo"/>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Discovery.owl#TellStick">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Discovery.owl#DiscoveryInfo"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Discovery.owl#BlueToothService"/>
+<owl:Class rdf:about="http://localhost/ontologies/Discovery.owl#BlueTooth">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Discovery.owl#DiscoveryInfo"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Discovery.owl#RFIDTag">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Discovery.owl#DiscoveryInfo"/>
+</owl:Class>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Discovery.owl#btService">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#BlueTooth"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Discovery.owl#BlueToothService"/>
+</owl:ObjectProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#sType">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#Sensor"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#btClass">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#BlueTooth"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#btName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#BlueTooth"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#btServiceName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#BlueToothService"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#tsName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#TellStick"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#sVendor">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#Sensor"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#tsVendor">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#TellStick"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#btServiceType">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#BlueToothService"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#rfidVendor">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#RFIDTag"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Discovery.owl#btType">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Discovery.owl#BlueTooth"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:Ontology rdf:about="http://localhost/ontologies/Hardware.owl">
+	<owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+	<owl:imports rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl"/>
+</owl:Ontology>
+<owl:Class rdf:about="http://localhost/ontologies/Hardware.owl#Speaker">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Hardware.owl#Hardware">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Hardware.owl#Display">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Hardware.owl#screenHeight">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Hardware.owl#Display"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<owl:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#SingleValueFormProperty">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl#FormProperty"/>
+</owl:Class>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Hardware.owl#hasSpeaker">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Hardware.owl#Hardware"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Hardware.owl#Speaker"/>
+</property:MultiValueFormProperty>
+<owl:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#MultiValueFormProperty">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl#FormProperty"/>
+</owl:Class>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Hardware.owl#maxVolumeLevel">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Hardware.owl#Speaker"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Hardware.owl#hasDisplay">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Hardware.owl#Hardware"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Hardware.owl#Display"/>
+</property:MultiValueFormProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Hardware.owl#resolution">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Hardware.owl#Display"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Hardware.owl#screenWidth">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Hardware.owl#Display"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<owl:Ontology rdf:about="http://localhost/ontologies/Application.owl">
+	<owl:imports rdf:resource="http://localhost/ontologies/PIDRuleModel.owl"/>
+	<owl:imports rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl"/>
+	<owl:imports>
+		<owl:Ontology rdf:about="http://localhost/ontologies/Device.owl">
+			<owl:imports rdf:resource="http://localhost/ontologies/Configuration.owl"/>
+			<owl:imports rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl"/>
+			<owl:imports rdf:resource="http://localhost/ontologies/Discovery.owl"/>
+			<owl:imports rdf:resource="http://localhost/ontologies/Hardware.owl"/>
+			<owl:imports rdf:resource="http://localhost/ontologies/Service.owl"/>
+			<owl:imports rdf:resource="http://localhost/ontologies/Security.owl"/>
+			<owl:imports rdf:resource="http://localhost/ontologies/Energy.owl"/>
+			<owl:imports rdf:resource="http://localhost/ontologies/Event.owl"/>
+		</owl:Ontology>
+	</owl:imports>
+</owl:Ontology>
+<owl:Class rdf:about="http://localhost/ontologies/Application.owl#LivingRoom">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Application.owl#Location">
+			<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Application.owl#BedRoom">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Application.owl#Location"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Application.owl#Person">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Application.owl#Resident">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Application.owl#Person"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Application.owl#SmartHome">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Application.owl#Application">
+			<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Application.owl#Hall">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Application.owl#Location"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Application.owl#MaintananceCrew">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Application.owl#Person"/>
+</owl:Class>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Application.owl#applicationName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Application.owl#Application"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Application.owl#locatedIn">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Application.owl#Location"/>
+</owl:ObjectProperty>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Device"/>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Application.owl#ownedBy">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Application.owl#Person"/>
+</owl:ObjectProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Application.owl#personName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Application.owl#Person"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Application.owl#locationName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Application.owl#Location"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Application.owl#hasLocation">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Application.owl#Application"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Application.owl#Location"/>
+</property:MultiValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Application.owl#hasUser">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Application.owl#Application"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Application.owl#Person"/>
+</property:MultiValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Application.owl#ownsDevice">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Application.owl#Person"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/PIDRuleModel.owl#DevicePID"/>
+	<rule:generatesInverseProperty rdf:resource="http://localhost/ontologies/Application.owl#ownedBy"/>
+</property:MultiValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Application.owl#containsDevice">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Application.owl#Location"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/PIDRuleModel.owl#DevicePID"/>
+	<rule:generatesInverseProperty rdf:resource="http://localhost/ontologies/Application.owl#locatedIn"/>
+</property:MultiValueFormProperty>
+<owl:Ontology rdf:about="http://localhost/ontologies/Service.owl">
+	<owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+	<owl:imports rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl"/>
+	<owl:imports>
+		<owl:Ontology rdf:about="http://localhost/ontologies/Security.owl"/>
+	</owl:imports>
+</owl:Ontology>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#AudioCapability">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#Capability">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#LockService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#ActuatorService">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#PhysicalService"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SendEmailService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SendTextMessageService">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#SendMessageService"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SensorService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#PhysicalService">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#Service"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#WindSensorService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#MeasurementService">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#SensorService"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#VideoCapability">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#Capability"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#PowerSwitchService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#ActuatorService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#TemperatureConversionService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#ConversionService">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#PhysicalService"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SendMMSService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SendMultipartMessageService">
+			<rdfs:subClassOf>
+				<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SendMessageService">
+					<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#ActuatorService"/>
+				</owl:Class>
+			</rdfs:subClassOf>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#LightSensorService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#SensorService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SendMultipartEmailService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#SendMultipartMessageService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#TemperatureWithHistoricDataSensorService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#TemperatureSensorService">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#MeasurementService"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#ServiceOutput">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#ServiceParameter"/>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SemanticService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#Service"/>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#AirpressureSensorService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#MeasurementService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#MediaService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#PhysicalService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#DoorLockService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#LockService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#DimmerService">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Service.owl#LightSwitchService">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#PowerSwitchService"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#MeasurementCapability">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#Capability"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#ScheduledPowerSwitchService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#PowerSwitchService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#SendSMSService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#SendTextMessageService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#RFIDSensorService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#SensorService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#ServiceInput">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#ServiceParameter"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#MultiLightSwitchService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#LightSwitchService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#RFIDNotificationService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#RFIDSensorService"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Service.owl#FlowSensorService">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Service.owl#MeasurementService"/>
+</owl:Class>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Service.owl#hasInput">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#Service"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Service.owl#ServiceInput"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Service.owl#hasOutput">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#Service"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Service.owl#ServiceOutput"/>
+</owl:ObjectProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Service.owl#sendEvents">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#ServiceParameter"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Service.owl#textDescription">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#Service"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Service.owl#serviceOperation">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#Service"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Service.owl#parameterName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#ServiceParameter"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Service.owl#parameterType">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#ServiceParameter"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<service:VideoCapability rdf:about="http://localhost/ontologies/Service.owl#playsVideo"/>
+<service:AudioCapability rdf:about="http://localhost/ontologies/Service.owl#playsMusic"/>
+<service:AudioCapability rdf:about="http://localhost/ontologies/Service.owl#recordsMusic"/>
+<property:MultiValueAnnotationProperty rdf:about="http://localhost/ontologies/Service.owl#supportsSecurityMechanism">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#PhysicalService"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+</property:MultiValueAnnotationProperty>
+<owl:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#MultiValueAnnotationProperty">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl#AnnotationProperty"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#SecurityMechanism">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+</owl:Class>
+<service:MeasurementCapability rdf:about="http://localhost/ontologies/Service.owl#measuresTemperature"/>
+<service:MeasurementCapability rdf:about="http://localhost/ontologies/Service.owl#measuresWindSpeed"/>
+<property:SingleValueAnnotationProperty rdf:about="http://localhost/ontologies/Service.owl#parameterUnit">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#ServiceParameter"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#Unit"/>
+</property:SingleValueAnnotationProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Service.owl#serviceCost">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#Service"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<rdfs:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#SingleValueFormFieldProperty">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl#FormFieldProperty"/>
+</rdfs:Class>
+<property:MultiValueAnnotationProperty rdf:about="http://localhost/ontologies/Service.owl#hasCapability">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#Service"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Service.owl#Capability"/>
+</property:MultiValueAnnotationProperty>
+<service:VideoCapability rdf:about="http://localhost/ontologies/Service.owl#recordsVideo"/>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#SecurityObjective">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#SecurityAlgorithm">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#AsymmetricEncryptionAlgorithm">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Security.owl#EncryptionAlgorithm">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#ObjectiveStrengthRelation">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A relation class describing how well a SecurityProtocol supports a certain SecurityObjective</rdfs:comment>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#SignatureAlgorithm">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#StreamCipher">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Security.owl#SymmetricEncryptionAlgorithm">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#EncryptionAlgorithm"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#OSGi">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Security.owl#Module">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#RandomAlgorithm">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#HostMechanism">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#DigestAlgorithm">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#SecurityProtocol">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#Configuration">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#Module"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#SecurityAssurance">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#Organization">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#MACAlgorithm">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Security.owl#TrustModel">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+</owl:Class>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Security.owl#supportsSecurityObjective">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Security.owl#ObjectiveStrengthRelation"/>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Any SecurityConcept can support one or more of the Security Objective defined in the SecurityObjective class</rdfs:comment>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Security.owl#hasAssurance">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Security.owl#SecurityAssurance"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Security.owl#reqCredential"/>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Security.owl#hasSecurityObjective">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#ObjectiveStrengthRelation"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Security.owl#SecurityObjective"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Security.owl#byOrganisation">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityAssurance"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Security.owl#Organization"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Security.owl#usesAlgorithm">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Security.owl#supportsSecurityMechanism">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityAlgorithm"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+</owl:ObjectProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Security.owl#level">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityAssurance"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Security.owl#validUntil">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityAssurance"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Security.owl#implementedBy">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Security.owl#hasStrength">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#ObjectiveStrengthRelation"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Security.owl#requiresMemory">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityProtocol"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Security.owl#configuredBy">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Security.owl#requiresComputingPower">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Security.owl#SecurityProtocol"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+</owl:DatatypeProperty>
+<security:DigestAlgorithm rdf:about="http://localhost/ontologies/Security.owl#SHA1">
+	<security:hasAssurance rdf:resource="http://localhost/ontologies/Security.owl#BNA-SHA-1-ext"/>
+	<security:hasAssurance rdf:resource="http://localhost/ontologies/Security.owl#BNA-SHA-1"/>
+</security:DigestAlgorithm>
+<security:SecurityAssurance rdf:about="http://localhost/ontologies/Security.owl#BNA-SHA-1-ext">
+	<security:byOrganisation rdf:resource="http://localhost/ontologies/Security.owl#Bundesnetzagentur"/>
+	<security:level rdf:datatype="http://www.w3.org/2001/XMLSchema#string">suited for certificate generation if entropy of serial number is &gt; 20</security:level>
+	<security:validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int">2010</security:validUntil>
+</security:SecurityAssurance>
+<security:Organization rdf:about="http://localhost/ontologies/Security.owl#Bundesnetzagentur"/>
+<security:SecurityAssurance rdf:about="http://localhost/ontologies/Security.owl#BNA-SHA-1">
+	<security:byOrganisation rdf:resource="http://localhost/ontologies/Security.owl#Bundesnetzagentur"/>
+	<security:level rdf:datatype="http://www.w3.org/2001/XMLSchema#string">suited for certificate generation</security:level>
+	<security:validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int">2007</security:validUntil>
+</security:SecurityAssurance>
+<security:SecurityProtocol rdf:about="http://localhost/ontologies/Security.owl#XMLEncSigSporadic">
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#LowMessageAuthenticity"/>
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#MediumMessageIntegrity"/>
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighConfidentiality"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#TripleDES-CBC"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#RSA-v1.5"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#RSA-SHA1"/>
+	<security:requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float">56288.0</security:requiresMemory>
+	<security:requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float">102.39</security:requiresComputingPower>
+</security:SecurityProtocol>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#LowMessageAuthenticity">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#MessageAuthenticity"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.4</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#MessageAuthenticity">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Provides guarantee that message came from whoever claimed to have sent it.</rdfs:comment>
+</security:SecurityObjective>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#MediumMessageIntegrity">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#MessageIntegrity"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.7</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#MessageIntegrity">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Data integrity or Message integrity; data cannot be changed, deleted, modified, etc by unauthorized parties.</rdfs:comment>
+</security:SecurityObjective>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#TripleDES-CBC">
+	<security:requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.1</security:requiresMemory>
+	<security:requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.2</security:requiresComputingPower>
+</security:SymmetricEncryptionAlgorithm>
+<security:AsymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#RSA-v1.5">
+	<security:requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.8</security:requiresMemory>
+	<security:requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.8</security:requiresComputingPower>
+</security:AsymmetricEncryptionAlgorithm>
+<security:SignatureAlgorithm rdf:about="http://localhost/ontologies/Security.owl#RSA-SHA1">
+	<security:hasAssurance rdf:resource="http://localhost/ontologies/Security.owl#BNA-SHA-1-ext"/>
+	<security:hasAssurance rdf:resource="http://localhost/ontologies/Security.owl#BNA-SHA-1"/>
+	<security:hasAssurance rdf:resource="http://localhost/ontologies/Security.owl#BNA-RSA-1280"/>
+	<security:hasAssurance rdf:resource="http://localhost/ontologies/Security.owl#BNA-RSA-1536"/>
+	<security:hasAssurance rdf:resource="http://localhost/ontologies/Security.owl#BNA-RSA-1024"/>
+	<security:requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.8</security:requiresMemory>
+	<security:requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9</security:requiresComputingPower>
+</security:SignatureAlgorithm>
+<security:SecurityAssurance rdf:about="http://localhost/ontologies/Security.owl#BNA-RSA-1280">
+	<security:byOrganisation rdf:resource="http://localhost/ontologies/Security.owl#Bundesnetzagentur"/>
+	<security:level rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Acceptable if key length &gt;= 1280 bit</security:level>
+	<security:validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int">2009</security:validUntil>
+</security:SecurityAssurance>
+<security:SecurityAssurance rdf:about="http://localhost/ontologies/Security.owl#BNA-RSA-1536">
+	<security:level rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Acceptable if key length &gt;= 1536 bit</security:level>
+	<security:validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int">2010</security:validUntil>
+</security:SecurityAssurance>
+<security:SecurityAssurance rdf:about="http://localhost/ontologies/Security.owl#BNA-RSA-1024">
+	<security:byOrganisation rdf:resource="http://localhost/ontologies/Security.owl#Bundesnetzagentur"/>
+	<security:level rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Acceptable if key length &gt;= 1024 bit</security:level>
+	<security:validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int">2008</security:validUntil>
+</security:SecurityAssurance>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#HighConfidentiality">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#Confidentiality"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#Confidentiality">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Protects against information being disclosed or revealed to unauthorized parties.</rdfs:comment>
+</security:SecurityObjective>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#AES128-CBC"/>
+<security:MACAlgorithm rdf:about="http://localhost/ontologies/Security.owl#HMAC-SHA1-96"/>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#MediumConfidentiality">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#Confidentiality"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.7</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#HostTrust">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(Secondary Objective) How to trust host or platform. Is relevant to Common criteria, etc.</rdfs:comment>
+</security:SecurityObjective>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#DES"/>
+<security:SecurityProtocol rdf:about="http://localhost/ontologies/Security.owl#XMLEnc">
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighConfidentiality"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#TripleDES-CBC"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#RSA-v1.5"/>
+	<security:implementedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string">LinkSmartWSProvider_1.0.0.qualifier</security:implementedBy>
+	<security:requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float">29656.0</security:requiresMemory>
+	<security:configuredBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string">eu.linksmart.security.core;eu.linksmart.security.core.config;1</security:configuredBy>
+	<security:requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float">21.42</security:requiresComputingPower>
+</security:SecurityProtocol>
+<security:DigestAlgorithm rdf:about="http://localhost/ontologies/Security.owl#MD4"/>
+<security:SecurityProtocol rdf:about="http://localhost/ontologies/Security.owl#XMLEncTrusted">
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighConfidentiality"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#TripleDES-CBC"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#RSA-v1.5"/>
+	<security:usesAlgorithm>
+		<security:TrustModel rdf:about="http://localhost/ontologies/Security.owl#PKI-X"/>
+	</security:usesAlgorithm>
+</security:SecurityProtocol>
+<security:MACAlgorithm rdf:about="http://localhost/ontologies/Security.owl#HMAC-Ripemod160"/>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#TrafficHiding">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(Secondary Objective) Pad traffic with bogus data to hide traffic patterns</rdfs:comment>
+</security:SecurityObjective>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#LowMessageIntegrity">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#MessageIntegrity"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.4</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:DigestAlgorithm rdf:about="http://localhost/ontologies/Security.owl#MD5">
+	<security:hasAssurance>
+		<security:SecurityAssurance rdf:about="http://localhost/ontologies/Security.owl#BNA-MD5">
+			<security:byOrganisation rdf:resource="http://localhost/ontologies/Security.owl#Bundesnetzagentur"/>
+			<security:level rdf:datatype="http://www.w3.org/2001/XMLSchema#string">insecure</security:level>
+		</security:SecurityAssurance>
+	</security:hasAssurance>
+</security:DigestAlgorithm>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#UserAuthentication">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Provides assurance of the identity of a person or entity.</rdfs:comment>
+</security:SecurityObjective>
+<security:AsymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#ElGamal"/>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#AES192-CBC"/>
+<security:SignatureAlgorithm rdf:about="http://localhost/ontologies/Security.owl#RSA-SHA512"/>
+<security:SecurityProtocol rdf:about="http://localhost/ontologies/Security.owl#None">
+	<security:requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float">328.0</security:requiresMemory>
+	<security:requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float">16.3</security:requiresComputingPower>
+</security:SecurityProtocol>
+<security:SignatureAlgorithm rdf:about="http://localhost/ontologies/Security.owl#DSA"/>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#AES256-CBC"/>
+<security:Organization rdf:about="http://localhost/ontologies/Security.owl#BSI"/>
+<security:SignatureAlgorithm rdf:about="http://localhost/ontologies/Security.owl#RSA-SHA384"/>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#MediumMessageAuthenticity">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#MessageAuthenticity"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.7</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#KeyManagement">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(SecondaryObjective) Securely manages keys for legitimate users.</rdfs:comment>
+</security:SecurityObjective>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#Caesar"/>
+<security:SecurityProtocol rdf:about="http://localhost/ontologies/Security.owl#XMLEncSig">
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighConfidentiality"/>
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighMessageAuthenticity"/>
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighMessageIntegrity"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#TripleDES-CBC"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#RSA-v1.5"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#RSA-SHA1"/>
+	<security:requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float">58904.0</security:requiresMemory>
+	<security:requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float">114.31</security:requiresComputingPower>
+</security:SecurityProtocol>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#HighMessageAuthenticity">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#MessageAuthenticity"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#HighMessageIntegrity">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#MessageIntegrity"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:SecurityProtocol rdf:about="http://localhost/ontologies/Security.owl#XMLSig">
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighMessageAuthenticity"/>
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighMessageIntegrity"/>
+	<security:usesAlgorithm rdf:resource="http://localhost/ontologies/Security.owl#RSA-SHA1"/>
+</security:SecurityProtocol>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#Blowfish"/>
+<security:TrustModel rdf:about="http://localhost/ontologies/Security.owl#CommonPKI"/>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#LowConfidentiality">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#Confidentiality"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.4</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:MACAlgorithm rdf:about="http://localhost/ontologies/Security.owl#HMAC-SHA1"/>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#Blowfish-CBC"/>
+<security:HostMechanism rdf:about="http://localhost/ontologies/Security.owl#TamperProofStorage">
+	<security:supportsSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#HighNonRepudiation"/>
+	<security:implementedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string">desktop_all-3.1.0</security:implementedBy>
+</security:HostMechanism>
+<security:ObjectiveStrengthRelation rdf:about="http://localhost/ontologies/Security.owl#HighNonRepudiation">
+	<security:hasSecurityObjective rdf:resource="http://localhost/ontologies/Security.owl#NonRepudiation"/>
+	<security:hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.9</security:hasStrength>
+</security:ObjectiveStrengthRelation>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#NonRepudiation"/>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#DES-CBC"/>
+<security:MACAlgorithm rdf:about="http://localhost/ontologies/Security.owl#HMAC-MD5-96"/>
+<security:StreamCipher rdf:about="http://localhost/ontologies/Security.owl#RC4"/>
+<security:SignatureAlgorithm rdf:about="http://localhost/ontologies/Security.owl#RSA-SHA256"/>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#Authorization">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Only authorized entities are allowed to access resources in an authorized manner. 
+      (Aka Access Control). If desired, user may create instance of AccessControl as well.</rdfs:comment>
+</security:SecurityObjective>
+<security:MACAlgorithm rdf:about="http://localhost/ontologies/Security.owl#HMAC-MD5"/>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#Arcfour"/>
+<security:StreamCipher rdf:about="http://localhost/ontologies/Security.owl#E0"/>
+<security:DigestAlgorithm rdf:about="http://localhost/ontologies/Security.owl#SHA-256"/>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#Vigenere"/>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#IDEA"/>
+<security:TrustModel rdf:about="http://localhost/ontologies/Security.owl#OpenPGP"/>
+<security:SecurityObjective rdf:about="http://localhost/ontologies/Security.owl#ReplayPrevention">
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(Secondary Objective) Protect against replay attacks</rdfs:comment>
+</security:SecurityObjective>
+<security:HostMechanism rdf:about="http://localhost/ontologies/Security.owl#AuditLog"/>
+<security:SymmetricEncryptionAlgorithm rdf:about="http://localhost/ontologies/Security.owl#Cast128-CBC"/>
+<rdfs:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#FormFieldProperty">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+</rdfs:Class>
+<rdfs:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#MultiValueFormFieldProperty">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl#FormFieldProperty"/>
+</rdfs:Class>
+<owl:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#FormProperty">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#AnnotationProperty">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/StaticPropertyModel.owl#StaticTaxonomy">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+<owl:Ontology rdf:about="http://localhost/ontologies/Energy.owl">
+	<owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+</owl:Ontology>
+<owl:Class rdf:about="http://localhost/ontologies/Energy.owl#EnergyClassification"/>
+<owl:Class rdf:about="http://localhost/ontologies/Energy.owl#EnergyOperation"/>
+<owl:Class rdf:about="http://localhost/ontologies/Energy.owl#EnergyProfile"/>
+<owl:Class rdf:about="http://localhost/ontologies/Energy.owl#EnergyLifeTime"/>
+<owl:Class rdf:about="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Energy.owl#modeMax">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Energy.owl#modeShutdown">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Energy.owl#modeAverage">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Energy.owl#modeStart">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Energy.owl#classificationSystem">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyClassification"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Energy.owl#modeName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Energy.owl#classificationValue">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyClassification"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<property:SingleValueAnnotationProperty rdf:about="http://localhost/ontologies/Energy.owl#modeUnit">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#Power"/>
+</property:SingleValueAnnotationProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#shutDownCost">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyLifeTime"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#generation">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyProfile"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+</property:MultiValueFormProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#startCost">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyLifeTime"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#lifeTime">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyProfile"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Energy.owl#EnergyLifeTime"/>
+</property:MultiValueFormProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#classification">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyProfile"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Energy.owl#EnergyClassification"/>
+</property:SingleValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#operation">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyProfile"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Energy.owl#EnergyOperation"/>
+</property:MultiValueFormProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#minimumRunTime">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyOperation"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#expected">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyLifeTime"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Energy.owl#consumption">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Energy.owl#EnergyProfile"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Energy.owl#EnergyMode"/>
+</property:MultiValueFormProperty>
+<owl:Ontology rdf:about="http://localhost/ontologies/Event.owl">
+	<owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+	<owl:imports rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl"/>
+</owl:Ontology>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#MotionDetected">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Event.owl#Motion">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Event.owl#Event"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#Controller">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Event.owl#Event"/>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#StateChange">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Event.owl#Event"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#EventKey"/>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#MotionDetectorAlarm">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Event.owl#Motion"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#Temperature">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Event.owl#Event"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#KeyReleased">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Event.owl#Controller"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#KeyPushed">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Event.owl#Controller"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#TemperatureAlarm">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Event.owl#Temperature"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Event.owl#MetaInformation"/>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Event.owl#trigger">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#MetaInformation"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Event.owl#relatedStateVariable">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#EventKey"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Event.owl#minValue">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#EventKey"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Event.owl#hasTopic">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#Event"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Event.owl#description">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#MetaInformation"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Event.owl#dataType">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#EventKey"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Event.owl#keyName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#EventKey"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Event.owl#maxValue">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#EventKey"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Event.owl#hasMetaInformation">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#Event"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Event.owl#MetaInformation"/>
+</property:SingleValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Event.owl#hasKey">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#Event"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Event.owl#EventKey"/>
+</property:MultiValueFormProperty>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Event.owl#frequency">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#MetaInformation"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+</property:SingleValueFormProperty>
+<property:SingleValueAnnotationProperty rdf:about="http://localhost/ontologies/Event.owl#valueUnit">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Event.owl#EventKey"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#Unit"/>
+</property:SingleValueAnnotationProperty>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#DataProjector">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#MediaDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Pump">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#ActuatorDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#TemperatureControllingDevice">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#ControllingDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Fax">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#DuplexDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PeripheralDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Scanner">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#InputDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#IODevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#DoorLock">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Lock">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#Switch"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Mouse">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#InputDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#PortableStorage">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#StorageDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PeripheralDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#PortableHDD">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PortableStorage"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Television">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#MediaDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#SemanticDevicePIDPrecondition">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#SemanticDevicePrecondition">
+			<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Regulator">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#ActuatorDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Printer">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#OutputDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#IODevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#RegulableLight">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#Regulator"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Appliance">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#PhysicalDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#LCDDisplay">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#MediaDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#LightSwitch">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Switch">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#ActuatorDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#MobilePhone">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#MobileDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#IODevice">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PeripheralDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Owen">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#ProgrammableAppliance">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#Appliance"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Laptop">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#ProcessingUnit">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Screen">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#OutputDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#SemanticSubSubDevice">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#SemanticSubDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Floppy">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#StaticStorage">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#StorageDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#EnergySavingDevice">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#SemanticDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#FlowMeter">
+	<rdfs:subClassOf>
+		<owl:Class rdf:about="http://localhost/ontologies/Device.owl#SensorDevice">
+			<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+		</owl:Class>
+	</rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#PeripheralDevice">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Thermometer">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#SensorDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#PDA">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#ProcessingUnit"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Modem">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#DuplexDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Windmeter">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#SensorDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#HDD">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#StaticStorage"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#USB">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PortableStorage"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Accessory">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Robot">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#ActuatorDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#LightSensor">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#SensorDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Keyboard">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#InputDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#SemanticDeviceQueryPrecondition">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevicePrecondition"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#PressureMeter">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#SensorDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Microphone">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#InputDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#WashingMachine">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#ProgrammableAppliance"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#WindowLock">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#Lock"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#DesktopPC">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#ProcessingUnit"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#PlasmaDisplay">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#MediaDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#InfoDescription">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#LightControllingDevice">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#ControllingDevice"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Device.owl#Ventilator">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Device.owl#ActuatorDevice"/>
+</owl:Class>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Device.owl#clonedFromTemplate">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Device.owl#hasService">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Service.owl#PhysicalService"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Device.owl#isSatisfiedBy">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevicePrecondition"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Device.owl#hasConfiguration">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Configuration.owl#Configuration"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Device.owl#hasDiscoveryInfo">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Discovery.owl#DiscoveryInfo"/>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://localhost/ontologies/Device.owl#info">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Device.owl#InfoDescription"/>
+</owl:ObjectProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#deviceType">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevicePrecondition"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#PID">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#preconditionQuery">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#SemanticDeviceQueryPrecondition"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#friendlyName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#InfoDescription"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#modelDescription">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#InfoDescription"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#modelNumber">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#InfoDescription"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#manufacturerURL">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#InfoDescription"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#modelName">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#InfoDescription"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#preconditionId">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevicePrecondition"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#preconditionPID">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevicePIDPrecondition"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#preconditionDeviceType">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevicePrecondition"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#manufacturer">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#InfoDescription"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#preconditionCardinality">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#SemanticDeviceQueryPrecondition"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Device.owl#isDeviceTemplate">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+</owl:DatatypeProperty>
+<unit:UnitValue rdf:about="http://localhost/ontologies/Device.owl#UnitValue_2">
+	<unit:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">600</unit:value>
+	<unit:inUnit rdf:resource="http://localhost/ontologies/Unit.owl#Pixel"/>
+</unit:UnitValue>
+<unit:UnitValue rdf:about="http://localhost/ontologies/Device.owl#UnitValue_1">
+	<unit:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">800</unit:value>
+	<unit:inUnit rdf:resource="http://localhost/ontologies/Unit.owl#Pixel"/>
+</unit:UnitValue>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Device.owl#hasHardware">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Hardware.owl#Hardware"/>
+</property:SingleValueFormProperty>
+<property:MultiValueAnnotationProperty rdf:about="http://localhost/ontologies/Device.owl#supportsSecurityMechanism">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Security.owl#SecurityMechanism"/>
+</property:MultiValueAnnotationProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Device.owl#hasEvent">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#Device"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Event.owl#Event"/>
+</property:MultiValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Device.owl#hasEnergyProfile">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#PhysicalDevice"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Energy.owl#EnergyProfile"/>
+</property:MultiValueFormProperty>
+<property:MultiValueFormProperty rdf:about="http://localhost/ontologies/Device.owl#hasPrecondition">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevice"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Device.owl#SemanticDevicePrecondition"/>
+</property:MultiValueFormProperty>
+<owl:Ontology rdf:about="http://localhost/ontologies/StaticTaxonomyModel.owl">
+	<owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+	<owl:imports rdf:resource="http://localhost/ontologies/Application.owl"/>
+</owl:Ontology>
+<owl:Class rdf:about="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Unit.owl#Currency">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Unit.owl#Basic"/>
+</owl:Class>
+<unit:Currency rdf:about="http://localhost/ontologies/Unit.owl#EUR"/>
+<unit:Currency rdf:about="http://localhost/ontologies/Unit.owl#USD"/>
+<owl:DatatypeProperty rdf:about="http://localhost/ontologies/Service.owl#relatedStateVariable">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Service.owl#ServiceParameter"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>
+<owl:Class rdf:about="http://localhost/ontologies/Discovery.owl#PhysicalDeviceSource">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/Discovery.owl#DiscoveryInfo"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Hardware.owl#BatteryLevelValue">
+	<rdfs:subClassOf rdf:resource="http://localhost/ontologies/StaticTaxonomyModel.owl#StaticTaxonomy"/>
+</owl:Class>
+<owl:Class rdf:about="http://localhost/ontologies/Hardware.owl#BatteryLevel">
+	<rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+</owl:Class>
+<hardware:BatteryLevelValue rdf:about="http://localhost/ontologies/Hardware.owl#High"/>
+<property:SingleValueFormProperty rdf:about="http://localhost/ontologies/Hardware.owl#hasBatteryLevel">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Hardware.owl#Hardware"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Hardware.owl#BatteryLevel"/>
+</property:SingleValueFormProperty>
+<hardware:BatteryLevelValue rdf:about="http://localhost/ontologies/Hardware.owl#Low"/>
+<hardware:BatteryLevelValue rdf:about="http://localhost/ontologies/Hardware.owl#Medium"/>
+<property:SingleValueAnnotationProperty rdf:about="http://localhost/ontologies/Hardware.owl#batteryLevelValue">
+	<rdfs:domain rdf:resource="http://localhost/ontologies/Hardware.owl#BatteryLevel"/>
+	<rdfs:range rdf:resource="http://localhost/ontologies/Hardware.owl#BatteryLevelValue"/>
+</property:SingleValueAnnotationProperty>
+<unit:UnitValue rdf:about="http://localhost/ontologies/Device.owl#UnitValue_3">
+	<unit:value rdf:datatype="http://www.w3.org/2001/XMLSchema#string">3323%</unit:value>
+	<unit:inUnit rdf:resource="http://localhost/ontologies/Unit.owl#Joule"/>
+</unit:UnitValue>
+<device:Thermometer rdf:about="http://localhost/ontologies/Device.owl#TestingThermometer">
+	<device:isDeviceTemplate rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</device:isDeviceTemplate>
+	<device:hasHardware>
+		<hardware:Hardware rdf:about="http://localhost/ontologies/Device.owl#TestingThermometerHardware">
+			<hardware:hasBatteryLevel>
+				<hardware:BatteryLevel rdf:about="http://localhost/ontologies/Device.owl#TestingThermometerBatteryLevel">
+					<hardware:batteryLevelValue rdf:resource="http://localhost/ontologies/Hardware.owl#High"/>
+				</hardware:BatteryLevel>
+			</hardware:hasBatteryLevel>
+		</hardware:Hardware>
+	</device:hasHardware>
+</device:Thermometer>
+
+</rdf:RDF>

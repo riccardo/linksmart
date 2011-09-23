@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LinkSmartManagerConfigurator" immediate="true" >
+	<implementation class="eu.linksmart.configurator.ConfiguratorActivator"/>
+		<reference bind="registerHID" cardinality="0..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="dynamic" unbind="unregisterHID"/>
+  		
+  		<reference cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="dynamic"/>
+    <reference bind="registerServlets" cardinality="0..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="dynamic" unbind="unregisterServlets"/>
+</component>
+

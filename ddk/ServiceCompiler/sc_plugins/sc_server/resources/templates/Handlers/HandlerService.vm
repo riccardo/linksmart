@@ -1,0 +1,10 @@
+package $package;
+
+import java.io.OutputStream;
+
+
+public interface $interface {
+
+	public abstract void handle(String request, String clientHost);
+
+}

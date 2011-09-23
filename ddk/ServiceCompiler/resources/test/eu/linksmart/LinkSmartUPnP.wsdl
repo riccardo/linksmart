@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:impl="http://linksmart.eu" targetNamespace="http://linksmart.eu">
+	<message name="getLinkSmartIDRequest">
+	</message>
+	
+	<message name="getLinkSmartIDResponse">
+		<part name="LinkSmartID" type="xs:string"/>
+	</message>
+	
+	<message name="createWSRequest">
+	</message>
+	
+	<message name="createWSResponse">
+		<part name="WSEndpoint" type="xs:string"/>
+	</message>
+
+	<message name="getStatusRequest">
+	</message>
+
+	<message name="getStatusResponse">
+		<part name="Status" type="xs:string"/>
+	</message>
+	
+	<message name="getPropertyRequest">
+		<part name="Property" type="xs:string"/>
+	</message>
+	
+	<message name="getPropertyResponse">
+		<part name="PropValue" type="xs:string"/>
+	</message>
+	
+	<message name="getHasErrorRequest">
+	</message>
+	
+	<message name="getHasErrorResponse">
+		<part name="HasError" type="xs:boolean"/>
+	</message>
+	
+	<message name="getErrorMessageRequest">
+	</message>
+	
+	<message name="getErrorMessageResponse">
+		<part name="ErrorMessage" type="xs:string"/>
+	</message>
+	
+	<message name="getDiscoveryInfoRequest">
+	</message>
+
+	<message name="getDiscoveryInfoResponse">
+		<part name="DiscoveryInfo" type="xs:string"/>
+	</message>
+	
+	<message name="getDACEndpointRequest">
+	</message>
+	
+	<message name="getDACEndpointResponse">
+		<part name="DACEndpoint" type="xs:string"/>
+	</message>
+	
+	<message name="getWSEndpointRequest">
+	</message>
+	
+	<message name="getWSEndpointResponse">
+		<part name="WSEndpoint" type="xs:string"/>
+	</message>
+	
+	<message name="getLinkSmartWSEndpointRequest">
+	</message>
+	
+	<message name="getLinkSmartWSEndpointResponse">
+		<part name="LinkSmartWSEndpoint" type="xs:string"/>
+	</message>
+	
+	<message name="getWSDLRequest">
+	</message>
+	
+	<message name="getWSDLResponse">
+		<part name="WSDL" type="xs:string"/>
+	</message>
+		
+	<message name="setLinkSmartIDRequest">
+	    <part name="LinkSmartID" type="xs:string"/>
+	</message>
+	
+	<message name="setLinkSmartIDResponse">
+	</message>
+	
+	<message name="setStatusRequest">
+		<part name="Status" type="xs:string"/>
+	</message>
+	
+	<message name="setStatusResponse">
+	</message>
+	
+	<message name="setDACEndpointRequest">
+		<part name="DACEndpoint" type="xs:string"/>
+	</message>
+	
+	<message name="setDACEndpointResponse">
+	</message>
+	
+	<message name="setPropertyRequest">
+		<part name="Property" type="xs:string"/>
+		<part name="Value" type="xs:string"/>
+	</message>
+	
+	<message name="setPropertyResponse">
+	</message>
+
+	<message name="stopRequest">
+	</message>
+	
+	<message name="stopResponse">
+	</message>	
+	
+	<message name="stopWSRequest">
+	</message>
+	
+	<message name="stopWSResponse">
+	</message>	
+	
+	<message name="stopLinkSmartWSRequest">
+	</message>
+	
+	<message name="stopLinkSmartWSResponse">
+	</message>	
+
+	<portType name="LinkSmartServicePort">
+		<operation name="GetLinkSmartID">
+      		<input message="impl:getLinkSmartIDRequest"/>
+      		<output message="impl:getLinkSmartIDResponse"/>
+  		</operation>
+  		<operation name="CreateWS">
+      		<input message="impl:createWSRequest"/>
+      		<output message="impl:createWSResponse"/>
+  		</operation>
+    	<operation name="GetStatus">
+      		<input message="impl:getStatusRequest"/>
+      		<output message="impl:getStatusResponse"/>
+  		</operation>
+    	<operation name="GetProperty">
+      		<input message="impl:getPropertyRequest"/>
+      		<output message="impl:getPropertyResponse"/>
+  		</operation>
+    	<operation name="GetHasError">
+      		<input message="impl:getHasErrorRequest"/>
+      		<output message="impl:getHasErrorResponse"/>
+  		</operation>
+    	<operation name="GetErrorMessage">
+      		<input message="impl:getErrorMessageRequest"/>
+      		<output message="impl:getErrorMessageResponse"/>
+  		</operation>
+    	<operation name="GetDiscoveryInfo">
+      		<input message="impl:getDiscoveryInfoRequest"/>
+      		<output message="impl:getDiscoveryInfoResponse"/>
+  		</operation>
+    	<operation name="GetDACEndpoint">
+      		<input message="impl:getDACEndpointRequest"/>
+      		<output message="impl:getDACEndpointResponse"/>
+  		</operation>
+  		<operation name="GetWSEndpoint">
+      		<input message="impl:getWSEndpointRequest"/>
+      		<output message="impl:getWSEndpointResponse"/>
+  		</operation>
+  		<operation name="GetLinkSmartWSEndpoint">
+      		<input message="impl:getLinkSmartWSEndpointRequest"/>
+      		<output message="impl:getLinkSmartWSEndpointResponse"/>
+  		</operation>
+  			<operation name="GetWSDL">
+      		<input message="impl:getWSDLRequest"/>
+      		<output message="impl:getWSDLResponse"/>
+  		</operation>
+  		<operation name="SetLinkSmartID">
+      		<input message="impl:setLinkSmartIDRequest"/>
+      		<output message="impl:setLinkSmartIDResponse"/>
+  		</operation>
+  		<operation name="SetStatus">
+      		<input message="impl:setStatusRequest"/>
+      		<output message="impl:setStatusResponse"/>
+  		</operation>
+  		<operation name="SetDACEndpoint">
+      		<input message="impl:setDACEndpointRequest"/>
+      		<output message="impl:setDACEndpointResponse"/>
+  		</operation>
+  		<operation name="SetProperty">
+      		<input message="impl:setPropertyRequest"/>
+      		<output message="impl:setPropertyResponse"/>
+  		</operation>
+  		<operation name="Stop">
+      		<input message="impl:stopRequest"/>
+      		<output message="impl:stopResponse"/>
+  		</operation>
+  		<operation name="StopWS">
+      		<input message="impl:stopWSRequest"/>
+      		<output message="impl:stopWSResponse"/>
+  		</operation>
+  		<operation name="StopLinkSmartWS">
+      		<input message="impl:stopLinkSmartWSRequest"/>
+      		<output message="impl:stopLinkSmartWSResponse"/>
+  		</operation>
+	</portType>
+	
+	<binding name="LinkSmartServiceBinding" type="impl:LinkSmartServicePort">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+			<operation name="GetLinkSmartID">
+			<soap:operation soapAction="GetLinkSmartID" style="rpc"/>
+				<input name="getLinkSmartIDRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getLinkSmartIDResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+	
+			<operation name="CreateWS">
+			<soap:operation soapAction="CreateWS" style="rpc"/>
+				<input name="createWSRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="createWSResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+	
+			<operation name="GetStatus">
+			<soap:operation soapAction="GetStatus" style="rpc"/>
+				<input name="getStatusRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getStatusResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+	
+			<operation name="GetProperty">
+			<soap:operation soapAction="GetProperty" style="rpc"/>
+				<input name="getPropertyRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getPropertyResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="GetHasError">
+			<soap:operation soapAction="GetHasError" style="rpc"/>
+				<input name="getHasErrorRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getHasErrorResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="GetErrorMessage">
+			<soap:operation soapAction="GetErrorMessage" style="rpc"/>
+				<input name="getErrorMessageRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getErrorMessageResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="GetDiscoveryInfo">
+			<soap:operation soapAction="GetDiscoveryInfo" style="rpc"/>
+				<input name="getDiscoveryInfoRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getDiscoveryInfoResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>			
+	
+			<operation name="GetDACEndpoint">
+			<soap:operation soapAction="GetDACEndpoint" style="rpc"/>
+				<input name="getDACEndpointRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getDACEndpointResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="GetWSEndpoint">
+			<soap:operation soapAction="GetWSEndpoint" style="rpc"/>
+				<input name="getWSEndpointRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getWSEndpointResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="GetLinkSmartWSEndpoint">
+			<soap:operation soapAction="GetLinkSmartWSEndpoint" style="rpc"/>
+				<input name="getLinkSmartWSEndpointRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getLinkSmartWSEndpointResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+				
+			<operation name="GetWSDL">
+			<soap:operation soapAction="GetWSDL" style="rpc"/>
+				<input name="getWSDLRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="getWSDLResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="SetLinkSmartID">
+			<soap:operation soapAction="SetLinkSmartID" style="rpc"/>
+				<input name="setLinkSmartIDRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="setLinkSmartIDResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="SetStatus">
+			<soap:operation soapAction="SetStatus" style="rpc"/>
+				<input name="setStatusRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="setStatusResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="SetDACEndpoint">
+			<soap:operation soapAction="SetDACEndpoint" style="rpc"/>
+				<input name="setDACEndpointRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="setDACEndpointResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="SetProperty">
+			<soap:operation soapAction="SetProperty" style="rpc"/>
+				<input name="setPropertyRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="setPropertyResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="Stop">
+			<soap:operation soapAction="Stop" style="rpc"/>
+				<input name="stopRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="stopResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+			
+			<operation name="StopWS">
+			<soap:operation soapAction="StopWS" style="rpc"/>
+				<input name="stopWSRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="stopWSResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>
+
+			<operation name="StopLinkSmartWS">
+			<soap:operation soapAction="StopLinkSmartWS" style="rpc"/>
+				<input name="stopLinkSmartWSRequest">
+					<soap:body use="literal"/>
+				</input>
+				<output name="stopLinkSmartWSResponse">
+					<soap:body use="literal"/>
+				</output>
+			</operation>			
+	</binding>
+
+	<service name="linksmartservice">
+		<port name="LinkSmartServicePort" binding="impl:LinkSmartServiceBinding">
+			<soap:address location="http://linksmart.eu/LinkSmart"/>
+		</port>
+	</service>	
+</definitions>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  Copyright (C) 2006-2010 
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="LinkSmart" module="sc_soap"/>
+    <publications>
+      <artifact name="sc_soap" type="jar"/>
+    </publications>
+    <dependencies>
+      <dependency name="sc_framework" rev="1.0"/>
+      <dependency org="junit" name="junit" rev="4.8.1"/>
+      <dependency org="log4j" name="log4j" rev="1.2.16"/>
+      <dependency org="org.apache.velocity" name="velocity" rev="1.5"/>
+      <dependency org="org.apache.felix" name="org.osgi.compendium" rev="1.4.0"/>
+      <dependency org="org.apache.felix" name="org.osgi.core" rev="1.4.0"/>
+      <dependency org="wsdl4j" name="wsdl4j" rev="1.6.2"/>
+    </dependencies>
+</ivy-module>

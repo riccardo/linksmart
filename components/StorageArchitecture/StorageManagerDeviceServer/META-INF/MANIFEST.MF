@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: StorageManagerDeviceServer Plug-in
+Bundle-SymbolicName: StorageManagerDeviceServer
+Bundle-Version: 1.0.0
+Import-Package: eu.linksmart.storage.helper,
+ javax.servlet,
+ javax.servlet.http,
+ org.apache.felix.upnp.extra.util,
+ org.apache.log4j,
+ org.apache.log4j.chainsaw,
+ org.osgi.framework,
+ org.osgi.service.cm;version="1.2.0",
+ org.osgi.service.device,
+ org.osgi.service.http,
+ org.osgi.service.upnp,
+ org.osgi.util.tracker
+Export-Package: eu.linksmart.limbo.storagemanagerdevice,
+ eu.linksmart.limbo.storagemanagerdevice.handler,
+ eu.linksmart.limbo.storagemanagerdevice.upnp
+Bundle-ClassPath: .,
+ lib/commons-lang-2.4.jar,
+ lib/jdom.jar,
+ lib/NetworkManagerClient.jar
+Eclipse-LazyStart: true
+Bundle-Activator: eu.linksmart.limbo.storagemanagerdevice.upnp.StorageManagerDeviceUPnPActivator

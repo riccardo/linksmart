@@ -1,0 +1,66 @@
+package eu.linksmart.limbo.client;
+
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class Protocols {
+    public static final String UDP = "udp";
+    public static final String TCP = "tcp";
+
+    private Map<String, ClientProtocol> protocols 
+	 = new HashMap<String, ClientProtocol>();
+    private Map<String, String> addresses 
+	 = new HashMap<String, String>();
+		
+    /**
+     * Override to return current protocol (as String)
+     */
+    protected abstract String getId();
+
+    public Protocols() {
+	 protocols.put(UDP, new UDPProtocol());
+	 protocols.put(TCP, new TCPProtocol());
+    }
+
+    protected String getCurrentProtocolString() {
+	 String result = System.getProperty("http.clientprotocol." + getId());
+	 if (result == null) {
+	     result = TCP;
+	 }
+	 return result;
+    }
+		
+    protected synchronized void setAddresses(String ... addressMap) {
+	 addresses.clear();
+	 StringBuffer ipAddresses = new StringBuffer();
+	 for (int i = 0; i < addressMap.length/2; i++) {
+	     String protocol = addressMap[2*i];
+	     String address = addressMap[2*i+1];
+	     addresses.put(protocol, address);
+	     try {
+		  if (i > 0) {
+		      ipAddresses.append(',');
+		  }
+          URL url = new URL(address);
+          ipAddresses.append(InetAddress.getByName(url.getHost()).getHostAddress() + ":" + url.getPort());
+	     } catch (UnknownHostException e) {
+		  e.printStackTrace();
+	     } catch (MalformedURLException e) {
+		  e.printStackTrace();
+	     }
+	 }
+	 System.setProperty("http.clientprotocol.connections." + getId(), ipAddresses.toString());
+    }
+
+    protected synchronized ClientProtocol getCurrentProtocol() {
+	 return protocols.get(getCurrentProtocolString());
+    }
+
+    protected synchronized String getCurrentAddress() {
+	 return addresses.get(getCurrentProtocolString());
+    }
+}

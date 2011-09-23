@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:impl="http://linksmart.eu/"
+	xmlns:linksmart="http://linksmart.eu/" targetNamespace="http://linksmart.eu/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+	<wsdl:message name="createContainerRequest">
+		<wsdl:part name="containername" type="xs:string" />
+		<wsdl:part name="config" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="createContainerResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="removeContainerRequest">
+		<wsdl:part name="container" type="xs:string" />
+		<wsdl:part name="delete" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="removeContainerResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getContainerRequest">
+		<wsdl:part name="container" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getContainerResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getContainersRequest">
+	</wsdl:message>
+
+	<wsdl:message name="getContainersResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getCookieNamesRequest">
+	</wsdl:message>
+
+	<wsdl:message name="getCookieNamesResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getAllDataRequest">
+	</wsdl:message>
+
+	<wsdl:message name="getAllDataResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getCookieValueRequest">
+
+		<wsdl:part name="cookieName" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getCookieValueResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="setCookieValueRequest">
+		<wsdl:part name="cookieName" type="xs:string" />
+		<wsdl:part name="cookieValue" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="setCookieValueResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="removeEntryRequest">
+
+		<wsdl:part name="cookieName" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:message name="removeEntryResponse">
+		<wsdl:part name="result" type="xs:string" />
+	</wsdl:message>
+
+	<wsdl:portType name="Cookie">
+		<wsdl:operation name="getCookieNames">
+			<wsdl:input message="impl:getCookieNamesRequest"
+				name="getKeysRequest" />
+			<wsdl:output message="impl:getCookieNamesResponse"
+				name="getKeysResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="getAllData">
+			<wsdl:input message="impl:getAllDataRequest"
+				name="getDataRequest" />
+			<wsdl:output message="impl:getAllDataResponse"
+				name="getDataResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="getCookieValue">
+			<wsdl:input message="impl:getCookieValueRequest"
+				name="getValueRequest" />
+			<wsdl:output message="impl:getCookieValueResponse"
+				name="getValueResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="setCookieValue">
+			<wsdl:input message="impl:setCookieValueRequest"
+				name="setValueRequest" />
+			<wsdl:output message="impl:setCookieValueResponse"
+				name="setValueResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="removeEntry">
+			<wsdl:input message="impl:removeEntryRequest"
+				name="removeEntryRequest" />
+			<wsdl:output message="impl:removeEntryResponse"
+				name="removeEntryResponse" />
+		</wsdl:operation>
+		
+	</wsdl:portType>
+
+	<binding name="CMbind" type="impl:Cookie">
+		<linksmart:binding device="file:./resources/Device.owl#Laptop_1" />
+		
+		<soap:binding style="rpc"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="getCookieNames">
+			<soap:operation soapAction="getKeys" />
+			<wsdl:input name="getKeysRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getKeysResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getAllData">
+			<soap:operation soapAction="getData" />
+			<wsdl:input name="getDataRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getDataResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getCookieValue">
+			<soap:operation soapAction="getValue" />
+			<wsdl:input name="getValueRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getValueResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setCookieValue">
+			<soap:operation soapAction="setValue" />
+			<wsdl:input name="setValueRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="setValueResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="removeEntry">
+			<soap:operation soapAction="removeEntry" />
+			<wsdl:input name="removeEntryRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="removeEntryResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+	</binding>
+	
+	<service name="CM">
+		<port name="CMPort" binding="impl:CMbind">
+			<soap:address location="http://localhost:8083/services/cookie" />
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,142 @@
+package $package;
+
+
+$imports
+import javax.bluetooth.ServiceRecord;
+
+public class $class extends Thread {
+
+	TextBox textBox;
+	private int port;
+	private String eventManagerHost;
+	private int eventManagerPort; 
+	private String serverHost;
+	private String PID; 
+	public String endpoint;
+	public boolean stopped;
+	protected String UUID = new UUID("1101", true).toString();
+	private StreamConnectionNotifier notifier;
+
+
+	public $class(TextBox theBox, ServerSocketConnection serversocket, 
+							 int thePort, String PID, String eventManagerHost, int eventManagerPort) {
+		this.textBox = theBox;
+		this.port = thePort;
+		this.PID = PID;
+		this.eventManagerHost = eventManagerHost;
+		this.eventManagerPort = eventManagerPort;
+		this.stopped = false;
+		LocalDevice device = null;
+		try {
+			device = LocalDevice.getLocalDevice();
+			device.setDiscoverable(DiscoveryAgent.GIAC);
+			String url = "btspp://localhost:"+UUID+";name=$service";
+			this.notifier = (StreamConnectionNotifier) Connector
+						.open(url);
+			this.endpoint = LocalDevice.getLocalDevice().getRecord(notifier).getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	public void run() {
+		try {
+
+			InputStream is = null;
+			int count = 0;
+			${endPoint}.createEndPoints(this.serverHost, this.port, this.PID, null, this.eventManagerHost, this.eventManagerPort);
+			try{
+				while(!stopped){
+					//textBox.setString("Waiting for Connections..."+count);
+					count++;
+					StreamConnection sc = (StreamConnection) notifier.acceptAndOpen();
+					is = sc.openInputStream();
+					OutputStream cos = sc.openDataOutputStream();
+					//textBox.setString("Connection established. Receiving request...");
+					int ch = 0;
+					int chCount = 0;
+				
+					boolean condition = true;
+					int content = -1;
+					String SOAPAction =null;
+                			StringBuffer sb = new StringBuffer();
+					StringBuffer auxiliar = new StringBuffer();
+					while(condition){
+						ch = is.read();
+						sb.append((char)ch);
+						auxiliar.append((char)ch);
+						if((char)ch == '\n'){
+							String line = auxiliar.toString();
+							if(line.startsWith("Content-Length")){
+								line = line.substring(0,line.length()-2);
+								StringTokenizer st = new StringTokenizer(line,": ");
+								st.nextToken();
+								content = Integer.parseInt(st.nextToken());
+							}
+							if(line.startsWith("SOAPAction")){
+								line = line.substring(13,line.length()-3);
+								SOAPAction = line;
+							}
+							else if(line.equalsIgnoreCase("\r\n"))
+								condition = false;
+							auxiliar = new StringBuffer();
+						}
+					}
+					while(chCount<content){
+						ch = is.read();
+						sb.append((char)ch);
+						//if (chCount % 100 == 0)
+						//	textBox.setString("" + chCount);
+						chCount++;
+					}
+					String request = sb.toString();
+					//textBox.setString("Request Received. Attendance in progress...");
+					$HeaderParser p = new $HeaderParser(request);
+					if(p.parseHeader()){
+						String result = "";
+						for(int i=0; i<${endPoint}.getEndPoints().size(); i++){
+							result = ((${endPoint})${endPoint}.getEndPoints().elementAt(i)).handleRequest(p.getRequest(), SOAPAction, null, null, cos);
+							if(result != null){
+								cos.write((result).getBytes());
+								cos.flush();
+								i = ${endPoint}.getEndPoints().size();
+							}
+						}
+						if(result == null){
+							result = "HTTP/1.1 403 Inexistent Operation\r\n\r\n";
+							cos.write(result.getBytes());
+							cos.flush();
+						}
+					}
+					else{
+						String result = "HTTP/1.1 200 Header Invalid\r\n\r\n";
+						cos.write(result.getBytes());
+						cos.flush();
+					}
+					cos.write("</$END>".getBytes());
+					cos.flush();
+					int bytesRead = 0;
+					String response = "";
+					byte[] buffer = new byte[256];
+					do {
+				            bytesRead = is.read(buffer);
+				            if (bytesRead > 0)
+				                response = response.concat(new String(buffer, 0, bytesRead));
+				        } while(!response.endsWith("$OK"));
+					
+					is.close();
+				    	cos.close();
+					sc.close();
+					}
+		} catch (IOException e) {
+			//textBox.setString(e.getMessage());
+		} finally{
+			notifier.close();
+			is.close();
+		}} catch (IOException e1) {
+			textBox.setString("Exception: "+e1.getMessage());
+		}
+	}
+
+}

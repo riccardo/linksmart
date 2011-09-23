@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<ivy-module version="2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	<info organisation="InsideSecurity" module="InsideSecurity" />
+	<publications>
+		<artifact name="InsideSecurity" type="jar" />
+	</publications>
+	<dependencies>
+		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
+		<dependency org="org.apache.servicemix" name="org.apache.servicemix.bundles.xmlsec" rev="1.4.4_2" />
+		<!-- logging downloads javax.servlet 2.4.0 so we turned transitive resolution off here -->
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" transitive="false"/>
+		<dependency org="org.apache.xalan" name="com.springsource.org.apache.xalan" rev="2.7.1" />
+		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi"	rev="3.6.2" />
+		<dependency org="org.eclipse.osgi.services" name="org.eclipse.osgi.services" rev="3.2.100" />
+		<dependency org="LinkSmartMiddlewareAPI" name="LinkSmartMiddlewareAPI"	rev="latest.integration" changing="true"  />
+	</dependencies>
+</ivy-module>

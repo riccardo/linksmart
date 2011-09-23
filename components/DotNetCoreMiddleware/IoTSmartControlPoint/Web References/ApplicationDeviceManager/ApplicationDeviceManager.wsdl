@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="http://tempuri.org/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" name="ApplicationDeviceManager" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://212.214.80.161:8080/ApplicationDeviceManager?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://212.214.80.161:8080/ApplicationDeviceManager?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IApplicationDeviceManager_GetAllGateways_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllGateways" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetAllGateways_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllGatewaysResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_ResolveDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:ResolveDevices" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_ResolveDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ResolveDevicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_DiscoverDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:DiscoverDevices" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_DiscoverDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DiscoverDevicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_ProcessErrorMessage_InputMessage">
+    <wsdl:part name="parameters" element="tns:ProcessErrorMessage" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_ProcessErrorMessage_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ProcessErrorMessageResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetDeviceXML_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDeviceXML" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetDeviceXML_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDeviceXMLResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTDevices" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTDevicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTDevicesEndpoints_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTDevicesEndpoints" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTDevicesEndpoints_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTDevicesEndpointsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTDevicesFromType_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTDevicesFromType" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTDevicesFromType_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTDevicesFromTypeResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTDevicesFromXpath_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTDevicesFromXpath" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTDevicesFromXpath_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTDevicesFromXpathResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetUnresolvedDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetUnresolvedDevices" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetUnresolvedDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetUnresolvedDevicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetDeviceOntologyDescription_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDeviceOntologyDescription" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetDeviceOntologyDescription_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDeviceOntologyDescriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_InvokeIoTService_InputMessage">
+    <wsdl:part name="parameters" element="tns:InvokeIoTService" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_InvokeIoTService_OutputMessage">
+    <wsdl:part name="parameters" element="tns:InvokeIoTServiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_InvokeService_InputMessage">
+    <wsdl:part name="parameters" element="tns:InvokeService" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_InvokeService_OutputMessage">
+    <wsdl:part name="parameters" element="tns:InvokeServiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_InvokeServiceXPath_InputMessage">
+    <wsdl:part name="parameters" element="tns:InvokeServiceXPath" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_InvokeServiceXPath_OutputMessage">
+    <wsdl:part name="parameters" element="tns:InvokeServiceXPathResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_AddDevice_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddDevice" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_AddDevice_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddDeviceResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_RemoveDevice_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveDevice" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_RemoveDevice_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveDeviceResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_IsRegistered_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsRegistered" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_IsRegistered_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsRegisteredResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTID" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTURL_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTURL" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTURL_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTURLResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetWSEndpoint_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetWSEndpoint" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetWSEndpoint_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetWSEndpointResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTWSEndpoint_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTWSEndpoint" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetIoTWSEndpoint_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetIoTWSEndpointResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetDACEndpoint_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDACEndpoint" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetDACEndpoint_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDACEndpointResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetWSDL_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetWSDL" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetWSDL_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetWSDLResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_StartDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:StartDevices" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_StartDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StartDevicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_StopDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:StopDevices" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_StopDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StopDevicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetHID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetHID" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetHID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetHIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetHIDsFromXPath_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetHIDsFromXPath" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetHIDsFromXPath_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetHIDsFromXPathResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetHIDsbyNMDescription_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetHIDsbyNMDescription" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetHIDsbyNMDescription_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetHIDsbyNMDescriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetAllLocalHIDS_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllLocalHIDS" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetAllLocalHIDS_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllLocalHIDSResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetAllLocalDeviceXml_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllLocalDeviceXml" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_GetAllLocalDeviceXml_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllLocalDeviceXmlResponse" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_RegisterCallBackUrl_InputMessage">
+    <wsdl:part name="parameters" element="tns:RegisterCallBackUrl" />
+  </wsdl:message>
+  <wsdl:message name="IApplicationDeviceManager_RegisterCallBackUrl_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RegisterCallBackUrlResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IApplicationDeviceManager">
+    <wsdl:operation name="GetAllGateways">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetAllGateways" message="tns:IApplicationDeviceManager_GetAllGateways_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetAllGatewaysResponse" message="tns:IApplicationDeviceManager_GetAllGateways_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ResolveDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/ResolveDevices" message="tns:IApplicationDeviceManager_ResolveDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/ResolveDevicesResponse" message="tns:IApplicationDeviceManager_ResolveDevices_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DiscoverDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/DiscoverDevices" message="tns:IApplicationDeviceManager_DiscoverDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/DiscoverDevicesResponse" message="tns:IApplicationDeviceManager_DiscoverDevices_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ProcessErrorMessage">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/ProcessErrorMessage" message="tns:IApplicationDeviceManager_ProcessErrorMessage_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/ProcessErrorMessageResponse" message="tns:IApplicationDeviceManager_ProcessErrorMessage_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDeviceXML">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetDeviceXML" message="tns:IApplicationDeviceManager_GetDeviceXML_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetDeviceXMLResponse" message="tns:IApplicationDeviceManager_GetDeviceXML_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTDevices" message="tns:IApplicationDeviceManager_GetIoTDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesResponse" message="tns:IApplicationDeviceManager_GetIoTDevices_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTDevicesEndpoints">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesEndpoints" message="tns:IApplicationDeviceManager_GetIoTDevicesEndpoints_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesEndpointsResponse" message="tns:IApplicationDeviceManager_GetIoTDevicesEndpoints_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTDevicesFromType">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesFromType" message="tns:IApplicationDeviceManager_GetIoTDevicesFromType_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesFromTypeResponse" message="tns:IApplicationDeviceManager_GetIoTDevicesFromType_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTDevicesFromXpath">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesFromXpath" message="tns:IApplicationDeviceManager_GetIoTDevicesFromXpath_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesFromXpathResponse" message="tns:IApplicationDeviceManager_GetIoTDevicesFromXpath_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUnresolvedDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetUnresolvedDevices" message="tns:IApplicationDeviceManager_GetUnresolvedDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetUnresolvedDevicesResponse" message="tns:IApplicationDeviceManager_GetUnresolvedDevices_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDeviceOntologyDescription">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetDeviceOntologyDescription" message="tns:IApplicationDeviceManager_GetDeviceOntologyDescription_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetDeviceOntologyDescriptionResponse" message="tns:IApplicationDeviceManager_GetDeviceOntologyDescription_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="InvokeIoTService">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/InvokeIoTService" message="tns:IApplicationDeviceManager_InvokeIoTService_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/InvokeIoTServiceResponse" message="tns:IApplicationDeviceManager_InvokeIoTService_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="InvokeService">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/InvokeService" message="tns:IApplicationDeviceManager_InvokeService_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/InvokeServiceResponse" message="tns:IApplicationDeviceManager_InvokeService_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="InvokeServiceXPath">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/InvokeServiceXPath" message="tns:IApplicationDeviceManager_InvokeServiceXPath_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/InvokeServiceXPathResponse" message="tns:IApplicationDeviceManager_InvokeServiceXPath_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddDevice">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/AddDevice" message="tns:IApplicationDeviceManager_AddDevice_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/AddDeviceResponse" message="tns:IApplicationDeviceManager_AddDevice_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveDevice">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/RemoveDevice" message="tns:IApplicationDeviceManager_RemoveDevice_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/RemoveDeviceResponse" message="tns:IApplicationDeviceManager_RemoveDevice_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="IsRegistered">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/IsRegistered" message="tns:IApplicationDeviceManager_IsRegistered_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/IsRegisteredResponse" message="tns:IApplicationDeviceManager_IsRegistered_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTID">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTID" message="tns:IApplicationDeviceManager_GetIoTID_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTIDResponse" message="tns:IApplicationDeviceManager_GetIoTID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTURL">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTURL" message="tns:IApplicationDeviceManager_GetIoTURL_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTURLResponse" message="tns:IApplicationDeviceManager_GetIoTURL_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWSEndpoint">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetWSEndpoint" message="tns:IApplicationDeviceManager_GetWSEndpoint_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetWSEndpointResponse" message="tns:IApplicationDeviceManager_GetWSEndpoint_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTWSEndpoint">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTWSEndpoint" message="tns:IApplicationDeviceManager_GetIoTWSEndpoint_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetIoTWSEndpointResponse" message="tns:IApplicationDeviceManager_GetIoTWSEndpoint_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDACEndpoint">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetDACEndpoint" message="tns:IApplicationDeviceManager_GetDACEndpoint_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetDACEndpointResponse" message="tns:IApplicationDeviceManager_GetDACEndpoint_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWSDL">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetWSDL" message="tns:IApplicationDeviceManager_GetWSDL_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetWSDLResponse" message="tns:IApplicationDeviceManager_GetWSDL_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StartDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/StartDevices" message="tns:IApplicationDeviceManager_StartDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/StartDevicesResponse" message="tns:IApplicationDeviceManager_StartDevices_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StopDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/StopDevices" message="tns:IApplicationDeviceManager_StopDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/StopDevicesResponse" message="tns:IApplicationDeviceManager_StopDevices_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetHID">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetHID" message="tns:IApplicationDeviceManager_GetHID_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetHIDResponse" message="tns:IApplicationDeviceManager_GetHID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetHIDsFromXPath">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetHIDsFromXPath" message="tns:IApplicationDeviceManager_GetHIDsFromXPath_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetHIDsFromXPathResponse" message="tns:IApplicationDeviceManager_GetHIDsFromXPath_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetHIDsbyNMDescription">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetHIDsbyNMDescription" message="tns:IApplicationDeviceManager_GetHIDsbyNMDescription_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetHIDsbyNMDescriptionResponse" message="tns:IApplicationDeviceManager_GetHIDsbyNMDescription_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllLocalHIDS">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetAllLocalHIDS" message="tns:IApplicationDeviceManager_GetAllLocalHIDS_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetAllLocalHIDSResponse" message="tns:IApplicationDeviceManager_GetAllLocalHIDS_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllLocalDeviceXml">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetAllLocalDeviceXml" message="tns:IApplicationDeviceManager_GetAllLocalDeviceXml_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/GetAllLocalDeviceXmlResponse" message="tns:IApplicationDeviceManager_GetAllLocalDeviceXml_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RegisterCallBackUrl">
+      <wsdl:input wsaw:Action="http://tempuri.org/IApplicationDeviceManager/RegisterCallBackUrl" message="tns:IApplicationDeviceManager_RegisterCallBackUrl_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IApplicationDeviceManager/RegisterCallBackUrlResponse" message="tns:IApplicationDeviceManager_RegisterCallBackUrl_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IApplicationDeviceManager" type="tns:IApplicationDeviceManager">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetAllGateways">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetAllGateways" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ResolveDevices">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/ResolveDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DiscoverDevices">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/DiscoverDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessErrorMessage">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/ProcessErrorMessage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDeviceXML">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetDeviceXML" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTDevices">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetIoTDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTDevicesEndpoints">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesEndpoints" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTDevicesFromType">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesFromType" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTDevicesFromXpath">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetIoTDevicesFromXpath" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUnresolvedDevices">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetUnresolvedDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDeviceOntologyDescription">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetDeviceOntologyDescription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InvokeIoTService">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/InvokeIoTService" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InvokeService">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/InvokeService" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InvokeServiceXPath">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/InvokeServiceXPath" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddDevice">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/AddDevice" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveDevice">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/RemoveDevice" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsRegistered">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/IsRegistered" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTID">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetIoTID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTURL">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetIoTURL" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWSEndpoint">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetWSEndpoint" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIoTWSEndpoint">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetIoTWSEndpoint" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDACEndpoint">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetDACEndpoint" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWSDL">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetWSDL" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StartDevices">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/StartDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StopDevices">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/StopDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetHID">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetHID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetHIDsFromXPath">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetHIDsFromXPath" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetHIDsbyNMDescription">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetHIDsbyNMDescription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllLocalHIDS">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetAllLocalHIDS" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllLocalDeviceXml">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/GetAllLocalDeviceXml" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RegisterCallBackUrl">
+      <soap:operation soapAction="http://tempuri.org/IApplicationDeviceManager/RegisterCallBackUrl" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ApplicationDeviceManager">
+    <wsdl:port name="BasicHttpBinding_IApplicationDeviceManager" binding="tns:BasicHttpBinding_IApplicationDeviceManager">
+      <soap:address location="http://212.214.80.161:8080/ApplicationDeviceManager" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

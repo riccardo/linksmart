@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <device>
+    <deviceType>upnp:type</deviceType>
+    <deviceClass xmlns="hydra">OntologyTaxonomySemanticDeviceTypeSelectedInDDK</deviceClass>
+    <friendlyName>FuglesangFan</friendlyName>
+    <manufacturer>Telldus</manufacturer>
+    <manufacturerURL>http://www.telldus.se</manufacturerURL>
+    <modelDescription>Remote switch</modelDescription>
+    <modelName>Tellstick</modelName>
+    <modelNumber>X1</modelNumber>
+
+	<!-- MANDATORY -->
+    <serviceList>
+    <!-- FULL LIST OF DEVICE SPECIFIC SERVICES - THE SAME WAY AS IN PHYSICAL DEVICE -->
+    </serviceList>
+
+	<!-- OPTIONAL -->
+    <eventList>
+    <!-- FULL LIST OF DEVICE SPECIFIC EVENTS - THE SAME WAY AS IN PHYSICAL DEVICE -->
+    </eventList>
+
+	<!-- MANDATORY: DDK CONFIGURATION -->
+    <Configuration ...>
+    
+    <!-- NO ENERGY PROFILE .. EMBEDDED DEVICES HAVE THE ENERGY PROFILE,
+         THUS SEMANTIC DEVICE ENERGY PROFILE HAS TO BE DERIVED -->
+    
+    <!-- NO DISCOVERY INFO .. SEMANTIC DEVICE IS DISCOVERED USING
+         PRECONDITIONS DEFINED IN "deviceList" -->
+    
+    <deviceList>
+          <!-- Example of single device found using single PID or multiple PIDs.
+               If PIDs are defined, cardinality attribute is the number of PIDs,
+               thus it will be not parsed. 
+               Precondition is satisfied when all PIDs are presented in the system.
+          -->
+          <precondition id="myWindMeters" PID="RoofWind;GardenWind" deviceType="SemanticDevice"/>
+          
+
+          
+          <!-- Example of multiple devices found using query-->
+          <precondition id="myThermometers"  
+                        query="rdf:type device:Thermometer,
+                               device:hasService service:hasOutput service:hasUnit;unit:Celsius" 
+                        cardinality="3..M"
+                        deviceType="PhysicalDevice"/>
+          
+          
+    </deviceList>
+  </device>
+</root>

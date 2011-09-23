@@ -1,0 +1,78 @@
+package $package;
+
+import eu.linksmart.limbo.*;
+#if($hasTypes == true)
+import eu.linksmart.limbo.types.*;
+#end
+
+public class $class extends $handler{
+	
+	public $class($handlers context) {
+		super(context);
+	}
+	
+	public void handle() {
+		
+		String result = this.handleRequest(super.getContext().getRequest());
+		super.getContext().setResponse(result);
+		if(super.getNextLayer() != null)
+			super.getNextLayer().handle();
+	}
+
+	private String getSOAPAction(String headers) {
+		StringTokenizer tok = new StringTokenizer(headers);
+		String SOAPAction = null;
+		while(tok.hasMoreTokens()) {
+			String line = tok.nextToken("\n");
+			if(line.toLowerCase().startsWith("soapaction")) {
+				line = line.substring(13,line.length()-2);
+				SOAPAction = line;
+			}
+		}
+		return SOAPAction;
+	}
+	
+	public String handleRequest(String theRequest) {
+
+		$OperationsImpl operations = super.getContext().getService().getOperations();
+		HeaderParser hp = new HeaderParser(theRequest);
+		String theSOAPAction = getSOAPAction(hp.getHeader());
+		if(!hp.parseHeader() || theSOAPAction == null) {
+			String result = "HTTP/1.1 200 Header Invalid\r\n\r\n";
+			return result;
+		}
+		String theSOAPRequest = hp.getRequest();
+		if(super.getContext().getService().hasOperation(theSOAPAction)){
+			$Parser p = new $Parser(theSOAPRequest, theSOAPAction);
+			if(p.parseRequest(theSOAPRequest)){
+#foreach ($OperationType in $operations)
+			if(p.getOperation().equalsIgnoreCase("$OperationType.getOpName()") && theSOAPAction.equalsIgnoreCase("$OperationType.getSOAPAction()")){
+				String s = "";
+				s = s.concat("<?xml version="+'"'+"1.0"+'"'+" encoding="+'"'+"utf-8"+'"'+"?>");
+				s = s.concat("<soapenv:Envelope xmlns:soapenv="+'"'+"http://schemas.xmlsoap.org/soap/envelope/"+'"'+" xmlns:xsd="+'"'+"http://www.w3.org/2001/XMLSchema"+'"'+" xmlns:xsi="+'"'+"http://www.w3.org/2001/XMLSchema-instance"+'"'+">");
+				s = s.concat($OperationType.getSOAPBody());
+				String result = "HTTP/1.1 200 OK\r\n";
+				result = result.concat("Server: Limbo Server 1.0 (LinkSmart x86 java/1.5.0_06\r\n");
+				result = result.concat("Content-Type: text/xml; charset=utf-8\r\nConnection: close\r\n");
+				result = result.concat("Content-Length: "+s.getBytes().length+"\r\n\r\n");
+				result = result.concat(s);
+				return result;
+			}
+#end
+			else{
+				String result = "HTTP/1.1 401 Invalid Message\r\n\r\n";
+				return result;
+			}
+		}
+		else{
+			String result = "HTTP/1.1 400 Bad Request\r\n\r\n";
+     			return result;
+		}
+	}
+	else{
+		String result = "HTTP/1.1 403 Inexistent Operation\r\n\r\n";
+		return result;
+	}	
+}
+
+}

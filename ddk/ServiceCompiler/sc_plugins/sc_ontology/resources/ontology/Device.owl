@@ -1,0 +1,491 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:error="file:./resources/Error.owl#"
+    xmlns:protege="http://protege.stanford.edu/plugins/owl/protege#"
+    xmlns:xsp="http://www.owl-ontologies.com/2005/08/07/xsp.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns="file:./resources/Device.owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+    xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:Hardware="file:./resources/Hardware.owl#"
+  xml:base="file:./resources/Device.owl">
+  <owl:Ontology rdf:about="file:./resources/Device.owl"/>
+  <owl:Class rdf:ID="StaticStorage">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="StorageDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Keyboard">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="InputDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Thermometer">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="SensorDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="USB">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="PortableStorage"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Regulator">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="ActuatorDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="WeighScale">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#SensorDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="ProgrammableAppliance">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Appliance"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="InfoDescription">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="modelDescription"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="manufacturerURL"/>
+        </owl:onProperty>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="friendlyName"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="modelName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="manufacturer"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="modelNumber"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="DesktopPC">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="ProcessingUnit"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Mouse">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#InputDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Printer">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="OutputDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="DoorLock">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Lock"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#ActuatorDevice">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="LinkSmartDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="IODevice">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="PeripheralDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#PortableStorage">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#StorageDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#OutputDevice">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#IODevice"/>
+  </owl:Class>
+  <owl:Class rdf:ID="PortableHDD">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#PortableStorage"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Fax">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="DuplexDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="LightSwitch">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Switch"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Modem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#DuplexDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Floppy">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#StaticStorage"/>
+  </owl:Class>
+  <owl:Class rdf:ID="RegulableLight">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#Regulator"/>
+  </owl:Class>
+  <owl:Class rdf:ID="BloodPressure">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#SensorDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#InputDevice">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#IODevice"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Robot">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#ActuatorDevice"/>
+  </owl:Class>
+  <owl:Class rdf:ID="WindowLock">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#Lock"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="MobilePhone">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="MobileDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Screen">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#OutputDevice"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#StorageDevice">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#PeripheralDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Laptop">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#ProcessingUnit"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Microphone">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#InputDevice"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Pump">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#Appliance"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#MobileDevice">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#LinkSmartDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="HDD">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#StaticStorage"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Thermometer_Accelerometer_Light">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="MultifunctionDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Owen">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#ProgrammableAppliance"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#Appliance">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#LinkSmartDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="WashingMachine">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#ProgrammableAppliance"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Scanner">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#InputDevice"/>
+  </owl:Class>
+  <owl:Class rdf:ID="PDA">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#ProcessingUnit"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="FlowMeter">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#SensorDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#Lock">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#Switch"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#PeripheralDevice">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#LinkSmartDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#SensorDevice">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#LinkSmartDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#Switch">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#ActuatorDevice"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#MultifunctionDevice">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#LinkSmartDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#ProcessingUnit">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#LinkSmartDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Accessory">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="file:./resources/Device.owl#LinkSmartDevice"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#DuplexDevice">
+    <rdfs:subClassOf rdf:resource="file:./resources/Device.owl#PeripheralDevice"/>
+  </owl:Class>
+  <owl:Class rdf:about="file:./resources/Device.owl#LinkSmartDevice">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="info"/>
+        </owl:onProperty>
+        <owl:maxCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="deviceId"/>
+        </owl:onProperty>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="hasMalfunction"/>
+        </owl:onProperty>
+        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+        >0</owl:minCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >general device class</rdfs:label>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="file:./resources/Device.owl#hasMalfunction">
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#LinkSmartDevice"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="hasSoftware">
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#LinkSmartDevice"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="file:./resources/Device.owl#info">
+    <rdfs:range rdf:resource="file:./resources/Device.owl#InfoDescription"/>
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#LinkSmartDevice"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="hasHardware">
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#LinkSmartDevice"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="file:./resources/Device.owl#modelDescription">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#InfoDescription"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="file:./resources/Device.owl#manufacturerURL">
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#InfoDescription"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="remedy">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="file:./resources/Device.owl#deviceId">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#LinkSmartDevice"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="file:./resources/Device.owl#friendlyName">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#InfoDescription"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="file:./resources/Device.owl#modelNumber">
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#InfoDescription"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="faultName">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="errorCode">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="file:./resources/Device.owl#modelName">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#InfoDescription"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="cause">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="file:./resources/Device.owl#manufacturer">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="file:./resources/Device.owl#InfoDescription"/>
+  </owl:DatatypeProperty>
+  <MobilePhone rdf:ID="NokiaN80"/>
+  <Keyboard rdf:ID="Keyboard_3"/>
+  <Thermometer rdf:ID="PicoTh03_Indoor">
+    <info>
+      <InfoDescription rdf:ID="PicoTh03_info">
+        <friendlyName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >PicoTh03</friendlyName>
+        <modelDescription rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >3 channels</modelDescription>
+        <manufacturer rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Pico technology limited</manufacturer>
+        <modelName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >th03</modelName>
+        <manufacturerURL rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >www.picotech.com</manufacturerURL>
+        <modelNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >th03</modelNumber>
+      </InfoDescription>
+    </info>
+    <deviceId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PicoTh03_Indoor</deviceId>
+  </Thermometer>
+  <BloodPressure rdf:ID="BloodPressure_1">
+    <info>
+      <InfoDescription rdf:ID="Bloodpressure1info">
+        <manufacturerURL rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >http://www.corscience.de/</manufacturerURL>
+        <modelDescription rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >705IT BT</modelDescription>
+        <modelName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >705IT BT</modelName>
+        <modelNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >705IT BT</modelNumber>
+        <friendlyName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Blood pressure</friendlyName>
+        <manufacturer rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Corscience</manufacturer>
+      </InfoDescription>
+    </info>
+    <deviceId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >BloodPressure1</deviceId>
+  </BloodPressure>
+  <MobilePhone rdf:ID="MotorolaMPx220"/>
+  <MobilePhone rdf:ID="SEP910">
+    <info>
+      <InfoDescription rdf:ID="SEP910Info">
+        <manufacturer rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >SonyEcrisson</manufacturer>
+        <modelName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >P910</modelName>
+      </InfoDescription>
+    </info>
+  </MobilePhone>
+  <Robot rdf:ID="LegoRobot"/>
+  <Thermometer_Accelerometer_Light rdf:ID="SunSpot">
+    <deviceId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >SunSpot</deviceId>
+    <info>
+      <InfoDescription rdf:ID="SunSpotinfo">
+        <friendlyName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >SunSPOT</friendlyName>
+        <modelName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >SunSPOTV4</modelName>
+        <modelDescription rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >SunSPOT version 4</modelDescription>
+        <modelNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >4</modelNumber>
+        <manufacturerURL rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >http://www.sunspotworld.com/</manufacturerURL>
+        <manufacturer rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Sun</manufacturer>
+      </InfoDescription>
+    </info>
+  </Thermometer_Accelerometer_Light>
+  <Thermometer rdf:ID="PicoTh03_Outdoor">
+    <info rdf:resource="file:./resources/Device.owl#PicoTh03_info"/>
+    <deviceId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >PicoTh03_outdoor</deviceId>
+  </Thermometer>
+  <FlowMeter rdf:ID="Flowmeter1">
+    <deviceId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Flowmeter</deviceId>
+    <info>
+      <InfoDescription rdf:ID="FlowmeterInfo">
+        <modelName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >VX VORTEX</modelName>
+        <modelNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >16</modelNumber>
+        <friendlyName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Flow meter</friendlyName>
+        <modelDescription rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >IN-LINE FLOW METERS</modelDescription>
+        <manufacturer rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Aalborg Instruments and Controls</manufacturer>
+        <manufacturerURL rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >www.aalborg.com</manufacturerURL>
+      </InfoDescription>
+    </info>
+  </FlowMeter>
+  <WeighScale rdf:ID="WeighScale_3">
+    <info>
+      <InfoDescription rdf:ID="InfoDescription_weightscale1">
+        <modelName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >UC-321PBT</modelName>
+        <manufacturer rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >A and D Medical</manufacturer>
+        <modelDescription rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >weight scale device</modelDescription>
+        <manufacturerURL rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >www.aandd.jp</manufacturerURL>
+        <friendlyName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >Weight scale</friendlyName>
+        <modelNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >321PBT</modelNumber>
+      </InfoDescription>
+    </info>
+    <deviceId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >weightscale1</deviceId>
+  </WeighScale>
+</rdf:RDF>
+
+<!-- Created with Protege (with OWL Plugin 3.4.1, Build 536)  http://protege.stanford.edu -->

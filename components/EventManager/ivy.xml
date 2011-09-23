@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		Copyright (C) 2006-2010 the HYDRA consortium, EU project
+		IST-2005-034891 This file is part of LinkSmart. LinkSmart is free
+		software: you can redistribute it and/or modify it under the terms of
+		the GNU LESSER GENERAL PUBLIC LICENSE version 3 as published by the
+		Free Software Foundation. LinkSmart is distributed in the hope that it
+		will be useful, but WITHOUT ANY WARRANTY; without even the implied
+		warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+		the GNU Lesser General Public License for more details. You should
+		have received a copy of the GNU Lesser General Public License along
+		with LinkSmart. If not, see <http://www.gnu.org/licenses/>.
+	-->
+<ivy-module version="2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	<info organisation="EventManager" module="EventManager" />
+	<publications>
+		<artifact name="EventManager" type="jar" />
+	</publications>
+	<dependencies>
+		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
+		<dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.5.0" />
+		<dependency org="javax.xml.rpc" name="com.springsource.javax.xml.rpc" rev="1.1.0" />
+		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi"	rev="3.6.2" />
+		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi.services" rev="3.2.100" />
+		<dependency org="LinkSmartMiddlewareAPI" name="LinkSmartMiddlewareAPI"	rev="latest.integration" changing="true" />
+		<dependency org="LinkSmartMiddlewareClients" name="LinkSmartMiddlewareClients"	rev="latest.integration" changing="true" />			
+	</dependencies>
+</ivy-module>

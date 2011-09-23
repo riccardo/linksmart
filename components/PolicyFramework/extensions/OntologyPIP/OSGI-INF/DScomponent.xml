@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="eu.linksmart.policy.pip.ontologypip">
+   <implementation class="eu.linksmart.policy.pip.ontology.OntologyPIP"/>
+   <service>
+      <provide interface="eu.linksmart.policy.pdp.ext.impl.PipModule"/>
+   </service>
+   <reference bind="bindAOM" cardinality="1..1" interface="eu.linksmart.aom.ApplicationOntologyManager" name="ApplicationOntologyManager" policy="static" unbind="unbindAOM"/>
+</scr:component>

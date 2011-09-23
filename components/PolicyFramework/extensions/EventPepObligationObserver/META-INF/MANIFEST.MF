@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: LinkSmart PEP event obligation handler
+Bundle-SymbolicName: eu.linksmart.policy.pep.obl.event
+Bundle-Version: 1.0.0
+Bundle-Vendor: University of Reading
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Service-Component: OSGI-INF/DSActivation.xml
+Import-Package: eu.linksmart.eventmanager,
+ eu.linksmart.eventmanager.client,
+ eu.linksmart.network;version="1.0.0",
+ eu.linksmart.utils,
+ com.sun.xacml,
+ com.sun.xacml.attr,
+ com.sun.xacml.ctx,
+ eu.linksmart.policy.pep.impl,
+ eu.linksmart.policy.pep.request.impl,
+ eu.linksmart.policy.pep.response,
+ javax.xml.rpc,
+ org.apache.axis.client,
+ org.apache.log4j,
+ org.osgi.framework;version="1.5.0",
+ org.osgi.service.cm;version="1.2.1",
+ org.osgi.service.component;version="1.1.0"

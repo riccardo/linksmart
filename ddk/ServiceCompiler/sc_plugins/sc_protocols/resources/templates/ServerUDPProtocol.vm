@@ -1,0 +1,87 @@
+package $package;
+
+$imports
+
+public class $class implements $interface {
+	
+	private InetAddress clientHost;
+	private int clientPort;
+	private DatagramSocket sd;
+	private int port;
+	private int bufferSize = 10240; 
+	private String url;
+	
+	public UDPProtocol() {
+		super();
+	}
+	public UDPProtocol(int port) {
+		this.port=port;
+		try {
+			this.sd =  new DatagramSocket( this.port );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void createConnectors(int port) {
+		if (this.port != port)
+		 {
+		   this.port=port;
+		   try {
+			   this.sd = new DatagramSocket( this.port ) ;
+		     } catch (SocketException e) {
+			    e.printStackTrace();
+		        }
+		 }
+		try {
+			this.url = "http://"+InetAddress.getLocalHost().getHostAddress()+":"+this.port;
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String getServerURL() {
+		return this.url;
+	}
+
+	public String getClientHost() {
+		return this.clientHost.toString();
+	}
+
+	public String receive() {
+		String request = "";
+		byte[] buffer = new byte[bufferSize];
+		DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+		
+		try {
+			sd.receive(dp);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.clientHost = dp.getAddress();
+		this.clientPort = dp.getPort();
+		request = new String(buffer);
+		request = request.trim();
+		return request;
+	}
+
+	public void send(String result) {
+		DatagramPacket response = new DatagramPacket(result.getBytes(), result.getBytes().length, this.clientHost, this.clientPort); 
+		try {
+			sd.send(response);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void closeConnection() {
+		try {
+			sd.close();	
+			sd.setReuseAddress(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+}

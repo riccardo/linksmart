@@ -1,0 +1,3 @@
+Private-Package: eu.linksmart.limbo.backend.protocol
+Include-Resource: resources/Protocols = templates
+Service-Component: eu.linksmart.limbo.backend.protocol.*

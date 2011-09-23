@@ -1,0 +1,114 @@
+package $package;
+
+$imports
+import java.util.Date;
+
+$importTypes
+
+public class $class implements $interface{
+	
+	private String host;
+	private int port;
+	private String path; 
+	private ClientProtocol protocol;	
+
+	public $class(ClientProtocol p, String url){
+	
+	  if (url.startsWith("btspp"))
+		{
+			this.host = url;
+			this.port = -1;
+			this.path = "/";
+		//	this.protocol = p;
+			
+		}
+
+#if($protocol == "BT")
+		this.host = url;
+		this.port = -1;
+		this.path = "/";
+		this.protocol = p;
+#else
+#if($language == "JME")
+		try {
+			String auxiliar; 
+			StringTokenizer tok = new StringTokenizer(url);
+			auxiliar = tok.nextToken("//");
+			auxiliar = tok.nextToken(":");
+			this.host = auxiliar.substring(2);
+			String portAsString = tok.nextToken("/").substring(1);
+			this.port = Integer.parseInt(portAsString);
+			this.path = url.substring(url.indexOf(portAsString)+portAsString.length());
+			if(this.path == "")
+				this.path = "/";
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		this.protocol = p;
+#else
+		if(p instanceof TCPProtocol || p instanceof UDPProtocol) {
+		try {
+			URL u = new URL(url);
+			this.host = u.getHost();
+			this.port = u.getPort();
+			String path = u.getPath();
+			if(path == "")
+				this.path = "/";
+			else
+				this.path = path;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		}
+		this.protocol = p;
+#end
+#end
+	}
+	
+#foreach ($OperationType in $operations)
+	public $OperationType.getOutputType() $OperationType.getOpName()($OperationType.getArgumentLine()) {
+		String XMLRequest = new String();
+		XMLRequest = XMLRequest.concat("<?xml version="+'"'+"1.0"+'"'+" encoding="+'"'+"UTF-8"+'"'+"?>");
+		XMLRequest = XMLRequest.concat("<soapenv:Envelope xmlns:soapenv="+'"'+"http://schemas.xmlsoap.org/soap/envelope/"+'"'+" xmlns:xsd="+'"'+"http://www.w3.org/2001/XMLSchema"+'"'+" xmlns:xsi="+'"'+"http://www.w3.org/2001/XMLSchema-instance"+'"'+">");
+		XMLRequest = XMLRequest.concat("<soapenv:Body><$OperationType.getOpName() xmlns="+'"'+'"'+">");
+#foreach ($Part in $OperationType.getInputParts())
+		XMLRequest = XMLRequest.concat("<$Part.getName()>"+$Part.getMessage()+"</$Part.getName()>");
+#end
+		XMLRequest = XMLRequest.concat("</$OperationType.getOpName()></soapenv:Body></soapenv:Envelope>");
+		String request = "";
+		request = request.concat("POST "+this.path+" HTTP/1.0\r\n");
+		request = request.concat("Content-Type: text/xml; charset=utf-8\r\n");
+		request = request.concat("Accept: application/soap+xml, application/dime, multipart/related, text/*\r\n");
+		request = request.concat("User-Agent: Limbo/1.0\r\n");
+		request = request.concat("Host: afonso.at.openlaboratory.net:8080\r\n");
+		request = request.concat("Cache-Control: no-cache\r\n");
+		request = request.concat("Pragma: no-cache\r\n");
+		request = request.concat("Date: "+new Date().toString()+"\r\n");
+		request = request.concat("SOAPAction: "+'"'+"$OperationType.getSOAPAction()"+'"'+"\r\n");
+		request = request.concat("Content-Length: "+XMLRequest.length()+"\r\n\r\n");//FIXME calculate content length
+		request = request.concat(XMLRequest);
+		
+		//Open Connection -> send request -> wait for answer -> parse response
+		try {
+#if($withProbe == "true")
+ 			new eu.linksmart.limbo.client.handler.${probe}(request, this.host, this.port, "clientbegin").handle();
+#end
+			String response = this.protocol.communicateWithServer(request, this.host, this.port); 
+#if($withProbe == "true")
+			new eu.linksmart.limbo.client.handler.${probe}(request, this.host, this.port, "clientend").handle();
+#end
+			$HeaderParser hp = new $HeaderParser(response);
+			$Parser p = new $Parser(hp.getRequest(),null);
+			if((p.parseRequest(hp.getRequest())&&(hp.parseHeader())))
+					return $OperationType.getClientReturnLine();
+			else
+				return $OperationType.getClientDefaultReturnLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return $OperationType.getClientDefaultReturnLine();
+		}
+		
+	}
+#end
+}

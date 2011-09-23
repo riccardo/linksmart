@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiscoveryClientResultsFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.DiscoveryDocumentReference" url="http://212.214.80.151:8080/BluetoothDiscoveryWS?disco" filename="BluetoothDiscoveryWS.disco" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="http://212.214.80.151:8080/BluetoothDiscoveryWS?xsd=xsd0" filename="BluetoothDiscoveryWS.xsd" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="http://212.214.80.151:8080/BluetoothDiscoveryWS?wsdl" filename="DiscoveryManagerWS.wsdl" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="http://212.214.80.151:8080/BluetoothDiscoveryWS?xsd=xsd1" filename="BluetoothDiscoveryWS0.xsd" />
+  </Results>
+</DiscoveryClientResultsFile>

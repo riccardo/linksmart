@@ -1,0 +1,24 @@
+# SendMailPepObligationObserver bnd instructions
+# 
+# Note that we are currently still using a separate MANIFEST.MF and 
+# declarative services activation file; this will change in a future 
+# version. Changes in this file will not directly change the 
+# MANIFEST.MF until then.
+#
+# author Marco Tiemann
+#
+-manifest= ../META-INF/MANIFEST.MF
+version=1.0.0
+Include-Resource: resources/mailpepobserver.properties=mailpepobserver.properties,\
+ OSGI-INF/DSActivation.xml=../OSGI-INF/DSActivation.xml,\
+ lib/dsn.jar=../../../build/SendMailPepObligationObserver/lib/dsn.jar,\
+ lib/mailapi.jar=../../../build/SendMailPepObligationObserver/lib/mailapi.jar,\
+ lib/smtp.jar=../../../build/SendMailPepObligationObserver/lib/smtp.jar
+Export-Package: eu.linksmart.policy.pep.response.bundle.impl.*
+Service-Component: OSGI-INF/DSActivation.xml
+Bundle-Version: ${version}
+Bundle-Name: LinkSmart PEP mail obligation handler
+Bundle-Description: eu.linksmart.policy.pep.obl.mail
+Bundle-Vendor: University of Reading
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

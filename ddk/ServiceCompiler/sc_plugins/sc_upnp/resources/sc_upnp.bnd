@@ -1,0 +1,3 @@
+Private-Package: eu.linksmart.limbo.*,eu.linksmart.upnp.*
+Include-Resource: resources = templates
+Service-Component: eu.linksmart.limbo.*

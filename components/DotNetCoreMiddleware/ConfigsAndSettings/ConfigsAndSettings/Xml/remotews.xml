@@ -1,0 +1,15 @@
+<IoT>
+<wsdevicelist>
+<device>
+<IoTid>12</IoTid>
+<name>BloodPressure</name>
+<vendor>CNet</vendor>
+<deviceURN>urn:schemas-upnp-org:IoTdevice:bloodpressure:1</deviceURN>
+<!--wsdl>http://192.76.241.14/bpm.wsdl</wsdl-->
+<wsdl>http://193.175.163.153:8080/axis2/services/Operations?wsdl</wsdl>
+  <!--endpoint>http://dissrv1.c-lab.de/IoT/services/Operations</endpoint-->
+<endpoint>http://193.175.163.153:8080/axis2/services/Operations</endpoint>
+</device>
+</wsdevicelist>
+
+</IoT>

@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2006-2010 Technical University of Kosice
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns="http://localhost/ontologies/Security.owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://localhost/ontologies/Security.owl">
+  <owl:Ontology rdf:about=""/>
+  <owl:Class rdf:ID="SecurityObjective"/>
+  <owl:Class rdf:ID="SecurityAlgorithm"/>
+  <owl:Class rdf:ID="AsymmetricEncryptionAlgorithm">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="EncryptionAlgorithm"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="ObjectiveStrengthRelation">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >A relation class describing how well a SecurityProtocol supports a certain SecurityObjective</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="SignatureAlgorithm">
+    <rdfs:subClassOf rdf:resource="#SecurityAlgorithm"/>
+  </owl:Class>
+  <owl:Class rdf:ID="StreamCipher">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="SymmetricEncryptionAlgorithm"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="OSGi">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Module"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="RandomAlgorithm">
+    <rdfs:subClassOf rdf:resource="#SecurityAlgorithm"/>
+  </owl:Class>
+  <owl:Class rdf:ID="HostMechanism">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="SecurityMechanism"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="DigestAlgorithm">
+    <rdfs:subClassOf rdf:resource="#SecurityAlgorithm"/>
+  </owl:Class>
+  <owl:Class rdf:ID="SecurityProtocol">
+    <rdfs:subClassOf rdf:resource="#SecurityMechanism"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Configuration">
+    <rdfs:subClassOf rdf:resource="#Module"/>
+  </owl:Class>
+  <owl:Class rdf:about="#SymmetricEncryptionAlgorithm">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#EncryptionAlgorithm"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#EncryptionAlgorithm">
+    <rdfs:subClassOf rdf:resource="#SecurityAlgorithm"/>
+  </owl:Class>
+  <owl:Class rdf:ID="SecurityAssurance"/>
+  <owl:Class rdf:about="http://www.w3.org/2002/07/owl#Thing"/>
+  <owl:Class rdf:ID="Organization"/>
+  <owl:Class rdf:ID="MACAlgorithm">
+    <rdfs:subClassOf rdf:resource="#SecurityAlgorithm"/>
+  </owl:Class>
+  <owl:Class rdf:ID="TrustModel">
+    <rdfs:subClassOf rdf:resource="#SecurityAlgorithm"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:ID="supportsSecurityObjective">
+    <rdfs:domain rdf:resource="#SecurityMechanism"/>
+    <rdfs:range rdf:resource="#ObjectiveStrengthRelation"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Any SecurityConcept can support one or more of the Security Objective defined in the SecurityObjective class</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="hasAssurance">
+    <rdfs:range rdf:resource="#SecurityAssurance"/>
+    <rdfs:domain rdf:resource="#SecurityAlgorithm"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="reqCredential"/>
+  <owl:ObjectProperty rdf:ID="hasSecurityObjective">
+    <rdfs:range rdf:resource="#SecurityObjective"/>
+    <rdfs:domain rdf:resource="#ObjectiveStrengthRelation"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="byOrganisation">
+    <rdfs:range rdf:resource="#Organization"/>
+    <rdfs:domain rdf:resource="#SecurityAssurance"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="usesAlgorithm">
+    <rdfs:domain rdf:resource="#SecurityMechanism"/>
+    <rdfs:range rdf:resource="#SecurityAlgorithm"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="supportsSecurityMechanism">
+    <rdfs:range rdf:resource="#SecurityMechanism"/>
+    <rdfs:domain rdf:resource="#SecurityAlgorithm"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:ID="level">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#SecurityAssurance"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="validUntil">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    <rdfs:domain rdf:resource="#SecurityAssurance"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="implementedBy">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#SecurityMechanism"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="hasStrength">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="#ObjectiveStrengthRelation"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="requiresMemory">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="#SecurityProtocol"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="configuredBy">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#SecurityMechanism"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="requiresComputingPower">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="#SecurityProtocol"/>
+  </owl:DatatypeProperty>
+  <DigestAlgorithm rdf:ID="SHA1">
+    <hasAssurance>
+      <SecurityAssurance rdf:ID="BNA-SHA-1-ext">
+        <byOrganisation>
+          <Organization rdf:ID="Bundesnetzagentur"/>
+        </byOrganisation>
+        <level rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >suited for certificate generation if entropy of serial number is &gt; 20</level>
+        <validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >2010</validUntil>
+      </SecurityAssurance>
+    </hasAssurance>
+    <hasAssurance>
+      <SecurityAssurance rdf:ID="BNA-SHA-1">
+        <byOrganisation rdf:resource="#Bundesnetzagentur"/>
+        <level rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >suited for certificate generation</level>
+        <validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >2007</validUntil>
+      </SecurityAssurance>
+    </hasAssurance>
+  </DigestAlgorithm>
+  <SecurityProtocol rdf:ID="XMLEncSigSporadic">
+    <requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >102.39</requiresComputingPower>
+    <supportsSecurityObjective>
+      <ObjectiveStrengthRelation rdf:ID="LowMessageAuthenticity">
+        <hasSecurityObjective>
+          <SecurityObjective rdf:ID="MessageAuthenticity">
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Provides guarantee that message came from whoever claimed to have sent it.</rdfs:comment>
+          </SecurityObjective>
+        </hasSecurityObjective>
+        <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.4</hasStrength>
+      </ObjectiveStrengthRelation>
+    </supportsSecurityObjective>
+    <supportsSecurityObjective>
+      <ObjectiveStrengthRelation rdf:ID="MediumMessageIntegrity">
+        <hasSecurityObjective>
+          <SecurityObjective rdf:ID="MessageIntegrity">
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Data integrity or Message integrity; data cannot be changed, deleted, modified, etc by unauthorized parties.</rdfs:comment>
+          </SecurityObjective>
+        </hasSecurityObjective>
+        <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.7</hasStrength>
+      </ObjectiveStrengthRelation>
+    </supportsSecurityObjective>
+    <usesAlgorithm>
+      <SymmetricEncryptionAlgorithm rdf:ID="TripleDES-CBC">
+        <requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.2</requiresComputingPower>
+        <requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.1</requiresMemory>
+      </SymmetricEncryptionAlgorithm>
+    </usesAlgorithm>
+    <requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >56288.0</requiresMemory>
+    <usesAlgorithm>
+      <AsymmetricEncryptionAlgorithm rdf:ID="RSA-v1.5">
+        <requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.8</requiresComputingPower>
+        <requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.8</requiresMemory>
+      </AsymmetricEncryptionAlgorithm>
+    </usesAlgorithm>
+    <usesAlgorithm>
+      <SignatureAlgorithm rdf:ID="RSA-SHA1">
+        <hasAssurance rdf:resource="#BNA-SHA-1"/>
+        <requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.9</requiresComputingPower>
+        <hasAssurance rdf:resource="#BNA-SHA-1-ext"/>
+        <requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.8</requiresMemory>
+        <hasAssurance>
+          <SecurityAssurance rdf:ID="BNA-RSA-1280">
+            <byOrganisation rdf:resource="#Bundesnetzagentur"/>
+            <level rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Acceptable if key length &gt;= 1280 bit</level>
+            <validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+            >2009</validUntil>
+          </SecurityAssurance>
+        </hasAssurance>
+        <hasAssurance>
+          <SecurityAssurance rdf:ID="BNA-RSA-1536">
+            <level rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Acceptable if key length &gt;= 1536 bit</level>
+            <validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+            >2010</validUntil>
+          </SecurityAssurance>
+        </hasAssurance>
+        <hasAssurance>
+          <SecurityAssurance rdf:ID="BNA-RSA-1024">
+            <byOrganisation rdf:resource="#Bundesnetzagentur"/>
+            <level rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Acceptable if key length &gt;= 1024 bit</level>
+            <validUntil rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+            >2008</validUntil>
+          </SecurityAssurance>
+        </hasAssurance>
+      </SignatureAlgorithm>
+    </usesAlgorithm>
+    <supportsSecurityObjective>
+      <ObjectiveStrengthRelation rdf:ID="HighConfidentiality">
+        <hasSecurityObjective>
+          <SecurityObjective rdf:ID="Confidentiality">
+            <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Protects against information being disclosed or revealed to unauthorized parties.</rdfs:comment>
+          </SecurityObjective>
+        </hasSecurityObjective>
+        <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.9</hasStrength>
+      </ObjectiveStrengthRelation>
+    </supportsSecurityObjective>
+  </SecurityProtocol>
+  <SymmetricEncryptionAlgorithm rdf:ID="AES128-CBC"/>
+  <MACAlgorithm rdf:ID="HMAC-SHA1-96"/>
+  <ObjectiveStrengthRelation rdf:ID="MediumConfidentiality">
+    <hasSecurityObjective rdf:resource="#Confidentiality"/>
+    <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >0.7</hasStrength>
+  </ObjectiveStrengthRelation>
+  <owl:AnnotationProperty rdf:about="http://www.w3.org/2000/01/rdf-schema#comment"/>
+  <SecurityObjective rdf:ID="HostTrust">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >(Secondary Objective) How to trust host or platform. Is relevant to Common criteria, etc.</rdfs:comment>
+  </SecurityObjective>
+  <SymmetricEncryptionAlgorithm rdf:ID="DES"/>
+  <SecurityProtocol rdf:ID="XMLEnc">
+    <supportsSecurityObjective rdf:resource="#HighConfidentiality"/>
+    <implementedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >HydraWSProvider_1.0.0.qualifier</implementedBy>
+    <requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >29656.0</requiresMemory>
+    <usesAlgorithm rdf:resource="#RSA-v1.5"/>
+    <requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >21.42</requiresComputingPower>
+    <configuredBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.eu.hydra.security.core;hydra.security.core.config;1</configuredBy>
+    <usesAlgorithm rdf:resource="#TripleDES-CBC"/>
+  </SecurityProtocol>
+  <DigestAlgorithm rdf:ID="MD4"/>
+  <SecurityProtocol rdf:ID="XMLEncTrusted">
+    <usesAlgorithm rdf:resource="#TripleDES-CBC"/>
+    <usesAlgorithm rdf:resource="#RSA-v1.5"/>
+    <usesAlgorithm>
+      <TrustModel rdf:ID="PKI-X"/>
+    </usesAlgorithm>
+    <supportsSecurityObjective rdf:resource="#HighConfidentiality"/>
+  </SecurityProtocol>
+  <MACAlgorithm rdf:ID="HMAC-Ripemod160"/>
+  <SecurityObjective rdf:ID="TrafficHiding">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >(Secondary Objective) Pad traffic with bogus data to hide traffic patterns</rdfs:comment>
+  </SecurityObjective>
+  <ObjectiveStrengthRelation rdf:ID="LowMessageIntegrity">
+    <hasSecurityObjective rdf:resource="#MessageIntegrity"/>
+    <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >0.4</hasStrength>
+  </ObjectiveStrengthRelation>
+  <DigestAlgorithm rdf:ID="MD5">
+    <hasAssurance>
+      <SecurityAssurance rdf:ID="BNA-MD5">
+        <byOrganisation rdf:resource="#Bundesnetzagentur"/>
+        <level rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >insecure</level>
+      </SecurityAssurance>
+    </hasAssurance>
+  </DigestAlgorithm>
+  <SecurityObjective rdf:ID="UserAuthentication">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Provides assurance of the identity of a person or entity.</rdfs:comment>
+  </SecurityObjective>
+  <AsymmetricEncryptionAlgorithm rdf:ID="ElGamal"/>
+  <SymmetricEncryptionAlgorithm rdf:ID="AES192-CBC"/>
+  <SignatureAlgorithm rdf:ID="RSA-SHA512"/>
+  <SecurityProtocol rdf:ID="None">
+    <requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >328.0</requiresMemory>
+    <requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >16.3</requiresComputingPower>
+  </SecurityProtocol>
+  <SignatureAlgorithm rdf:ID="DSA"/>
+  <SymmetricEncryptionAlgorithm rdf:ID="AES256-CBC"/>
+  <Organization rdf:ID="BSI"/>
+  <SignatureAlgorithm rdf:ID="RSA-SHA384"/>
+  <ObjectiveStrengthRelation rdf:ID="MediumMessageAuthenticity">
+    <hasSecurityObjective rdf:resource="#MessageAuthenticity"/>
+    <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >0.7</hasStrength>
+  </ObjectiveStrengthRelation>
+  <SecurityObjective rdf:ID="KeyManagement">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >(SecondaryObjective) Securely manages keys for legitimate users.</rdfs:comment>
+  </SecurityObjective>
+  <SymmetricEncryptionAlgorithm rdf:ID="Caesar"/>
+  <SecurityProtocol rdf:ID="XMLEncSig">
+    <supportsSecurityObjective>
+      <ObjectiveStrengthRelation rdf:ID="HighMessageAuthenticity">
+        <hasSecurityObjective rdf:resource="#MessageAuthenticity"/>
+        <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.9</hasStrength>
+      </ObjectiveStrengthRelation>
+    </supportsSecurityObjective>
+    <requiresComputingPower rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >114.31</requiresComputingPower>
+    <usesAlgorithm rdf:resource="#RSA-v1.5"/>
+    <usesAlgorithm rdf:resource="#RSA-SHA1"/>
+    <supportsSecurityObjective rdf:resource="#HighConfidentiality"/>
+    <supportsSecurityObjective>
+      <ObjectiveStrengthRelation rdf:ID="HighMessageIntegrity">
+        <hasSecurityObjective rdf:resource="#MessageIntegrity"/>
+        <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.9</hasStrength>
+      </ObjectiveStrengthRelation>
+    </supportsSecurityObjective>
+    <requiresMemory rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >58904.0</requiresMemory>
+    <usesAlgorithm rdf:resource="#TripleDES-CBC"/>
+  </SecurityProtocol>
+  <SecurityProtocol rdf:ID="XMLSig">
+    <usesAlgorithm rdf:resource="#RSA-SHA1"/>
+    <supportsSecurityObjective rdf:resource="#HighMessageIntegrity"/>
+    <supportsSecurityObjective rdf:resource="#HighMessageAuthenticity"/>
+  </SecurityProtocol>
+  <SymmetricEncryptionAlgorithm rdf:ID="Blowfish"/>
+  <TrustModel rdf:ID="CommonPKI"/>
+  <ObjectiveStrengthRelation rdf:ID="LowConfidentiality">
+    <hasSecurityObjective rdf:resource="#Confidentiality"/>
+    <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+    >0.4</hasStrength>
+  </ObjectiveStrengthRelation>
+  <MACAlgorithm rdf:ID="HMAC-SHA1"/>
+  <SymmetricEncryptionAlgorithm rdf:ID="Blowfish-CBC"/>
+  <HostMechanism rdf:ID="TamperProofStorage">
+    <supportsSecurityObjective>
+      <ObjectiveStrengthRelation rdf:ID="HighNonRepudiation">
+        <hasSecurityObjective>
+          <SecurityObjective rdf:ID="NonRepudiation"/>
+        </hasSecurityObjective>
+        <hasStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
+        >0.9</hasStrength>
+      </ObjectiveStrengthRelation>
+    </supportsSecurityObjective>
+    <implementedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >desktop_all-3.1.0</implementedBy>
+  </HostMechanism>
+  <SymmetricEncryptionAlgorithm rdf:ID="DES-CBC"/>
+  <MACAlgorithm rdf:ID="HMAC-MD5-96"/>
+  <StreamCipher rdf:ID="RC4"/>
+  <SignatureAlgorithm rdf:ID="RSA-SHA256"/>
+  <SecurityObjective rdf:ID="Authorization">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Only authorized entities are allowed to access resources in an authorized manner. 
+      (Aka Access Control). If desired, user may create instance of AccessControl as well.</rdfs:comment>
+  </SecurityObjective>
+  <MACAlgorithm rdf:ID="HMAC-MD5"/>
+  <SymmetricEncryptionAlgorithm rdf:ID="Arcfour"/>
+  <StreamCipher rdf:ID="E0"/>
+  <DigestAlgorithm rdf:ID="SHA-256"/>
+  <SymmetricEncryptionAlgorithm rdf:ID="Vigenere"/>
+  <SymmetricEncryptionAlgorithm rdf:ID="IDEA"/>
+  <TrustModel rdf:ID="OpenPGP"/>
+  <SecurityObjective rdf:ID="ReplayPrevention">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >(Secondary Objective) Protect against replay attacks</rdfs:comment>
+  </SecurityObjective>
+  <HostMechanism rdf:ID="AuditLog"/>
+  <SymmetricEncryptionAlgorithm rdf:ID="Cast128-CBC"/>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

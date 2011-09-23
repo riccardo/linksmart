@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:impl="http://linksmart.eu/"
+	xmlns:linksmart="http://linksmart.eu/" targetNamespace="http://linksmart.eu/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+<!-- 	<wsdl:types>
+		<xs:schema>
+			<xs:import namespace="http://linksmart.eu/" schemaLocation="StorageManagerTypes.xsd" />
+		</xs:schema>
+	</wsdl:types>
+ -->
+
+
+	<wsdl:message name="clearFileRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="clearFileResponse">
+		<wsdl:part name="clearFileReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="copyRequest">
+		<wsdl:part name="source" type="soapenc:string" />
+		<wsdl:part name="destination" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="copyResponse">
+		<wsdl:part name="copyReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="createDirectoryRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="createDirectoryResponse">
+		<wsdl:part name="createDirectoryReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="createFileRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+		<wsdl:part name="properties" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="createFileResponse">
+		<wsdl:part name="createFileReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="existsPathRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="existsPathResponse">
+		<wsdl:part name="existsPathReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getDirectoryEntriesRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getDirectoryEntriesResponse">
+		<wsdl:part name="getDirectoryEntriesReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getFileRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getFileResponse">
+		<wsdl:part name="getFileReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getFreeSpaceRequest">
+	</wsdl:message>
+
+	<wsdl:message name="getFreeSpaceResponse">
+		<wsdl:part name="getFreeSpaceReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getIDRequest">
+	</wsdl:message>
+
+	<wsdl:message name="getIDResponse">
+		<wsdl:part name="getIDReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="getSizeRequest">
+	</wsdl:message>
+
+	<wsdl:message name="getSizeResponse">
+		<wsdl:part name="getSizeReturn" type="soapenc:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="getStatFSRequest">
+	</wsdl:message>
+
+	<wsdl:message name="getStatFSResponse">
+		<wsdl:part name="getStatFSReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="readFileRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+		<wsdl:part name="start" type="soapenc:string" />
+		<wsdl:part name="size" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="readFileResponse">
+		<wsdl:part name="readFileReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="removeDirectoryRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+		<wsdl:part name="recursive" type="xs:boolean" />
+	</wsdl:message>
+
+	<wsdl:message name="removeDirectoryResponse">
+		<wsdl:part name="removeDirectoryReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="removeFileRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="removeFileResponse">
+		<wsdl:part name="removeFileReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="moveRequest">
+		<wsdl:part name="source" type="soapenc:string" />
+		<wsdl:part name="destination" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="moveResponse">
+		<wsdl:part name="moveReturn" type="soapenc:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="setFilePropertiesRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+		<wsdl:part name="properties" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="setFilePropertiesResponse">
+		<wsdl:part name="createFileReturn" type="soapenc:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="setFilePropertyRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+		<wsdl:part name="propertiesName" type="soapenc:string" />
+		<wsdl:part name="propertiesValue" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="setFilePropertyResponse">
+		<wsdl:part name="createFileReturn" type="soapenc:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="truncateFileRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+		<wsdl:part name="size" type="soapenc:string" />
+	</wsdl:message>
+	
+	<wsdl:message name="truncateFileResponse">
+		<wsdl:part name="truncateFileReturn" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="writeFileRequest">
+		<wsdl:part name="path" type="soapenc:string" />
+		<wsdl:part name="start" type="soapenc:string" />
+		<wsdl:part name="data" type="soapenc:string" />
+	</wsdl:message>
+
+	<wsdl:message name="writeFileResponse">
+		<wsdl:part name="writeFileReturn" type="soapenc:string" />
+	</wsdl:message>
+
+
+
+
+	<wsdl:portType name="FileSystemDevice">
+		<wsdl:operation name="clearFile" parameterOrder="path">
+			<wsdl:input message="impl:clearFileRequest" name="clearFileRequest" />
+			<wsdl:output message="impl:clearFileResponse" name="clearFileResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="copy" parameterOrder="source destination">
+			<wsdl:input message="impl:copyRequest" name="copyRequest" />
+			<wsdl:output message="impl:copyResponse" name="copyResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="createDirectory" parameterOrder="path">
+			<wsdl:input message="impl:createDirectoryRequest" name="createDirectoryRequest" />
+			<wsdl:output message="impl:createDirectoryResponse" name="createDirectoryResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="createFile" parameterOrder="path properties">
+			<wsdl:input message="impl:createFileRequest" name="createFileRequest" />
+			<wsdl:output message="impl:createFileResponse" name="createFileResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="getID">
+			<wsdl:input message="impl:getIDRequest" name="getIDRequest" />
+			<wsdl:output message="impl:getIDResponse" name="getIDResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="existsPath" parameterOrder="path">
+			<wsdl:input message="impl:existsPathRequest" name="existsPathRequest" />
+			<wsdl:output message="impl:existsPathResponse" name="existsPathResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="getDirectoryEntries"
+			parameterOrder="path">
+			<wsdl:input message="impl:getDirectoryEntriesRequest"
+				name="getDirectoryEntriesRequest" />
+			<wsdl:output message="impl:getDirectoryEntriesResponse"
+				name="getDirectoryEntriesResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="getFile" parameterOrder="path">
+			<wsdl:input message="impl:getFileRequest" name="getFileRequest" />
+			<wsdl:output message="impl:getFileResponse" name="getFileResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="getFreeSpace">
+			<wsdl:input message="impl:getFreeSpaceRequest" name="getFreeSpaceRequest" />
+			<wsdl:output message="impl:getFreeSpaceResponse" name="getFreeSpaceResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="getSize">
+			<wsdl:input message="impl:getSizeRequest" name="getSizeRequest" />
+			<wsdl:output message="impl:getSizeResponse" name="getSizeResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="getStatFS">
+			<wsdl:input message="impl:getStatFSRequest" name="getStatFSRequest" />
+			<wsdl:output message="impl:getStatFSResponse" name="getStatFSResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="move" parameterOrder="source destination">
+			<wsdl:input message="impl:moveRequest" name="moveRequest" />
+			<wsdl:output message="impl:moveResponse" name="moveResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="readFile" parameterOrder="path start size">
+			<wsdl:input message="impl:readFileRequest" name="readFileRequest" />
+			<wsdl:output message="impl:readFileResponse" name="readFileResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="removeDirectory" parameterOrder="path recursive">
+			<wsdl:input message="impl:removeDirectoryRequest" name="removeDirectoryRequest" />
+			<wsdl:output message="impl:removeDirectoryResponse" name="removeDirectoryResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="removeFile" parameterOrder="path">
+			<wsdl:input message="impl:removeFileRequest" name="removeFileRequest" />
+			<wsdl:output message="impl:removeFileResponse" name="removeFileResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="setFileProperties" parameterOrder="path properties">
+			<wsdl:input message="impl:setFilePropertiesRequest" name="setFilePropertiesRequest" />
+			<wsdl:output message="impl:setFilePropertiesResponse" name="setFilePropertiesResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="setFileProperty" parameterOrder="path propertyName propertyValue">
+			<wsdl:input message="impl:setFilePropertyRequest" name="setFilePropertyRequest" />
+			<wsdl:output message="impl:setFilePropertyResponse" name="setFilePropertyResponse" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="truncateFile" parameterOrder="path size">
+			<wsdl:input message="impl:truncateFileRequest" name="truncateFileRequest" />
+			<wsdl:output message="impl:truncateFileResponse" name="truncateFileResponse" />
+		</wsdl:operation>
+
+		<wsdl:operation name="writeFile" parameterOrder="path start data">
+			<wsdl:input message="impl:writeFileRequest" name="writeFileRequest" />
+			<wsdl:output message="impl:writeFileResponse" name="writeFileResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+
+
+
+	<binding name="FileSystemDevicebind" type="impl:FileSystemDevice">
+		<linksmart:binding device="file:./resources/Device.owl#Laptop_1" />
+		<soap:binding style="rpc"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="clearFile">
+			<soap:operation soapAction="clearFile" />
+			<wsdl:input name="clearFileRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="clearFileResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="copy">
+			<soap:operation soapAction="copy" />
+			<wsdl:input name="copyRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="copyResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="createDirectory">
+			<soap:operation soapAction="createDirectory" />
+			<wsdl:input name="createDirectoryRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="createDirectoryResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="createFile">
+			<soap:operation soapAction="createFile" />
+			<wsdl:input name="createFileRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="createFileResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="existsPath">
+			<soap:operation soapAction="existsPath" />
+			<wsdl:input name="existsPathRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="existsPathResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="getDirectoryEntries">
+			<soap:operation soapAction="getDirectoryEntries" />
+			<wsdl:input name="getDirectoryEntriesRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getDirectoryEntriesResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="getFile">
+			<soap:operation soapAction="getFile" />
+			<wsdl:input name="getFileRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getFileResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="getFreeSpace">
+			<soap:operation soapAction="getFreeSpace" />
+			<wsdl:input name="getFreeSpaceRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getFreeSpaceResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="getID">
+			<soap:operation soapAction="getID" />
+			<wsdl:input name="getIDRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getIDResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSize">
+			<soap:operation soapAction="getSize" />
+			<wsdl:input name="getSizeRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getSizeResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getStatFS">
+			<soap:operation soapAction="getStatFS" />
+			<wsdl:input name="getStatFSRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="getStatFSResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="move">
+			<soap:operation soapAction="move" />
+			<wsdl:input name="moveRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="moveResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="readFile">
+			<soap:operation soapAction="readFile" />
+			<wsdl:input name="readFileRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="readFileResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="removeDirectory">
+			<soap:operation soapAction="removeDirectory" />
+			<wsdl:input name="removeDirectoryRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="removeDirectoryResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="removeFile">
+			<soap:operation soapAction="removeFile" />
+			<wsdl:input name="removeFileRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="removeFileResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setFileProperties">
+			<soap:operation soapAction="setFileProperties" />
+			<wsdl:input name="setFilePropertiesRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="setFilePropertiesResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setFileProperty">
+			<soap:operation soapAction="setFileProperty" />
+			<wsdl:input name="setFilePropertyRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="setFilePropertyResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="truncateFile">
+			<soap:operation soapAction="truncateFile" />
+			<wsdl:input name="truncateFileRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="truncateFileResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="writeFile">
+			<soap:operation soapAction="writeFile" />
+			<wsdl:input name="writeFileRequest">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:input>
+			<wsdl:output name="writeFileResponse">
+				<soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+					namespace="http://storagemanager.storage.linksmart.eu" use="encoded" />
+			</wsdl:output>
+		</wsdl:operation>
+	</binding>
+
+
+
+	<service name="FileSystemDevice">
+		<port name="FileSystemDevicePort" binding="impl:FileSystemDevicebind">
+			<soap:address location="http://localhost:8083/services/FileSystemDevice" />
+		</port>
+	</service>
+</definitions>

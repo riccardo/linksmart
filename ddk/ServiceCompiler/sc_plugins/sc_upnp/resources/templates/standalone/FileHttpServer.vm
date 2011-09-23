@@ -1,0 +1,348 @@
+package eu.linksmart.limbo.upnp;
+
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.LinkedList;
+import eu.linksmart.upnp.*;
+import eu.linksmart.limbo.*;
+
+
+
+/**
+ * <b>Class UPnPServer</b>
+ * This class is responsible for making the UPnP device and services description available in the network.
+ * It creates a server socket and listens to incoming HTTP requests.
+ */
+
+public class UPnPServer extends Thread {
+
+	private byte[] content;
+	private byte[] header;
+	private int port = 80;
+	private String devicePath;
+	private String[] servicesPath;
+	private UPnPDeviceImpl device;
+	private ServerSocket server;
+	private boolean notRunning = true;
+	public static int serverPort = 50000;
+	private UPnPMulticastThread mt;
+	private String deviceWSDLName; 
+#set($opsImplN = 0)
+#foreach($UPnPServiceImpl in $device.getServicesImpl())
+	private ${UPnPServiceImpl.getServiceName()}UPnPOpsImpl s${opsImplN};
+#set($opsImplN = $opsImplN +1)
+#end
+
+    /**
+     * <b>UPnPServer Constructor</b>
+     * @param device UPnPDeviceImpl variable. 
+     * @param port Server port.
+     * @param deviceDescFilePath UPnP device description file path. 
+     * @param servicesDescFilePath UPnP services descriptions file paths.
+     */
+    public UPnPServer(int port) {
+
+	  this.device = new UPnPDeviceImpl();
+          this.device.setFriendlyName("$device.getFriendlyName()");
+          this.device.setManufacturer("$device.getManufacturer()");
+          this.device.setModelDescription("$device.getModelDescription()");
+          this.device.setModelNumber("$device.getModelNumber()");
+          this.device.setDeviceType("$device.getDeviceType()");
+          this.device.setUDN("$device.getUDN()");
+          this.port = port;
+	  this.deviceWSDLName = "$deviceWSDL"; 
+   	  this.devicePath = "$deviceFilePath";
+	  this.servicesPath = new String[$nServices];
+	  int i = 0;
+#foreach($UPnPServiceImpl in $device.getServicesImpl())
+	  this.servicesPath[i] = "${deviceWSDL}Server/${UPnPServiceImpl.getServiceName()}.xml";
+	  i++; 
+#end	  
+#set($actionNumber = 1)
+#set($serviceNumber = 1)
+#set($statVarNumber = 1)
+#set($argNumber = 1)
+#foreach($UPnPServiceImpl in $device.getServicesImpl())
+#set($currentService = "service${serviceNumber}")
+	  UPnPServiceImpl $currentService = new UPnPServiceImpl();
+          ${currentService}.setType("$UPnPServiceImpl.getType()");
+          ${currentService}.setId("$UPnPServiceImpl.getId()");
+          ${currentService}.setSCPDURL("$UPnPServiceImpl.getSCPDURL()");
+          ${currentService}.setEventSubUrl("$UPnPServiceImpl.getEventSubUrl()");
+          ${currentService}.setControlUrl("$UPnPServiceImpl.getControlUrl()"); 
+#foreach($UPnPStateVariableImpl in $UPnPServiceImpl.getStateVariablesImpl())
+#set($currentStatVar = "st${statVarNumber}")
+	  UPnPStateVariableImpl $currentStatVar = new UPnPStateVariableImpl("$UPnPStateVariableImpl.getName()", ${UPnPStateVariableImpl.getVarDataType()}.class, null, null, null, null, $UPnPStateVariableImpl.sendsEvents());
+	  ${currentService}.addStateVariable(${currentStatVar});
+#set($statVarNumber = $statVarNumber+1)
+#end
+#foreach($UPnPActionImpl in $UPnPServiceImpl.getActionsImpl())
+#set($currentAction = "ac${actionNumber}")
+	  UPnPActionImpl $currentAction = new UPnPActionImpl();
+	  ${currentAction}.setActionName("$UPnPActionImpl.getName()");
+#foreach($ActionArgument in $UPnPActionImpl.getArgumentsList())
+#set($currentArg = "aa${argNumber}")
+	  ActionArgument $currentArg = new ActionArgument("$ActionArgument.getArgumentName()", "$ActionArgument.getDirection()", "$ActionArgument.getRelatedStateVariableName()");
+	  ${currentAction}.addArgument(${currentArg});
+	  ${currentArg}.setRelatedStateVariable(${currentService}.getStateVariable("$ActionArgument.getRelatedStateVariableName()"));
+#set($argNumber = $argNumber+1)
+#end
+	${currentService}.addAction(${currentAction});
+#set($actionNumber = $actionNumber+1)
+#end
+	  for(UPnPActionImpl action : ${currentService}.getActionsImpl())
+	  	action.setService(${currentService});
+	  this.device.addService(${currentService});
+#set($serviceNumber = $serviceNumber+1)
+#end
+
+#set($opsImplN = 0)
+#foreach($UPnPServiceImpl in $device.getServicesImpl())
+	this.s${opsImplN} = new ${UPnPServiceImpl.getServiceName()}UPnPOpsImpl();
+#set($opsImplN = $opsImplN +1)
+#end	  
+   	  System.out.println("UPnP server starting...");
+   	 
+        try { 
+           Thread t = this;
+           t.start();
+       }catch (Exception ex) {ex.printStackTrace();}
+    }
+
+    
+    public void processByeBye() {
+    	this.mt.sendByeByeMessages();
+		this.stop();
+    }
+    
+    private String buildResponse(Dictionary resultValues) {
+    	
+    	String result ="";
+    	result = result.concat("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n");
+    	result = result.concat("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\r\n");
+    	result = result.concat("\t<s:Body>\r\n");
+    	result = result.concat("\t\t<u:"+resultValues.get("actionName")+"Response xmlns:u=\""+resultValues.get("service")+"\">\r\n");
+    	if(resultValues.get("result")!= null)
+    		if(resultValues.get("multiValueResponse").equals("false"))
+    			result = result.concat("\t\t\t<"+resultValues.get("returnArgumentName")+">"+resultValues.get("result")+"</"+resultValues.get("returnArgumentName")+">\r\n");
+    		else
+    			result = result.concat(resultValues.get("result").toString());
+    	result = result.concat("\t\t</u:"+resultValues.get("actionName")+"Response>\r\n");
+    	result = result.concat("\t</s:Body>\r\n");
+    	result = result.concat("</s:Envelope>\r\n\r\n");
+    	return result;
+    }
+
+    private Dictionary<String,String> invoke(UPnPServiceImpl serv, UPnPActionImpl ac, LinkedList<String> argsNames, LinkedList<String> argsValues) {
+	
+		Dictionary<String,String> result = new Hashtable<String,String>();
+		String servName;
+#set($serviceNumber = 0)
+#foreach($UPnPServiceImpl in $device.getServicesImpl())
+		servName = serv.getId();
+	#set($serviceName = $UPnPServiceImpl.getId())
+		if(servName == "$serviceName") {
+#foreach($UPnPActionImpl in $UPnPServiceImpl.getActionsImpl())
+			if((ac.getName()=="$UPnPActionImpl.getName()") && (ac.getInputArgumentList().size()==argsNames.size())) {
+#set($OpsImpl = "OpsImpl")
+#set($comma = ",")
+#if($UPnPActionImpl.getOutputArgumentList().size()==0)
+				this.s${serviceNumber}.$UPnPActionImpl.getName()(#set($n = 0)#foreach($argument in $UPnPActionImpl.getInputArgumentList())#set($i = $UPnPActionImpl.getInputArgumentList().size())#set($pos=$n)#set($n=$n+1)#if($n<$i)#set($argumentType = "$argument.getRelatedStateVariable().getVarDataType()")#set($param = "argsValues.get(${pos})")$basicTypes.getConvertionOfType($argumentType, $param)$comma#else #set($argumentType = "$argument.getRelatedStateVariable().getVarDataType()")#set($param = "argsValues.get(${pos})")$basicTypes.getConvertionOfType($argumentType, $param)#end#end);	
+#else
+#if($UPnPActionImpl.getOutputArgumentList().size() > 1)
+#set($outputType = "String")
+#else
+#set($outputType = "$UPnPActionImpl.getOutputArgumentList().get(0).getRelatedStateVariable().getVarDataType()")
+#end
+				$outputType res = this.s${serviceNumber}.$UPnPActionImpl.getName()(#set($n = 0)#foreach($argument in $UPnPActionImpl.getInputArgumentList())#set($i = $UPnPActionImpl.getInputArgumentList().size())#set($pos=$n)#set($n=$n+1)#if($n<$i)#set($argumentType = "$argument.getRelatedStateVariable().getVarDataType()")#set($param = "argsValues.get(${pos})")$basicTypes.getConvertionOfType($argumentType, $param)$comma#else #set($argumentType = "$argument.getRelatedStateVariable().getVarDataType()")#set($param = "argsValues.get(${pos})")$basicTypes.getConvertionOfType($argumentType, $param)#end#end);	
+				if(res == null)
+					result.put("result","null");
+				else
+					result.put("result", res.toString());			
+#end
+#if($UPnPActionImpl.getName() == "Stop")
+				this.processByeBye(); 
+#end
+			}
+	
+#end
+		  }
+#set($serviceNumber = $serviceNumber+1)
+#end	
+	return result;
+
+    }
+ 
+  /**
+   * <b>run</b>
+   * This method creates a server socket in the specified port and listens to incoming HTTP requests for the UPnP 
+   * device and services descriptions and sends them to the requester. 
+   * It creates a new instance of MulticastThread.
+   */
+    @Override
+  	public void run() {
+	  	while(notRunning){
+	  		try {
+	  			this.server = new ServerSocket(this.port);
+	  			
+	  			this.mt = new UPnPMulticastThread(this.port, this.device, this.devicePath, this.servicesPath);
+	  			
+	  			while (true) {
+	  				notRunning = false;
+	  				Socket connection = null;
+	  				try {
+	  					connection = server.accept();
+          
+	  					OutputStream out = new BufferedOutputStream(
+                                  connection.getOutputStream()
+                                 );
+	  					BufferedReader biin = new BufferedReader(
+					new InputStreamReader(
+							connection.getInputStream()));
+	  					
+	  					String inputLine = biin.readLine();
+	  					StringTokenizer tokGetLine = new StringTokenizer(inputLine);
+	  					tokGetLine.nextToken(" ");
+	  					String url = tokGetLine.nextToken(" ");
+	  					if(url.equals("/") || (url.equals(""))) {
+	  						File deviceFile = new File(this.devicePath);
+	  						FileInputStream fs = new FileInputStream(deviceFile);
+	  						this.content = new byte[(int)deviceFile.length()];
+	  						fs.read(this.content, 0, this.content.length);
+	  						fs.close();
+	  					}
+	  					else {
+	  						if(url.contains("_urn:upnp-org:serviceId:")) {
+	  							String serviceFileName = url.substring("_urn:upnp-org:serviceId:".length()+1, url.length());
+	  							String serviceFilePath = "resources/"+serviceFileName;
+	  							File serviceFile = new File(serviceFilePath);
+	  							if(serviceFile.exists()) {
+	  								FileInputStream fs = new FileInputStream(serviceFile);
+	  								this.content = new byte[(int)serviceFile.length()];
+	  								fs.read(this.content, 0, this.content.length); 
+	  								fs.close();
+	  							}
+	  							else {
+	  								url = url.substring(1);
+	  								for(UPnPServiceImpl serv : device.getServicesImpl()) {
+	  									if(serv.getControlUrl().equals(url)) {
+	  										while(!inputLine.startsWith("SOAPACTION: ")) {
+	  											inputLine = biin.readLine();
+	  										}
+	  										String actionName = inputLine.substring(inputLine.lastIndexOf("#")+1, inputLine.length()-1);
+	  										while(!inputLine.startsWith("<?xml"))
+	  											inputLine = biin.readLine();
+	  										String soapRequest = inputLine; 
+	  										while(!inputLine.contains("</s:Body>")) {
+	  											inputLine = biin.readLine();
+	  										soapRequest = soapRequest.concat(inputLine.trim());
+	  									}
+	  									//Dictionary<String,String> args = new Hashtable<String,String>();
+										LinkedList<String> argsNames = new LinkedList<String>();
+										LinkedList<String> argsValues = new LinkedList<String>();
+	  									String soapBody = soapRequest.substring(soapRequest.indexOf("<s:Body>")+"<s:Body>".length(), soapRequest.indexOf("</s:Body>"));
+	  									if(!soapBody.endsWith("/>")) {
+	  										String arguments = soapBody.substring(soapBody.indexOf(">")+">".length(), soapBody.lastIndexOf("</"));
+	  										while(!arguments.equals("")) {
+	  											String argumentName = arguments.substring(arguments.indexOf("<")+"<".length(), arguments.indexOf(">"));
+	  											arguments = arguments.substring(arguments.indexOf(">")+">".length());
+	  											String value = arguments.substring(0, arguments.indexOf("<"));
+	  											arguments = arguments.substring(arguments.indexOf("<"));
+												argsNames.add(argumentName);
+												argsValues.add(value);
+	  											arguments = arguments.substring(arguments.indexOf(">")+">".length());
+	  										}
+	  									}
+	  									UPnPActionImpl ac = serv.getAction(actionName);
+	  									try {
+											
+											Dictionary<String,String> result = this.invoke(serv,ac,argsNames,argsValues);
+											result.put("actionName", actionName);
+											result.put("service", serv.getType());
+											if(result.get("result") != null) {
+												if(ac.getOutputArgumentList().size() > 1)
+													result.put("multiValueResponse", "true");
+												else{
+													result.put("multiValueResponse", "false");
+													result.put("returnArgumentName", ac.getOutputArgumentList().get(0).getArgumentName());
+												}
+											}
+										    	String responseSOAP = buildResponse(result);
+											this.content = responseSOAP.getBytes();
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+	  								}
+	  									
+	  							}
+	  						}
+	  					}	  
+	  					}
+	  					int contentLength = this.content.length;
+	  					String header = "HTTP/1.1 200 OK\r\n"
+	  									+ "SERVER: LinkSmartPlugin 1.0\r\n"
+	  									+ "CONTENT-LENGTH: " +contentLength + "\r\n"
+	  									+ "EXT: \r\n"
+	  									+ "Content-type: text/xml; charset=\"utf-8\"\r\n\r\n";
+	  						this.header = header.getBytes("ASCII");
+	  					out.write(this.header);
+	  					out.write(this.content);
+	  					out.flush();
+	  				}  // end try
+	  				catch (IOException ex) {ex.printStackTrace();}
+	  			finally {
+	  				if (connection != null) connection.close();
+	  			}
+	  		} // end while
+	  	} // end try
+	  		catch (IOException ex) {
+	  			this.port +=10;
+	  			ex.printStackTrace();}
+	  }
+  } // end run
+
+  public static void main(String[] args) {
+		try {
+			int portNumber = 50000;
+			int wsPort = 8082;
+			if (args.length != 0) {
+				portNumber = Integer.parseInt(args[0]);
+			}
+			if(args.length == 2) {
+				wsPort = Integer.parseInt(args[1]);
+			}
+			new UPnPServer(portNumber);
+#set($port = 0)
+#if($protocol != "BTProtocol")
+#foreach($UPnPServiceImpl in $services)
+#if($port == 0)
+			new ${UPnPServiceImpl.getServiceName()}LimboServer(new ${protocol}(), wsPort).runServer();
+#else
+			new ${UPnPServiceImpl.getServiceName()}LimboServer(new ${protocol}(), wsPort+$port).runServer();
+#end
+#set($port = $port+1)
+#end
+#else
+#foreach($UPnPServiceImpl in $services)
+			BTProtocol ${UPnPServiceImpl.getServiceName().toLowerCase()}Protocol = new BTProtocol();
+			${UPnPServiceImpl.getServiceName().toLowerCase()}Protocol.setServiceName("${UPnPServiceImpl.getServiceName()}"); 
+			new ${UPnPServiceImpl.getServiceName()}LimboServer(${UPnPServiceImpl.getServiceName().toLowerCase()}Protocol,-1).runServer();
+#end
+#end
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}

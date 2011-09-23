@@ -1,0 +1,20 @@
+# OntologyPIP bnd instructions
+# 
+# Note that we are currently still using a separate MANIFEST.MF and 
+# declarative services activation file; this will change in a future 
+# version. Changes in this file will not directly change the 
+# MANIFEST.MF until then.
+#
+# author Julian Schuette
+#
+-manifest= ../META-INF/MANIFEST.MF
+version=1.0.0
+Include-Resource: OSGI-INF/DSComponent.xml=../OSGI-INF/DSComponent.xml
+Export-Package: eu.linksmart.policy.pip.ontology.*;version=${version}
+Service-Component: OSGI-INF/DSComponent.xml
+Bundle-Version: ${version}
+Bundle-Name: LinkSmart Ontology PIP
+Bundle-Description: eu.linksmart.policy.pip.ontology
+Bundle-Vendor: Fraunhofer SIT
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
