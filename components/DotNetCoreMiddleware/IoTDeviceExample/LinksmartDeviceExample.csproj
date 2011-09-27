@@ -86,14 +86,6 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DeviceServiceManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\DeviceServiceManager.dll</HintPath>
-    </Reference>
-    <Reference Include="IoTDevice, Version=1.0.4163.17089, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\IoTDevice.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -106,10 +98,6 @@
     <Reference Include="System.ServiceModel">
       <Name>System.ServiceModel</Name>
       <HintPath>..\..\WINDOWS\Microsoft.NET\Framework\v3.0\System.ServiceModel.dll</HintPath>
-    </Reference>
-    <Reference Include="UPnP, Version=1.0.4163.16319, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\UPnP.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +138,20 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DeviceServiceManager\DeviceServiceManager\DeviceServiceManager.csproj">
+      <Project>{BC3AD9ED-892F-4B19-BF78-64CF95D62BA0}</Project>
+      <Name>DeviceServiceManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GenericIoTDevice\IoTDevice.csproj">
+      <Project>{0FC1D941-3BEE-479F-8B31-5F164F58497B}</Project>
+      <Name>IoTDevice</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IntelOpenSource\Global\UPnP\UPnP.csproj">
+      <Project>{584ED187-8F2A-4B58-A266-85F3F212B092}</Project>
+      <Name>UPnP</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
