@@ -185,7 +185,7 @@ implements eu.linksmart.network.NetworkManagerApplication {
 		} catch (Exception e) {
 			logger.error("Error registering servlets", e);
 		}
-		
+
 		createSecureSession();
 	}
 
@@ -398,7 +398,7 @@ implements eu.linksmart.network.NetworkManagerApplication {
 	public CryptoManager getCryptoManager() {
 		return cryptoManager;
 	}
-	
+
 	public InsideHydra getSecurityLibrary(){
 		return secLib;
 	}
@@ -699,7 +699,7 @@ implements eu.linksmart.network.NetworkManagerApplication {
 			sessionMgr.addSessionLocalClient(response.getSessionID(), 
 					senderHID, receiverHID);
 		}
-		
+
 		//open response message if encrypted
 		/*
 		 * Look for a LinkSmart:InsideProtectedMessage element and if it 
@@ -1009,9 +1009,14 @@ implements eu.linksmart.network.NetworkManagerApplication {
 		HID hid = null;
 		try {
 			Properties attr = cryptoManager.getAttributesFromCertificate(certRef);
-			hid = hidMgr.createHID("", endpoint, attr);
-			cryptoManager.addPrivateKeyForHID(hid.toString(), certRef);
-			return hid.toString();
+			if(attr.size() != 0){
+				hid = hidMgr.createHID("", endpoint, attr);
+				cryptoManager.addPrivateKeyForHID(hid.toString(), certRef);
+				return hid.toString();
+			}else{
+				logger.warn("Certificate reference does not exist!");
+				return null;
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		} 
@@ -1673,7 +1678,7 @@ implements eu.linksmart.network.NetworkManagerApplication {
 			}
 		}
 	}
-	
+
 	private void createSecureSession(){
 		if(!SecureSessionControllerImpl.instanceCreated() && cryptoManager != null && trustManager != null && configurator != null){
 			SecureSessionControllerImpl.createInstance(this, 
@@ -1681,7 +1686,7 @@ implements eu.linksmart.network.NetworkManagerApplication {
 			//set trust threshold
 			SecureSessionControllerImpl.getInstance().setTrustThreshold(
 					Double.valueOf(
-					(String)configurator.get(NetworkManagerConfigurator.TRUSTMANAGER_TRUST_THRESHOLD)));
+							(String)configurator.get(NetworkManagerConfigurator.TRUSTMANAGER_TRUST_THRESHOLD)));
 		}
 	}
 }
