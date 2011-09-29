@@ -16,6 +16,8 @@ package eu.linksmart.network.identity;
 
 import static org.junit.Assert.*;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Vector;
 
 import eu.linksmart.network.impl.NetworkManagerApplicationSoapBindingImpl;
@@ -76,6 +78,21 @@ public class HIDManagerApplicationTest {
     }
     
     @Test
+    public void testGetAllHIDs() {
+    	PeerID peerid = context.mock(PeerID.class, "net.jxta.peer.PeerID");
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	hidmanagerapplication.createHID();
+    	
+    	Vector<String> res = hidmanagerapplication.getHIDs();
+    	assertTrue(res.size() == 1);
+    	hidmanagerapplication.removeAllHIDs();
+    	
+    	res = hidmanagerapplication.getHIDs();
+    	assertTrue(res.size() == 0);
+    }
+    
+    @Test
     public void testGetHIDByDescription() {
     	PeerID peerid = context.mock(PeerID.class, "net.jxta.peer.PeerID");
     	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
@@ -100,19 +117,37 @@ public class HIDManagerApplicationTest {
     	assertTrue(result.indexOf(hid2 + ";TestService2") >= 0);
     }
     
-    @Test
-    public void testGetHIDsFromIP() {
-    	/*PeerID peerid = context.mock(PeerID.class, "net.jxta.peer.PeerID");
+    /*
+    @Test //[TID:b8a6c47d-e82a-414a-926c-3495d5da29b3]
+    public void testGetHIDsFromIP() throws UnknownHostException {
+    	PeerID peerid = context.mock(PeerID.class, "net.jxta.peer.PeerID");
     	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
     	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
     	HID hid1 = hidmanagerapplication.createHID("TestService1", "http://localhost:8082/axis/services/TestService1");
     	HID hid2 = hidmanagerapplication.createHID("TestService2", "http://localhost:8082/axis/services/TestService2");
     	
-    	String result = hidmanagerapplication.getHIDsFromIP("127.0.0.1:8888");
+    	String result = hidmanagerapplication.getHIDsFromIP(InetAddress.getLocalHost() + ":8888");
     	
-    	assertTrue(result.indexOf(hid1 + ";TestService1") >= 0);*/
-    	//assertTrue(result.indexOf(hid2 + ";TestService2") >= 0);
+    	assertTrue(result.indexOf(hid1 + ";TestService1") >= 0);
+    	assertTrue(result.indexOf(hid2 + ";TestService2") >= 0);
     }
+    */
+    
+    /*
+    @Test //[TID:91218d3c-34af-439f-a26c-85cc008746ed]
+    public void testGetHIDsFromIP() throws UnknownHostException {
+    	PeerID peerid = context.mock(PeerID.class, "net.jxta.peer.PeerID");
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	HID hid1 = hidmanagerapplication.createHID("TestService1", "http://localhost:8082/axis/services/TestService1");
+    	HID hid2 = hidmanagerapplication.createHID("TestService2", "http://localhost:8082/axis/services/TestService2");
+    	
+    	String result = hidmanagerapplication.printHIDtable();
+    	
+    	assertTrue(result.indexOf(hid1 + ";TestService1") >= 0);
+    	assertTrue(result.indexOf(hid2 + ";TestService2") >= 0);
+    }
+    */
     
     @Test
     public void testSetHID() {
@@ -141,5 +176,56 @@ public class HIDManagerApplicationTest {
     	
     	PeerID id = hidmanagerapplication.getIDfromHID(new HID("3.2.1.0"));
     	assertEquals(peerid, id);
+    }
+    
+    @Test
+    public void testCheckUpToDate2() throws UnknownHostException {
+    	PeerID peerid = context.mock(PeerID.class, "net.jxta.peer.PeerID");
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	hidmanagerapplication.createHID("TestService1", "http://localhost:8082/axis/services/TestService1");
+    	String result = hidmanagerapplication.getHIDsFromID(peerid);
+    	
+    	hidmanagerapplication.createHID("TestService2", "http://localhost:8082/axis/services/TestService2");
+    	String result2 = hidmanagerapplication.getHIDsFromID(peerid);
+    	
+    	assertFalse(hidmanagerapplication.checkUpToDate2(result, peerid, InetAddress.getLocalHost() + ":8888"));
+    	assertTrue(hidmanagerapplication.checkUpToDate2(result2, peerid, InetAddress.getLocalHost() + ":8888"));
+    }
+    
+    /*
+    @Test //[TID:1a7cd053-5be5-4d89-afd7-ef1e5949805e]
+    public void testCheckUpToDate() throws UnknownHostException {
+    	PeerID peerid = context.mock(PeerID.class, "net.jxta.peer.PeerID");
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	hidmanagerapplication.createHID("TestService1", "http://localhost:8082/axis/services/TestService1");
+    	hidmanagerapplication.createHID("TestService2", "http://localhost:8082/axis/services/TestService2");
+    	
+    	String result = hidmanagerapplication.getHIDsFromID(peerid);
+    	
+    	assertTrue(hidmanagerapplication.checkUpToDate(result, peerid, InetAddress.getLocalHost() + ":8888"));
+    }
+    */
+    
+    @Test
+    public void testRemoveHID() {
+    	PeerID peerid = context.mock(PeerID.class, "net.jxta.peer.PeerID");
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	HID hid1 = hidmanagerapplication.createHID("TestService1", "http://localhost:8082/axis/services/TestService1");
+    	HID hid2 = hidmanagerapplication.createHID("TestService2", "http://localhost:8082/axis/services/TestService2");
+    	
+    	Vector<String> hids = hidmanagerapplication.getHIDs();
+    	assertEquals(2, hids.size());
+    	assertTrue(hids.contains(hid1.toString()));
+    	assertTrue(hids.contains(hid2.toString()));
+    	
+    	hidmanagerapplication.removeHID(hid1);
+    	
+    	hids = hidmanagerapplication.getHIDs();
+    	assertEquals(1, hids.size());
+    	assertFalse(hids.contains(hid1.toString()));
+    	assertTrue(hids.contains(hid2.toString()));
     }
 }
