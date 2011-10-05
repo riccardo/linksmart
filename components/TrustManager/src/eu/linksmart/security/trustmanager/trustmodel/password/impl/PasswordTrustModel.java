@@ -29,12 +29,10 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-
 import eu.linksmart.security.trustmanager.impl.TrustManagerImpl;
 import eu.linksmart.security.trustmanager.trustmodel.TrustModel;
 import eu.linksmart.security.trustmanager.trustmodel.password.config.PasswordTrustModelConfiguration;
+import eu.linksmart.security.trustmanager.util.Base64;
 import eu.linksmart.security.trustmanager.util.Util;
 
 public class PasswordTrustModel implements TrustModel {
@@ -83,8 +81,6 @@ public class PasswordTrustModel implements TrustModel {
 				return;
 			} catch (FileNotFoundException e) {
 				logger.debug("Password file not found",e);
-			} catch (Base64DecodingException e) {
-				logger.error("PasswordTrustModel cannot interpret stored password");
 			} catch (IOException e) {
 				logger.error("PasswordTrustModel cannot read stored password");
 			}finally{
@@ -124,7 +120,7 @@ public class PasswordTrustModel implements TrustModel {
 		try {
 			bw = new BufferedWriter(new FileWriter(PASSWORD_FILE_PATH));
 			passwordHash = createHash(pass.getBytes());
-			bw.write(Base64.encode(passwordHash));
+			bw.write(Base64.encodeBytes(passwordHash));
 			bw.newLine();
 			stored = true;
 		} catch (IOException e) {
