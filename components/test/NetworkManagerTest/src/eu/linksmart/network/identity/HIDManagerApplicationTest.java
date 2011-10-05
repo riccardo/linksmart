@@ -100,8 +100,39 @@ public class HIDManagerApplicationTest {
     	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
     	HID hid = hidmanagerapplication.createHID("TestService", "http://localhost:8082/axis/services/TestService");
     	Vector hidByDesc = hidmanagerapplication.getHIDsbyDescription("TestService");
-    	assertTrue(hidByDesc.size() == 1);
+    	assertEquals(1, hidByDesc.size());
     	assertEquals(hid.toString(), hidByDesc.get(0));
+    }
+    
+    @Test
+    public void testGetHIDByDescriptionWithWildcard() {
+    	PeerID peerid = context.mock(PeerID.class);
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	HID hid1 = hidmanagerapplication.createHID("TestService1", "http://localhost:8082/axis/services/TestService1");
+    	HID hid2 = hidmanagerapplication.createHID("TestService2", "http://localhost:8082/axis/services/TestService2");
+    	HID hid3 = hidmanagerapplication.createHID("AnotherService", "http://localhost:8082/axis/services/AnotherService");
+    	HID hid4 = hidmanagerapplication.createHID("AnotherExtendedService1", "http://localhost:8082/axis/services/AnotherExtendedTestService1");
+    	
+    	Vector hidByDesc1 = hidmanagerapplication.getHIDsbyDescription("TestService*");
+    	assertEquals(2, hidByDesc1.size());
+    	assertTrue(hidByDesc1.contains(hid1.toString()));
+    	assertTrue(hidByDesc1.contains(hid2.toString()));
+    	
+    	Vector hidByDesc2 = hidmanagerapplication.getHIDsbyDescription("*Service*");
+    	assertEquals(4, hidByDesc2.size());
+    	assertTrue(hidByDesc2.contains(hid1.toString()));
+    	assertTrue(hidByDesc2.contains(hid2.toString()));
+    	assertTrue(hidByDesc2.contains(hid3.toString()));
+    	assertTrue(hidByDesc2.contains(hid4.toString()));
+    	
+    	Vector hidByDesc3 = hidmanagerapplication.getHIDsbyDescription("*Test*1*");
+    	assertEquals(1, hidByDesc3.size());
+    	assertTrue(hidByDesc3.contains(hid1.toString()));
+    	
+    	// wildcards limited up to 3
+    	Vector hidByDesc4 = hidmanagerapplication.getHIDsbyDescription("A*E*S*1*");
+    	assertEquals(0, hidByDesc4.size());
     }
     
     @Test
@@ -336,4 +367,66 @@ public class HIDManagerApplicationTest {
     	assertEquals(1, res.size());
     	assertEquals(hidLocal.toString() ,res.get(0));
     }
+    
+    @Test
+    public void testRemoveHIDsFromID() {
+    	PeerID peerid = context.mock(PeerID.class);
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	
+    	hidmanagerapplication.createHID(999, 1);
+    	hidmanagerapplication.createHID(999, 2);
+    	
+    	Vector<String> res1 = hidmanagerapplication.getHIDs();
+    	assertEquals(2, res1.size());
+    	
+    	hidmanagerapplication.removeHIDsFromID(peerid);
+    	
+    	Vector<String> res2 = hidmanagerapplication.getHIDs();
+    	assertEquals(0, res2.size());
+    }
+    
+    @Test
+    public void testAddContext() {
+    	PeerID peerid = context.mock(PeerID.class);
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	
+    	HID hid1 = hidmanagerapplication.createHID(999, 2);
+    	
+    	Vector<String> res1 = hidmanagerapplication.getHIDs();
+    	assertEquals(1, res1.size());
+    	assertEquals(hid1.toString(), res1.get(0));
+    	
+    	HID hid2 = hidmanagerapplication.addContext(888, hid1);
+    	
+    	assertEquals(hid1.getLevel() + 1, hid2.getLevel());
+    	
+    	Vector<String> res2 = hidmanagerapplication.getHIDs();
+    	assertEquals(2, res2.size());
+    	assertTrue(res2.contains(hid2.toString()));
+    }
+    
+    /*
+    @Test //[TID:0d0c274f-aa34-4d9b-bf83-7633c3fc033f]
+    public void testRenewHID() {
+    	PeerID peerid = context.mock(PeerID.class);
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	
+    	HID hid1 = hidmanagerapplication.createHID(999, 2);
+    	
+    	Vector<String> res1 = hidmanagerapplication.getHIDs();
+    	assertEquals(1, res1.size());
+    	assertEquals(hid1.toString(), res1.get(0));
+    	
+    	HID hid2 = hidmanagerapplication.renewHID(888, 3, hid1);
+    	
+    	assertEquals(3, hid2.getLevel());
+    	
+    	Vector<String> res2 = hidmanagerapplication.getHIDs();
+    	assertEquals(1, res2.size());
+    	assertEquals(hid2.toString(), res2.get(0));
+    }
+    */
 }
