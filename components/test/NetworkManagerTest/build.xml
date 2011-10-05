@@ -20,7 +20,6 @@
 	<property name="build.dir" value="${rootBuildDir}/test/${moduleName}/bin" />
 	<property name="src.dist.dir" value="${basedir}/../../../distribution" />
 	<property name="targetPlatform.dir" value="${basedir}/../../target_platform" />
-	<property name="targetPlatform.test.dir" value="${basedir}/../target_platform_test" />
 
 	<!-- paths -->
 
@@ -29,9 +28,6 @@
 			<include name="**/*.jar" />
 		</fileset>
 		<fileset dir="${targetPlatform.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="${targetPlatform.test.dir}">
 			<include name="**/*.jar" />
 		</fileset>
 		<fileset dir="${basedir}/../../../distribution">
@@ -51,9 +47,9 @@
 	<target name="resolve">
 		<echo message="Setting up build environment" />
 		<ivy:resolve transitive="true" />
-		<ivy:retrieve transitive="true" type="jar" pattern="${targetPlatform.test.dir}/[artifact]-[revision].[ext]" />
-		<ivy:retrieve transitive="true" type="jars" pattern="${targetPlatform.test.dir}/[artifact]-[revision].[ext]" />
-		<ivy:retrieve transitive="true" type="bundle" pattern="${targetPlatform.test.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="jar" pattern="${lib.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="jars" pattern="${lib.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="bundle" pattern="${lib.dir}/[artifact]-[revision].[ext]" />
 	</target>
 
 	<!-- build -->
@@ -66,7 +62,7 @@
 	</target>
 
 	<!-- test -->
-	<target name="test" depends="resolve">
+	<target name="test" depends="resolve, build">
 		<echo message="Testing" />
 		<junit fork="yes" haltonfailure="yes">
 		    <batchtest fork="yes">
