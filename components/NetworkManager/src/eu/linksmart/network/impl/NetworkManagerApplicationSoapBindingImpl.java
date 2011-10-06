@@ -1009,9 +1009,14 @@ implements eu.linksmart.network.NetworkManagerApplication {
 		HID hid = null;
 		try {
 			Properties attr = cryptoManager.getAttributesFromCertificate(certRef);
-			hid = hidMgr.createHID("", endpoint, attr);
-			cryptoManager.addPrivateKeyForHID(hid.toString(), certRef);
-			return hid.toString();
+			if(attr.size() != 0){
+				hid = hidMgr.createHID("", endpoint, attr);
+				cryptoManager.addPrivateKeyForHID(hid.toString(), certRef);
+				return hid.toString();
+			}else{
+				logger.warn("Certificate reference does not exist!");
+				return null;
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		} 
