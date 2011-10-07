@@ -392,8 +392,22 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		return result.getHID();
 	}
 	
-	@Override
 	public Class getTrustModelConfigurator(){
 		return TrustModelRegistry.getInstance().getCurrentTrustModel().getConfigurator();
+	}
+
+	public String getTrustToken(String identifier) throws RemoteException {
+		return TrustModelRegistry.getInstance().getCurrentTrustModel().getTrustToken(identifier);
+	}
+
+	public String createTrustToken() throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean createTrustTokenWithFriendlyName(String identifier)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

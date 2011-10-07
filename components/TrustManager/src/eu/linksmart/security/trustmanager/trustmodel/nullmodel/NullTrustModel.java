@@ -88,4 +88,9 @@ public class NullTrustModel implements TrustModel {
 		// No configuration
 		return null;
 	}
+
+	@Override
+	public String getTrustToken(String identifier) {
+		return null;
+	}
 }

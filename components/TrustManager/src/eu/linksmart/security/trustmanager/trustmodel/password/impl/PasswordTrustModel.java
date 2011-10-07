@@ -29,10 +29,10 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
+import eu.linksmart.security.trustmanager.util.Base64;
 import eu.linksmart.security.trustmanager.impl.TrustManagerImpl;
 import eu.linksmart.security.trustmanager.trustmodel.TrustModel;
 import eu.linksmart.security.trustmanager.trustmodel.password.config.PasswordTrustModelConfiguration;
-import eu.linksmart.security.trustmanager.util.Base64;
 import eu.linksmart.security.trustmanager.util.Util;
 
 public class PasswordTrustModel implements TrustModel {
@@ -152,6 +152,17 @@ public class PasswordTrustModel implements TrustModel {
 		} catch (NoSuchAlgorithmException e) {
 			logger.error("Your JCE does not support SHA-256. Password cannot be protected and will not work!");
 		}
+		return null;
+	}
+
+	@Override
+	public String getTrustToken(String identifier) {
+		//TODO ckeck whom you give the trusted token
+//		if(passwordHash != null){
+//			return Base64.encode(passwordHash);
+//		}else{
+//			return null;
+//		}
 		return null;
 	}
 }

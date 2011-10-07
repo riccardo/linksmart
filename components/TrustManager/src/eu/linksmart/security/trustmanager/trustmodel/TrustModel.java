@@ -77,4 +77,10 @@ public interface TrustModel {
 	 * @return Class which should be instantiated as configurator
 	 */
 	Class getConfiguratorClass();
+	
+	/**
+	 * Returns the Trust Model specific trust token
+	 * @return Base64 encoded representation of the trust token
+	 */
+	String getTrustToken(String identifier);
 }

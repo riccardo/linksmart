@@ -69,4 +69,26 @@ public interface TrustManager extends java.rmi.Remote {
 	public double getTrustValueWithIdentifier(String token,
 			String trustModelIdentifier) throws RemoteException;
 
+	/**
+	 * Creates a token according to the active trust model
+	 * @return Identifier of created token
+	 * @throws RemoteException
+	 */
+	public String createTrustToken() throws RemoteException;
+	
+	/**
+	 * Creates a token according to the active trust model
+	 * @param identifier Tries to give the token provided identifier
+	 * @return False if identifier already taken
+	 * @throws RemoteException
+	 */
+	public boolean createTrustTokenWithFriendlyName(String identifier) throws RemoteException;
+	
+	
+	/**
+	 * Returns the trust token of the device with given identifier.
+	 * This can be used as trust identification to other NetworkManagers. 
+	 * @return Base64 encoded representation of the trust token
+	 */
+	public String getTrustToken(String identifier) throws RemoteException;
 }

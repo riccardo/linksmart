@@ -220,4 +220,10 @@ public class X509TrustModel implements TrustModel {
 	public Class getConfiguratorClass() {
 		return X509TrustModelConfigurationImpl.class;
 	}
+
+	@Override
+	public String getTrustToken(String identifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

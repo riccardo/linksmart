@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LinkSmart Middleware Clients
 Bundle-SymbolicName: LinkSmartMiddlewareClients
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Import-Package: eu.linksmart.aom,
  eu.linksmart.caf,
  eu.linksmart.caf.cm,
@@ -96,7 +96,7 @@ Import-Package: eu.linksmart.aom,
  org.osgi.service.component
 Service-Component: OSGI-INF/component.xml
 Export-Package: eu.linksmart.aom.client,
-  eu.linksmart.caf.cm.client,
+ eu.linksmart.caf.cm.client,
  eu.linksmart.caf.cm.client.query,
  eu.linksmart.caf.cm.client.rules,
  eu.linksmart.caf.cm.client.specification,
@@ -110,7 +110,7 @@ Export-Package: eu.linksmart.aom.client,
  eu.linksmart.policy.pdp.client,
  eu.linksmart.policy.pep.client,
  eu.linksmart.qos.client,
- eu.linksmart.security.trustmanager.client,
+ eu.linksmart.security.trustmanager.client;version="1.1.0",
  eu.linksmart.wsprovider.test.client
 Bundle-Vendor: TID
 Bundle-ClassPath: .

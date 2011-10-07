@@ -17,11 +17,13 @@
 	<dirname property="project.basedir" file="${ant.file.LinkSmartMiddlewareClients}" />
 
 	<property name="src" value="${project.basedir}/src" />
+	<!-- provide what address to create axis stub for -->
 	<property name="wsdl" value="http://localhost:8082/axis/services/TrustManager?wsdl" />
 
+	<!-- provide axis lib path here -->
 	<path id="axis.classpath">
-		<fileset dir="${project.basedir}/lib">
-			<include name="**/*.jar" />
+		<fileset dir="${lib.dir}/axis/">
+			<include name="*.jar" />
 		</fileset>
 
 	</path>
@@ -31,6 +33,7 @@
 	</target>
 
 	<target name="make-axis" depends="init">
+		<taskdef resource="axis-tasks.properties" classpathref="axis.classpath" />
 		<axis-wsdl2java output="${src}" testcase="false" verbose="true" skeletondeploy="true" helpergen="true" url="${wsdl}">
 			<mapping namespace="http://axis.apache.org/ns/interop" package="interop" />
 		</axis-wsdl2java>

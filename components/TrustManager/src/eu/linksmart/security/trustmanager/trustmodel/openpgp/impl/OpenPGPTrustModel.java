@@ -193,4 +193,10 @@ public class OpenPGPTrustModel implements TrustModel {
 		return OpenPGPTrustModelConfigurationImpl.class;
 	}
 
+	@Override
+	public String getTrustToken(String identifier) {
+		//TODO Auto-generated method stub
+		return null;
+	}
+
 }

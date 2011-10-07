@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CryptoManager
 Bundle-SymbolicName: CryptoManager
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.0.qualifier
 Service-Component: OSGI-INF/component.xml, OSGI-INF/component_admin.xml
 Import-Package: eu.linksmart.clients,
  eu.linksmart.security.cryptomanager,
@@ -26,4 +26,4 @@ Import-Package: eu.linksmart.clients,
 Bundle-ClassPath: resources/,
  .,
  lib/bcprov-jdk16-138.jar
-Export-Package: eu.linksmart.security.cryptomanager.impl
+Export-Package: eu.linksmart.security.cryptomanager.impl;version="1.1.0"
