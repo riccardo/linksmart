@@ -20,6 +20,7 @@
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}" />
 	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
+	<property name="javadoc.dir" value="${basedir}/doc" />
 	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
 
 	<!-- paths -->
@@ -129,6 +130,15 @@
 	<target name="test" depends="make">
 		<echo message="Testing" />
 		<mkdir dir="${test.build.dir}" />
+	</target>
+	
+	<!-- javadoc -->
+	<target name="javadoc">
+		<javadoc access="public" destdir="${javadoc.dir}" author="true" version="true" use="true" windowtitle="LinkSmartMiddleware API">
+			<fileset dir="${src.dir}" defaultexcludes="yes">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
 	</target>
 
 	<!-- clean -->
