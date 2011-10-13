@@ -3,54 +3,40 @@
 <!-- Build file for LinkSmartMiddlewareClients
 	 author: Marco Tiemann -->
 
-<!--
-		The following properties must be pre-defined in the parent ant script:
-		- javaLibDir directory containing 3rd party Java libraries -
-		rootBuildDir base directory for all intermediate outputs -
-		rootDistributionDir directory for compiled bundles
-	-->
-
 <project name="LinkSmartMiddlewareClients" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
-	<!-- from previous build.xml -->
-
-	<dirname property="project.basedir" file="${ant.file.LinkSmartMiddlewareClients}" />
-
-	<property name="src" value="${project.basedir}/src" />
-	<!-- provide what address to create axis stub for -->
-	<property name="wsdl" value="http://localhost:8082/axis/services/TrustManager?wsdl" />
-
-	<!-- provide axis lib path here -->
-	<path id="axis.classpath">
-		<fileset dir="${lib.dir}/axis/">
-			<include name="*.jar" />
-		</fileset>
-
-	</path>
-
-	<target name="init">
-		<mkdir dir="${src}" />
-	</target>
-
-	<target name="make-axis" depends="init">
-		<taskdef resource="axis-tasks.properties" classpathref="axis.classpath" />
-		<axis-wsdl2java output="${src}" testcase="false" verbose="true" skeletondeploy="true" helpergen="true" url="${wsdl}">
-			<mapping namespace="http://axis.apache.org/ns/interop" package="interop" />
-		</axis-wsdl2java>
-	</target>
-
+	<!-- CHANGE HERE: provide the path to your local axis installation or wherever your axis libs are -->
+	<property name="axis1.lib.dir" value="/Users/jahnadmin/Opt/axis-1_4/lib" />
+	
+	<!-- CHANGE HERE: provide the address of the manager you want to create the axis stub for -->
+	<property name="wsdl" value="http://localhost:8082/axis/services/NetworkManagerApplication?wsdl" />
+	
 	<!-- properties -->
-
 	<property name="moduleName" value="LinkSmartMiddlewareClients" />
 	<property name="revision" value="1.0.0" />
-
 	<property name="src.dir" value="${basedir}/src" />
-	<property name="test.dir" value="${basedir}/test" />
-	<property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="lib.dir" value="${basedir}/../LinkSmartWSProvider/lib" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
 	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
+	
+
+	<path id="axis.classpath">
+		<fileset dir="${axis1.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+		<mkdir dir="${src.dir}" />
+	</target>
+
+	<target name="make-axis" depends="init">
+		<taskdef resource="axis-tasks.properties" classpathref="axis.classpath" />
+		<axis-wsdl2java output="${src.dir}" testcase="false" verbose="true" skeletondeploy="true" helpergen="true" url="${wsdl}">
+			<mapping namespace="http://axis.apache.org/ns/interop" package="interop" />
+		</axis-wsdl2java>
+	</target>
 
 	<!-- paths -->
 
@@ -64,17 +50,6 @@
 		<pathelement path="${build.dir}" />
 	</path>
 
-	<path id="test-classpath">
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="${targetPlatform.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-		<pathelement path="${build.dir}" />
-		<pathelement path="${test.build.dir}" />
-	</path>
-
 	<!-- targets -->
 
 	<!-- default target fails -->
@@ -85,7 +60,7 @@
 	<!-- set up local build environment -->
 	<target name="setup-local">
 		<echo message="Setting up local build environment" />
-		<property name="antlib.dir" value="${basedir}/../antlibs" />
+		<property name="antlib.dir" value="${basedir}/../../antlibs" />
 		<path id="antlib.path">
 			<fileset dir="${antlib.dir}" includes="*.jar" />
 		</path>
@@ -96,12 +71,6 @@
 	<target name="make-local" depends="setup-local">
 		<echo message="Calling make locally" />
 		<antcall target="make" />
-	</target>
-
-	<!-- local test -->
-	<target name="test-local" depends="setup-local">
-		<echo message="Calling test locally" />
-		<antcall target="test" />
 	</target>
 
 	<!-- set up build environment -->
@@ -147,12 +116,6 @@
 		<echo message="Published as: ${rootDistributionDir}/${moduleName}-${revision}.jar" />
 	</target>
 
-	<!-- test -->
-	<target name="test" depends="make">
-		<echo message="Testing" />
-		<mkdir dir="${test.build.dir}" />
-	</target>
-
 	<!-- clean -->
 	<target name="clean">
 		<echo message="Cleaning" />
@@ -161,8 +124,6 @@
 		<!-- files in distribution directory -->
 		<delete dir="${dist.dir}" includeEmptyDirs="true" failonerror="false" />
 		<delete file="${rootDistributionDir}/${moduleName}-${revision}.jar" failonerror="false" />
-		<!-- files in test directory -->
-		<delete dir="${test.build.dir}" includeEmptyDirs="true" failonerror="false" />
 	</target>
 
 </project>
