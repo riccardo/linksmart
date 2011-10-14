@@ -11,5 +11,8 @@
 	<classpathentry kind="lib" path="lib/com.springsource.org.jmock-2.4.0.jar"/>
 	<classpathentry kind="lib" path="lib/com.springsource.org.objenesis-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="C:/Work/LinkSmart/components/target_platform/org.eclipse.osgi-3.6.2.jar"/>
+	<classpathentry kind="lib" path="C:/Work/LinkSmart/components/target_platform/org.eclipse.osgi.services-3.2.100.jar"/>
+	<classpathentry kind="lib" path="C:/Work/LinkSmart/components/target_platform/com.springsource.javax.servlet-2.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -105,6 +105,42 @@ public class HIDManagerApplicationTest {
     }
     
     @Test
+    public void testGetHostHIDsByAttributes() {
+    	PeerID peerid = context.mock(PeerID.class);
+    	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
+    	hidmanagerapplication.setJXTAID(peerid, "3.2.1.0", "Test description", "localhost", "127.0.0.1", "8888", false);
+    	
+    	Properties props1 = new Properties();
+    	props1.put("pr1", "10");
+    	props1.put("pr2", "11");
+    	
+    	HID hid1 = hidmanagerapplication.createHID(999, 3, "TestService", "http://localhost:8082/axis/services/TestService", props1);
+    	
+    	Properties props2 = new Properties();
+    	props2.put("pr1", "12");
+    	props2.put("pr2", "13");
+    	
+    	HID hid2 = hidmanagerapplication.createHID(999, 3, "TestService", "http://localhost:8082/axis/services/TestService", props2);
+    	
+    	Vector<String> hids1 = hidmanagerapplication.getHostHIDbyAttributes("((pr1==10)&&(pr2==11))", 10);
+    	assertEquals(1, hids1.size());
+    	assertTrue(hids1.contains(hid1.toString()));
+    	
+    	Vector<String> hids2 = hidmanagerapplication.getHostHIDbyAttributes("((pr1==10)||(pr1==12))", 10);
+    	assertEquals(2, hids2.size());
+    	assertTrue(hids2.contains(hid1.toString()));
+    	assertTrue(hids2.contains(hid2.toString()));
+    	
+    	Vector<String> hids3 = hidmanagerapplication.getHostHIDbyAttributes("(pr1==*0)", 10);
+    	assertEquals(1, hids3.size());
+    	assertTrue(hids3.contains(hid1.toString()));
+    	
+    	Vector<String> hids4 = hidmanagerapplication.getHostHIDbyAttributes("(pr2!=13)", 10);
+    	assertEquals(1, hids4.size());
+    	assertTrue(hids4.contains(hid1.toString()));
+    }
+    
+    @Test
     public void testGetHIDByDescriptionWithWildcard() {
     	PeerID peerid = context.mock(PeerID.class);
     	HIDManagerApplication hidmanagerapplication = new HIDManagerApplication(nm);
