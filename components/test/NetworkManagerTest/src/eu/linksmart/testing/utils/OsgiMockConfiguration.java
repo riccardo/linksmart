@@ -190,6 +190,9 @@ public class OsgiMockConfiguration {
 			will(returnValue("true"));
 			((Dictionary)allowing(configProps)).get(with(equal("Security.Access.DefaultDeny")));
 			will(returnValue("false"));
+			
+			((Dictionary)allowing(configProps)).get(with(equal("Network.CommunicationType")));
+			will(returnValue("P2P"));
 		}});
 	}
 

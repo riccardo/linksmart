@@ -57,5 +57,24 @@ public class NetworkManagerApplicationSoapBindingImplTest {
     	OsgiMockConfiguration osgiMock = OsgiMockConfiguration.getMinimalConfiguratoin(context);
     	
     	impl.activate(osgiMock.getComponentContext());
+    	impl.stop();
     }
+    
+    /*@Test
+    public void TestOpenSession() throws IOException, ServletException, NamespaceException {
+    	NetworkManagerApplicationSoapBindingImpl impl = new NetworkManagerApplicationSoapBindingImpl();
+    	
+    	OsgiMockConfiguration osgiMock = OsgiMockConfiguration.getMinimalConfiguratoin(context);
+    	
+    	impl.activate(osgiMock.getComponentContext());
+    	String sourceHID = impl.createHID();
+    	String destHID = impl.createHID();
+    	
+    	String sessionID = impl.openSession(sourceHID, destHID);
+    	assertNotNull(sessionID);
+    	
+    	impl.closeSession(sessionID);
+
+    	impl.stop();
+    }*/
 }
