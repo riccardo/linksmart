@@ -33,6 +33,7 @@
 
 package eu.linksmart.wsprovider.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Dictionary;
@@ -55,6 +56,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 
+import eu.linksmart.security.communication.core.SecurityLibrary;
+import eu.linksmart.security.communication.core.impl.SecurityLibraryImpl;
 import eu.linksmart.wsprovider.AxisAdmin;
 import eu.linksmart.wsprovider.servlet.ServletDescriptor;
 import eu.linksmart.wsprovider.servlet.WebApp;
@@ -65,18 +68,19 @@ import eu.linksmart.wsprovider.servlet.WebAppDescriptor;
  * Activator class
  */
 public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
-	
+
 	public static BundleContext context = null;
 	public Logger log = Logger.getLogger(Activator.class.getName());
 	private static AxisServer axisServer = null;
 	private WebApp webApp = null;
 	private ServiceTracker registrationTracker;
 	public static Dictionary configuration;
-	
+
 	private boolean activated = false;
 	private WSProviderConfigurator configurator;
-	
-    public Map exportedServices = new HashMap();
+	private SecurityLibrary securityLib = null;
+
+	public Map exportedServices = new HashMap();
 
 	/**
 	 * Gets the axis server
@@ -85,7 +89,7 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 	public static AxisServer getAxisServer() {
 		return axisServer;
 	}
-	
+
 	/**
 	 * Activate method
 	 * 
@@ -93,9 +97,9 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 	 */
 	protected void activate(ComponentContext context) {
 		this.context = context.getBundleContext();
-		
+
 		configurator = new WSProviderConfigurator(context.getBundleContext());
-		
+
 		try {
 			init();
 		} catch (Exception e) {
@@ -103,42 +107,48 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		/* Register as Managed Service to receive configuration modifications. */
 		configurator.registerConfiguration();
-		
+
+		//create core security and initialize with config if needed
+		int secConfig = Integer.parseInt(configurator.get(WSProviderConfigurator.CORE_SECURITY_CONFIG));
+		securityLib = SecurityLibraryImpl.getInstance();
+		securityLib.setConfiguration(Short.parseShort((String) 
+				configurator.get(WSProviderConfigurator.CORE_SECURITY_CONFIG)));
+
 		activated  = true;
 	}
-	
+
 	/**
 	 * Init method
 	 */
 	private void init() throws Exception {
 		ClassUtils.setDefaultClassLoader(this.getClass().getClassLoader());
-		
+
 		URL url = this.getClass().getResource("/resources/axis/server-config.wsdd");
 		InputStream is = url.openStream();
-		
+
 		EngineConfiguration fromBundleResource = new FileProvider(is);
-		
+
 		log.info("Configuration file read.");
 		axisServer = new AxisServer(fromBundleResource);
 		log.info("Axis server started.");
 		webApp = new WebApp(getWebAppDescriptor());
 		webApp.start(context);
 		log.info("Web application started.");
-		
+
 		try {
 			/* Get the tracker for any registered service that have the WS property. */
 			registrationTracker = new ServiceTracker(context, context.createFilter(
-				"(&(objectClass=*)(" + AxisAdmin.SOAP_SERVICE_NAME + "=*))"), this);
+					"(&(objectClass=*)(" + AxisAdmin.SOAP_SERVICE_NAME + "=*))"), this);
 		} catch (InvalidSyntaxException e) {
 			e.printStackTrace();
 		}
-		
+
 		registrationTracker.open();
 	}
-	
+
 	/**
 	 * Deactivate method
 	 * 
@@ -153,7 +163,7 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 			axisServer = null;
 
 			configurator.stop();
-			
+
 			log = null;
 		} catch (Exception e) {
 			log.error("Exception when stopping bundle", e);
@@ -168,13 +178,13 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 	 */
 	private WebAppDescriptor getWebAppDescriptor() {
 		WebAppDescriptor wad = new WebAppDescriptor();
-		
+
 		wad.servlet = new ServletDescriptor[1];
 		wad.context = "/axis";
 		wad.servlet[0] = new ServletDescriptor("/services", new ServicesServlet());
 		return wad;
 	}
-	
+
 	/**
 	 * A service is being added to the <code>ServiceTracker</code>.
 	 * 
@@ -193,39 +203,39 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 	 *         service or <code>null</code> if the specified referenced service
 	 *         should not be tracked.
 	 */
-    public Object addingService(ServiceReference reference) {
-    	String serviceName = 
-    		(String) reference.getProperty(AxisAdmin.SOAP_SERVICE_NAME);
-    	String[] classes = 
-    		(String[]) reference.getProperty(Constants.OBJECTCLASS);
-    	String allowedMethods = 
-    		(String) reference.getProperty(AxisAdmin.SOAP_SERVICE_METHODS);
-    	String security = 
-    		(String) reference.getProperty(AxisAdmin.CORE_LINK_SMART_CONFIG);
-    	
-    	if (serviceName != null) {
-    		log.info("Added service: "+serviceName);
-    		
-    		/* Throws exception if name is invalid. */
-    		assertServiceName(serviceName);
-    		Object serviceObj = context.getService(reference);	
+	public Object addingService(ServiceReference reference) {
+		String serviceName = 
+			(String) reference.getProperty(AxisAdmin.SOAP_SERVICE_NAME);
+		String[] classes = 
+			(String[]) reference.getProperty(Constants.OBJECTCLASS);
+		String allowedMethods = 
+			(String) reference.getProperty(AxisAdmin.SOAP_SERVICE_METHODS);
+		String security = 
+			(String) reference.getProperty(AxisAdmin.CORE_LINK_SMART_CONFIG);
 
-    		/* By default, the service is configured to have CoreSecurity. */
-    		boolean coreSecurity = true;
-    		if (security != null) {
-    			coreSecurity = Boolean.parseBoolean(security);
-    		}
-    		
-    		ObjectSOAPService soapService =
-    			new ObjectSOAPService(axisServer, serviceName, serviceObj, classes,
-    				allowedMethods, coreSecurity);
-    		
-    		soapService.deploy();
-    		exportedServices.put(reference, soapService);
-    	}
-    	return context.getService(reference);
-    }
-    
+		if (serviceName != null) {
+			log.info("Added service: "+serviceName);
+
+			/* Throws exception if name is invalid. */
+			assertServiceName(serviceName);
+			Object serviceObj = context.getService(reference);	
+
+			/* By default, the service is configured to have CoreSecurity. */
+			boolean coreSecurity = true;
+			if (security != null) {
+				coreSecurity = Boolean.parseBoolean(security);
+			}
+
+			ObjectSOAPService soapService =
+				new ObjectSOAPService(axisServer, serviceName, serviceObj, classes,
+						allowedMethods, coreSecurity);
+
+			soapService.deploy();
+			exportedServices.put(reference, soapService);
+		}
+		return context.getService(reference);
+	}
+
 	/**
 	 * A service tracked by the <code>ServiceTracker</code> has been modified.
 	 * 
@@ -236,11 +246,11 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 	 * @param reference The reference to the service that has been modified.
 	 * @param service The service object for the specified referenced service.
 	 */
-    public void modifiedService(ServiceReference reference, Object service) {
-    	/* The service properties have been modified. Do nothing. */
-    	log.error("Modified service. I will do nothing!");
-    }
-    
+	public void modifiedService(ServiceReference reference, Object service) {
+		/* The service properties have been modified. Do nothing. */
+		log.error("Modified service. I will do nothing!");
+	}
+
 	/**
 	 * A service tracked by the <code>ServiceTracker</code> has been removed.
 	 * 
@@ -251,83 +261,83 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 	 * @param reference The reference to the service that has been removed.
 	 * @param service The service object for the specified referenced service.
 	 */
-    public void removedService(ServiceReference reference, Object service) {
-    	String serviceName = 
-    		(String) reference.getProperty(AxisAdmin.SOAP_SERVICE_NAME);
-    	
-    	if (serviceName != null) {
-    		
-    		ObjectSOAPService soapService = 
-    			(ObjectSOAPService) exportedServices.get(reference);
-    		
-    		if(soapService != null) {
-    			soapService.undeploy();
-    			log.info("removed service " + serviceName);
-    			exportedServices.remove(reference);
-    		}
+	public void removedService(ServiceReference reference, Object service) {
+		String serviceName = 
+			(String) reference.getProperty(AxisAdmin.SOAP_SERVICE_NAME);
+
+		if (serviceName != null) {
+
+			ObjectSOAPService soapService = 
+				(ObjectSOAPService) exportedServices.get(reference);
+
+			if(soapService != null) {
+				soapService.undeploy();
+				log.info("removed service " + serviceName);
+				exportedServices.remove(reference);
+			}
 		}
-    }
+	}
 
-    /**
-     * Check if service name is OK for publishing as SOAP service.
-     * This included checking for previous registrations at the same name.
-     * 
-     * @param serviceName the service name to check
-     * @throws IllegalArgumentException if name is not valid
-     */
-    public void assertServiceName(String serviceName) {
-    	if(serviceName == null) {
-    		throw new IllegalArgumentException("Service name cannot be null");
-    	}
-    	
-    	if("".equals(serviceName)) {
-    		throw new IllegalArgumentException("Service name cannot be empty string");
-    	}
-    	
-    	for(int i = 0; i < serviceName.length(); i++) {
-    		if(Character.isWhitespace(serviceName.charAt(i))) {
-    			throw new IllegalArgumentException("Service name '" + serviceName 
-    				+ "' cannot contain whitespace");
-    		}
-    	}
-    	
-    	synchronized(exportedServices) {
-    		for(Iterator it = exportedServices.keySet().iterator(); it.hasNext();) {
-    			ServiceReference sr = (ServiceReference) it.next();
-    			String name = (String) sr.getProperty(AxisAdmin.SOAP_SERVICE_NAME);
-    			
-    			if(name.equals(serviceName)) {
-    				throw new IllegalArgumentException("Service '" + name
-    					+ "' is already exported");
-    			}
-    		}
-    	}
-    }
+	/**
+	 * Check if service name is OK for publishing as SOAP service.
+	 * This included checking for previous registrations at the same name.
+	 * 
+	 * @param serviceName the service name to check
+	 * @throws IllegalArgumentException if name is not valid
+	 */
+	public void assertServiceName(String serviceName) {
+		if(serviceName == null) {
+			throw new IllegalArgumentException("Service name cannot be null");
+		}
 
-    /**
-     * Gets the currently published service names.
-     * 
-     * @return the published service names
-     */
-    public String[] getPublishedServiceNames() {
-    	synchronized(exportedServices) {
-    		try {
-    			String[] sa = new String[exportedServices.size()];
-    			
-    			int i = 0;
-    			for(Iterator it = exportedServices.keySet().iterator(); it.hasNext();) {
-    				ServiceReference sr = (ServiceReference) it.next();
-    				String name = (String) sr.getProperty(AxisAdmin.SOAP_SERVICE_NAME);
-    				sa[i++] = name;
-    			}
-    			
-    			return sa;
-    		} catch (RuntimeException e) {
-    			e.printStackTrace();
-    			throw e;
-    		}
-    	}
-    }
+		if("".equals(serviceName)) {
+			throw new IllegalArgumentException("Service name cannot be empty string");
+		}
+
+		for(int i = 0; i < serviceName.length(); i++) {
+			if(Character.isWhitespace(serviceName.charAt(i))) {
+				throw new IllegalArgumentException("Service name '" + serviceName 
+						+ "' cannot contain whitespace");
+			}
+		}
+
+		synchronized(exportedServices) {
+			for(Iterator it = exportedServices.keySet().iterator(); it.hasNext();) {
+				ServiceReference sr = (ServiceReference) it.next();
+				String name = (String) sr.getProperty(AxisAdmin.SOAP_SERVICE_NAME);
+
+				if(name.equals(serviceName)) {
+					throw new IllegalArgumentException("Service '" + name
+							+ "' is already exported");
+				}
+			}
+		}
+	}
+
+	/**
+	 * Gets the currently published service names.
+	 * 
+	 * @return the published service names
+	 */
+	public String[] getPublishedServiceNames() {
+		synchronized(exportedServices) {
+			try {
+				String[] sa = new String[exportedServices.size()];
+
+				int i = 0;
+				for(Iterator it = exportedServices.keySet().iterator(); it.hasNext();) {
+					ServiceReference sr = (ServiceReference) it.next();
+					String name = (String) sr.getProperty(AxisAdmin.SOAP_SERVICE_NAME);
+					sa[i++] = name;
+				}
+
+				return sa;
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				throw e;
+			}
+		}
+	}
 
 	/**
 	 * Sets the Configuration Admin, thats is a service for administer 
@@ -335,15 +345,15 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 	 * 
 	 * @param cm the configuration admin
 	 */
-    protected void bindConfiguration(ConfigurationAdmin cm) {
-    	if (configurator != null) {
-    		configurator.bindConfigurationAdmin(cm);
-    		if (activated) {
-    			configurator.registerConfiguration();
-    		}
-    	}
-    }
-    
+	protected void bindConfiguration(ConfigurationAdmin cm) {
+		if (configurator != null) {
+			configurator.bindConfigurationAdmin(cm);
+			if (activated) {
+				configurator.registerConfiguration();
+			}
+		}
+	}
+
 	/**
 	 * Unsets the Configuration Admin.
 	 * 

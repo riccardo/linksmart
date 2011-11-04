@@ -33,6 +33,7 @@
 
 package eu.linksmart.wsprovider.impl;
 
+import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -49,11 +50,11 @@ import eu.linksmart.utils.Configurator;
  * Class that implements the Configurator of the Service Provider 
  */
 public class WSProviderConfigurator extends Configurator {
-	
+
 	public final static String CMPID = "eu.linksmart.security.core";
 	public final static String CORE_SECURITY_CONFIG = "linksmart.security.core.config";
 	public final static String CONFIGURATION_FILE = "/resources/WS.properties";
-	
+
 	/**
 	 * Constructor
 	 * 
@@ -61,9 +62,9 @@ public class WSProviderConfigurator extends Configurator {
 	 */
 	public WSProviderConfigurator(BundleContext context) {
 		super(context, Logger.getLogger(WSProviderConfigurator.class.getName()),
-			CMPID, CONFIGURATION_FILE);
+				CMPID, CONFIGURATION_FILE);
 	}
-	
+
 	/**
 	 * Apply the configuration changes
 	 * 
@@ -72,33 +73,11 @@ public class WSProviderConfigurator extends Configurator {
 	@Override
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(CORE_SECURITY_CONFIG)) {
-			try {
-				logger.info("Switching Core Security level to "
-					+ updates.get(CORE_SECURITY_CONFIG));
-				
-				SecurityLibraryImpl securityLib = 
-					new SecurityLibraryImpl(Short.parseShort((String) 
-						updates.get(CORE_SECURITY_CONFIG)));
-				
-				CoreSecurityRequestHandler.securityLib = securityLib;
-				CoreSecurityResponseHandler.securityLib = securityLib;
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
+
+			logger.info("Switching Core Security level to " + updates.get(CORE_SECURITY_CONFIG));
+
+			SecurityLibraryImpl.getInstance().setConfiguration(Short.parseShort((String) 
+					updates.get(CORE_SECURITY_CONFIG)));
 		}
 	}
-	
-	/**
-	 * Loads the default configuration
-	 * 
-	 * @return the default configuration loaded
-	 */
-	//commenting out because implemented via properties file
-	/*@Override
-	public Dictionary loadDefaults() {
-		Hashtable h = new Hashtable();
-		h.put(CORE_SECURITY_CONFIG, Short.toString(SecurityLibrary.CONF_ENC));
-		return h;
-	}*/
-
 }

@@ -34,18 +34,25 @@
 package eu.linksmart.security.axis;
 
 import java.io.ByteArrayInputStream;
+import java.util.Iterator;
 
+import javax.xml.soap.Name;
 import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPHeaderElement;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
+import org.apache.axis.Constants;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
+import eu.linksmart.security.communication.VerificationFailureException;
 import eu.linksmart.security.communication.core.SecurityLibrary;
 import eu.linksmart.security.communication.core.impl.SecurityLibraryImpl;
+import eu.linksmart.security.communication.utils.CookieProvider;
 import eu.linksmart.wsprovider.impl.Activator;
 import eu.linksmart.wsprovider.impl.WSProviderConfigurator;
 
@@ -56,32 +63,27 @@ import eu.linksmart.wsprovider.impl.WSProviderConfigurator;
  * @author Julian Schuette
  */
 public class CoreSecurityRequestHandler extends BasicHandler {
-	
+
+
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = 
 		Logger.getLogger(CoreSecurityRequestHandler.class.getName());
-	
-	public static SecurityLibrary securityLib;
+
+	public static SecurityLibrary securityLib = null;
 	public static final String COREPROTECTION_STRING = "coreProtection";
 	public static final String YES_STRING = "yes";
 	public static final String UTF8_STRING = "UTF-8";
-	
+
 	// Pre-load the security library
 	static {
-		try {
-			logger.debug("Initialising Core Security Request Handler");
-			if (Activator.configuration!=null) 
-				securityLib = new SecurityLibraryImpl(
-					Short.parseShort((String) Activator.configuration.get(
-						WSProviderConfigurator.CORE_SECURITY_CONFIG)));
-			else {
-				securityLib = new SecurityLibraryImpl(SecurityLibrary.CONF_ENC);
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
+		logger.debug("Initialising Core Security Request Handler");
+		securityLib = SecurityLibraryImpl.getInstance();
+
+		if (Activator.configuration!=null) {
+			securityLib.setConfiguration(Short.parseShort((String) Activator.configuration.get(
+					WSProviderConfigurator.CORE_SECURITY_CONFIG)));	}
 	}
-	
+
 	/**
 	 * Constructor
 	 */
@@ -110,47 +112,72 @@ public class CoreSecurityRequestHandler extends BasicHandler {
 
 			if (msgContext.isClient()) {
 				if (securityLib.getConfig() != securityLib.CONF_NULL) {
-					String protectedBody = 
-						securityLib.protectCoreMessage(msg.getSOAPBody().toString());
+					if(AxisWorkarounds.isLocalCall(msgContext, true)){
+						//create cookie header field
+						Name name = msg.getSOAPEnvelope().createName(
+								CookieProvider.COOKIE_PROPERTY_NAME, 
+								CookieProvider.COOKIE_PREFIX, 
+								SecurityLibrary.CORE_SECURITY_NAMESPACE);
+						SOAPHeaderElement cookieElement = msg.getSOAPHeader().addHeaderElement(name);
+						cookieElement.addTextNode(securityLib.getCookie());
+					}else{
+						String protectedBody = 
+							securityLib.protectCoreMessage(msg.getSOAPBody().toString());
 
-					// Convert string result to XML document
-					javax.xml.parsers.DocumentBuilderFactory dbf = 
-						javax.xml.parsers.DocumentBuilderFactory.newInstance();
-					dbf.setNamespaceAware(securityLib.getConfig() 
-						== SecurityLibrary.CONF_ENC_SIG);
-					javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-					ByteArrayInputStream bis = new ByteArrayInputStream(
-						protectedBody.getBytes());
-					logger.debug("Protecting the outgoing core request: "
-						+ msg.getSOAPEnvelope().getAsString());
-					Document document = db.parse(bis);
-					msg.getSOAPBody().removeContents();
-					msg.getSOAPBody().addDocument(document);
-					msgContext.setCurrentMessage(msg);
-					msgContext.setProperty(COREPROTECTION_STRING, YES_STRING);
-					logger.info("Protected the outgoing core request to " + serviceName);
+						// Convert string result to XML document
+						javax.xml.parsers.DocumentBuilderFactory dbf = 
+							javax.xml.parsers.DocumentBuilderFactory.newInstance();
+						/*when not using core security there are no elements which are from other namespace
+						 * when using core security with signatures than namespaces would destroy the digest value
+						 */
+						dbf.setNamespaceAware(securityLib.getConfig()== SecurityLibrary.CONF_ENC);
+						javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
+						ByteArrayInputStream bis = new ByteArrayInputStream(
+								protectedBody.getBytes());
+						logger.debug("Protecting the outgoing core request: "
+								+ msg.getSOAPEnvelope().getAsString());
+						Document document = db.parse(bis);
+						msg.getSOAPBody().removeContents();
+						msg.getSOAPBody().addDocument(document);
+						msgContext.setCurrentMessage(msg);
+						msgContext.setProperty(COREPROTECTION_STRING, YES_STRING);
+						logger.debug("Protected the outgoing core request to " + serviceName);
+					}
 				}
-				
+
 				logger.debug("Outgoing message body is " 
-					+ msgContext.getCurrentMessage().getSOAPEnvelope().getBody() + "\n");
+						+ msgContext.getCurrentMessage().getSOAPEnvelope().getBody() + "\n");
 			}
 			else {
 				logger.debug("Server request handler for call to service " 
-					+ msgContext.getTargetService());
+						+ msgContext.getTargetService());
 
 				String textContent = msg.getSOAPBody().getFirstChild().toString();
-				if (securityLib.isValidCoreMessage(textContent) 
-						|| securityLib.isValidCoreSigMessage(textContent)) {
-					
+
+				//check wether message has to be opened or dropped
+				boolean msgEnc = securityLib.isValidCoreMessage(textContent);
+				boolean msgMac = securityLib.isValidCoreMacMessage(textContent);
+				short secConfig = securityLib.getConfig();
+				/* accept if no security required but present
+				 * or message has the required amount of security
+				 */
+				if ( secConfig == SecurityLibrary.CONF_NULL && (msgEnc || msgMac)
+						|| secConfig == SecurityLibrary.CONF_ENC && (msgEnc || msgMac)
+						|| (secConfig == SecurityLibrary.CONF_ENC_SIG || secConfig == SecurityLibrary.CONF_ENC_SIG_SPORADIC)
+						&& msgMac) {
+
 					// Retrieve plain text from the message
 					String unprotectedContent = 
 						securityLib.unprotectCoreMessage(textContent);
 					javax.xml.parsers.DocumentBuilderFactory dbf = 
 						javax.xml.parsers.DocumentBuilderFactory.newInstance();
+					/*when not using core security there are no elements which are from other namespace
+					 * when using core security with signatures than namespaces would destroy the digest value
+					 */
 					dbf.setNamespaceAware(securityLib.getConfig()== SecurityLibrary.CONF_ENC);
 					javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
 					ByteArrayInputStream bis = new ByteArrayInputStream(
-						unprotectedContent.getBytes(UTF8_STRING));
+							unprotectedContent.getBytes(UTF8_STRING));
 					Document document = db.parse(bis);
 
 					// Remove old body
@@ -159,10 +186,10 @@ public class CoreSecurityRequestHandler extends BasicHandler {
 
 					Document xmlDocument2 = db.newDocument();
 					xmlDocument2.appendChild(xmlDocument2.importNode(
-						document.getDocumentElement().getElementsByTagName("*").item(0), true));
+							document.getDocumentElement().getElementsByTagName("*").item(0), true));
 
 					newBody.addNamespaceDeclaration("soapenv", 
-						"http://schemas.xmlsoap.org/soap/envelope/");
+					"http://schemas.xmlsoap.org/soap/envelope/");
 					newBody.addDocument(xmlDocument2);
 
 					// Remember that the requester is able to speak "Core LinkSmart security"
@@ -170,20 +197,39 @@ public class CoreSecurityRequestHandler extends BasicHandler {
 
 					// getSOAPPartAsString has to be called here to avoid an
 					// Exception. This is an Axis bug.
-					logger.info("Decrypted incoming request message: " 
-						+ msgContext.getCurrentMessage().getSOAPPartAsString());
+					logger.debug("Decrypted incoming request message: " 
+							+ msgContext.getCurrentMessage().getSOAPPartAsString());
 				}
-				else {
-					// The request was in plain text, so remember to answer in
-					// plain text as well.
-					msgContext.setProperty(COREPROTECTION_STRING, "no");
-					logger.debug("Is not a valid protected request message. I'll leave it as it is.");
+				else if(secConfig != SecurityLibrary.CONF_NULL && AxisWorkarounds.isLocalCall(msgContext, false)){
+
+					SOAPHeader header = msg.getSOAPHeader();
+					Iterator<SOAPHeaderElement> hit = (Iterator<SOAPHeaderElement>)header.examineAllHeaderElements();
+					boolean valid = false;
+					while(hit.hasNext()){
+						SOAPHeaderElement el = hit.next();
+						if(el.getNodeName().equals(CookieProvider.COOKIE_PREFIX + ":" + CookieProvider.COOKIE_PROPERTY_NAME)){
+							if(securityLib.checkCookie(el.getFirstChild().getNodeValue())){
+								valid = true;
+							}
+							break;
+						}
+					}
+					if(!valid){
+						//drop message because shows to be localhost but does not have valid cookie
+						logger.warn("Received local message with invalid cookie!");
+						throw new VerificationFailureException("Not valid message.");
+					}
+				}
+				else if(secConfig != SecurityLibrary.CONF_NULL){
+					//drop message because security is required but not provided
+					logger.warn("Received not protected message from: " + msgContext.getProperty(Constants.MC_REMOTE_ADDR));
+					throw new VerificationFailureException("Not valid message.");
 				}
 			}
 
 			logger.debug("===== Stop trace message in request handler =====");
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			throw AxisFault.makeFault(e);
 		}
 	}
 
@@ -192,5 +238,5 @@ public class CoreSecurityRequestHandler extends BasicHandler {
 	 * @param msgContext the message context
 	 */
 	public void undo(MessageContext msgContext) { }
-	
+
 }

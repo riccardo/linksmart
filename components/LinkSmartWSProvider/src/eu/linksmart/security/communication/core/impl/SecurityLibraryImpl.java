@@ -15,28 +15,23 @@
 package eu.linksmart.security.communication.core.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
+import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Random;
 
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESedeKeySpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -46,10 +41,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
-import org.apache.xml.security.encryption.EncryptedData;
-import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Base64;
@@ -65,8 +57,9 @@ import org.w3c.dom.Text;
 import eu.linksmart.security.communication.CryptoException;
 import eu.linksmart.security.communication.VerificationFailureException;
 import eu.linksmart.security.communication.core.SecurityLibrary;
-import eu.linksmart.security.communication.utils.NonceGenerator;
-import eu.linksmart.security.communication.utils.impl.NonceGeneratorFactory;
+import eu.linksmart.security.communication.utils.CookieProvider;
+import eu.linksmart.security.communication.utils.impl.CookieProviderImpl;
+import eu.linksmart.security.communication.utils.impl.JarUtil;
 
 /**
  * This class implements the <code>SecurityLibrary</code> interface.
@@ -76,23 +69,47 @@ import eu.linksmart.security.communication.utils.impl.NonceGeneratorFactory;
  */
 public class SecurityLibraryImpl implements SecurityLibrary {
 
-	private String KEY_ENCRYPTION_KEY_FILE;
 	private static Logger logger = Logger.getLogger(SecurityLibraryImpl.class.getName());
+	private static SecurityLibrary instance = null;
+
+	private String DATA_FOLDER;
 	private String KEYSTORE_PASS;
 	private String KEYSTORE_FILE;
 	private String KEYSTORE_TYPE;
-	private String CORE_KEY_ALIAS;
-	private String CORE_KEY_PASS;
-	private String PRIVATE_SIGNING_KEY_ALIAS;
-	private NonceGenerator nonceGenerator = null;
-	private String lastNonce = "";
-	private short config;
-	private String PRIVATE_SIGNING_KEY_PASS;
-	private SecretKey privateKey; // For caching my private key
-	private SecretKey secretKey; // For caching my secret key
-	private PrivateKey signingKey; // For caching my secret key
-	private X509Certificate signingCert; // For caching my signature certificate
+	private String CORE_ENC_KEY_ALIAS;
+	private String CORE_ENC_KEY_PASS;
+	private String MAC_KEY_ALIAS;
+	private String MAC_KEY_PASS;
+
+	private short config = -1;
+	private SecretKey macKey; // For caching my mac key
+	private SecretKey encKey; // For caching my enc key
 	private Properties settings;
+	private Random rand = null;
+	private CookieProvider cookieProv = null;
+
+	static {
+		/*
+		 * We are using the bouncycastle crypto provider (Sun's provider might
+		 * not be available on PS3).
+		 */
+		Security.addProvider(new BouncyCastleProvider());
+		org.apache.xml.security.Init.init();
+	}
+
+	public static synchronized SecurityLibrary getInstance(){
+		if(instance == null){
+			try{
+				instance = new SecurityLibraryImpl();
+			}catch(IOException e){
+				logger.error("Cannot initialize core security!", e);
+				RuntimeException re = new RuntimeException();
+				re.initCause(e);
+				throw re;
+			}
+		}
+		return instance;
+	}
 
 	public void setConfiguration(short config) {
 		this.config = config;
@@ -105,53 +122,37 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 	 * The settings can be configured in the file
 	 * <code>settings.properties</code>.
 	 * 
-	 * @throws FileNotFoundException
 	 * @throws IOException
-	 * @throws CertificateException
-	 * @throws NoSuchAlgorithmException
-	 * @throws KeyStoreException
-	 * @throws UnrecoverableKeyException
 	 */
-	private void init(short config) throws FileNotFoundException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
+	private void init() throws IOException{
 		logger.debug("Loading settings for SecurityLibrary");
 		settings = new Properties();
 		logger.debug("Loading file " + "settings.properties");
 		try {
-			settings.load(this.getClass().getResourceAsStream("/settings.properties"));
+			settings.load(this.getClass().getResourceAsStream("/resources/settings.properties"));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		KEY_ENCRYPTION_KEY_FILE = settings.getProperty("kek.file", "kek");
-		KEYSTORE_FILE = settings.getProperty("keystore.file", "keystore.bks");
-		KEYSTORE_PASS = settings.getProperty("keystore.pass", "hydrademo");
+
+		DATA_FOLDER = settings.getProperty("keystore.coresecurity.deploydir", "linksmart/eu.linksmart.wsprovider") + "/data";
+		KEYSTORE_FILE = settings.getProperty("keystore.file", "linksmart.core.keystore.ks");
+		KEYSTORE_PASS = settings.getProperty("keystore.pass", "coresecurity");
 		KEYSTORE_TYPE = settings.getProperty("keystore.type", "BKS");
-		CORE_KEY_ALIAS = settings.getProperty("core.key.alias.default", "corekey");
-		CORE_KEY_PASS = settings.getProperty("core.key.pass", "hydrademo");
-		PRIVATE_SIGNING_KEY_PASS = settings.getProperty("core_sign.key.pass", "hydrademo");
-		PRIVATE_SIGNING_KEY_ALIAS = settings.getProperty("core_sign.key.alias.default", "sigkey");
-		nonceGenerator = NonceGeneratorFactory.getInstance();
-		this.config = config;
+		CORE_ENC_KEY_ALIAS = settings.getProperty("core.key.alias", "coreenckey");
+		CORE_ENC_KEY_PASS = settings.getProperty("core.key.pass", "coresecurity");
+		MAC_KEY_ALIAS = settings.getProperty("core_mac.key.alias", "coremackey");
+		MAC_KEY_PASS = settings.getProperty("core_mac.key.pass", "coresecurity");
 
-		/*
-		 * This is a dirty performance trick: The first time the keystore is
-		 * opened and keys are loaded, some singletons have to be created. That
-		 * takes ~700ms. That's why we do it here for the first time, then the
-		 * first "real" encryption won't be delayed.
-		 */
-		try {
-			loadDataEncryptionKey();
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
-	}
+		Hashtable<String, String> HashFilesExtract =
+			new Hashtable<String, String>();
+		logger.debug("Deploying core security files");
+		HashFilesExtract.put(DATA_FOLDER + "/" + KEYSTORE_FILE,
+		"data/linksmart.core.keystore.ks");
+		JarUtil.createDirectory(DATA_FOLDER);
+		JarUtil.extractFilesJar(HashFilesExtract);
 
-	static {
-		/*
-		 * We are using the bouncycastle crypto provider (Sun's provider might
-		 * not be available on PS3).
-		 */
-		Security.addProvider(new BouncyCastleProvider());
-		org.apache.xml.security.Init.init();
+		rand = new Random();
+		cookieProv = new CookieProviderImpl();
 	}
 
 	/**
@@ -161,60 +162,25 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 	 * will be thrown.
 	 * 
 	 * @throws IOException
-	 * @throws FileNotFoundException
-	 * @throws CertificateException
-	 * @throws NoSuchAlgorithmException
-	 * @throws KeyStoreException
-	 * @throws UnrecoverableKeyException
 	 */
-	public SecurityLibraryImpl() throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException,
-			CertificateException {
-		init(SecurityLibrary.CONF_ENC);
-	}
-
-	/**
-	 * Creates a new instance of the SecurityLibrary that will use the default
-	 * key alias for Core Hydra communication. If the keystore file could not be
-	 * opened or the default Core Hydra key alias is not present, an exception
-	 * will be thrown.
-	 * 
-	 * @param config
-	 *            The configuration to be used for protecting the messages. See
-	 *            constants in <code>SecurityLibrary</code>.
-	 * @throws IOException
-	 * @throws FileNotFoundException
-	 * @throws CertificateException
-	 * @throws NoSuchAlgorithmException
-	 * @throws KeyStoreException
-	 * @throws UnrecoverableKeyException
-	 */
-	public SecurityLibraryImpl(short config) throws FileNotFoundException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException,
-			CertificateException {
-		init(config);
-	}
-
-	/**
-	 * Creates a new instance of the SecurityLibrary that will use
-	 * <code>coreKeyIdentifier</code> as the alias for the Core Hydra key. If
-	 * <code>coreKeyIdentifier</code> does not exist in the keystore, an
-	 * exception will be thrown.
-	 * 
-	 * @param coreKeyIdentifier
-	 */
-	public SecurityLibraryImpl(String coreKeyIdentifier) {
-		// TODO implement SecurityLibraryImpl(String coreKeyIdentifier)
-		throw new RuntimeException("Not yet implemented");
+	private SecurityLibraryImpl() throws IOException{
+		init();
 	}
 
 	/**
 	 * @see eu.linksmart.security.communication.core.SecurityLibrary#protectCoreMessage(java.lang.String)
 	 */
 	public String protectCoreMessage(String plaintextData) throws CryptoException {
-		String result = "";
 		if (config == SecurityLibrary.CONF_NULL) {
 			logger.debug("Skipping protection. NULL config is set");
 			return plaintextData;
 		}
+		if(config == -1){
+			throw new CryptoException("Core security not yet initialized with configuration.");
+		}
+
+		String result = "";
+
 		try {
 			if (plaintextData == null) {
 				plaintextData = "";
@@ -227,14 +193,9 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:linksmart", CORE_SECURITY_NAMESPACE);
 			Element protectedElement = document.createElementNS(CORE_SECURITY_NAMESPACE, CORE_PROTECTED_ELEMENT);
 
-			String nonce = nonceGenerator.getNextNonce();
-			Element nonceElement = document.createElementNS(CORE_SECURITY_NAMESPACE, CORE_NONCE_ELEMENT);
-			nonceElement.appendChild(document.createTextNode(nonce));
-
 			Element contentElement = document.createElementNS(CORE_SECURITY_NAMESPACE, CORE_CONTENT_ELEMENT);
 			contentElement.appendChild(document.createTextNode(plaintextData));
 
-			protectedElement.appendChild(nonceElement);
 			protectedElement.appendChild(contentElement);
 			rootElement.appendChild(protectedElement);
 			document.appendChild(rootElement);
@@ -243,32 +204,15 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			 * Get a key to be used for encrypting the element. Here we are
 			 * generating an AES key.
 			 */
-			Key symmetricKey = loadDataEncryptionKey();
-
-			String algorithmURI = XMLCipher.TRIPLEDES_KeyWrap;
-
-			Key kek = loadKeyEncryptionKey();
-			XMLCipher keyCipher = XMLCipher.getInstance(algorithmURI);
-			keyCipher.init(XMLCipher.WRAP_MODE, kek);
-			EncryptedKey encryptedKey = keyCipher.encryptKey(document, symmetricKey);
+			Key symmetricKey = getDataEncryptionKey();
 
 			/*
 			 * Let us encrypt the contents of the document element.
 			 */
-
-			algorithmURI = XMLCipher.AES_192;
-
+			String algorithmURI = XMLCipher.AES_192;
 			XMLCipher xmlCipher = XMLCipher.getInstance(algorithmURI);
 			xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
 
-			/*
-			 * Uncomment these lines if a key should be embedded in the message
-			 * (not neccessary for Core Hydra)
-			 */
-			EncryptedData encryptedData = xmlCipher.getEncryptedData();
-			KeyInfo keyInfo = new KeyInfo(document);
-			keyInfo.add(encryptedKey);
-			encryptedData.setKeyInfo(keyInfo);
 			/*
 			 * doFinal - "true" below indicates that we want to encrypt
 			 * element's content and not the element itself. Also, the doFinal
@@ -290,9 +234,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			if (config == SecurityLibrary.CONF_ENC_SIG || config == SecurityLibrary.CONF_ENC_SIG_SPORADIC) {
 				result = sign(result);
 			}
-			// logger.debug("Protected Core message: " + result);
 		} catch (Exception e) {
-			e.printStackTrace();
 			CryptoException ce = new CryptoException(e.getMessage());
 			ce.initCause(e);
 			throw ce;
@@ -305,13 +247,18 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 	 * @see eu.linksmart.security.communication.core.SecurityLibrary#unprotectCoreMessage(java.lang.String)
 	 */
 	public String unprotectCoreMessage(String protectedData) throws VerificationFailureException, CryptoException {
+		if(config == -1){
+			throw new CryptoException("Core security not yet initialized with configuration.");
+		}
+
 		String result = "";
 		try {
 
-			if (!isValidCoreMessage(protectedData) && !isValidCoreSigMessage(protectedData)) {
-				throw new VerificationFailureException("Not in valid Core Hydra format.");
+			if (!isValidCoreMessage(protectedData) && !isValidCoreMacMessage(protectedData)) {
+				throw new VerificationFailureException("Not in valid Core LinkSmart format.");
 			}
-			if (config != CONF_ENC_SIG_SPORADIC && isValidCoreSigMessage(protectedData)) {
+			if (isValidCoreMacMessage(protectedData) 
+					&& ((config == CONF_ENC_SIG_SPORADIC && rand.nextInt(100) <= 25) || config == CONF_ENC_SIG)) {
 				protectedData = validate(protectedData);
 			}
 
@@ -334,7 +281,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			 * Load the key to be used for decrypting the xml data encryption
 			 * key.
 			 */
-			SecretKey kek = loadDataEncryptionKey();
+			SecretKey kek = getDataEncryptionKey();
 
 			XMLCipher xmlCipher = XMLCipher.getInstance();
 			/*
@@ -348,13 +295,6 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			 * decrypted contents in the document.
 			 */
 			xmlCipher.doFinal(document, encryptedDataElement);
-
-			// Check the nonce
-			String nonce = document.getElementsByTagName(CORE_NONCE_ELEMENT).item(0).getTextContent();
-			if (this.lastNonce.equals(nonce)) {
-				throw new VerificationFailureException("Message contained a nonce I've seen before. Maybe this was a replay attack?");
-			}
-			lastNonce = nonce;
 			result = document.getElementsByTagName(CORE_CONTENT_ELEMENT).item(0).getTextContent();
 		} catch (Exception e) {
 			// Explicitly excepting the VerificationFailureException is a bit
@@ -377,7 +317,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 	 * Loads a secret data encryption key from the keystore.
 	 * <p>
 	 * The alias of the key is given by constant
-	 * <code>PRIVATE_ENCRYPTION_KEY_ALIAS</code>.
+	 * <code>CORE_ENC_KEY_ALIAS</code>.
 	 * 
 	 * @return a private key to be used for encryption.
 	 * @throws KeyStoreException
@@ -396,86 +336,88 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 	 *             <code>PRIVATE_ENCRYPTION_KEY_PASS</code> is valid and the "<a
 	 *             href="http://java.sun.com/javase/downloads/index.jsp">JCE
 	 *             Unlimited Strength Jurisdiction Policy</a>" is in place.
+	 * @throws CryptoException 
+	 *			   If keystore does not contain alias for core encryption
 	 */
-	private SecretKey loadDataEncryptionKey() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException {
-		if (this.privateKey == null) {
-			KeyStore ks = KeyStore.getInstance(KEYSTORE_TYPE);
-			logger.debug("Loading " + this.getClass().getResource("/" + KEYSTORE_FILE));
-			InputStream fis = this.getClass().getResourceAsStream("/" + KEYSTORE_FILE);
+	private SecretKey getDataEncryptionKey() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException, Exception {
+		if (this.encKey == null) {
+			InputStream fis = null;
+			try{
+				KeyStore ks = KeyStore.getInstance(KEYSTORE_TYPE);
+				logger.debug("Loading " + DATA_FOLDER + "/" + KEYSTORE_FILE);
+				File f = new File(DATA_FOLDER + "/" + KEYSTORE_FILE);
+				fis = new FileInputStream(f);
 
-			// load the keystore
-			ks.load(fis, KEYSTORE_PASS.toCharArray());
-			if (!ks.containsAlias(CORE_KEY_ALIAS)) {
-				logger.error("Keystore does not contain alias for Core Hydra: " + CORE_KEY_ALIAS);
+				// load the keystore
+				ks.load(fis, KEYSTORE_PASS.toCharArray());
+				if (!ks.containsAlias(CORE_ENC_KEY_ALIAS)) {
+					logger.error("Keystore does not contain alias for Core Hydra: " + CORE_ENC_KEY_ALIAS);
+					throw new Exception("Keystore does not contain alias for Core LinkSmart: " + CORE_ENC_KEY_ALIAS);
+				}
+
+				logger.debug("Using password for Core key: " + (new String(CORE_ENC_KEY_PASS.toCharArray())));
+				this.encKey = (SecretKey) ks.getKey(CORE_ENC_KEY_ALIAS, (CORE_ENC_KEY_PASS).toCharArray());
+
+			}finally{
+				if(fis != null){
+					fis.close();
+				}
 			}
-
-			logger.debug("Using password for Core key: " + (new String(CORE_KEY_PASS.toCharArray())));
-			SecretKey privateKey = (SecretKey) ks.getKey(CORE_KEY_ALIAS, (CORE_KEY_PASS).toCharArray());
-
-			this.privateKey = privateKey;
 		}
-
-		return this.privateKey;
-
+		return this.encKey;
 	}
 
-	private PrivateKey loadSigningKey() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException {
-		if (this.signingKey == null) {
-			KeyStore ks = KeyStore.getInstance(KEYSTORE_TYPE);
-			logger.debug("Loading " + this.getClass().getResource("/" + KEYSTORE_FILE));
-			InputStream fis = this.getClass().getResourceAsStream("/" + KEYSTORE_FILE);
+	/**
+	 * Loads a secret MAC key from the keystore.
+	 * <p>
+	 * The alias of the key is given by constant
+	 * <code>MAC_KEY_ALIAS</code>.
+	 * 
+	 * @return a private key to be used for encryption.
+	 * @throws KeyStoreException
+	 * @throws IOException
+	 *             If an error ocurred while reading from keystore file. Is file
+	 *             <code>KEYSTORE_FILE</code> present, readable and in
+	 *             <code>KEYSTORE_TYPE</code> format?
+	 * @throws CertificateException
+	 *             Problems with a certificate occured.
+	 * @throws NoSuchAlgorithmException
+	 *             If algorithm of the key is invalid. Check if bouncycastle
+	 *             crypto provider is in place.
+	 * @throws UnrecoverableKeyException
+	 *             If the key was not found in keystore or could not be
+	 *             recovered. Check if password
+	 *             <code>PRIVATE_ENCRYPTION_KEY_PASS</code> is valid and the "<a
+	 *             href="http://java.sun.com/javase/downloads/index.jsp">JCE
+	 *             Unlimited Strength Jurisdiction Policy</a>" is in place.
+	 * @throws CryptoException 
+	 *			   If keystore does not contain alias for core encryption
+	 */
+	private SecretKey getMacKey() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException, Exception {
+		if (this.macKey == null) {
+			InputStream fis = null;
+			try{
+				KeyStore ks = KeyStore.getInstance(KEYSTORE_TYPE);
+				logger.debug("Loading " + DATA_FOLDER + "/" + KEYSTORE_FILE);
+				File f = new File(DATA_FOLDER + "/" + KEYSTORE_FILE);
+				fis = new FileInputStream(f);
 
-			// load the keystore
-			ks.load(fis, KEYSTORE_PASS.toCharArray());
-			if (!ks.containsAlias(CORE_KEY_ALIAS)) {
-				logger.error("Keystore does not contain alias for Core Hydra: " + CORE_KEY_ALIAS);
+				// load the keystore
+				ks.load(fis, KEYSTORE_PASS.toCharArray());
+				if (!ks.containsAlias(MAC_KEY_ALIAS)) {
+					logger.error("Keystore does not contain alias for Core LinkSmart: " + MAC_KEY_ALIAS);
+					throw new Exception("Keystore does not contain alias for Core LinkSmart: " + MAC_KEY_ALIAS);
+				}
+				this.macKey = (SecretKey) ks.getKey(MAC_KEY_ALIAS, MAC_KEY_PASS.toCharArray());		
+
+			}finally{
+				if(fis != null){
+					fis.close();
+				}
 			}
-
-			PrivateKey signingKey = (PrivateKey) ks.getKey(PRIVATE_SIGNING_KEY_ALIAS, PRIVATE_SIGNING_KEY_PASS.toCharArray());
-
-			this.signingKey = signingKey;
 		}
 
-		return this.signingKey;
-	}
-
-	private SecretKey loadKeyEncryptionKey() throws InvalidKeyException, FileNotFoundException, IOException, InvalidKeySpecException, NoSuchAlgorithmException {
-		if (this.secretKey == null) {
-			String jceAlgorithmName = "DESede";
-			System.out.println(this.getClass().getResource("/" + KEY_ENCRYPTION_KEY_FILE).toString());
-			InputStream is = this.getClass().getResourceAsStream("/" + KEY_ENCRYPTION_KEY_FILE);
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			int b = 0;
-			while (b != -1) {
-				b = is.read();
-				if (b != -1)
-					bos.write(b);
-			}
-
-			DESedeKeySpec keySpec = new DESedeKeySpec(bos.toByteArray());
-			SecretKeyFactory skf = SecretKeyFactory.getInstance(jceAlgorithmName);
-			SecretKey key = skf.generateSecret(keySpec);
-			this.secretKey = key;
-		}
-		return this.secretKey;
-	}
-
-	private X509Certificate loadSigningCertificate() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
-		if (this.signingCert == null) {
-			KeyStore ks = KeyStore.getInstance(KEYSTORE_TYPE);
-			logger.debug("Loading " + this.getClass().getResource("/" + KEYSTORE_FILE));
-			InputStream fis = this.getClass().getResourceAsStream("/" + KEYSTORE_FILE);
-
-			// load the keystore
-			ks.load(fis, KEYSTORE_PASS.toCharArray());
-			if (!ks.containsAlias(CORE_KEY_ALIAS)) {
-				logger.error("Keystore does not contain alias for Core Hydra: " + CORE_KEY_ALIAS);
-			}
-
-			X509Certificate cert = (X509Certificate) ks.getCertificate(PRIVATE_SIGNING_KEY_ALIAS);
-			this.signingCert = cert;
-		}
-		return this.signingCert;
+		return macKey;
 	}
 
 	/**
@@ -500,7 +442,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 
 			if (document.getElementsByTagName(CORE_PROTECTED_MESSAGE_NAME).getLength() != 1) {
 				valid = false;
-				logger.info("Input does not contain " + CORE_PROTECTED_MESSAGE_NAME);
+				logger.debug("Input does not contain " + CORE_PROTECTED_MESSAGE_NAME);
 			}
 		} catch (Exception e) {
 			valid = false;
@@ -508,7 +450,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 		return valid;
 	}
 
-	public boolean isValidCoreSigMessage(String message) {
+	public boolean isValidCoreMacMessage(String message) {
 		boolean valid = true;
 		try {
 			/*
@@ -521,12 +463,12 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			Document document = db.parse(bis);
 
 			/*
-			 * Check if it's a Hydra message
+			 * Check if it's a LinkSmart message
 			 */
 
-			if (document.getElementsByTagName(CORE_SIGNED_MESSAGE_NAME).getLength() != 1) {
+			if (document.getElementsByTagName(CORE_MAC_MESSAGE_NAME).getLength() != 1) {
 				valid = false;
-				logger.info("Input does not contain " + CORE_SIGNED_MESSAGE_NAME);
+				logger.debug("Input does not contain " + CORE_MAC_MESSAGE_NAME);
 			}
 		} catch (Exception e) {
 			valid = false;
@@ -540,7 +482,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			Constants.setSignatureSpecNSprefix("");
 			data = Base64.encode(data.getBytes());
 
-			PrivateKey signingKey = loadSigningKey();
+			SecretKey macingKey = getMacKey();
 
 			// XML Signature needs to be namespace aware
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -549,18 +491,18 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			org.w3c.dom.Document doc = db.newDocument();
 
-			Element root = doc.createElementNS(CORE_SIGNED_MESSAGE_NAMESPACE, CORE_SIGNED_MESSAGE_NAME);
-			root.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:linksmart", CORE_SIGNED_MESSAGE_NAMESPACE);
+			Element root = doc.createElementNS(CORE_MAC_MESSAGE_NAMESPACE, CORE_MAC_MESSAGE_NAME);
+			root.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:linksmart", CORE_MAC_MESSAGE_NAMESPACE);
 
 			doc.appendChild(root);
 			root.appendChild(doc.createTextNode(data));
 
 			// The BaseURI is the URI that's used to prepend to relative URIs
-			String BaseURI = CORE_SIGNED_MESSAGE_NAMESPACE + "/";
+			String BaseURI = CORE_MAC_MESSAGE_NAMESPACE + "/";
 
 			// Create an XML Signature object from the document, BaseURI and
 			// signature algorithm (in this case DSA)
-			XMLSignature sig = new XMLSignature(doc, BaseURI, XMLSignature.ALGO_ID_SIGNATURE_DSA);
+			XMLSignature sig = new XMLSignature(doc, BaseURI, XMLSignature.ALGO_ID_MAC_HMAC_SHA256);
 
 			// Append the signature element to the root element before signing
 			// because this is going to be an enveloped signature.
@@ -587,18 +529,9 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 				transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_WITH_COMMENTS);
 				// Add the above Document/Reference
 				sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
+				sig.sign(macingKey);
 			}
 
-			{
-				// Add in the KeyInfo for the certificate that we used the
-				// private
-				// key of
-				X509Certificate cert = loadSigningCertificate();
-
-				sig.addKeyInfo(cert);
-				sig.addKeyInfo(cert.getPublicKey());
-				sig.sign(signingKey);
-			}
 			// Transform DOM tree to XML string.
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer transformer = factory.newTransformer();
@@ -607,7 +540,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			StreamResult sresult = new StreamResult();
 			sresult.setOutputStream(new java.io.ByteArrayOutputStream());
 			transformer.transform(source, sresult);
-			result = (new StringBuffer()).append(sresult.getOutputStream()).toString();
+			result = new StringBuffer().append(sresult.getOutputStream()).toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 			result = "";
@@ -615,7 +548,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 		return result;
 	}
 
-	public String validate(String data) {
+	public String validate(String data) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, Exception {
 		logger.debug("Validating: \n" + data + "\n -------------------------");
 		String textResult = null;
 		boolean result = false;
@@ -640,85 +573,49 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			dbf.setAttribute("http://apache.org/xml/properties/schema/external-schemaLocation", Constants.SignatureSpecNS + " " + signatureSchemaFile);
 		}
 
-		try {
-			javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-			db.setErrorHandler(new org.apache.xml.security.utils.IgnoreAllErrorHandler());
+		javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
+		db.setErrorHandler(new org.apache.xml.security.utils.IgnoreAllErrorHandler());
 
-			if (schemaValidate) {
-				db.setEntityResolver(new org.xml.sax.EntityResolver() {
-					public org.xml.sax.InputSource resolveEntity(String publicId, String systemId) throws org.xml.sax.SAXException {
+		if (schemaValidate) {
+			db.setEntityResolver(new org.xml.sax.EntityResolver() {
+				public org.xml.sax.InputSource resolveEntity(String publicId, String systemId) throws org.xml.sax.SAXException {
 
-						if (systemId.endsWith("xmldsig-core-schema.xsd")) {
-							try {
-								return new org.xml.sax.InputSource(new FileInputStream(signatureSchemaFile));
-							} catch (FileNotFoundException ex) {
-								throw new org.xml.sax.SAXException(ex);
-							}
-						} else {
-							return null;
+					if (systemId.endsWith("xmldsig-core-schema.xsd")) {
+						try {
+							return new org.xml.sax.InputSource(new FileInputStream(signatureSchemaFile));
+						} catch (FileNotFoundException ex) {
+							throw new org.xml.sax.SAXException(ex);
 						}
-					}
-				});
-			}
-
-			// Create DOM tree from input data as XML string.
-			ByteArrayInputStream bis = new ByteArrayInputStream(data.getBytes());
-			org.w3c.dom.Document doc = db.parse(bis);
-			Element nscontext = XMLUtils.createDSctx(doc, "ds", Constants.SignatureSpecNS);
-
-			// Check for a "ds:Signature" element in the DOM tree
-			Element sigElement = (Element) XPathAPI.selectSingleNode(doc, "//ds:Signature[1]", nscontext);
-			XMLSignature signature = new XMLSignature(sigElement, CORE_SIGNED_MESSAGE_NAMESPACE);
-
-			// XMLUtils.outputDOMc14nWithComments(signature.getElement(),
-			// System.out);
-
-			// Get the KeyInfo element within the signature element.
-			KeyInfo ki = signature.getKeyInfo();
-
-			if (ki != null) {
-
-				// There should be a X509.3 certificate contained in the
-				// KeyInfo...
-				if (ki.containsX509Data()) {
-					logger.debug("Could find a X509Data element in the KeyInfo");
-				}
-				X509Certificate cert = signature.getKeyInfo().getX509Certificate();
-
-				if (cert != null) {
-					// Try to validate the signature using the contained
-					// certificate.
-					result = signature.checkSignatureValue(cert);
-					logger.debug("XML signature is " + ((result == true) ? "valid " : "invalid !!!!!"));
-				} else {
-					// If there is no certificate in the KeyInfo, the maybe a
-					// public key?
-					logger.warn("Did not find a Certificate");
-					PublicKey pk = signature.getKeyInfo().getPublicKey();
-
-					if (pk != null) {
-						// Try to validate the signature using the public key
-						result = signature.checkSignatureValue(pk);
-						logger.debug("The XML signature in file is " + ((result == true) ? "valid " : "invalid !!!!!"));
 					} else {
-						logger.debug("Did not find a public key, so I can't check the signature");
+						return null;
 					}
 				}
-			} else {
-				logger.debug("Did not find a KeyInfo");
-			}
-			/*
-			 * Decide whether Signature was valid or not
-			 */
-			if (result == true) {
-				Text textElement = (Text) XPathAPI.selectSingleNode(doc, "/hydra:CoreSignedProtectedMessage/text()");
-				textResult = new String(Base64.decode(textElement.getTextContent()));
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			});
 		}
 
+		// Create DOM tree from input data as XML string.
+		ByteArrayInputStream bis = new ByteArrayInputStream(data.getBytes());
+		org.w3c.dom.Document doc = db.parse(bis);
+		Element nscontext = XMLUtils.createDSctx(doc, "ds", Constants.SignatureSpecNS);
+
+		// Check for a "ds:Signature" element in the DOM tree
+		Element sigElement = (Element) XPathAPI.selectSingleNode(doc, "//ds:Signature[1]", nscontext);
+		XMLSignature signature = new XMLSignature(sigElement, CORE_MAC_MESSAGE_NAMESPACE);
+
+		SecretKey macingKey = getMacKey();
+		result = signature.checkSignatureValue(macingKey);
+		logger.debug("XML signature is " + ((result == true) ? "valid " : "invalid !!!!!"));
+
+		/*
+		 * Decide whether Signature was valid or not
+		 */
+		if (result == true) {
+			Text textElement = (Text) XPathAPI.selectSingleNode(doc, "/" + CORE_MAC_MESSAGE_NAME + "/text()");
+			textResult = new String(Base64.decode(textElement.getTextContent()));
+		}
+		else {
+			throw new VerificationFailureException("Not valid message.");
+		}
 		return textResult;
 	}
 
@@ -730,5 +627,15 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 	public short getConfig() {
 		return this.config;
 	}
+
+	public boolean checkCookie(String cookie) {
+		return cookieProv.checkCookie(cookie);
+	}
+
+	@Override
+	public String getCookie() {
+		return cookieProv.getCookie();
+	}
+
 
 }

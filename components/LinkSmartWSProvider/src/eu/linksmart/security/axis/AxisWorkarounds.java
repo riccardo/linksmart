@@ -33,9 +33,13 @@
 
 package eu.linksmart.security.axis;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axis.AxisFault;
+import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 
@@ -58,11 +62,11 @@ class AxisWorkarounds {
 	 * @return MessageContext
 	 */
 	protected static MessageContext fixTargetServiceSpec(MessageContext msgContext) 
-			throws AxisFault {
-		
+	throws AxisFault {
+
 		// Check if we need to apply the workaround
 		if (msgContext.getService() == null) {
-			
+
 			// First try: Get service name from Servlet path
 			String path = (String) msgContext.getProperty(
 					HTTPConstants.MC_HTTP_SERVLETPATHINFO);
@@ -75,11 +79,28 @@ class AxisWorkarounds {
 				// Second try: Get service name from wsdl port name
 				if (msgContext.containsProperty("wsdl.portName")) {
 					msgContext.setTargetService(((QName) msgContext.getProperty(
-						"wsdl.portName")).getLocalPart());
+					"wsdl.portName")).getLocalPart());
 				}
 			}
 		}
 		return msgContext;
 	}
 
+	protected static boolean isLocalCall(MessageContext msgContext, boolean isClient){
+		if(isClient){
+			//client checks service url
+			URL url;
+			try {
+				url = new URL((String)msgContext.getProperty("transport.url"));
+			} catch (MalformedURLException e) {
+				return false;
+			}
+			return url.getAuthority().startsWith("localhost") || url.getAuthority().startsWith("127.0.0.1");
+		}
+		else{
+			//server checks remote addrs
+			String addr = (String)msgContext.getProperty(Constants.MC_REMOTE_ADDR);
+			return addr.startsWith("localhost") || addr.startsWith("127.0.0.1");
+		}
+	}
 }
