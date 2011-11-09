@@ -77,4 +77,14 @@ public class SPARQLResult {
 		}
 		return out+"]";
 	}
+
+	public String toXML(){
+		String out = "<result>\n";
+		Iterator<String> i = this.binding.keySet().iterator();
+		while(i.hasNext()){
+			String key = i.next();
+			out += "  <variable name=\""+key+"\">"+value(key)+"</variable>\n";
+		}
+		return out+"</result>";
+	}
 }
