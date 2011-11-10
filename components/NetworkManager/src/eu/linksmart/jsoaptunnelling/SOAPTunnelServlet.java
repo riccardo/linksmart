@@ -74,18 +74,19 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 * @param request HttpServletRequest that encapsulates the request to the servlet 
 	 * @param response HttpServletResponse that encapsulates the response from the servlet
 	 */
+
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws IOException {
 		
 		String path = request.getPathInfo();
-		String parts[] = path.split("/", 4);
+		String parts[] = path.split("/",5);
 		if (parts.length != 4) {
 			return;
 		}
 		
 		String senderHID = parts[1];
 		String receiverHID = parts[2];
-		String url = parts[3];
+		String url = parts[3].equals("wsdl")?"?"+parts[3]:parts[3];
 		String req = request.getMethod() + " /" + url + " " + request.getProtocol() + "\r\n";
 		Enumeration headerNames = request.getHeaderNames();
 		

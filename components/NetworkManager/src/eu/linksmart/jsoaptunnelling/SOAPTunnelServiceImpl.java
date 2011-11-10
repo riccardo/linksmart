@@ -88,10 +88,14 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 				StringTokenizer token = new StringTokenizer(data, "\r\n");
 				String header = "", aux = "";
 				String dataproc = "";
+				String url = "";
 				while (token.hasMoreElements()) {
 					aux = token.nextToken();
-					
-					if (aux.toLowerCase().contains("host")) {
+					if (aux.toLowerCase().contains("get")) {
+							String parts[] = aux.toLowerCase().split(" ");
+						urlEndpoint = new URL(urlEndpoint.toString() + parts[1].replace("/", ""));
+						header = aux.replace(parts[1], urlEndpoint.getFile()) + "\r\n";
+					}else if (aux.toLowerCase().contains("host")) {
 						header = "Host: " + urlEndpoint.getHost() + ":"
 							+ urlEndpoint.getPort() + "\r\n";
 					}					
@@ -102,7 +106,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 						header = "";
 					}						
 					else {
-						header = aux + "\r\n";
+						header =  "\r\n";
 					}
 					
 					dataproc = dataproc + header;
