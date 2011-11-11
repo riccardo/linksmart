@@ -228,10 +228,19 @@ public class KeyManagerImpl implements KeyManager {
 	 * Create a random identifier and store it in the database.
 	 * 
 	 */
-	public String createKeyIdentifier() {
+	public String createAndStoreKeyIdentifier() {
 		// Identifiers in Datenbank geschrieben.
-		String identifier = java.util.UUID.randomUUID().toString();
+		String identifier = createKeyIdentifier();
 		dbase.storeIdentifier(identifier);
+		return identifier;
+	}
+	
+	/**
+	 * Creates a random key identifier
+	 * @return generated UUID
+	 */
+	public String createKeyIdentifier(){
+		String identifier = java.util.UUID.randomUUID().toString();
 		return identifier;
 	}
 
@@ -522,7 +531,7 @@ public class KeyManagerImpl implements KeyManager {
 	NoSuchProviderException {
 		logger.debug("Creating new certificate");
 		String algorithm_name = "RSA";
-		String identifier = createKeyIdentifier();
+		String identifier = createAndStoreKeyIdentifier();
 		String alias = dbase.setIdentifierAlias(identifier, algorithm_name);
 
 		KeyPairGenerator keyGenerator =
@@ -733,7 +742,7 @@ public class KeyManagerImpl implements KeyManager {
 			} else {// wenn den certificate nicht gibt...
 
 				// neue identifier generieren
-				identifier = KeyManagerImpl.getInstance().createKeyIdentifier();
+				identifier = createAndStoreKeyIdentifier();
 				// Alias fuer neue identifier sipeichern
 				alias =
 					dbase.setIdentifierAlias(identifier, cert
@@ -968,11 +977,7 @@ public class KeyManagerImpl implements KeyManager {
 	@Override
 	public boolean generateSymmetricKey(String friendlyName, int keysize, String algo) throws NoSuchAlgorithmException, SQLException {
 		if(!identifierExists(friendlyName)){
-			// TODO fest eingestellter Algorithmus sollte geändert werden. Mapping
-			// von BC nach XMLSec benötigt.
 			KeyGenerator keyGenerator = KeyGenerator.getInstance(algo);
-			// TODO festeingestellte Schlüssellänge (128) wird nicht mit allen
-			// Algorithmen funktioniere.
 			keyGenerator.init(keysize);
 			SecretKey kek = keyGenerator.generateKey();
 			storeSymmetricKey(friendlyName,
@@ -1022,7 +1027,7 @@ public class KeyManagerImpl implements KeyManager {
 
 		try {
 			// neuen identifier generieren
-			identifier = KeyManagerImpl.getInstance().createKeyIdentifier();
+			identifier = createAndStoreKeyIdentifier();
 			logger.debug("Generated new Identifier " + identifier);
 
 			String algorithm = symKey.getAlgorithm();
