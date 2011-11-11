@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.pde.ui.EquinoxLauncher">
+<booleanAttribute key="append.args" value="true"/>
+<booleanAttribute key="automaticAdd" value="false"/>
+<booleanAttribute key="automaticValidate" value="true"/>
+<stringAttribute key="bootstrap" value=""/>
+<stringAttribute key="checked" value="[NONE]"/>
+<booleanAttribute key="clearConfig" value="false"/>
+<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/LinkSmart 2.0"/>
+<booleanAttribute key="default" value="true"/>
+<booleanAttribute key="default_auto_start" value="true"/>
+<intAttribute key="default_start_level" value="4"/>
+<booleanAttribute key="includeOptional" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog -console"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Declipse.ignoreApp=true -Dosgi.noShutdown=true -Dorg.osgi.service.http.port=8082"/>
+<stringAttribute key="pde.version" value="3.3"/>
+<booleanAttribute key="show_selected_only" value="false"/>
+<stringAttribute key="target_bundles" value="com.springsource.javax.activation@default:default,com.springsource.javax.el@default:default,com.springsource.javax.jms@default:default,com.springsource.javax.mail@default:default,com.springsource.javax.servlet*2.4.0@default:default,com.springsource.javax.servlet*2.5.0@default:default,com.springsource.javax.servlet.jsp@default:default,com.springsource.javax.transaction@default:default,com.springsource.javax.wsdl@default:default,com.springsource.javax.xml.rpc@default:default,com.springsource.javax.xml.soap@default:default,com.springsource.org.apache.bcel@default:default,com.springsource.org.apache.commons.beanutils@default:default,com.springsource.org.apache.commons.codec@default:default,com.springsource.org.apache.commons.collections@default:default,com.springsource.org.apache.commons.configuration@default:default,com.springsource.org.apache.commons.digester@default:default,com.springsource.org.apache.commons.discovery@default:default,com.springsource.org.apache.commons.httpclient@default:default,com.springsource.org.apache.commons.jxpath@default:default,com.springsource.org.apache.commons.lang@default:default,com.springsource.org.apache.commons.logging@default:default,com.springsource.org.apache.derby.client@default:default,com.springsource.org.apache.derby@default:default,com.springsource.org.apache.log4j@default:default,com.springsource.org.apache.regexp@default:default,com.springsource.org.apache.xalan@default:default,com.springsource.org.apache.xerces@default:false,com.springsource.org.apache.xml.resolver@default:default,com.springsource.org.apache.xml.serializer@default:default,com.springsource.org.apache.xmlcommons@default:default,com.springsource.org.jdom@default:default,javax.xml@default:default,org.apache.servicemix.bundles.xmlsec@default:default,org.eclipse.equinox.cm@default:default,org.eclipse.equinox.common@2:true,org.eclipse.equinox.ds@1:true,org.eclipse.equinox.http.jetty@default:default,org.eclipse.equinox.http.registry@default:default,org.eclipse.equinox.http.servlet@default:default,org.eclipse.equinox.registry@default:default,org.eclipse.equinox.util@default:default,org.eclipse.osgi.services@default:default,org.eclipse.osgi@-1:true,org.mortbay.jetty.server@default:default,org.mortbay.jetty.util@default:default"/>
+<booleanAttribute key="tracing" value="false"/>
+<booleanAttribute key="useCustomFeatures" value="false"/>
+<booleanAttribute key="useDefaultConfigArea" value="true"/>
+<stringAttribute key="workspace_bundles" value="BackboneJXTA@default:default,BackboneRouter@default:default,BackboneWS@default:default,CommunicationSecurityManager@default:default,CryptoManager@default:default,IdentityManager@default:default,LinkSmartManagerConfigurator@default:default,LinkSmartMiddlewareAPI@default:default,LinkSmartMiddlewareClients@default:default,LinkSmartWSProvider@default:default,Log4j@default:false,NetworkManager2.0@default:default"/>
+</launchConfiguration>
