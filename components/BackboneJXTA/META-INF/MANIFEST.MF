@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BackboneJXTA
+Bundle-SymbolicName: BackboneJXTA
+Bundle-Version: 1.0.0.qualifier
+Import-Package: eu.linksmart.network.backbone,
+ org.osgi.service.component;version="1.1.0"
+Service-Component: OSGI-INF/DS_BackboneJXTA.xml

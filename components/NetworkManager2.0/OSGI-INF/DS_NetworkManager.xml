@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="NetworkManager">
+   <implementation class="eu.linksmart.network.networkmanager.impl.NetworkManagerImpl"/>
+   <service>
+      <provide interface="eu.linksmart.network.networkmanager.NetworkManager"/>
+   </service>
+   <reference bind="bindCommunicationSecurityManager" cardinality="0..n" interface="eu.linksmart.security.communication.CommunicationSecurityManager" name="CommunicationSecurityManager" policy="dynamic" unbind="unbindCommunicationSecurityManager"/>
+   <reference bind="bindBackboneRouter" cardinality="1..1" interface="eu.linksmart.network.routing.BackboneRouter" name="BackboneRouter" policy="dynamic" unbind="unbindBackboneRouter"/>
+   <reference bind="bindIdentityManager" cardinality="1..n" interface="eu.linksmart.network.identity.IdentityManager" name="IdentityManager" policy="dynamic" unbind="unbindIdentityManager"/>
+</scr:component>

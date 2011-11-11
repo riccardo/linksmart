@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CommunicationSecurityManager
+Bundle-SymbolicName: CommunicationSecurityManager
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: eu.linksmart.security.communication,
+ eu.linksmart.security.cryptomanager;version="1.1.0",
+ org.osgi.service.component
+Service-Component: OSGI-INF/DS_CommunicationSecurityManager.xml

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="BackboneRouter">
+   <implementation class="eu.linksmart.network.routing.impl.BackboneRouterImpl"/>
+   <service>
+      <provide interface="eu.linksmart.network.routing.BackboneRouter"/>
+   </service>
+   <reference bind="bindBackbone" cardinality="1..n" interface="eu.linksmart.network.backbone.Backbone" name="Backbone" policy="dynamic" unbind="unbindBackbone"/>
+</scr:component>

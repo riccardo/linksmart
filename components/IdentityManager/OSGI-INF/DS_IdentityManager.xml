@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="IdentityManager">
+   <implementation class="eu.linksmart.network.identity.impl.IdentityManagerImpl"/>
+   <service>
+      <provide interface="eu.linksmart.network.identity.IdentityManager"/>
+   </service>
+</scr:component>
