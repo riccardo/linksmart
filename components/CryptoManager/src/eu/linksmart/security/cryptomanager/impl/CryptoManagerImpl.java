@@ -138,7 +138,7 @@ public class CryptoManagerImpl implements CryptoManager{
 		configurator.registerConfiguration();
 		activated = true;
 
-		logger.debug("CryptoManager Activated");
+		logger.info("CryptoManager Activated");
 	}
 
 	/**
