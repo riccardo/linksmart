@@ -52,10 +52,14 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 	display:none;
 }
 
-.in-error {
+.noscript {
+	width: 70%;
+	margin: 60px auto;
+}
+.in-error, .noscript {
 	background: #ffeeee;
 }
-.in-error .errormsg {
+.in-error .errormsg, .noscript {
 	display:block;
 	font-size: 8pt;
 	color: red;
