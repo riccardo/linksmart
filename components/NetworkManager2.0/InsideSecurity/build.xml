@@ -13,7 +13,7 @@ Local build file for the Linksmart InsideSecurity
 	<property name="test.dir" value="${basedir}/test" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="lib.dir" value="${basedir}/lib" />
-	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
+	<property name="targetPlatform.dir" value="${basedir}/../../target_platform" />
 	<property name="distribution.dir" value="${rootDistributionDir}" />
 	<property name="revision" value="1.0.0" />
 

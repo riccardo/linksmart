@@ -55,7 +55,7 @@
 	<target name="make-java" depends="make-dirs" description="Build components">
 		<ant dir="Log4j" target="make" />
 		<ant dir="LinkSmartMiddlewareAPI" target="make" />
-		<ant dir="InsideSecurity" target="make" />
+		<ant dir="NetworkManager2.0/InsideSecurity" target="make" />
 		<ant dir="LinkSmartWSProvider" target="make" />
 		<ant dir="LinkSmartMiddlewareClients" target="make" />
 		<ant dir="LinkSmartManagerConfigurator" target="make" />
