@@ -1,17 +1,21 @@
 package eu.linksmart.network.identity;
 
 import java.util.Map;
+import java.util.Set;
 
 import eu.linksmart.network.HID;
-import eu.linksmart.network.HID.HIDAttributes;
 
 
 /*
  * TODO #NM refactoring
  */
 public interface IdentityManager {
-		
-	public HID createHID(Map<HIDAttributes, String> attributes);
 	
-	public HID getHID(Map<HIDAttributes, String> attributes);
+	public enum HIDAttribute {
+		PID, SID, DESCRIPTION
+	}
+		
+	public HID createHID(Map<HIDAttribute, String> attributes);
+	
+	public Set<HID> getHIDs(Map<HIDAttribute, String> attributes);
 }
