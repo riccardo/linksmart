@@ -1,7 +1,9 @@
 package eu.linksmart.network.identity.impl;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
@@ -17,10 +19,11 @@ public class IdentityManagerImpl implements IdentityManager {
 	private static String IDENTITY_MGR = IdentityManagerImpl.class
 			.getSimpleName();
 	
-	private Map<HID, Map<HIDAttribute, String>> hidTable;
-	
+	private ConcurrentHashMap<HID, Properties> hidTable;
 	private Logger LOG = Logger.getLogger(IdentityManagerImpl.class); 
-		
+
+	
+	
 	protected void activate(ComponentContext context) {
 		LOG.info(IDENTITY_MGR + "started");
 	}
@@ -30,7 +33,7 @@ public class IdentityManagerImpl implements IdentityManager {
 	}
 
 	@Override
-	public HID createHID(Map<HIDAttribute, String> attributes) {
+	public HID createHID(Properties attributes) {
 		// TODO Auto-generated method stub
 		HID newHID = null; //TODO generate this HID!
 		
@@ -39,7 +42,7 @@ public class IdentityManagerImpl implements IdentityManager {
 	}
 
 	@Override
-	public Set<HID> getHIDs(Map<HIDAttribute, String> attributes) {
+	public Set<HID> getHIDs(Properties attributes) {
 		// TODO Auto-generated method stub
 		Set<HID> searchResults = null;
 		
