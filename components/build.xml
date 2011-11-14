@@ -60,7 +60,7 @@
 		<ant dir="LinkSmartMiddlewareClients" target="make" />
 		<ant dir="LinkSmartManagerConfigurator" target="make" />
 		<ant dir="TrustManager" target="make" />
-		<ant dir="NetworkManager" target="make" />
+		<ant dir="NetworkManager2.0/NetworkManager" target="make" />
 		<ant dir="EventManager" target="make" />
 		<ant dir="CryptoManager" target="make" />
 	</target>
