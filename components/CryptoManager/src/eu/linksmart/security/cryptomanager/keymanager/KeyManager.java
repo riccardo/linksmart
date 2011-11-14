@@ -104,7 +104,7 @@ public interface KeyManager {
 	 * 
 	 * @return a unique and random identifier.
 	 */
-	public abstract String createKeyIdentifier();
+	public abstract String createAndStoreKeyIdentifier();
 
 	/**
 	 * Returns all public keys that belong to the <code>identifier</code>. <p>
