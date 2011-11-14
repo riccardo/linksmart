@@ -40,6 +40,10 @@ import java.util.Random;
  */
 public class HID {
 	
+	public enum HIDAttributes {
+		PID, SID, DESCRIPTION
+	}
+	
 	public long deviceID = 0;
 	public long contextID1 = 0;
 	public long contextID2=0;
