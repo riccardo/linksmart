@@ -1,5 +1,8 @@
 package eu.linksmart.network.routing.impl;
 
+import java.util.List;
+import java.util.Vector;
+
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.HID;
@@ -31,16 +34,18 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 	}
 
-	/**
-	 * This method checks by which channel the receiver is reachable and sends
-	 * the message.
-	 * 
-	 * @param senderHID
-	 * @param receiverHID
-	 * @param message
-	 */
 	public void sendData(HID senderHID, HID receiverHID, Message message) {
 		// TODO implement this
+	}
+
+	public void receiveData(HID senderHID, HID receiverHID, Message message,
+			String backboneType) {
+		// TODO implement this
+	}
+
+	public List<String> getAvailableCommunicationChannels() {
+		// TODO implement this
+		return new Vector<String>();
 	}
 
 }
