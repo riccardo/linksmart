@@ -79,10 +79,10 @@ import net.jxta.peer.PeerID;
 import org.apache.log4j.Logger;
 
 
+import eu.linksmart.network.HID;
 import eu.linksmart.network.NetworkManagerApplication;
 import eu.linksmart.network.impl.NetworkManagerApplicationSoapBindingImpl;
 import eu.linksmart.network.impl.NetworkManagerConfigurator;
-import eu.linksmart.types.HID;
 
 /**
  * The HID Manager
@@ -289,7 +289,8 @@ public class HIDManagerApplication {
 			String endpoint, Properties attr) {
 		
 		Random rnd = new Random();
-		HID hid = new HID(this);
+		HID hid = createHIDwithNewDeviceID();
+		
 		HIDInfo info = new HIDInfo(myIP, myPort, description, endpoint, myID, attr);
 		long rndContext;
 		switch (level) {
@@ -332,6 +333,14 @@ public class HIDManagerApplication {
 		logger.debug("Created HID: " + hid.toString());
 		queue.add("A;"+ hid + ";" + info.getDescription());
 		return hid;
+	}
+
+	private HID createHIDwithNewDeviceID() {
+		HID hid = new HID();
+		while((this.existsDeviceID(hid.getDeviceID()) || (hid.getDeviceID() == 0))) {
+			hid = new HID();
+		}
+		return hid;
 	} 
 
 	/**
@@ -356,7 +365,7 @@ public class HIDManagerApplication {
 	 */
 	public HID createHID(String description, String endpoint) {
 		HIDInfo info = new HIDInfo(myIP, myPort, description, endpoint, myID);
-		HID hid = new HID(this);
+		HID hid = createHIDwithNewDeviceID();
 		addHID(myID, hid, info);
 		queue.add("A;" + hid + ";" + info.getDescription());
 		logger.debug("Created HID: " + hid.toString() + " for " + endpoint);		
@@ -383,7 +392,7 @@ public class HIDManagerApplication {
 	 */
 	public HID createHID(String description, String endpoint, Properties attr) {
 		HIDInfo info = new HIDInfo(myIP, myPort, description, endpoint, myID, attr);
-		HID hid = new HID(this);
+		HID hid = createHIDwithNewDeviceID();
 		addHID(myID, hid, info);
 		queue.add("A;" + hid + ";" + info.getDescription());
 		logger.debug("Created HID " + hid.toString() + " for " + endpoint);
