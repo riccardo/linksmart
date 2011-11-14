@@ -11,7 +11,7 @@ import eu.linksmart.network.routing.BackboneRouter;
  * TODO #NM refactoring
  */
 public class BackboneRouterImpl implements BackboneRouter {
-	
+
 	private static String BACKBONE_ROUTER = BackboneRouterImpl.class
 			.getSimpleName();
 
@@ -30,22 +30,17 @@ public class BackboneRouterImpl implements BackboneRouter {
 	protected void unbindBackbone(Backbone backbone) {
 
 	}
-	
-	
+
 	/**
-	 * This method checks by which channel the receiver is reachable and sends the message.
+	 * This method checks by which channel the receiver is reachable and sends
+	 * the message.
 	 * 
 	 * @param senderHID
 	 * @param receiverHID
 	 * @param message
 	 */
 	public void sendData(HID senderHID, HID receiverHID, Message message) {
-		
+		// TODO implement this
 	}
-	
 
-	
-
-	
-	
 }

@@ -20,7 +20,6 @@ public class BackboneWSImpl implements Backbone {
 		System.out.println(BACKBONE_WS + "stopped");
 	}
 
-	
 	/**
 	 * Sends a message over the webservice communication channel.
 	 * 
@@ -29,11 +28,9 @@ public class BackboneWSImpl implements Backbone {
 	 * @param message
 	 */
 	public void sendData(HID senderHID, HID receiverHID, Message message) {
-		
+		// TODO implement this
 	}
-	
 
-	
 	/**
 	 * Receives a message over the webservice communication channel.
 	 * 
@@ -42,8 +39,7 @@ public class BackboneWSImpl implements Backbone {
 	 * @param message
 	 */
 	public void receiveData(HID senderHID, HID receiverHID, Message message) {
-		
+		// TODO implement this
 	}
-
 
 }

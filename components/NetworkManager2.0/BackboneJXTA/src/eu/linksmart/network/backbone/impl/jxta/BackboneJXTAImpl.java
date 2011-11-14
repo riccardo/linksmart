@@ -30,7 +30,7 @@ public class BackboneJXTAImpl implements Backbone {
 	 * @param message
 	 */
 	public void sendData(HID senderHID, HID receiverHID, Message message) {
-
+		// TODO implement this
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class BackboneJXTAImpl implements Backbone {
 	 * @param message
 	 */
 	public void receiveData(HID senderHID, HID receiverHID, Message message) {
-
+		// TODO implement this
 	}
 
 }
