@@ -160,7 +160,7 @@ function updateRight(configuration){
 			case 'text':
 			default:
 				formElement = (configuration.parameters['ParamDescription.'+paramName+'.ereg'] ? 
-									('<span class="range">Regular Expression: ^' + configuration.parameters['ParamDescription.'+paramName+'.ereg'] +'</span>') 
+									('<span class="range">Must match this regular expression: ^' + configuration.parameters['ParamDescription.'+paramName+'.ereg'] +'</span>') 
 									: 
 									''
 							  );
