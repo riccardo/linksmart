@@ -20,7 +20,7 @@
 	<property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="lib.dir" value="${basedir}/lib" />
-	<property name="axis.lib.dir" value="${basedir}/../LinkSmartWSProvider/lib" />
+	<property name="axis.lib.dir" value="${basedir}/../../LinkSmartWSProvider/lib" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
 	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
 
