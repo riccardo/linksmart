@@ -96,6 +96,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private static Logger logger = Logger.getLogger(PipeSyncHandler.class.getName());
 
 	private static final int MAXNUMRETRIES = 15;
+	private static final long OUTPUTPIPE_CREATION_TIMEOUT = 2000;
 	public static final String HID_ATTRIBUTE_QUERY_RESPONSE = "1";
 
 	private NetworkManagerApplicationSoapBindingImpl nm;
@@ -103,7 +104,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	HIDManagerApplication hidMgr;
 	SessionManagerApplication sessionMgr;
 	RouteManagerApplication routeMgr;
-	
+
 	private PipeService pipeService;
 	private PipeAdvertisement pipeAdv;
 	private InputPipe inputPipe;
@@ -115,10 +116,10 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private int ok = 0;
 	private Hashtable<Integer, PipeSender> h;
 	Integer i = 0;
-	
+
 	private int MAXTIMERESPONSE = 200000;
 	private boolean firstStart = true;
-	
+
 	/**
 	 * Constructor
 	 * 
@@ -126,12 +127,12 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 */
 	public PipeSyncHandler(NetworkManagerApplicationSoapBindingImpl nm) {
 		this.nm = nm;
-		
+
 		backboneMgr = nm.backboneMgr;
 		hidMgr = nm.hidMgr;
 		sessionMgr = nm.sessionMgr;
 		routeMgr = nm.routeMgr;
-		
+
 		this.pipeAdv = createPipeAdv();
 		this.pipeService = backboneMgr.netPeerGroup.getPipeService();
 		this.pipeTable = new ConcurrentHashMap<ID, PipeInfo>();
@@ -146,7 +147,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			logger.error(e.getMessage(), e);
 		}	
 	}
-	
+
 	/**
 	 * Creates a Pipe Advertisement
 	 * 
@@ -155,22 +156,22 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private PipeAdvertisement createPipeAdv() {
 		PipeID pipeID = IDFactory.newPipeID(backboneMgr.netPeerGroup.getPeerGroupID());
 		PipeAdvertisement pipeAdv = (PipeAdvertisement)
-			AdvertisementFactory.newAdvertisement(PipeAdvertisement.getAdvertisementType());
+		AdvertisementFactory.newAdvertisement(PipeAdvertisement.getAdvertisementType());
 		System.err.println(pipeID.toString());
 		String ppid = 
 			"urn:jxta:uuid-79B6A084D3264DF8B641867D926C48D9F3C29CB8709F4D7EB39D92335B61D4CE04";
-		
+
 		try {
 			pipeID = (PipeID) IDFactory.fromURI(new URI(ppid));
 		} catch (URISyntaxException e) {
 			logger.error("Imposible to create PipeID for the pipe advertisement");
 		}
-		
+
 		pipeAdv.setPipeID(pipeID);
 		pipeAdv.setName("Input Pipe Advertisement for Network Manager");
 		pipeAdv.setType(PipeService.UnicastType);
 		logger.debug("Pipe created: " + pipeID);
-		
+
 		return pipeAdv;
 	}
 
@@ -182,7 +183,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		i = i + 1;
 		return i;
 	}
-	
+
 	/**
 	 * Sends a response message
 	 * @param sessionID the session ID
@@ -194,13 +195,13 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 */
 	private boolean sendMessageResponse(String sessionID, String s, String d, 
 			String data, String i) {
-		
+
 		HID dest = new HID(d);
 		HID source = new HID(s);
 		PeerID pID = null;
 		int numRetries = 0;
 		OutputPipe outPipe = null;
-		
+
 		while (numRetries < MAXNUMRETRIES) {
 			try {
 				pID = hidMgr.getIDfromHID(dest);
@@ -220,12 +221,12 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				logger.error(e.getMessage(), e);
 			}
 		}
-		
+
 		if ((outPipe == null)) {
 			if ((pID != null)) {
 				outPipe = createOutputPipe(pID);
 				logger.debug("The pipe to " + pID.toString()
-					+ " was closed or never created before");
+						+ " was closed or never created before");
 				Message message = createResponseMessage(sessionID, source, dest, data, i);
 
 				try {
@@ -233,29 +234,29 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				} catch (IOException e) {
 					logger.error("Error sending data to HID = " + dest.toString());
 				}
-				
+
 				return true;
 			}
 			else {
 				logger.error("Resp. Could not find destination HID "
-					+ dest.toString() + ". Please try later...");
+						+ dest.toString() + ". Please try later...");
 				return false;
 			}
 		}
 		else {
 			Message message = createResponseMessage(sessionID, source, dest, data, i);
-			
+
 			try {
 				outPipe.send(message);
 			} catch (IOException e) {
 				logger.error("Error sending data to HID = " + dest.toString());
 			}
-			
+
 			pipeTable.get(pID).setTime(System.currentTimeMillis());
 			return true;	
 		}
 	}
-	
+
 	/**
 	 * Sends an asynchronous message
 	 * 
@@ -267,17 +268,17 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 */
 	public void sendAsyncMessage(String senderHID, String receiverHID, 
 			String data, String messageType, Integer i) {
-		
+
 		HID source = new HID(senderHID);
 		HID dest = new HID(receiverHID);
 		PeerID pID = null;
 		int numRetries = 0;
 		OutputPipe outPipe = null;
-		
+
 		while (numRetries < MAXNUMRETRIES) {
 			try {
 				pID = hidMgr.getIDfromHID(dest);
-				
+
 				if (pID != null) {
 					if (pipeTable.containsKey(pID)) outPipe = 
 						pipeTable.get(pID).getOutputPipe();
@@ -288,22 +289,22 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				logger.debug("Could not find destination HID. Backing off");
 				numRetries++;
 			}
-			
+
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 		if ((outPipe == null)) {
 			if ((pID != null)) {
 				outPipe = createOutputPipe(pID);
 				logger.debug("The pipe to " + pID.toString()
-					+ " was closed or never created before");
+						+ " was closed or never created before");
 				Message message = 
 					createAsyncMessage(source, dest, data, i.toString(), messageType);
-				
+
 				try {
 					outPipe.send(message);
 				} catch (IOException e) {
@@ -312,19 +313,19 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			}
 			else {
 				logger.error("Async: Could not find destination HID "
-					+ dest.toString() +". Please try later...");
+						+ dest.toString() +". Please try later...");
 			}
 		}
 		else  {
 			Message message = 
 				createAsyncMessage(source, dest, data, i.toString(), messageType);
-			
+
 			try {
 				outPipe.send(message);
 			} catch (IOException e) {
 				logger.error("Error sending async message to HID = " + dest.toString());
 			}
-			
+
 			pipeTable.get(pID).setTime(System.currentTimeMillis());
 		}
 	}
@@ -352,15 +353,15 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				res.setData("Max expiration time reached. No response was received"); 
 			}
 		}
-		
+
 		h.remove(i);
 		logger.info("Closing " + i + " the size is " + h.size()
-			+ " Time: " + (System.currentTimeMillis() - time));
+				+ " Time: " + (System.currentTimeMillis() - time));
 		return res;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * PipeSender class
 	 */
@@ -368,7 +369,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		private NMResponse resp;
 		private Integer i;
 		private String response;
-		
+
 		/**
 		 * Constructor
 		 * 
@@ -378,7 +379,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			this.i = i;
 			response = new String("-1");
 		}
-		
+
 		/**
 		 * @param sessionId the session ID
 		 * @param data the data to send
@@ -390,7 +391,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				response.notify();	
 			}
 		}
-		
+
 		/**
 		 * Gets the response
 		 * 
@@ -419,7 +420,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		 */
 		public NMResponse sendDataOverPipe(String sessionID, String s, 
 				String d, String data) {
-		
+
 			HID dest = new HID(d);
 			HID source = new HID(s);
 			PeerID pID = null;
@@ -432,7 +433,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			while (numRetries < MAXNUMRETRIES) {
 				try {
 					pID = hidMgr.getIDfromHID(dest);
-					
+
 					if (pID != null) {
 						if (pipeTable.containsKey(pID)) outPipe = 
 							pipeTable.get(pID).getOutputPipe();
@@ -443,22 +444,22 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					logger.debug("Could not find destination HID. Backing off");
 					numRetries++;
 				}
-				
+
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			
+
 			if ((outPipe == null)) {
 				if ((pID != null)) {
 					outPipe = createOutputPipe(pID);
 					logger.debug("The pipe to " + pID.toString() 
-						+ " was closed or never created before");
+							+ " was closed or never created before");
 					Message message = 
 						createRequestMessage(sessionID, source, dest, data, i.toString());
-					
+
 					try {
 						outPipe.send(message);
 						resp.setSessionID("0");
@@ -466,21 +467,21 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 						logger.error("Error sending data to HID = " + dest.toString());
 						resp.setData("Error sending data to HID = "+ dest.toString());
 					}
-					
+
 					return resp;
 				}
 				else {
 					logger.error("Sender: Could not find destination HID " 
-						+ dest.toString() + ". Please try later...");
+							+ dest.toString() + ". Please try later...");
 					resp.setData("Could not find destination HID " 
-						+ dest.toString() + ". Please try later...");
+							+ dest.toString() + ". Please try later...");
 					return resp;
 				}
 			}
 			else  {
 				Message message = 
 					createRequestMessage(sessionID, source, dest, data, i.toString());
-				
+
 				try {
 					outPipe.send(message);
 					resp.setSessionID("0");
@@ -488,14 +489,14 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					logger.error("Error sending data to HID = " + dest.toString());
 					resp.setData("Error sending data to HID = "+ dest.toString());
 				}
-				
+
 				pipeTable.get(pID).setTime(System.currentTimeMillis());				
 				return resp;
 			}
 		}
 
 	}
-	
+
 
 
 	/**
@@ -509,7 +510,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 */
 	private Message createRequestMessage(String sessionID, HID source, 
 			HID dest, String data, String i) {
-		
+
 		Message msg = new Message();
 		MessageElement elem = new StringMessageElement("Data", data, null);
 		msg.addMessageElement(null, elem);
@@ -525,7 +526,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		msg.addMessageElement(null, elem);
 		return msg;
 	}
-	
+
 	/**
 	 * Creates an asynchronous message
 	 * @param source the source HID
@@ -537,7 +538,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 */
 	private Message createAsyncMessage(HID source, HID dest, String data, 
 			String i, String messageType) {
-		
+
 		Message msg = new Message();
 		MessageElement elem = new StringMessageElement("Data", data, null);
 		msg.addMessageElement(null, elem);
@@ -553,7 +554,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		msg.addMessageElement(null, elem);
 		return msg;
 	}
-	
+
 	/**
 	 * Creates a response message
 	 * @param sessionID the session ID
@@ -565,7 +566,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 */
 	private Message createResponseMessage(String sessionID, HID source, HID dest, 
 			String data, String i) {
-		
+
 		Message msg = new Message();
 		MessageElement elem = new StringMessageElement("Dest", dest.toString(), null);
 		msg.addMessageElement(null, elem);
@@ -581,7 +582,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		msg.addMessageElement(null, elem);
 		return msg;
 	}
-	
+
 	/**
 	 * Creates an output pipe
 	 * @param pID the peer ID
@@ -592,22 +593,29 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		pipeAdv = createPipeAdv();
 		Set<PeerID> peersID = new HashSet<PeerID>();
 		peersID.add(pID);
-		
-		try {
-			outputPipe = pipeService.createOutputPipe(pipeAdv, peersID, 0);
-			pipeTable.put(pID, new PipeInfo(outputPipe));
-		} catch (IOException e) {
-			logger.error("Error when creating pipe: Timeout");
-		} catch (NullPointerException e) {
-			logger.error("Error updating pipeTable: peerID or outputPipe don't exist");
-			e.printStackTrace();
-		}
 
+		//the outputpipe is often only created by second or third try so the loop is a workaround
+		int i=0;
+		while(i < MAXNUMRETRIES){
+			try {
+				outputPipe = pipeService.createOutputPipe(pipeAdv, peersID, OUTPUTPIPE_CREATION_TIMEOUT);
+				//only returns if pipe has been created so we can exit loop
+				break;
+			} catch (IOException e) {
+				logger.debug("Error when creating pipe: Timeout");
+				i++;
+			}
+		}
+		if(outputPipe != null){
+		pipeTable.put(pID, new PipeInfo(outputPipe));
+		}else{
+			logger.error("Cannot create outputpipe to destination: " + pID);
+		}
 		return outputPipe;
 	}	
-	
-	
-	
+
+
+
 	/**
 	 * Listener where arrive the messages from a pipe. Two different types of 
 	 * message are received: Request and Response
@@ -617,7 +625,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	public void pipeMsgEvent(PipeMsgEvent event) {
 		new EventProcessor(event).start();
 	}
-	
+
 
 	/**
 	 * Receives data
@@ -631,7 +639,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 */
 	private NMResponse receiveData(String sessionID, String senderHID, 
 			String receiverHID, String data) throws java.rmi.RemoteException {
-		
+
 		NMResponse response = new NMResponse();
 
 		if (sessionID.contains("@")) {
@@ -639,43 +647,43 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			int secondAt = sessionID.indexOf("@", firstAt + 1);
 			String oldStyleSessionId = sessionID.substring(firstAt + 1, secondAt);
 			String protocolId = sessionID.substring(secondAt + 1);
-			
+
 			if (protocolId.equals("SecureSession")) {				
 				SecureSessionController controller = 
 					SecureSessionControllerImpl.getInstance();
 				Command command = new Command();
-				
+
 				try {
 					command.loadFromXML(new ByteArrayInputStream(data.getBytes()));
 				} catch (IOException e) {
 					logger.error("Could not convert data to Command");
 					e.printStackTrace();
 				}
-				
+
 				String role = Consts.SERVER;
 				String server = command.getProperty("server");
 
 				if (!receiverHID.equals(server)) {
 					role = Consts.CLIENT;
 				}
-				
+
 				controller.handleCommand(command, role);
 			}
 			sessionID = oldStyleSessionId;
 		}
-		
+
 		/* SessionID checking. */
 		if(sessionID.equals("0")) {
 			/* A new session will be created. */
 			Session mySession = sessionMgr.createSession(senderHID, receiverHID);
-			
+
 			if(mySession != null) {
 				sessionID = mySession.getSessionID();
 			}
 			else {
-				 /* Maximum number of sessions reached. */
+				/* Maximum number of sessions reached. */
 				logger.error("Error - Cannot create session, Maximum number "
-					+ "of sessions reached");
+						+ "of sessions reached");
 				response.setSessionID("-1");
 				response.setData("Error - Session creation");
 				return response;
@@ -692,7 +700,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		else if (!sessionID.equals("-3")) {
 			/* We check if the sessionID is known on the server. */
 			boolean sessionLoaded = sessionMgr.loadSession(sessionID);
-			
+
 			/* Session ID is not on sessionServerList nor on disk. */
 			if(!sessionMgr.isSessionIDvalidServer(sessionID) && !sessionLoaded) {
 				logger.error("Error - Invalid SessionID");
@@ -704,7 +712,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				logger.debug("Session " + sessionID + "already exist !");
 			}
 		}
-		
+
 		/* We call receiveData with the right sessionID. */
 		response = routeMgr.receiveData(sessionID, senderHID, receiverHID, data);
 
@@ -716,7 +724,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			return response; 
 		}
 	}
-	
+
 	/**
 	 * Stops the pipes
 	 */
@@ -728,15 +736,15 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			en.nextElement().getOutputPipe().close();
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Event Processor class
 	 */
 	public class EventProcessor extends Thread {
 		PipeMsgEvent event;
-		
+
 		/**
 		 * Constructor
 		 * 
@@ -745,7 +753,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		public EventProcessor(PipeMsgEvent event) {
 			this.event = event;
 		}
-		
+
 		/**
 		 * Starts the thread
 		 */
@@ -757,7 +765,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			MessageElement source = msg.getMessageElement("Source");
 			MessageElement sessionID = msg.getMessageElement("SessionID");
 			MessageElement i = msg.getMessageElement("Count");
-			
+
 			if (type.toString().equalsIgnoreCase("REQUEST")) {
 				/* 
 				 * MESSAGE request arrived. Call the NMSoapImp.receiveData().
@@ -766,20 +774,20 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				 */
 				logger.debug("Receiving message. Creating response");
 				NMResponse r = new NMResponse();
-				
+
 				try {
 					r = receiveData(sessionID.toString(), source.toString(), 
-						dest.toString(), data.toString());
+							dest.toString(), data.toString());
 				} catch (RemoteException e) {
 					logger.error("Error calling receiveData " + e.getMessage());
 				}
-				
+
 				logger.debug("Received data : " + data.toString() + " from HID="
-					+ source.toString() + " to HID=" + dest.toString());
+						+ source.toString() + " to HID=" + dest.toString());
 				sendMessageResponse(r.getSessionID(), dest.toString(), 
-					source.toString(), r.getData(), i.toString());
+						source.toString(), r.getData(), i.toString());
 			}
-			
+
 			if (type.toString().equalsIgnoreCase("RESPONSE")) {
 				/*
 				 * RESPONSE MESSAGE. NOTIFY the lock (in sendDataOverPipe). 
@@ -787,22 +795,22 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				 */
 				logger.debug("Received response message: " + data.toString());
 				PipeSender p = h.get(Integer.valueOf(i.toString()));
-				
+
 				if (p != null) {
 					p.notification(sessionID.toString(), data.toString());
 				}
 			}
-			
+
 			if (type.toString().equalsIgnoreCase(HID_ATTRIBUTE_QUERY_RESPONSE)) {
 				logger.debug("Received async message: " + data.toString());
 				backboneMgr.receivedQueryResponse(data.toString(), 
-					Integer.parseInt(i.toString()));
+						Integer.parseInt(i.toString()));
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * PipeTableUpdater class
 	 */
@@ -810,10 +818,10 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		private boolean running;
 		final static long UPDATERTIME = 30000;
 
-	  	/**
-	  	 * Starts the thread
-	  	 */
-	  	public void run() {
+		/**
+		 * Starts the thread
+		 */
+		public void run() {
 			setName(PipeTableUpdater.class.getName());
 			running = true;
 			while (running) {
@@ -823,17 +831,17 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					ID id = en.nextElement();
 					Long time = pipeTable.get(id).getTime() - currentTime;
 					time = pipeTable.get(id).getTime();
-					
+
 					if ((currentTime - pipeTable.get(id).getTime()) 
 							> Long.parseLong((String) nm.getConfiguration().get(
-								NetworkManagerConfigurator.PIPE_LIFETIME))) {
+									NetworkManagerConfigurator.PIPE_LIFETIME))) {
 						pipeTable.get(id).getOutputPipe().close();
 						pipeTable.remove(id);
 						logger.debug("Closed pipe to peer " + id + ". Max "
-							+ "time without need reached");
+								+ "time without need reached");
 					}
 				}
-				
+
 				try {
 					Thread.sleep(UPDATERTIME);
 				} catch (InterruptedException e) {
@@ -841,13 +849,13 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				}
 			}
 		}
-	  	
-	  	/**
-	  	 * Stops the thread
-	  	 */
-	  	public void stopThread() {
-	  		running = false;
-	  	}
+
+		/**
+		 * Stops the thread
+		 */
+		public void stopThread() {
+			running = false;
+		}
 	}
 
 }
