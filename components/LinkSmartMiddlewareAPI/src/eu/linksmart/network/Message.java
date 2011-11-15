@@ -13,9 +13,17 @@ public class Message {
 
 	private Properties properties = new Properties();
 	private String topic = null;
+	private byte[] data = null;
+	private HID senderHID = null;
+	private HID receiverHID = null;
 	
-	public Message(String topic){
+	public Message(String topic, HID senderHID, HID receiverHID, byte[] data){
+		if(topic == null || senderHID == null || receiverHID == null || data == null)
+			throw new NullPointerException("Message cannot have null for required fields");
 		this.topic = topic;
+		this.senderHID = senderHID;
+		this.receiverHID = receiverHID;
+		this.data = data;
 	}
 	
 	/**
@@ -39,11 +47,19 @@ public class Message {
 		return properties.getProperty(key);
 	}
 	
-	/**
-	 * 
-	 * @return Topic of this message
-	 */
 	public String getTopic(){
 		return this.topic;
+	}
+	
+	public HID getSenderHID(){
+		return senderHID;
+	}
+	
+	public HID getReceiverHID(){
+		return receiverHID;
+	}
+	
+	public byte[] getData(){
+		return data;
 	}
 }

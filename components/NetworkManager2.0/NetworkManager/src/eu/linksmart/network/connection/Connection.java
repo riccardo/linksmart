@@ -33,7 +33,7 @@ public class Connection {
 	 */
 	Message processData(byte[] data){
 		//TODO #NM refactoring
-		return new Message(null);
+		return new Message(null, null, null, null);
 	}
 	
 	byte[] processMessage(Message msg){
