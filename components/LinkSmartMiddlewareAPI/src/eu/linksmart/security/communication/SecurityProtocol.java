@@ -22,9 +22,17 @@ public interface SecurityProtocol {
 	Message startProtocol() throws CryptoException;
 	
 	/**
+	 * @return Whether this object can already protect and unprotect messages or not.
+	 */
+	boolean isInitialized();
+	
+	/**
 	 * Processes general messages (like handshake) of 
 	 * the protocol. If the message is not identified 
 	 * it is returned in its original form.
+	 * 
+	 * Until the object is not initialized messages should
+	 * be passed to this method.
 	 * 
 	 * @param msg Message to be processed
 	 * @throws CryptoException If cryptography specific exception occurred

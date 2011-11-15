@@ -1,6 +1,10 @@
 package eu.linksmart.network.connection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.linksmart.network.HID;
+import eu.linksmart.security.communication.CommunicationSecurityManager;
 
 /**
  * Manages and creates connections between two HIDs.
@@ -8,15 +12,39 @@ import eu.linksmart.network.HID;
  *
  */
 public class ConnectionManager {
+
+	private List<Connection> connections = new ArrayList<Connection>();
+	private CommunicationSecurityManager comSecMgr = null;
+
+	public void setCommunicationSecurityManager(CommunicationSecurityManager comSecMgr){
+		this.comSecMgr = comSecMgr;
+	}
+	
+	public void removeCommunicationSecurityManager(){
+		comSecMgr = null;
+	}
+
 	/**
 	 * Returns {@link Connection} object associated to two entities.
 	 * Creates new if there exists none yet.
 	 * @param receiverHID
 	 * @param senderHID
-	 * @return Connection to use for processing
+	 * @return Connection to use for processing of communication
 	 */
-	Connection getConnection(HID receiverHID, HID senderHID){
-		//TODO #NM refactoring
-		return new Connection();
+	public synchronized Connection getConnection(HID receiverHID, HID senderHID){
+		//find connection belonging to these HIDs
+		for(Connection c : connections){
+			if((c.getClientHID() == receiverHID && c.getServerHID() == senderHID)
+					|| (c.getClientHID() == senderHID && c.getServerHID() == receiverHID)){
+				return c;
+			}
+		}
+
+		//there was no connection found so create new connection
+		Connection conn = new Connection(senderHID, receiverHID);
+		if(comSecMgr != null){
+			conn.setSecurityProtocol(comSecMgr.getSecurityProtocol());
+		}
+		return conn;
 	}
 }
