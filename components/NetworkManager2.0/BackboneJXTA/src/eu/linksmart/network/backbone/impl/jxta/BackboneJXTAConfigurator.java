@@ -1,4 +1,4 @@
-package eu.linksmart.network.backbone.jxta;
+package eu.linksmart.network.backbone.impl.jxta;
 
 import java.util.Hashtable;
 
@@ -11,7 +11,7 @@ public class BackboneJXTAConfigurator extends Configurator {
 
 	/* Configuration PID & file path. */
 	public static String BBJXTA_PID = "eu.linksmart.network.backbone.jxta";
-	public static String CONFIGURATION_FILE = "/BBJXTA.properties";
+	public static String CONFIGURATION_FILE = "/BBJXTA.properties";  
 
 	/* Configuration Keys. */
 	public static final String JXTA_HID = "BackboneJXTA.HID";

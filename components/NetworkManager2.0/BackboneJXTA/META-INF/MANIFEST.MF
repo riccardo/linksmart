@@ -5,6 +5,7 @@ Bundle-SymbolicName: BackboneJXTA
 Bundle-Version: 1.0.0.qualifier
 Import-Package: eu.linksmart.network;version="1.0.0",
  eu.linksmart.network.backbone,
+ eu.linksmart.network.networkmanager,
  eu.linksmart.network.routing,
  eu.linksmart.utils,
  org.apache.log4j;version="1.2.15",

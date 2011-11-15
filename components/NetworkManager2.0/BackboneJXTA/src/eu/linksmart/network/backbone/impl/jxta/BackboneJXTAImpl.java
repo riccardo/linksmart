@@ -1,8 +1,10 @@
-package eu.linksmart.network.backbone.jxta;
+package eu.linksmart.network.backbone.impl.jxta;
 
 import java.util.Hashtable;
 
+import net.jxta.discovery.DiscoveryListener;
 import net.jxta.logging.Logging;
+import net.jxta.rendezvous.RendezvousListener;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -17,23 +19,26 @@ import eu.linksmart.network.routing.BackboneRouter;
 /*
  * TODO #NM refactoring
  */
-public class BackboneJXTAImpl implements Backbone {
+public class BackboneJXTAImpl implements Backbone, RendezvousListener, DiscoveryListener {
 
 	private static String BACKBONE_JXTA = BackboneJXTAImpl.class
 			.getSimpleName();
 
 	private Logger logger = Logger.getLogger(BackboneJXTAImpl.class.getName());
 	protected ComponentContext context;
-	private BackboneJXTAConfigurator configurator;
+	private BackboneJXTAConfigurator configurator; 
 
-	protected String myIP;
-	protected String myHID;
+//	protected String myIP;
+//	protected String myHID;
 
 	private BackboneRouter bbRouter;
+	private NetworkManagerImpl nm;
+	private HIDManagerApplication hidManager;
 
+	
 	/**
-	 * Standard constructor must not be used because a backboneRouter instance
-	 * is needed.
+	 * Standard constructor must not be used because a BackboneRouter instance
+	 * is needed. Please use the appropriate constructor.
 	 */
 	private void init() {
 	}
@@ -43,8 +48,11 @@ public class BackboneJXTAImpl implements Backbone {
 	 * 
 	 * @param bbRouter
 	 */
-	public void init(BackboneRouter bbRouter) {
+	public void init(BackboneRouter bbRouter, NetworkManagerImpl nm) {
 		this.bbRouter = bbRouter;
+		this.nm = nm;
+		hidManager = nm.getHIDManagerApplication();
+
 		configurator = new BackboneJXTAConfigurator(this,
 				context.getBundleContext());
 		configurator.registerConfiguration();
@@ -118,4 +126,8 @@ public class BackboneJXTAImpl implements Backbone {
 		return new NMResponse();
 	}
 
+	
+	// here follows the JXTA specific stuff coming from the old NetworkManager Backbone.
+	
+	
 }
