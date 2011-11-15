@@ -61,19 +61,19 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 
 	IdentityManager identityManager;
 	ComponentContext context;
-	private NetworkManager nm;
+	private NetworkManager networkManager;
 	
 	/**
 	 * Constructor
 	 * 
 	 * @param context the bundle's context
-	 * @param nmServiceImpl the Network Manager Service implementation
+	 * @param networkManager the Network Manager Service implementation
 	 */
 	public NetworkManagerApplicationStatus(ComponentContext context, 
-			NetworkManager nmServiceImpl) {
+			NetworkManager networkManager, IdentityManager identityManager) {
 		
-		identityManager =  nmServiceImpl.getIdentityManager();
-		this.nm = nmServiceImpl;
+		this.identityManager =  identityManager;
+		this.networkManager = networkManager;
 		this.context = context;
 	}
 	
@@ -164,7 +164,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 				description = identityManager.getHID(hid).getDescription();
 				
 				if (description.equals("")) {
-					String xmlAtributes = nm.getInformationAssociatedWithHID(
+					String xmlAtributes = this.identityManager.getInformationAssociatedWithHID(
 						identityManager.getLocalNMHID(), hid.toString());
 					Properties attr = new Properties();
 					attr.loadFromXML(new ByteArrayInputStream(xmlAtributes.getBytes()));

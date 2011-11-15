@@ -50,6 +50,7 @@ import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.NetworkManager;
+import eu.linksmart.network.networkmanager.impl.NetworkManagerImpl;
 import eu.linksmart.network.HID;
 
 /**
@@ -57,9 +58,9 @@ import eu.linksmart.network.HID;
  */
 public class GetNetworkManagerStatus extends HttpServlet {
 
-	IdentityManager identityMgr;
-	ComponentContext context;
-	private NetworkManager nm;
+	IdentityManager identityManager;
+	
+	private NetworkManager networkManager;
 	
 	/**
 	 * Constructor
@@ -67,12 +68,12 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	 * @param context the bundle's context
 	 * @param nmServiceImpl the Network Manager Service implementation
 	 */
-	public GetNetworkManagerStatus(ComponentContext context, 
-			NetworkManager networkManager) {
+	public GetNetworkManagerStatus(NetworkManager networkManager, IdentityManager identityManager) {
 		
-		this.nm = networkManager;
-		this.identityMgr = networkManager.getIdentityManager();
-		this.context = context;
+		this.networkManager = networkManager;
+		
+		this.identityManager = identityManager;
+		
 	}
 	
 	/**
@@ -88,7 +89,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 		if(params.containsKey("method")) {
 			Object s = params.get("method");
 			if (((String[]) params.get("method"))[0].equals("getNetworkManagers")) {
-				Vector<String> hids = identityMgr.getHIDs("NetworkManager*");
+				Vector<String> hids = identityManager.getHIDs("NetworkManager*");
 
 				Iterator<String> it = hids.iterator();
 				String endpoint;
@@ -100,12 +101,12 @@ public class GetNetworkManagerStatus extends HttpServlet {
 					String hid = HID.toString();
 
 					try {
-						endpoint = identityMgr.getHID(HID).getEndpoint();
-						description = identityMgr.getHID(HID).getDescription();
+						endpoint = identityManager.getHID(HID).getEndpoint();
+						description = identityManager.getHID(HID).getDescription();
 						if (description.equals("")) {
 							description = "";
-							String xmlAtributes = nm.getInformationAssociatedWithHID(
-								nm.getHID().toString(), hid.toString());
+							String xmlAtributes = networkManager.getInformationAssociatedWithHID(
+								networkManager.getHID().toString(), hid.toString());
 							Properties attr = new Properties();
 							attr.loadFromXML(new ByteArrayInputStream(
 								xmlAtributes.getBytes()));
@@ -121,7 +122,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 							}
 						}
 						
-						host = identityMgr.getHID(HID).getIp();
+						host = identityManager.getHID(HID).getIp();
 						response.getWriter().write(hid + "|" + description
 							+ "|" + host + "|" + endpoint);
 						if (it.hasNext()) {
@@ -134,7 +135,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 				}
 			}
 			else if (((String[]) params.get("method"))[0].equals("getLocalHids")) {
-				Vector<String> hids = identityMgr.getHostHIDs();
+				Vector<String> hids = identityManager.getHostHIDs();
 				Iterator<String> it = hids.iterator();
 				String endpoint;
 				String description;
@@ -145,12 +146,12 @@ public class GetNetworkManagerStatus extends HttpServlet {
 					String hid = HID.toString();
 					
 					try {
-						endpoint = identityMgr.getHID(HID).getEndpoint();
-						description = identityMgr.getHID(HID).getDescription();
+						endpoint = identityManager.getHID(HID).getEndpoint();
+						description = identityManager.getHID(HID).getDescription();
 						if (description.equals("")) {
 							description = "";
-							String xmlAtributes = nm.getInformationAssociatedWithHID(
-								identityMgr.getLocalNMHID(), hid.toString());
+							String xmlAtributes = networkManager.getInformationAssociatedWithHID(
+								identityManager.getLocalNMHID(), hid.toString());
 							Properties attr = new Properties();
 							attr.loadFromXML(new ByteArrayInputStream(
 								xmlAtributes.getBytes()));
@@ -165,7 +166,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 								description = description + key +" = " + value + ";";
 							}
 						}
-						host = identityMgr.getHID(HID).getIp();
+						host = identityManager.getHID(HID).getIp();
 						response.getWriter().write(hid + "|" + description
 							+ "|" + host + "|" + endpoint);
 						if (it.hasNext()) {
@@ -177,7 +178,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 				}				
 			}
 			else if (((String[]) params.get("method"))[0].equals("getRemoteHids")) {
-				Vector<String> hids = identityMgr.getHIDs();
+				Vector<String> hids = identityManager.getHIDs();
 				Iterator<String> it = hids.iterator();
 				String endpoint;
 				String description;
@@ -186,18 +187,18 @@ public class GetNetworkManagerStatus extends HttpServlet {
 				while (it.hasNext()) {
 					HID HID = new HID(it.next());
 					String hid = HID.toString();
-					boolean out = identityMgr.getHostHIDs().contains(hid);
+					boolean out = identityManager.getHostHIDs().contains(hid);
 					if (out) {
 						continue;
 					}
 					
 					try {
-						endpoint = identityMgr.getHID(HID).getEndpoint();
-						description = identityMgr.getHID(HID).getDescription();
+						endpoint = identityManager.getHID(HID).getEndpoint();
+						description = identityManager.getHID(HID).getDescription();
 						if (description.equals("")) {
 							description = "HID entity not adapted to security issues";
 						}
-						host = identityMgr.getHID(HID).getIp();
+						host = identityManager.getHID(HID).getIp();
 						response.getWriter().write(hid + "|" + description
 							+ "|" + host + "|" + endpoint);
 						if (it.hasNext()) {
@@ -209,7 +210,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 				}
 			}
 			else if (((String[]) params.get("method"))[0].equals("getNetworkManagerSearch")) {
-				Vector<String> hids = identityMgr.getHIDs();
+				Vector<String> hids = identityManager.getHIDs();
 				Iterator<String> it = hids.iterator();
 				String endpoint;
 				String description;
@@ -220,15 +221,15 @@ public class GetNetworkManagerStatus extends HttpServlet {
 					String hid = HID.toString();
 					
 					try {
-						endpoint = identityMgr.getHID(HID).getEndpoint();
-						description = identityMgr.getHID(HID).getDescription();
+						endpoint = identityManager.getHID(HID).getEndpoint();
+						description = identityManager.getHID(HID).getDescription();
 						if (description.equals("")) {
 							description = "HID entity not adapted to security issues";
-							boolean in = identityMgr.getHostHIDs().contains(hid);
+							boolean in = identityManager.getHostHIDs().contains(hid);
 							if (in) {
 								description = "";
-								String xmlAtributes = nm.getInformationAssociatedWithHID(
-									identityMgr.getLocalNMHID(), hid.toString());
+								String xmlAtributes = this.identityManager.getInformationAssociatedWithHID(
+									identityManager.getLocalNMHID(), hid.toString());
 								Properties attr = new Properties();
 								attr.loadFromXML(new ByteArrayInputStream(
 									xmlAtributes.getBytes()));
@@ -244,7 +245,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 								}
 							}
 						}
-						host = identityMgr.getHID(HID).getIp();
+						host = identityManager.getHID(HID).getIp();
 						response.getWriter().write(hid + "|" + description
 							+ "|" + host + "|" + endpoint);
 						if (it.hasNext()) {
