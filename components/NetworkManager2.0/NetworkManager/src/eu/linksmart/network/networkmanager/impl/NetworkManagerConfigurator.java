@@ -42,18 +42,18 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 
-import eu.linksmart.network.networkmanager.NetworkManager;
+
+
 import eu.linksmart.utils.Configurator;
 
 
 public class NetworkManagerConfigurator extends Configurator {
 
+	private static final String OSGI_SERVICE_HTTP_PORT = System.getProperty("org.osgi.service.http.port");
 	/* Configuration PID & file path. */
 	public static String NM_PID = "eu.linksmart.network";
 	public static String CONFIGURATION_FILE = "/NM.properties";
 	
-	/* Configuration Keys. */
-	public static final String NM_HID = "NetworkManager.HID";
 	public static final String NM_DESCRIPTION = "NetworkManager.Description";
 	public static final String CERTIFICATE_REF = "Network.CertificateRef";
 	public static final String COMMUNICATION_TYPE = "Network.CommunicationType";
@@ -74,40 +74,37 @@ public class NetworkManagerConfigurator extends Configurator {
 	public static final String JXTA_HTTP_PORT = "Backbone.HttpPort";
 	public static final String PIPE_LIFETIME = "Backbone.PipeLifeTime";
 	
-	public static final String SESSION_ID_GENERATOR = "Session.GeneratorName";
-	public static final String SESSION_DELAY = "Session.Delay";
-	public static final String SESSION_DATA_PATH = "Session.DataPath";
-	public static final String SESSION_MAX_CLIENTS = "Session.MaxClients";
-	public static final String SESSION_MAX_SERVERS = "Session.MaxServers";
-	public static final String SESSION_CLEANING_FREQ = "Session.CleaningFrequency";
-	public static final String SESSION_SYNC_FREQ = "Session.SyncFrequency";
+//	public static final String SESSION_ID_GENERATOR = "Session.GeneratorName";
+//	public static final String SESSION_DELAY = "Session.Delay";
+//	public static final String SESSION_DATA_PATH = "Session.DataPath";
+//	public static final String SESSION_MAX_CLIENTS = "Session.MaxClients";
+//	public static final String SESSION_MAX_SERVERS = "Session.MaxServers";
+//	public static final String SESSION_CLEANING_FREQ = "Session.CleaningFrequency";
+//	public static final String SESSION_SYNC_FREQ = "Session.SyncFrequency";
 	
 	public static final String SECURITY_PROTOCOL = "Security.Protocol";
-	public static final String TRUSTMANAGER_TRUST_THRESHOLD = "TrustManager.trustThreshold";
-	public static final String TRUSTMANAGER_URL = "TrustManager.trustManagerURL";
+	
 	
 	//TODO Currently this functionality is not provided
 //	public static final String USE_CORE_SECURITY = "Security.UseCoreSecurity";
 	
 	public static final String DEFAULT_TO_DENY_ON_PEP_RESPONSE = "Security.Access.DefaultDeny";
 	
-	private NetworkManager nm;
+	private NetworkManagerImpl networkManagerImpl;
 	
 	/**
 	 * Constructor. Creates a new "NetworkManagerConfigurator" object
 	 * 
-	 * @param nm the network manager implementation
+	 * @param networkManagerImpl the network manager implementation
 	 * @param context the bundle's execution context
 	 */
-	public NetworkManagerConfigurator(NetworkManager nm, 
+	public NetworkManagerConfigurator(NetworkManagerImpl networkManagerImpl, 
 			BundleContext context) {
 		
 		super(context, Logger.getLogger(NetworkManagerConfigurator.class.getName()),
 			NM_PID, CONFIGURATION_FILE);
-		this.nm = nm;
-		//set initial configurations
-		this.nm.setTrustThreshold(Double.valueOf((String)this.getConfiguration().get(TRUSTMANAGER_TRUST_THRESHOLD)));
-		this.nm.setTrustManager((String)this.getConfiguration().get(TRUSTMANAGER_URL));
+		this.networkManagerImpl = networkManagerImpl;
+		
 	}
 	
 	/**
@@ -117,15 +114,20 @@ public class NetworkManagerConfigurator extends Configurator {
 	 */
 	@Override
 	public void applyConfigurations(Hashtable updates) {
-		if (this.nm.backboneMgr != null) {
-			this.nm.backboneMgr.applyConfigurations(updates);
+		
+		if (updates.containsKey(NetworkManagerConfigurator.NM_DESCRIPTION)){
+			this.getConfiguration().
+			updates.get(NetworkManagerConfigurator.NM_DESCRIPTION));
 		}
-		if(updates.containsKey(TRUSTMANAGER_TRUST_THRESHOLD)){
-			this.nm.setTrustThreshold(Double.valueOf((String)updates.get(TRUSTMANAGER_TRUST_THRESHOLD)));
-		}
-		if(updates.containsKey(TRUSTMANAGER_URL)){
-			this.nm.setTrustManager((String)updates.get(TRUSTMANAGER_URL));
-		}
+		
+//				
+//				|| (updates.containsKey(NetworkManagerConfigurator.CERTIFICATE_REF)
+//					&& updates.get(NetworkManagerConfigurator.CERTIFICATE_REF).equals(""))) {
+//			
+//			hidManager.setJXTAID(peerID, myHID, (String) networkManagerImpl.getConfiguration().get(
+//				NetworkManagerConfigurator.NM_DESCRIPTION), "http://localhost:" 
+//					+ OSGI_SERVICE_HTTP_PORT + servicePath,
+//					myIP, OSGI_SERVICE_HTTP_PORT, true);
 	}
 
 }
