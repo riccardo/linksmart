@@ -4,5 +4,6 @@
    <service>
       <provide interface="eu.linksmart.security.communication.CommunicationSecurityManager"/>
    </service>
-   <reference bind="bindCryptoManager" cardinality="1..1" interface="eu.linksmart.security.cryptomanager.CryptoManager" name="CryptoManager" policy="static"/>
+   <reference bind="bindCryptoManager" cardinality="1..1" interface="eu.linksmart.security.cryptomanager.CryptoManager" name="CryptoManager" policy="static" unbind="unbindCryptoManager"/>
+   <reference bind="bindTrustManager" cardinality="0..1" interface="eu.linksmart.security.trustmanager.TrustManager" name="TrustManager" policy="dynamic" unbind="unbindTrustManager"/>
 </scr:component>
