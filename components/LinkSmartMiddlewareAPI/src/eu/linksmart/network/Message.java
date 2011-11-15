@@ -5,7 +5,7 @@ import java.util.Properties;
 /**
  * An OO representation of a message received over
  * the network. This class is used for internal processing
- * by the modules of NetworkManager.
+ * by the modules of NetworkManagerCore.
  * @author Vinkovits
  *
  */
