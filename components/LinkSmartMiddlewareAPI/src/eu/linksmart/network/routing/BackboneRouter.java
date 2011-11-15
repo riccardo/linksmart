@@ -4,6 +4,7 @@ import java.util.List;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
+import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 
 /*
@@ -24,8 +25,8 @@ public interface BackboneRouter {
 	 * @param receiverHID
 	 * @param message
 	 */
-	public void sendData(HID senderHID, HID receiverHID, Message message);
-
+	public NMResponse sendData(HID senderHID, HID receiverHID, Message message);
+	
 	/**
 	 * Receives a message which also specifies the communication channel used by
 	 * the sender. This will then update the list of HIDs and which backbone
@@ -36,8 +37,7 @@ public interface BackboneRouter {
 	 * @param message
 	 * @param backboneType
 	 */
-	public void receiveData(HID senderHID, HID receiverHID, Message message,
-			String backboneType);
+	public NMResponse receiveData(HID senderHID, HID receiverHID, Message message, String backboneType);
 
 	/**
 	 * Returns a list of communication channels available to the network
