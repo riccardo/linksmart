@@ -16,7 +16,10 @@ import eu.linksmart.security.communication.CommunicationSecurityManager;
  * TODO #NM refactoring
  */
 public class NetworkManagerImpl implements NetworkManager{
+	
 	private static String NETWORK_MGR = NetworkManagerImpl.class.getSimpleName();
+	
+	private static IdentityManager identityManager;
 	
 protected void activate(ComponentContext context) {
 	
@@ -35,9 +38,9 @@ protected void unbindCommunicationSecurityManager(CommunicationSecurityManager c
 	
 }
 
-protected void bindIdentityManager(IdentityManager identityMgr){
-	
-}
+protected void bindIdentityManager(IdentityManager identityManager){
+	this.identityManager = identityManager;
+	}
 
 protected void unbindIdentityManager(IdentityManager identityMgr){
 	
