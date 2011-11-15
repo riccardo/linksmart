@@ -49,7 +49,6 @@ import org.osgi.service.component.ComponentContext;
 
 
 import eu.linksmart.network.identity.IdentityManager;
-import eu.linksmart.network.impl.NetworkManagerApplicationSoapBindingImpl;
 import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.network.HID;
 
