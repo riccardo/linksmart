@@ -1,3 +1,4 @@
+package eu.linksmart.network.networkmanager.impl;
 /*
  * In case of German law being applicable to this license agreement, the following warranty and liability terms shall apply:
  *
