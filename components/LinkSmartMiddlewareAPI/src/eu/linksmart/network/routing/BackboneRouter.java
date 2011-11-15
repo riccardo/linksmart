@@ -1,5 +1,6 @@
 package eu.linksmart.network.routing;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import eu.linksmart.network.HID;
@@ -25,7 +26,7 @@ public interface BackboneRouter {
 	 * @param receiverHID
 	 * @param message
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, Message message);
+	public NMResponse sendData(HID senderHID, HID receiverHID, String protectedData);
 	
 	/**
 	 * Receives a message which also specifies the communication channel used by
@@ -37,7 +38,7 @@ public interface BackboneRouter {
 	 * @param message
 	 * @param backboneType
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, Message message, String backboneType);
+	public NMResponse receiveData(HID senderHID, HID receiverHID, String protectedData, String backboneType);
 
 	/**
 	 * Returns a list of communication channels available to the network
@@ -46,5 +47,7 @@ public interface BackboneRouter {
 	 * @return list of communication channels
 	 */
 	public List<String> getAvailableCommunicationChannels();
+
+	public void applyConfigurations(Hashtable updates);
 
 }
