@@ -20,18 +20,18 @@ import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.identity.IdentityManager.HIDAttribute;
-import eu.linksmart.network.networkmanager.NetworkManager;
+import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 
 /*
  * TODO #NM refactoring
  */
-public class NetworkManagerImpl implements NetworkManager, MessageProvider{
+public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvider{
 
-	Logger LOG = Logger.getLogger(NetworkManagerImpl.class.getName());
+	Logger LOG = Logger.getLogger(NetworkManagerCoreImpl.class.getName());
 	
-	private static String NETWORK_MGR = NetworkManagerImpl.class.getSimpleName();
+	private static String NETWORK_MGR = NetworkManagerCoreImpl.class.getSimpleName();
 	
 	public static String SUCCESSFULL_PROCESSING = "OK";
 

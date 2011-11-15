@@ -54,7 +54,7 @@ public class NetworkManagerConfigurator extends Configurator {
 	public static String NM_PID = "eu.linksmart.network";
 	public static String CONFIGURATION_FILE = "/NM.properties";
 	
-	public static final String NM_DESCRIPTION = "NetworkManager.Description";
+	public static final String NM_DESCRIPTION = "NetworkManagerCore.Description";
 	public static final String CERTIFICATE_REF = "Network.CertificateRef";
 	public static final String COMMUNICATION_TYPE = "Network.CommunicationType";
 	
@@ -90,20 +90,20 @@ public class NetworkManagerConfigurator extends Configurator {
 	
 	public static final String DEFAULT_TO_DENY_ON_PEP_RESPONSE = "Security.Access.DefaultDeny";
 	
-	private NetworkManagerImpl networkManagerImpl;
+	private NetworkManagerCoreImpl networkManagerCoreImpl;
 	
 	/**
 	 * Constructor. Creates a new "NetworkManagerConfigurator" object
 	 * 
-	 * @param networkManagerImpl the network manager implementation
+	 * @param networkManagerCoreImpl the network manager implementation
 	 * @param context the bundle's execution context
 	 */
-	public NetworkManagerConfigurator(NetworkManagerImpl networkManagerImpl, 
+	public NetworkManagerConfigurator(NetworkManagerCoreImpl networkManagerImpl, 
 			BundleContext context) {
 		
 		super(context, Logger.getLogger(NetworkManagerConfigurator.class.getName()),
 			NM_PID, CONFIGURATION_FILE);
-		this.networkManagerImpl = networkManagerImpl;
+		this.networkManagerCoreImpl = networkManagerImpl;
 		
 	}
 	
@@ -116,15 +116,14 @@ public class NetworkManagerConfigurator extends Configurator {
 	public void applyConfigurations(Hashtable updates) {
 		
 		if (updates.containsKey(NetworkManagerConfigurator.NM_DESCRIPTION)){
-			this.getConfiguration().
-			updates.get(NetworkManagerConfigurator.NM_DESCRIPTION));
+			this.networkManagerCoreImpl.setDescription((String)updates.get(NetworkManagerConfigurator.NM_DESCRIPTION));
 		}
 		
 //				
 //				|| (updates.containsKey(NetworkManagerConfigurator.CERTIFICATE_REF)
 //					&& updates.get(NetworkManagerConfigurator.CERTIFICATE_REF).equals(""))) {
 //			
-//			hidManager.setJXTAID(peerID, myHID, (String) networkManagerImpl.getConfiguration().get(
+//			hidManager.setJXTAID(peerID, myHID, (String) networkManagerCoreImpl.getConfiguration().get(
 //				NetworkManagerConfigurator.NM_DESCRIPTION), "http://localhost:" 
 //					+ OSGI_SERVICE_HTTP_PORT + servicePath,
 //					myIP, OSGI_SERVICE_HTTP_PORT, true);

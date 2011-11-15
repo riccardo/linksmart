@@ -51,7 +51,7 @@ import org.osgi.service.component.ComponentContext;
 
 
 import eu.linksmart.network.identity.IdentityManager;
-import eu.linksmart.network.networkmanager.NetworkManager;
+import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.HID;
 
 /**
@@ -61,19 +61,19 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 
 	IdentityManager identityManager;
 	ComponentContext context;
-	private NetworkManager networkManager;
+	private NetworkManagerCore networkManagerCore;
 	
 	/**
 	 * Constructor
 	 * 
 	 * @param context the bundle's context
-	 * @param networkManager the Network Manager Service implementation
+	 * @param networkManagerCore the Network Manager Service implementation
 	 */
 	public NetworkManagerApplicationStatus(ComponentContext context, 
-			NetworkManager networkManager, IdentityManager identityManager) {
+			NetworkManagerCore networkManager, IdentityManager identityManager) {
 		
 		this.identityManager =  identityManager;
-		this.networkManager = networkManager;
+		this.networkManagerCore = networkManager;
 		this.context = context;
 	}
 	
@@ -88,7 +88,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 		
 		response.setContentType("text/html");
 		URL cssFile = context.getBundleContext().getBundle().getResource(
-			"resources/NetworkManager.css");
+			"resources/NetworkManagerCore.css");
 		BufferedReader cssReader = new BufferedReader(new InputStreamReader(
 			cssFile.openStream()));
 		
@@ -116,7 +116,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 			+ "width=25%>HOST</td><td class=\"hed\" width=25%>ENDPOINT</td></tr>");
 		
 		String s = "";
-		Vector<String> hids = identityManager.getHIDsbyDescription("NetworkManager*");
+		Vector<String> hids = identityManager.getHIDsbyDescription("NetworkManagerCore*");
 		Iterator<String> it = hids.iterator();
 		String endpoint;
 		String description;

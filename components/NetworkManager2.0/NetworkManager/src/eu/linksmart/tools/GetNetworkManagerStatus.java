@@ -49,8 +49,8 @@ import org.osgi.service.component.ComponentContext;
 
 
 import eu.linksmart.network.identity.IdentityManager;
-import eu.linksmart.network.networkmanager.NetworkManager;
-import eu.linksmart.network.networkmanager.impl.NetworkManagerImpl;
+import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.network.networkmanager.impl.NetworkManagerCoreImpl;
 import eu.linksmart.network.HID;
 
 /**
@@ -60,7 +60,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 
 	IdentityManager identityManager;
 	
-	private NetworkManager networkManager;
+	private NetworkManagerCore networkManager;
 	
 	/**
 	 * Constructor
@@ -68,7 +68,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	 * @param context the bundle's context
 	 * @param nmServiceImpl the Network Manager Service implementation
 	 */
-	public GetNetworkManagerStatus(NetworkManager networkManager, IdentityManager identityManager) {
+	public GetNetworkManagerStatus(NetworkManagerCore networkManager, IdentityManager identityManager) {
 		
 		this.networkManager = networkManager;
 		
@@ -89,7 +89,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 		if(params.containsKey("method")) {
 			Object s = params.get("method");
 			if (((String[]) params.get("method"))[0].equals("getNetworkManagers")) {
-				Vector<String> hids = identityManager.getHIDs("NetworkManager*");
+				Vector<String> hids = identityManager.getHIDs("NetworkManagerCore*");
 
 				Iterator<String> it = hids.iterator();
 				String endpoint;
