@@ -68,21 +68,21 @@ public class BackboneJXTAImpl implements Backbone {
 						Level.ALL.toString());
 			}
 		}
-//		if (updates.containsKey(BackboneJXTAConfigurator.JXTA_DESCRIPTION)
-//				|| updates.containsKey(BackboneJXTAConfigurator.JXTA_HID)) {
-//			this.myHID = (String) nm.getConfiguration().get(
-//					NetworkManagerConfigurator.NM_HID);
-//
-//			hidManager.setJXTAID(
-//					peerID,
-//					myHID,
-//					(String) nm.getConfiguration().get(
-//							NetworkManagerConfigurator.NM_DESCRIPTION),
-//					"http://localhost:"
-//							+ System.getProperty("org.osgi.service.http.port")
-//							+ servicePath, myIP, System
-//							.getProperty("org.osgi.service.http.port"), true);
-//		}
+		// if (updates.containsKey(BackboneJXTAConfigurator.JXTA_DESCRIPTION)
+		// || updates.containsKey(BackboneJXTAConfigurator.JXTA_HID)) {
+		// this.myHID = (String) nm.getConfiguration().get(
+		// NetworkManagerConfigurator.NM_HID);
+		//
+		// hidManager.setJXTAID(
+		// peerID,
+		// myHID,
+		// (String) nm.getConfiguration().get(
+		// NetworkManagerConfigurator.NM_DESCRIPTION),
+		// "http://localhost:"
+		// + System.getProperty("org.osgi.service.http.port")
+		// + servicePath, myIP, System
+		// .getProperty("org.osgi.service.http.port"), true);
+		// }
 	}
 
 	protected void activate(ComponentContext context) {
@@ -112,8 +112,10 @@ public class BackboneJXTAImpl implements Backbone {
 	 * @param receiverHID
 	 * @param message
 	 */
-	public void receiveData(HID senderHID, HID receiverHID, Message message) {
+	public NMResponse receiveData(HID senderHID, HID receiverHID,
+			Message message) {
 		// TODO implement this
+		return new NMResponse();
 	}
 
 }
