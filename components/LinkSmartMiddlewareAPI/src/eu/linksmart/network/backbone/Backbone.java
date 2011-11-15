@@ -18,7 +18,7 @@ public interface Backbone {
 	 * @param message
 	 * @return
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, Message message);
+	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] message);
 	
 
 	
@@ -30,7 +30,7 @@ public interface Backbone {
 	 * @param message
 	 * @return
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, Message message);
+	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] message);
 
 	
 }
