@@ -152,13 +152,16 @@ public void setDescription(String description) {
 
 @Override
 public NMResponse sendMessage(Message message) throws RemoteException {
-	byte[] protectedData = message.getData();
 	
 	HID senderHID = message.getReceiverHID();
 	
 	HID receiverHID = message.getSenderHID();
 	
-	NMResponse response = this.backboneRouter.sendData(senderHID, receiverHID, protectedData);
+	Connection connection = this.connectionManager.getConnection(receiverHID, senderHID);
+	
+	byte[] data = connection.processMessage(message);	
+	
+	NMResponse response = this.backboneRouter.sendData(senderHID, receiverHID, data);
 	
 	return response;
 }
