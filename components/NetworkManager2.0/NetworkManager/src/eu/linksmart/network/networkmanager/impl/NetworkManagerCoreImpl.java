@@ -31,7 +31,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvid
 
 	Logger LOG = Logger.getLogger(NetworkManagerCoreImpl.class.getName());
 	
-	private static String NETWORK_MGR = NetworkManagerCoreImpl.class.getSimpleName();
+	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
 	
 	public static String SUCCESSFULL_PROCESSING = "OK";
 
@@ -50,7 +50,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvid
 	
 protected void activate(ComponentContext context) {
 	
-	LOG.debug(NETWORK_MGR + "started");
+	LOG.debug(NETWORK_MGR_CORE + "started");
 	
 	init(context);
 	
@@ -63,7 +63,7 @@ private void init(ComponentContext context) {
 	
 }
 protected void deactivate(ComponentContext context) {
-	System.out.println(NETWORK_MGR + "stopped");
+	System.out.println(NETWORK_MGR_CORE + "stopped");
 }
 
 protected void bindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr){

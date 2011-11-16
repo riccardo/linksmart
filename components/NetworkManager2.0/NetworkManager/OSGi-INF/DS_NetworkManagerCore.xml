@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="NetworkManager">
-	<implementation class="eu.linksmart.network.networkmanager.impl.NetworkManagerImpl"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="NetworkManagerCore">
+	<implementation class="eu.linksmart.network.networkmanager.impl.NetworkManagerCoreImpl"/>
 	<service>
-  <provide interface="eu.linksmart.network.networkmanager.NetworkManager"/>
+  <provide interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore"/>
 	</service>
-	<property name="SOAP.service.name" type="String" value="NetworkManager"/>
+	<property name="SOAP.service.name" type="String" value="NetworkManagerCore"/>
  <reference cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static"/>
  <reference cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="static"/>
  <reference bind="bindCommunicationSecurityManager" cardinality="0..n" interface="eu.linksmart.security.communication.CommunicationSecurityManager" name="CommunicationSecurityManager" policy="dynamic" unbind="unbindCommunicationSecurityManager"/>

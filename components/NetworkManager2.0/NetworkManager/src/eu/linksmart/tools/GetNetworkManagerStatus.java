@@ -60,7 +60,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 
 	IdentityManager identityManager;
 	
-	private NetworkManagerCore networkManager;
+	private NetworkManagerCore networkManagerCore;
 	
 	/**
 	 * Constructor
@@ -68,9 +68,9 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	 * @param context the bundle's context
 	 * @param nmServiceImpl the Network Manager Service implementation
 	 */
-	public GetNetworkManagerStatus(NetworkManagerCore networkManager, IdentityManager identityManager) {
+	public GetNetworkManagerStatus(NetworkManagerCore networkManagerCore, IdentityManager identityManager) {
 		
-		this.networkManager = networkManager;
+		this.networkManagerCore = networkManagerCore;
 		
 		this.identityManager = identityManager;
 		
@@ -105,8 +105,8 @@ public class GetNetworkManagerStatus extends HttpServlet {
 						description = identityManager.getHID(HID).getDescription();
 						if (description.equals("")) {
 							description = "";
-							String xmlAtributes = networkManager.getInformationAssociatedWithHID(
-								networkManager.getHID().toString(), hid.toString());
+							String xmlAtributes = networkManagerCore.getInformationAssociatedWithHID(
+								networkManagerCore.getHID().toString(), hid.toString());
 							Properties attr = new Properties();
 							attr.loadFromXML(new ByteArrayInputStream(
 								xmlAtributes.getBytes()));
@@ -150,7 +150,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 						description = identityManager.getHID(HID).getDescription();
 						if (description.equals("")) {
 							description = "";
-							String xmlAtributes = networkManager.getInformationAssociatedWithHID(
+							String xmlAtributes = identityManager.getInformationAssociatedWithHID(
 								identityManager.getLocalNMHID(), hid.toString());
 							Properties attr = new Properties();
 							attr.loadFromXML(new ByteArrayInputStream(
