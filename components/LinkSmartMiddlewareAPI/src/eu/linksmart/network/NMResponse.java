@@ -42,7 +42,11 @@ package eu.linksmart.network;
  * Network Manager response type
  */
 public class NMResponse  {
-
+	
+	public static final String  STATUS_SUCCESS = "SUCCESS";
+	public static final String  STATUS_TIMEOUT = "TIMEOUT";
+	public static final String  STATUS_ERROR = "ERROR";
+	
 	private java.lang.String data;
 
 	private java.lang.Object __equalsCalc = null;
