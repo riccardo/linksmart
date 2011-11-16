@@ -19,6 +19,7 @@ import org.osgi.service.component.ComponentContext;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.NetworkManagerApplication;
 import eu.linksmart.network.identity.IdentityManager;
+import eu.linksmart.network.HIDInfo;
 
 
 /*
@@ -221,7 +222,7 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * @param hid The HID to be removed
 	 * @return the result
 	 */
-	public String removeHID(HID hid) {
+	private String removeHID(HID hid) {
 		queue.add("D;" + hid);
 		return idTable.remove(hid).toString();
 	}	
@@ -233,7 +234,7 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * @param hid The HID for getting the endpoint associated
 	 * @return The endpoint address associated
 	 */
-	public  HIDInfo getHID(HID hid) {
+	public HIDInfo getHIDInfo(HID hid) {
 		return idTable.get(hid);
 	}
 
@@ -322,9 +323,9 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * 
 	 * @return a vector containing all the HIDs inside idTable
 	 */	
-	public Enumeration<HID> getHIDs() {
+	public Enumeration<HID> getAllHIDs() {
 		return idTable.keys();
-	}	
+	}
 	
 
 	/**
