@@ -4,5 +4,5 @@
    <service>
       <provide interface="eu.linksmart.network.routing.BackboneRouter"/>
    </service>
-   <reference bind="bindBackbone" cardinality="1..n" interface="eu.linksmart.network.backbone.Backbone" name="Backbone" policy="dynamic" unbind="unbindBackbone"/>
+   <reference bind="bindBackbone" cardinality="0..n" interface="eu.linksmart.network.backbone.Backbone" name="Backbone" policy="dynamic" unbind="unbindBackbone"/>
 </scr:component>
