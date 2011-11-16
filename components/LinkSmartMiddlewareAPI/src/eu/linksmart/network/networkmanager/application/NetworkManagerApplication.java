@@ -8,12 +8,9 @@ import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 
 /*
- * TODO #NM refactoring
+ * External Network Manager interface intended to be used by LinkSmart application developers.
  */
 public interface NetworkManagerApplication {
-	/* external methods */
-	/*TODO separate interfaces */
-	
 	
 	/**
 	 * Send data from one LinkSmart node to another node.
