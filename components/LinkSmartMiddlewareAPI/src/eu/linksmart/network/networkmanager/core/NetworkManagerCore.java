@@ -25,7 +25,7 @@ public interface NetworkManagerCore extends NetworkManagerApplication{
 	/**
 	 * Creates an HID based on byte array data
 	 */
-	public NMResponse createHID(byte [] data)	throws RemoteException;
+	public HID createHID(byte [] data)	throws RemoteException;
 	
 
 }

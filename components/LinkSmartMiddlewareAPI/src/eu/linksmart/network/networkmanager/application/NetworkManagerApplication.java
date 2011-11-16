@@ -37,8 +37,9 @@ public interface NetworkManagerApplication {
 	/**
 	 * Creates HID for particular service.
 	 * @param attribute Attributes as description, PID etc
+	 * @return 
 	 * @throws RemoteException
 	 */
-	public void createHID(Properties attributes) throws RemoteException;
+	public HID createHID(Properties attributes) throws RemoteException;
 
 }
