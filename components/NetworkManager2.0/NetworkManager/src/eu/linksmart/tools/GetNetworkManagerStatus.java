@@ -105,8 +105,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 						description = identityManager.getHID(HID).getDescription();
 						if (description.equals("")) {
 							description = "";
-							String xmlAtributes = networkManagerCore.getInformationAssociatedWithHID(
-								networkManagerCore.getHID().toString(), hid.toString());
+							String xmlAtributes = identityManager.getHIDInfo(networkManagerCore.getHID().toString(), hid.toString());
 							Properties attr = new Properties();
 							attr.loadFromXML(new ByteArrayInputStream(
 								xmlAtributes.getBytes()));

@@ -26,7 +26,7 @@ import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 
 /*
- * TODO #NM refactoring
+ * Core implementation of NetworkManagerCore Interface
  */
 public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvider{
 
@@ -34,22 +34,21 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvid
 	
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
 	
-	public static String SUCCESSFULL_PROCESSING = "OK";
-
-	private static IdentityManager identityManager;
+	public static String SUCCESSFULL_PROCESSING = "OK";	
 
 	private HID myHID;
 
-	private String description;
+	private String myDescription;
 
 	private NetworkManagerCoreConfigurator configurator;
 	
+	private IdentityManager identityManager;
 	private CommunicationSecurityManager commSecMgr;
 	private ConnectionManager connectionManager;
-	private Map<String,ArrayList<MessageObserver>> msgObservers = new HashMap<String,ArrayList<MessageObserver>>();
-
 	private BackboneRouter backboneRouter;
-
+	
+	private Map<String,ArrayList<MessageObserver>> msgObservers = new HashMap<String,ArrayList<MessageObserver>>();
+	
 	
 protected void activate(ComponentContext context) {
 	
@@ -60,7 +59,7 @@ protected void activate(ComponentContext context) {
 }
 private void init(ComponentContext context) {
 	 this.configurator = new NetworkManagerCoreConfigurator(this, context.getBundleContext());
-	 this.description = this.configurator.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
+	 this.myDescription = this.configurator.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 	this.connectionManager = new ConnectionManager();
 
 	
@@ -71,7 +70,7 @@ protected void deactivate(ComponentContext context) {
 
 protected void bindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr){
 	this.commSecMgr = commSecMgr;
-	connectionManager.setCommunicationSecurityManager(commSecMgr);
+	connectionManager.setCommunicationSecurityManager(this.commSecMgr);
 }
 
 protected void unbindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr){
@@ -82,14 +81,10 @@ protected void unbindCommunicationSecurityManager(CommunicationSecurityManager c
 protected void bindIdentityManager(IdentityManager identityManager){
 	this.identityManager = identityManager;
 	Properties attributes = new Properties();
-	attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.description);
+	attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.myDescription);
 	this.myHID=this.identityManager.createHID(attributes);
 	}
 
-private Properties getProperties() {
-	// TODO Auto-generated method stub
-	return null;
-}
 protected void unbindIdentityManager(IdentityManager identityMgr){
 	this.identityManager=null;
 	
@@ -144,7 +139,7 @@ public HID getHID() {
 public void setDescription(String description) {
 	
 	Properties attributes = new Properties();
-	attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.description);
+	attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.myDescription);
 	
 	this.identityManager.update(this.myHID, attributes);
 	
