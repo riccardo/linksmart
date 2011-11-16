@@ -1,4 +1,4 @@
-package eu.linksmart.network.networkmanager.impl;
+package eu.linksmart.network.networkmanager.core.impl;
 
 
 import java.rmi.RemoteException;
@@ -21,6 +21,7 @@ import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.identity.IdentityManager.HIDAttribute;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.network.networkmanager.impl.NetworkManagerCoreConfigurator;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 
@@ -37,15 +38,17 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvid
 
 	private static IdentityManager identityManager;
 
-	private Object myHID;
+	private HID myHID;
 
 	private String description;
 
-	private NetworkManagerConfigurator configurator;
+	private NetworkManagerCoreConfigurator configurator;
 	
-	private static CommunicationSecurityManager commSecMgr;
-	private static ConnectionManager connectionManager;
-	private static Map<String,ArrayList<MessageObserver>> msgObservers = new HashMap<String,ArrayList<MessageObserver>>();
+	private CommunicationSecurityManager commSecMgr;
+	private ConnectionManager connectionManager;
+	private Map<String,ArrayList<MessageObserver>> msgObservers = new HashMap<String,ArrayList<MessageObserver>>();
+
+	private BackboneRouter backboneRouter;
 
 	
 protected void activate(ComponentContext context) {
@@ -56,8 +59,8 @@ protected void activate(ComponentContext context) {
 	
 }
 private void init(ComponentContext context) {
-	 this.configurator = new NetworkManagerConfigurator(this, context.getBundleContext());
-	 this.description = this.configurator.get(NetworkManagerConfigurator.NM_DESCRIPTION);
+	 this.configurator = new NetworkManagerCoreConfigurator(this, context.getBundleContext());
+	 this.description = this.configurator.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 	this.connectionManager = new ConnectionManager();
 
 	
@@ -88,22 +91,25 @@ private Properties getProperties() {
 	return null;
 }
 protected void unbindIdentityManager(IdentityManager identityMgr){
+	this.identityManager=null;
 	
 }
 
 protected void bindBackboneRouter(BackboneRouter backboneRouter){
-	
+	this.backboneRouter = backboneRouter;
 }
 
 
 protected void unbindBackboneRouter(BackboneRouter backboneRouter){
-
+	this.backboneRouter=null;
 }
 @Override
 public NMResponse sendData(HID sender, HID receiver, byte[] data)
 throws RemoteException {
-	// TODO Auto-generated method stub
-	return null;
+	
+	NMResponse response = this.backboneRouter.sendData(sender,receiver,data);
+	
+	return response;
 }
 @Override
 public NMResponse receiveData(HID sender, HID receiver, byte[] data)
@@ -133,8 +139,7 @@ throws RemoteException {
 
 @Override
 public HID getHID() {
-	// TODO Auto-generated method stub
-	return null;
+	return this.myHID;
 }
 public void setDescription(String description) {
 	
@@ -144,6 +149,20 @@ public void setDescription(String description) {
 	this.identityManager.update(this.myHID, attributes);
 	
 }
+
+@Override
+public NMResponse sendMessage(Message message) throws RemoteException {
+	byte[] protectedData = message.getData();
+	
+	HID senderHID = message.getReceiverHID();
+	
+	HID receiverHID = message.getSenderHID();
+	
+	NMResponse response = this.backboneRouter.sendData(senderHID, receiverHID, protectedData);
+	
+	return response;
+}
+
 public void subscribe(String topic, MessageObserver observer) {
 	//check if topic already exists
 	if(msgObservers.containsKey(topic)){
@@ -167,4 +186,5 @@ public void unsubscribe(String topic, MessageObserver observer) {
 		msgObservers.get(topic).remove(observer);
 	}
 }
+
 }

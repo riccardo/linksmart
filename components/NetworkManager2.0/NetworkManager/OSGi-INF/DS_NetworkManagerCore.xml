@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="NetworkManagerCore">
-	<implementation class="eu.linksmart.network.networkmanager.impl.NetworkManagerCoreImpl"/>
+	<implementation class="eu.linksmart.network.networkmanager.core.impl.NetworkManagerCoreImpl"/>
 	<service>
   <provide interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore"/>
 	</service>

@@ -44,12 +44,13 @@ import org.osgi.framework.BundleContext;
 
 
 
+import eu.linksmart.network.networkmanager.core.impl.NetworkManagerCoreImpl;
 import eu.linksmart.utils.Configurator;
 
 
-public class NetworkManagerConfigurator extends Configurator {
+public class NetworkManagerCoreConfigurator extends Configurator {
 
-	private static final String OSGI_SERVICE_HTTP_PORT = System.getProperty("org.osgi.service.http.port");
+//	private static final String OSGI_SERVICE_HTTP_PORT = System.getProperty("org.osgi.service.http.port");
 	/* Configuration PID & file path. */
 	public static String NM_PID = "eu.linksmart.network";
 	public static String CONFIGURATION_FILE = "/NM.properties";
@@ -93,15 +94,15 @@ public class NetworkManagerConfigurator extends Configurator {
 	private NetworkManagerCoreImpl networkManagerCoreImpl;
 	
 	/**
-	 * Constructor. Creates a new "NetworkManagerConfigurator" object
+	 * Constructor. Creates a new "NetworkManagerCoreConfigurator" object
 	 * 
 	 * @param networkManagerCoreImpl the network manager implementation
 	 * @param context the bundle's execution context
 	 */
-	public NetworkManagerConfigurator(NetworkManagerCoreImpl networkManagerImpl, 
+	public NetworkManagerCoreConfigurator(NetworkManagerCoreImpl networkManagerImpl, 
 			BundleContext context) {
 		
-		super(context, Logger.getLogger(NetworkManagerConfigurator.class.getName()),
+		super(context, Logger.getLogger(NetworkManagerCoreConfigurator.class.getName()),
 			NM_PID, CONFIGURATION_FILE);
 		this.networkManagerCoreImpl = networkManagerImpl;
 		
@@ -115,16 +116,16 @@ public class NetworkManagerConfigurator extends Configurator {
 	@Override
 	public void applyConfigurations(Hashtable updates) {
 		
-		if (updates.containsKey(NetworkManagerConfigurator.NM_DESCRIPTION)){
-			this.networkManagerCoreImpl.setDescription((String)updates.get(NetworkManagerConfigurator.NM_DESCRIPTION));
+		if (updates.containsKey(NetworkManagerCoreConfigurator.NM_DESCRIPTION)){
+			this.networkManagerCoreImpl.setDescription((String)updates.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION));
 		}
 		
 //				
-//				|| (updates.containsKey(NetworkManagerConfigurator.CERTIFICATE_REF)
-//					&& updates.get(NetworkManagerConfigurator.CERTIFICATE_REF).equals(""))) {
+//				|| (updates.containsKey(NetworkManagerCoreConfigurator.CERTIFICATE_REF)
+//					&& updates.get(NetworkManagerCoreConfigurator.CERTIFICATE_REF).equals(""))) {
 //			
 //			hidManager.setJXTAID(peerID, myHID, (String) networkManagerCoreImpl.getConfiguration().get(
-//				NetworkManagerConfigurator.NM_DESCRIPTION), "http://localhost:" 
+//				NetworkManagerCoreConfigurator.NM_DESCRIPTION), "http://localhost:" 
 //					+ OSGI_SERVICE_HTTP_PORT + servicePath,
 //					myIP, OSGI_SERVICE_HTTP_PORT, true);
 	}
