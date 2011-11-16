@@ -26,7 +26,7 @@ public interface BackboneRouter {
 	 * @param receiverHID
 	 * @param message
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, String protectedData);
+	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] protectedData);
 	
 	/**
 	 * Receives a message which also specifies the communication channel used by
@@ -36,10 +36,22 @@ public interface BackboneRouter {
 	 * @param senderHID
 	 * @param receiverHID
 	 * @param message
-	 * @param backboneType
+	 * @param originatingBackbone
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, String protectedData, String backboneType);
+	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] protectedData, Backbone originatingBackbone);
 
+	/**
+	 * this method is invoked by backbone when a service requests a new HID to the network manager. 
+	 * this msg will be firstly accepted by backbone, and then propagated to the NMCore and IdManager
+	 * 
+	 * @param tempId
+	 * @param receiverHID
+	 * @param protectedData
+	 * @param originatingBackbone
+	 * @return
+	 */
+	public NMResponse createHid(HID tempId, HID receiverHID, byte[] protectedData,  Backbone originatingBackbone);
+	
 	/**
 	 * Returns a list of communication channels available to the network
 	 * manager.
