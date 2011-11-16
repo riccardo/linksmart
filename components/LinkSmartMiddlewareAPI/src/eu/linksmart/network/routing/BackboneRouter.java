@@ -35,10 +35,10 @@ public interface BackboneRouter {
 	 * 
 	 * @param senderHID
 	 * @param receiverHID
-	 * @param message
+	 * @param data
 	 * @param originatingBackbone
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] protectedData, Backbone originatingBackbone);
+	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data, Backbone originatingBackbone);
 
 	/**
 	 * this method is invoked by backbone when a service requests a new HID to the network manager. 
@@ -46,11 +46,11 @@ public interface BackboneRouter {
 	 * 
 	 * @param tempId
 	 * @param receiverHID
-	 * @param protectedData
+	 * @param data
 	 * @param originatingBackbone
 	 * @return
 	 */
-	public NMResponse createHid(HID tempId, HID receiverHID, byte[] protectedData,  Backbone originatingBackbone);
+	public NMResponse createHid(HID tempId, HID receiverHID, byte[] data,  Backbone originatingBackbone);
 	
 	/**
 	 * Returns a list of communication channels available to the network
