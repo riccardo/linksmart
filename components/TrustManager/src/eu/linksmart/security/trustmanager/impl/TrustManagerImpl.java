@@ -290,7 +290,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 
 		boolean withNetworkManager = Boolean.parseBoolean(configurator.get(TrustManagerConfigurator.USE_NETWORK_MANAGER));
 
-		LOG.debug("TrustManager with NetworkManager: "+ withNetworkManager);
+		LOG.debug("TrustManager with NetworkManagerCore: "+ withNetworkManager);
 
 		if(withNetworkManager) {
 			String nmAddress = (String)configurator.get(TrustManagerConfigurator.NETWORK_MANAGER_ADDRESS);
@@ -326,7 +326,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 									getRemoteWSClient(NetworkManagerApplication.class.getName(), 
 											(String)configurator.get(TrustManagerConfigurator.NETWORK_MANAGER_ADDRESS), false);
 								} catch (Exception e1) {
-									LOG.error("Error while creating client to NetworkManager: " + e1.getMessage(), e1);
+									LOG.error("Error while creating client to NetworkManagerCore: " + e1.getMessage(), e1);
 								}
 							}
 							if (configurator.get(TrustManagerConfigurator.CERTIFICATE_REF)!=null) {
