@@ -1,5 +1,6 @@
 package eu.linksmart.network.identity;
 
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
@@ -24,6 +25,8 @@ public interface IdentityManager {
 	public Vector<String> getHIDsByAttributes(String query, int maxNum);
 	
 	public Vector<String> getHIDsByDescription(String description);
+	
+	public Set<HID> getAllHIDs();
 	
 	public  HIDInfo getHIDInfo(HID hid);
 }
