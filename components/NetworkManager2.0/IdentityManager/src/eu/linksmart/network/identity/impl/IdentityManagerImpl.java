@@ -2,6 +2,7 @@ package eu.linksmart.network.identity.impl;
 
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.HID;
-import eu.linksmart.network.NetworkManagerApplication;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.HIDInfo;
 
@@ -99,7 +99,7 @@ public class IdentityManagerImpl implements IdentityManager {
 		
 		Random rnd = new Random();
 		HID hid = createUniqueHID();
-		HIDInfo info = new HIDInfo(description, endpoint, attr);
+		HIDInfo info = new HIDInfo(hid, description, endpoint, attr);
 		long rndContext;
 		switch (level) {
 			case 1:
@@ -164,8 +164,8 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * @return the HID created
 	 */
 	public HID createHID(String description, String endpoint) {
-		HIDInfo info = new HIDInfo(description, endpoint);
 		HID hid = createUniqueHID();
+		HIDInfo info = new HIDInfo(hid, description, endpoint);
 		addHID(hid, info);
 		queue.add("A;" + hid + ";" + info.getDescription());
 		LOG.debug("Created HID: " + hid.toString() + " for " + endpoint);		
@@ -193,8 +193,8 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * @return The HID created or null HID (0.0.0.0) if it could not be created
 	 */
 	public HID createHID(String description, String endpoint, Properties attr) {
-		HIDInfo info = new HIDInfo(description, endpoint, attr);
 		HID hid = createUniqueHID();
+		HIDInfo info = new HIDInfo(hid, description, endpoint, attr);
 		addHID(hid, info);
 		queue.add("A;" + hid + ";" + info.getDescription());
 		LOG.debug("Created HID " + hid.toString() + " for " + endpoint);
@@ -260,71 +260,14 @@ public class IdentityManagerImpl implements IdentityManager {
 		return is;
 	}
 	
-	/**
-	 * Adds to the idTable an string containing all the HID and their 
-	 * description (HID:description HID:description) with an specific IP 
-	 * address and PeerID discovered inside a NM_advertisement.
-	 * 
-	 * @param HIDs An String containing all the HIDs from an IP address
-	 * @param ipPort The IP address of the NM holding the HIDs
-	   @deprecated
-	   //TODO move to backbone or make broadcasts to start from Id Manager, not from Backbone. Conceptually only Id Manager knows when it has something new.
-	 */
-	private void setHIDs(String HIDs, String ipPort) {
-		StringTokenizer vectorHIDs;
-		String hid, description, endpoint, ip;
-		int port;
-		HID id;
-		
-		vectorHIDs = new StringTokenizer(HIDs, " ");
-		StringTokenizer st;
-		
-		while (vectorHIDs.hasMoreTokens()) {			
-			st = new StringTokenizer(vectorHIDs.nextToken(), ";");
-			hid = st.nextToken();
-			if (st.hasMoreTokens()) {
-				description = st.nextToken();
-				if (st.hasMoreTokens()) {
-					endpoint = st.nextToken();
-				}
-				else {
-					endpoint = " ";
-				}
-			}
-			else {
-				description = " ";
-				endpoint = " ";
-			}
-			
-			id = new HID(hid);				
-			if ((idTable.containsKey(id))) {
-				LOG.error("Already assigned HID: " + hid);
-			}
-			else {
-				if (id.toString().equals("0.0.0.0")) {
-					LOG.error("Wrong HID format :  " + hid);
-				}
-				else {
-					st = new StringTokenizer(ipPort, ":");
-					ip = st.nextToken();
-					port = Integer.parseInt(st.nextToken());
-					addHID(id, 
-						new HIDInfo(description, endpoint));
-					LOG.debug("HID: " + hid + " and IP: " + ipPort
-						+ " have been assigned");
-				}
-			}
-		}
-	}
-	
 	
 	/**
 	 * Returns a vector containing all the HID inside idTable
 	 * 
 	 * @return a vector containing all the HIDs inside idTable
 	 */	
-	public Enumeration<HID> getAllHIDs() {
-		return idTable.keys();
+	public Set<HIDInfo> getAllHIDs() {
+		return new HashSet<HIDInfo>(idTable.values());
 	}
 	
 
@@ -334,9 +277,8 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * @param description the description to search HIDs
 	 * @return thd HIDs that match with this description
 	 */
-	public Vector<String> getHIDsByDescription(String description) {
-		Vector<String> HIDs = new Vector<String>();
-		
+	public Set<HIDInfo> getHIDsByDescription(String description) {
+	
 		String[] toMatch;
 		boolean exactMatch = false;
 		
@@ -378,7 +320,7 @@ public class IdentityManagerImpl implements IdentityManager {
 						//this HIDInfo is already a candidate to be thrown out of further consideration
 						//but let's do a last check on CryptoHID just in case it matches
 						if (hidInfo.getAttributes() != null) {
-							oneDescription = hidInfo.getAttributes().getProperty(NetworkManagerApplication.DESCRIPTION);
+							oneDescription = hidInfo.getAttributes().getProperty(HIDAttribute.DESCRIPTION.name());
 							if (oneDescription != null) {
 								if( (!exactMatch && oneDescription.contains(toMatch[i]))
 									||
@@ -402,10 +344,7 @@ public class IdentityManagerImpl implements IdentityManager {
 			}
 		}
 	
-		for (HIDInfo hidInfo: allDescriptions) {
-			HIDs.add(hidInfo.toString());
-		}
-		return HIDs;
+		return new HashSet<HIDInfo>(allDescriptions);
 	}
 
 	/**
@@ -431,10 +370,10 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * @param maxNum the max number of host HIDs returned, or 0 for all
 	 * @return the host HIDs
 	 */
-	public Vector<String> getHIDsByAttributes(String query, int maxNum) {
+	public Set<HIDInfo> getHIDsByAttributes(String query, int maxNum) {
 		LinkedList<String> parsedQuery = AttributeQueryParser.parseQuery(query);
 		/* Parse the query. */
-		Vector<String> results = new Vector<String>();
+		HashSet<HIDInfo> results = new HashSet<HIDInfo>();
 		Iterator<Map.Entry<HID, HIDInfo>> it = idTable.entrySet().iterator();
 		
 		while (it.hasNext()) {
@@ -442,7 +381,7 @@ public class IdentityManagerImpl implements IdentityManager {
 			Properties attr = entry.getValue().getAttributes();
 			if (attr != null) {
 				if (AttributeQueryParser.checkAttributes(attr, parsedQuery)) {
-					results.add(entry.getKey().toString());
+					results.add(entry.getValue());
 					//TODO
 					//careful, maxNum=0 means return all
 					if ((results.size() == maxNum) && (maxNum> 0)) {

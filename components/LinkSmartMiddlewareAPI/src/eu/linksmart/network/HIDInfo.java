@@ -44,7 +44,7 @@ import java.util.Properties;
  * Class to store information about HIDs
  */
 public class HIDInfo {
-
+	private HID hid;
 	private String endpoint;
 	private String description;
 	private Properties attributes;
@@ -55,9 +55,10 @@ public class HIDInfo {
 	 * @param description the description
 	 * @param endpoint the endpoint
 	 */
-	public HIDInfo(String description, String endpoint) {
+	public HIDInfo(HID hid, String description, String endpoint) {
 		
 		super();
+		this.hid = hid;
 		this.endpoint = endpoint;
 		this.description = description;
 		this.attributes = null;
@@ -70,10 +71,11 @@ public class HIDInfo {
 	 * @param endpoint the endpoint
 	 * @param attributes the properties
 	 */
-	public HIDInfo(String description, String endpoint,
+	public HIDInfo(HID hid, String description, String endpoint,
 			Properties attributes) {
 		
 		super();
+		this.hid = hid;
 		this.endpoint = endpoint;
 		this.description = description;
 		this.attributes = attributes;
@@ -86,7 +88,7 @@ public class HIDInfo {
 	 */
 	@Override
 	public String toString() {
-		return description + ":" + endpoint;
+		return hid.toString() + ":" + description + ":" + endpoint;
 	}
 
 
@@ -147,5 +149,13 @@ public class HIDInfo {
 	public void setAttributes(Properties attr) {
 		this.attributes = attr;
 	}
-
+	
+	public HID getHID() {
+		return hid;
+	}
+	
+	public void setHID(HID hid) {
+		this.hid = hid;
+	}
+	
 }

@@ -126,12 +126,12 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 			HID hid = new HID(it.next());
 			
 			try {
-				endpoint = identityManager.getHID(hid).getEndpoint();
+				endpoint = identityManager.getHIDInfo(hid).getEndpoint();
 				if (endpoint.equals(" ")) {
 					endpoint = "-";
 				}
-				description = identityManager.getHID(hid).getDescription();
-				ip = identityManager.getHID(hid).getIp();
+				description = identityManager.getHIDInfo(hid).getDescription();
+				ip = identityManager.getHIDInfo(hid).getIp();
 				s = s + "<tr><td width=25%>" + hid.toString()
 					+ "</td><td width=25%>" + description
 					+ "</td><td width=25%>" + ip
@@ -157,11 +157,11 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 		while (it.hasNext()) {
 			HID hid = new HID(it.next());
 			try {
-				endpoint = identityManager.getHID(hid).getEndpoint();
+				endpoint = identityManager.getHIDInfo(hid).getEndpoint();
 				if (endpoint.equals(" ")) {
 					endpoint = "-";
 				}
-				description = identityManager.getHID(hid).getDescription();
+				description = identityManager.getHIDInfo(hid).getDescription();
 				
 				if (description.equals("")) {
 					String xmlAtributes = this.identityManager.getInformationAssociatedWithHID(
@@ -179,7 +179,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 						description = description + key + " = " + value + "<br/>";
 					}
 				}
-				ip = identityManager.getHID(hid).getIp();
+				ip = identityManager.getHIDInfo(hid).getIp();
 				s = s + "<tr><td width=25%>" + hid.toString()
 					+ "</td><td width=25%>" + description
 					+ "</td><td width=25%>" + ip
@@ -204,12 +204,12 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 		while (it.hasNext()) {
 			HID hid = new HID(it.next());
 			try {
-				endpoint = identityManager.getHID(hid).getEndpoint();
+				endpoint = identityManager.getHIDInfo(hid).getEndpoint();
 				if (endpoint == " ") {
 					endpoint = "-";
 				}
-				description = identityManager.getHID(hid).getDescription();
-				ip = identityManager.getHID(hid).getIp();
+				description = identityManager.getHIDInfo(hid).getDescription();
+				ip = identityManager.getHIDInfo(hid).getIp();
 				s = s + "<tr><td width=25%>" + hid.toString() 
 					+ "</td><td width=25%>" + description
 					+ "</td><td width=25%>" + ip
