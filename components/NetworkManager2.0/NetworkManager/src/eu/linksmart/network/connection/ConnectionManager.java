@@ -2,6 +2,7 @@ package eu.linksmart.network.connection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
@@ -46,5 +47,10 @@ public class ConnectionManager {
 			conn.setSecurityProtocol(comSecMgr.getSecurityProtocol());
 		}
 		return conn;
+	}
+
+	public Properties getHIDAttributes(byte[] data) {
+		// TODO tranten
+		return null;
 	}
 }

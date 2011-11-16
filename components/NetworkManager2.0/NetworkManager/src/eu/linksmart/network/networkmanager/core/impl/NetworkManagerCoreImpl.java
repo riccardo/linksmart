@@ -191,4 +191,21 @@ public void unsubscribe(String topic, MessageObserver observer) {
 	}
 }
 
+@Override
+public HID createHID(byte[] data) throws RemoteException {
+		
+	Properties attributes = this.connectionManager.getHIDAttributes(data);
+		
+	HID newHID = this.identityManager.createHID(attributes);
+	
+	return newHID;
+}
+@Override
+public HID createHID(Properties attributes) throws RemoteException {
+	
+	HID newHID = this.identityManager.createHID(attributes);
+	
+	return newHID;
+}
+
 }
