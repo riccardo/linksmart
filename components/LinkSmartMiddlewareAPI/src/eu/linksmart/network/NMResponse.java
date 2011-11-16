@@ -44,7 +44,6 @@ package eu.linksmart.network;
 public class NMResponse  {
 
 	private java.lang.String data;
-	private java.lang.String sessionID;
 
 	private java.lang.Object __equalsCalc = null;
 	private boolean __hashCodeCalc = false;
@@ -60,9 +59,8 @@ public class NMResponse  {
 	 * @param data the data value for this NMResponse
 	 * @param sessionID the sessionID value for this NMResponse
 	 */
-	public NMResponse(java.lang.String data, java.lang.String sessionID) {
-		this.data = data;
-		this.sessionID = sessionID;
+	public NMResponse(java.lang.String data) {
+		this.data = data;		
 	}
 
 	/**
@@ -81,24 +79,6 @@ public class NMResponse  {
 	 */
 	public void setData(java.lang.String data) {
 		this.data = data;
-	}
-
-	/**
-	 * Gets the sessionID value for this NMResponse
-	 * 
-	 * @return the sessionID value for this NMResponse
-	 */
-	public java.lang.String getSessionID() {
-		return sessionID;
-	}
-
-	/**
-	 * Sets the sessionID value for this NMResponse
-	 * 
-	 * @param sessionID the sessionID value for this NMResponse
-	 */
-	public void setSessionID(java.lang.String sessionID) {
-		this.sessionID = sessionID;
 	}
 
 	/**
@@ -127,9 +107,7 @@ public class NMResponse  {
 		boolean _equals;
 		_equals = true 
 			&& (((this.data == null) && (other.getData() == null))
-				|| ((this.data != null) && this.data.equals(other.getData())))
-			&& (((this.sessionID == null) && (other.getSessionID() == null))
-				|| ((this.sessionID != null) && this.sessionID.equals(other.getSessionID())));
+				|| ((this.data != null) && this.data.equals(other.getData())));
 		__equalsCalc = null;
 		return _equals;
 	}
@@ -147,9 +125,6 @@ public class NMResponse  {
 		int _hashCode = 1;
 		if (getData() != null) {
 			_hashCode += getData().hashCode();
-		}
-		if (getSessionID() != null) {
-			_hashCode += getSessionID().hashCode();
 		}
 		__hashCodeCalc = false;
 		return _hashCode;
