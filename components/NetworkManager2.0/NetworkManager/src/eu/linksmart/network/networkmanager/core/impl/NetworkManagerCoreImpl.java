@@ -30,6 +30,10 @@ import eu.linksmart.security.communication.CommunicationSecurityManager;
  */
 public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvider{
 
+	private static final String STARTED = "started";
+
+	private static final String STARTING = "Starting";
+
 	Logger LOG = Logger.getLogger(NetworkManagerCoreImpl.class.getName());
 	
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
@@ -52,9 +56,11 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvid
 	
 protected void activate(ComponentContext context) {
 	
-	LOG.debug(NETWORK_MGR_CORE + "started");
+	LOG.debug(STARTING + NETWORK_MGR_CORE);
 	
 	init(context);
+	
+	LOG.debug(NETWORK_MGR_CORE + STARTED);
 	
 }
 private void init(ComponentContext context) {
