@@ -109,10 +109,22 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 	@Override
 	public NMResponse broadcastData(HID senderHid, byte[] data) {
+		boolean success = true;
+		String failedBroadcast = ""; 
+		for(Backbone bb : availableBackbones){
+			if(bb.broadcastData(senderHid, data).getData() == NMResponse.STATUS_ERROR){
+				failedBroadcast += " " + bb.getClass();
+				success = false;
+			}
+		}		
 		
-//		for(Backbone bb : availableBackbones){
-//			if(bb.)
-//		}
+		if(!success)return new NMResponse(NMResponse.STATUS_ERROR);
+		else return new NMResponse(NMResponse.STATUS_SUCCESS);
+	}
+
+	@Override
+	public String getRoute(HID hid) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
