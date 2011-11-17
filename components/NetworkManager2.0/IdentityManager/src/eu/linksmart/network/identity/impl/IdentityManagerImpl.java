@@ -18,12 +18,13 @@ import org.osgi.service.component.ComponentContext;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.HIDInfo;
-
+import eu.linksmart.network.Message;
+import eu.linksmart.network.MessageObserver;
 
 /*
  * TODO #NM refactoring
  */
-public class IdentityManagerImpl implements IdentityManager {
+public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	private static String IDENTITY_MGR = IdentityManagerImpl.class.getSimpleName();
 	
 	private ConcurrentHashMap<HID, HIDInfo> localHIDs;
@@ -444,6 +445,29 @@ public class IdentityManagerImpl implements IdentityManager {
 			}
 		}
 		return results;
+	}
+
+	
+	public boolean updateHID(HID hid, Properties attr) {
+		HIDInfo toUpdate = localHIDs.get(hid);
+		if (toUpdate != null) {
+			synchronized (queue) { //because we need to be sure that both deletion of old and insertion of new attributes are in the queue at the same time
+				toUpdate.setAttributes(attr);
+				localHIDs.replace(hid, toUpdate);
+				queue.add("D;" + hid.toString());
+				queue.add("A;"+ hid.toString() + ";" + toUpdate.getDescription());
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	
+	@Override
+	public Message processMessage(Message msg) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 
