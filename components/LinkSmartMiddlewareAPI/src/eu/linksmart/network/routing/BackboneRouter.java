@@ -60,7 +60,14 @@ public interface BackboneRouter {
 	 */
 	public List<Backbone> getAvailableCommunicationChannels();
 	
-	public NMResponse broadcastData(byte[] data); 
+	/**
+	 * this method is invoked by NMCore to broadcast HIDs. 
+	 * 
+	 * @param sender
+	 * @param data
+	 * @return
+	 */
+	public NMResponse broadcastData(HID sender, byte[] data); 
 	
 	public void applyConfigurations(Hashtable updates);
 
