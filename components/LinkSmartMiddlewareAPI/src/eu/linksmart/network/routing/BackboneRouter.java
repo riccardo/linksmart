@@ -58,8 +58,10 @@ public interface BackboneRouter {
 	 * 
 	 * @return list of communication channels
 	 */
-	public List<String> getAvailableCommunicationChannels();
-
+	public List<Backbone> getAvailableCommunicationChannels();
+	
+	public NMResponse broadcastData(byte[] data); 
+	
 	public void applyConfigurations(Hashtable updates);
 
 }
