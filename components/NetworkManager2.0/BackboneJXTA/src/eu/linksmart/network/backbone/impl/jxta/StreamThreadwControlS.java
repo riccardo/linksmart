@@ -282,10 +282,8 @@ public class StreamThreadwControlS extends Thread {
 		Set<PeerID> peersID = new HashSet<PeerID>();
 		peersID.add(pID);
 		
-		 // TODO: fix this
-		/*
 		try {
-			outputPipe = socketHandler.backboneMgr.netPeerGroup.
+			outputPipe = socketHandler.bbjxta.netPeerGroup.
 				getPipeService().createOutputPipe(pipeAdv, peersID, 0);
 		} catch (IOException e) {
 			logger.error("Error when creating pipe: Timeout");
@@ -293,7 +291,7 @@ public class StreamThreadwControlS extends Thread {
 			logger.error("Error updating pipeTable: peerID or outputPipe don't exist");
 			e.printStackTrace();
 		}
-*/
+
 		return outputPipe;
 	}	
 

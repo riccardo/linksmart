@@ -39,6 +39,8 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.log4j.Logger;
+
 import net.jxta.document.AdvertisementFactory;
 import net.jxta.id.IDFactory;
 import net.jxta.peergroup.PeerGroup;
@@ -53,6 +55,9 @@ public class MulticastSocket {
 		"urn:jxta:uuid-59616261646162614E5047205032503393B5C2F6CA7A41FDB0F890173088E79404";
 	public PeerGroup pg;
 	public InetAddress localAddr;
+	
+	private Logger logger = Logger.getLogger(MulticastSocket.class.getName());
+
 	
 	/**
 	 * Constructor
@@ -93,13 +98,13 @@ public class MulticastSocket {
 	 * @return the Multicast Socket
 	 */
 	public JxtaMulticastSocket createMulticastSocket(PeerGroup pg) {
-		System.out.println("Creating JxtaMulticastSocket");
+		logger.debug("Creating JxtaMulticastSocket");
 		JxtaMulticastSocket mcastSocket = null;
 		
 		try {
 			mcastSocket = new JxtaMulticastSocket(pg, getSocketAdvertisement());
-			System.out.println("LocalAddress :" + mcastSocket.getLocalAddress());
-			System.out.println("LocalSocketAddress :" + mcastSocket.getLocalSocketAddress());
+			logger.debug("LocalAddress :" + mcastSocket.getLocalAddress());
+			logger.debug("LocalSocketAddress :" + mcastSocket.getLocalSocketAddress());
 			localAddr = mcastSocket.getLocalAddress();
 			} catch (IOException e) {
 				e.printStackTrace();

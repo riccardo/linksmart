@@ -68,15 +68,13 @@ import net.jxta.socket.JxtaSocket;
 
 import org.apache.log4j.Logger;
 
-import eu.linksmart.network.networkmanager.NetworkManager;
+import eu.linksmart.network.HID;
 
-/*
-import eu.linksmart.network.identity.HIDManagerApplication;
-import eu.linksmart.network.impl.NetworkManagerApplicationSoapBindingImpl;
-import eu.linksmart.network.impl.NetworkManagerConfigurator;
-import eu.linksmart.network.networkmanager.NetworkManager;
-import eu.linksmart.types.HID;
-*/
+
+//import eu.linksmart.network.identity.HIDManagerApplication;
+//import eu.linksmart.network.impl.NetworkManagerApplicationSoapBindingImpl;
+//import eu.linksmart.network.impl.NetworkManagerConfigurator;
+//import eu.linksmart.types.HID;
 
 /**
  * SocketHandler
@@ -84,50 +82,51 @@ import eu.linksmart.types.HID;
 public class SocketHandler implements PipeMsgListener  {
 	private static Logger logger = Logger.getLogger(SocketHandler.class.getName());
 	
-	/*
-	BackboneManagerApplication backboneMgr;
-	HIDManagerApplication hidMgr;
-	private NetworkManagerApplicationSoapBindingImpl nm;
-*/
-	
-	JxtaServerSocket serverSocket;
-	LocalServer local;
-	JXTASocketServer socketServer;
+//	BackboneManagerApplication backboneMgr;
+//	HIDManagerApplication hidMgr;
+//	private NetworkManagerApplicationSoapBindingImpl nm;
+
+	protected JxtaServerSocket serverSocket;
+	protected LocalServer local;
+	protected JXTASocketServer socketServer;
 
 	private Long count;
 	public int localPort;
 	public Hashtable<Long, Long> bitRates;
 	private InputPipe inputPipe;
+	
+	protected BackboneJXTAImpl bbjxta;
+
 
 	/**
 	 * Constructor
 	 * 
 	 * @param nm the Network Manager application
 	 */
-	public SocketHandler(NetworkManager nm) {
-		/*
-		this.nm = nm;
-		this.backboneMgr = nm.backboneMgr;
-		this.hidMgr = nm.hidMgr;
+	public SocketHandler(BackboneJXTAImpl bbjxta) {
+		this.bbjxta = bbjxta;
+
+//		this.nm = nm;
+//		this.backboneMgr = nm.backboneMgr;
+//		this.hidMgr = nm.hidMgr;
 		count = new Long(0);
 		bitRates = new Hashtable<Long, Long>();
-		this.localPort = Integer.valueOf((String) nm.getConfiguration().get(
-			NetworkManagerConfigurator.MULTIMEDIA_PORT));
+		this.localPort = Integer.valueOf((String) bbjxta.getConfiguration().get(
+			BackboneJXTAConfigurator.MULTIMEDIA_PORT));
 		
 		try {
-			this.serverSocket = new JxtaServerSocket(backboneMgr.netPeerGroup, 
+			this.serverSocket = new JxtaServerSocket(bbjxta.netPeerGroup, 
 				createPipeSocketAdv());
 			serverSocket.setSoTimeout(0);
 			socketServer = new JXTASocketServer(this);
 			socketServer.start();
 			local = new LocalServer(this);
 			local.start();
-			this.inputPipe = backboneMgr.netPeerGroup.getPipeService().createInputPipe(
+			this.inputPipe = bbjxta.netPeerGroup.getPipeService().createInputPipe(
 				createPipeAdv(), this);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	*/
 	}
 
 
@@ -315,11 +314,10 @@ public class SocketHandler implements PipeMsgListener  {
 				/* Adding the new ID to the table with the default bitrate. */
 				bitRates.put(id, DEF_BITRATE);
 				
-				 // TODO: fix this
-				URL serv = new URL("");
-				/*
-				URL serv = new URL(hidMgr.getEndpoint(hids));
-				*/
+				// TODO: fix this
+//				URL serv = new URL(hidMgr.getEndpoint(hids));
+				URL serv = new URL("fix this");
+					
 				
 				s = k[0] + " /" + t[3] + " " + k[2] + "\r\n";
 				byte[] b = s.getBytes();
@@ -391,9 +389,7 @@ public class SocketHandler implements PipeMsgListener  {
 		public void run() {
 			setName(this.getName());
 			running = true;
-			 // TODO: fix this
 			
-			/*
 			try {
 				InputStream clientIn = client.getInputStream();
 				DataInput clientDIS = new DataInputStream(clientIn);
@@ -426,10 +422,13 @@ public class SocketHandler implements PipeMsgListener  {
 				
 				s = s + "\r\n";
 				byte[] b = s.getBytes();
-				PeerID peerID = hidMgr.getIDfromHID(hid);
+				
+				// TODO: fix this
+//				PeerID peerID = hidMgr.getIDfromHID(hid);
+				PeerID peerID = null;
 				
 				if (peerID != null) {
-					JxtaSocket server = new JxtaSocket(backboneMgr.netPeerGroup,
+					JxtaSocket server = new JxtaSocket(bbjxta.netPeerGroup,
 						peerID, createPipeSocketAdv(), 120000, true);
 					server.setTcpNoDelay(true);
 					OutputStream socketOut = server.getOutputStream();
@@ -459,7 +458,6 @@ public class SocketHandler implements PipeMsgListener  {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			*/
 		}
 		
 		/**

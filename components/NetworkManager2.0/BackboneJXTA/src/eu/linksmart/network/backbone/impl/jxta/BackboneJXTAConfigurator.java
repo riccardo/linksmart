@@ -17,19 +17,21 @@ public class BackboneJXTAConfigurator extends Configurator {
 	public static final String JXTA_HID = "BackboneJXTA.HID";
 	public static final String JXTA_DESCRIPTION = "BackboneJXTA.Description";
 
-	public static final String JXTA_LOGS = "Backbone.JXTALogs";
-	public static final String PEER_NAME = "Backbone.PeerName";
-	public static final String ANNOUNCE_VALIDITY = "Backbone.AnnounceValidity";
-	public static final String FACTOR = "Backbone.Factor";
-	public static final String WAIT_FOR_RDV_TIME = "Backbone.WaitForRdvTime";
-	public static final String SYNCHRONIZED = "Backbone.Synchronized";
-	public static final String MODE = "Backbone.Mode";
-	public static final String RELAYED = "Backbone.Relayed";
-	public static final String EXT_TCP_ADDR = "Backbone.ExtTcpAddr";
-	public static final String MULTICAST = "Backbone.Multicast";
-	public static final String JXTA_TCP_PORT = "Backbone.TcpPort";
-	public static final String JXTA_HTTP_PORT = "Backbone.HttpPort";
-	public static final String PIPE_LIFETIME = "Backbone.PipeLifeTime";
+	public static final String JXTA_LOGS = "BackboneJXTA.JXTALogs";
+	public static final String PEER_NAME = "BackboneJXTA.PeerName";
+	public static final String ANNOUNCE_VALIDITY = "BackboneJXTA.AnnounceValidity";
+	public static final String FACTOR = "BackboneJXTA.Factor";
+	public static final String WAIT_FOR_RDV_TIME = "BackboneJXTA.WaitForRdvTime";
+	public static final String SYNCHRONIZED = "BackboneJXTA.Synchronized";
+	public static final String MODE = "BackboneJXTA.Mode";
+	public static final String RELAYED = "BackboneJXTA.Relayed";
+	public static final String EXT_TCP_ADDR = "BackboneJXTA.ExtTcpAddr";
+	public static final String MULTICAST = "BackboneJXTA.Multicast";
+	public static final String JXTA_TCP_PORT = "BackboneJXTA.TcpPort";
+	public static final String JXTA_HTTP_PORT = "BackboneJXTA.HttpPort";
+	public static final String PIPE_LIFETIME = "BackboneJXTA.PipeLifeTime";
+
+	public static final String MULTIMEDIA_PORT = "BackboneJXTA.MultimediaPort";
 
 	private BackboneJXTAImpl bbJXTA;
 
