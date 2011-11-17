@@ -5,6 +5,7 @@ Bundle-SymbolicName: BackboneRouter
 Bundle-Version: 1.0.0.qualifier
 Import-Package: eu.linksmart.network;version="1.0.0",
  eu.linksmart.network.backbone,
+ eu.linksmart.network.networkmanager.application,
  eu.linksmart.network.networkmanager.core,
  eu.linksmart.network.routing,
  eu.linksmart.policy.pep,

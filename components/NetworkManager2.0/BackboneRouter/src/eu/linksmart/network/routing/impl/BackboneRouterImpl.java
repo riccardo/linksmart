@@ -1,30 +1,20 @@
 package eu.linksmart.network.routing.impl;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
 
-import javax.xml.ws.Endpoint;
-
-import org.osgi.service.component.ComponentContext;
-import org.osgi.framework.ServiceReference;
 import org.apache.log4j.Logger;
+import org.osgi.service.component.ComponentContext;
 
-import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.HID;
-import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
+import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
-import eu.linksmart.policy.pep.PepResponse;
-import eu.linksmart.policy.pep.PepService;
-import eu.linksmart.security.communication.inside.InsideHydra;
 
 /*
  * TODO #NM refactoring
@@ -35,7 +25,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	private HashMap<HID, Backbone> hidBackboneMap;
 	private List<Backbone> availableBackbones;
 	private NetworkManagerCore nmCore;
-	private String routingMethod;
+	private String defaultRoute;
 	
 	private static String BACKBONE_ROUTER = BackboneRouterImpl.class.getSimpleName();				
 	private static String ROUTING_JXTA ="JXTA"; 
@@ -83,12 +73,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		Backbone b = (Backbone)hidBackboneMap.get(receiverHID);
 		hidBackboneMap.put(senderHID, originatingBackbone);
 				
-		try {
-			return nmCore.receiveData(senderHID, receiverHID, data);
-		} catch (RemoteException e) {
-			logger.error(e.getMessage(), e);
-		}				
-		return new NMResponse(NMResponse.STATUS_ERROR);
+		return nmCore.receiveData(senderHID, receiverHID, data);				
 		
 	}
 
@@ -96,13 +81,15 @@ public class BackboneRouterImpl implements BackboneRouter {
 	public NMResponse createHid(HID tempId, HID receiverHID,
 			byte[] data, Backbone originatingBackbone) {
 		
-		HID newHid = nmCore.createHID(data);
-
-		hidBackboneMap.put(newHid, originatingBackbone);
 		try {
-			nmCore.sendData(newHid, receiverHID, data);
+			HID newHid = nmCore.createHID(data);
+			hidBackboneMap.put(newHid, originatingBackbone);
+			return nmCore.sendData(newHid, receiverHID, data);
 		} catch (RemoteException e) {
 			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return new NMResponse(NMResponse.STATUS_ERROR);
 		
@@ -110,16 +97,23 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 	@Override
 	public List<Backbone> getAvailableCommunicationChannels() {
-	
-		
 		return availableBackbones;
 	}
-
+	
 	@Override
 	public void applyConfigurations(Hashtable updates) {
 		if(updates.containsKey(BackboneRouterImpl.BACKBONE_ROUTER)){
-			this.routingMethod = (String) configurator.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
+			this.defaultRoute = (String) configurator.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
 		}			 
+	}
+
+	@Override
+	public NMResponse broadcastData(HID senderHid, byte[] data) {
+		
+//		for(Backbone bb : availableBackbones){
+//			if(bb.)
+//		}
+		return null;
 	}
 
 
