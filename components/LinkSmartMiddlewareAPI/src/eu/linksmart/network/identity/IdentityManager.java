@@ -5,6 +5,7 @@ import java.util.Set;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.Message;
 
 
 /*
@@ -17,8 +18,9 @@ public interface IdentityManager {
 	}
 		
 	public HID createHID(Properties attributes);
-	public boolean updateHID(HID hid, Properties attr);
+	public boolean updateHIDInfo(HID hid, Properties attr);
 	public Set<HID> getHIDs(Properties attributes);
+	
 	//public HID createHID(long contextID, int level, String description, String endpoint, Properties attr);
 	//public HID createHID(long contextID, int level);
 	//public HID createHID(String description, String endpoint);

@@ -20,7 +20,7 @@ public class Message {
 	private HID receiverHID = null;
 	
 	public Message(String topic, HID senderHID, HID receiverHID, byte[] data){
-		if(StringUtils.isEmpty(topic) || senderHID == null || receiverHID == null || data == null || data.length == 0)
+		if(StringUtils.isEmpty(topic) || senderHID == null || data == null || data.length == 0)
 			throw new IllegalArgumentException("Message cannot have null for required fields");
 		this.topic = topic;
 		this.senderHID = senderHID;

@@ -43,6 +43,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
+		
 		Thread broadcastingThread = new Thread(new HIDUpdaterThread());
 		broadcastingThread.start();
 		LOG.info(IDENTITY_MGR + "started");
@@ -404,21 +405,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 		return new HashSet<HIDInfo>(allDescriptions);
 	}
 
-	/**
-	 * Gets HIDs update
-	 * 
-	 * @return the update
-	 */
-	private Message getHIDListUpdate() {
-//		String update = "";
-//		while (queue.peek() != null) {
-//			update = update + queue.poll() + " ";
-//		}
-//		if (update.equals("")) {
-//			update = " ";
-//		}
-		return null;
-	}
 
 	/**
 	 * Gets "max" host HIDs by attributes
@@ -470,9 +456,32 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	}
 
 	
+	
+	//keep the following two methods near each other
+	//because they refer to the same format
+	/**
+	 * Gets HIDs update
+	 * 
+	 * @return the update
+	 */
+	private synchronized Message getHIDListUpdate() {
+		
+		String update = "";
+		while (queue.peek() != null) {
+			update = update + queue.poll() + " ";
+		}
+		if (update.equals("")) {
+			update = " ";
+		}
+		
+		Message updateMsg = new Message("IDManagerHIDListUpdate", );
+		
+		return update;
+	}
+	
 	@Override
 	public Message processMessage(Message msg) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	
