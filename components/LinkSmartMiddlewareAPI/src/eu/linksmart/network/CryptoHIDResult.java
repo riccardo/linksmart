@@ -113,9 +113,7 @@ public class CryptoHIDResult  implements java.io.Serializable {
 		}
 		
 		CryptoHIDResult other = (CryptoHIDResult) obj;
-		if (obj == null) {
-			return false;
-		}
+		
 		if (this == obj) {
 			return true;
 		}
