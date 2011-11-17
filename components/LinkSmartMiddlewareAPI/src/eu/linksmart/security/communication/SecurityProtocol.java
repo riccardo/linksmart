@@ -1,5 +1,6 @@
 package eu.linksmart.security.communication;
 
+import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 import eu.linksmart.network.Message;
@@ -11,6 +12,18 @@ import eu.linksmart.network.Message;
  */
 public interface SecurityProtocol {
 
+	public static final short CONF_ENC=1;
+	public static final short CONF_NULL=0;
+	public static final short CONF_ENC_SIG_SPORADIC=2;
+	public static final short CONF_ENC_SIG=3;
+	public static final String INSIDE_SECURITY_NAMESPACE = "http://linksmart.eu/ns/security/inside";
+	public static final String INSIDE_SIGNED_MESSAGE_NAMESPACE = "http://linksmart.eu/ns/security/inside_sig";
+	public static final String INSIDE_PROTECTED_MESSAGE_NAME = "linksmart:InsideProtectedMessage";
+	public static final String INSIDE_SIGNED_MESSAGE_NAME = "linksmart:InsideSignedProtectedMessage";
+	public static final String INSIDE_NONCE_ELEMENT = "linksmart:InsideNonce";
+	public static final String INSIDE_CONTENT_ELEMENT = "linksmart:InsideContent";
+	public static final String INSIDE_PROTECTED_ELEMENT = "linksmart:InsideProtected";
+	
 	/**
 	 * Starts the initialization of the security
 	 * protocol. This might involve handshake or
@@ -36,9 +49,11 @@ public interface SecurityProtocol {
 	 * 
 	 * @param msg Message to be processed
 	 * @throws CryptoException If cryptography specific exception occurred
+	 * @throws VerificationFailureException If a received signature is not valid
+	 * @throws IOException If received data cannot be interpreted
 	 * @return original Message object if it is not identified
 	 */
-	Message processMessage(Message msg) throws CryptoException;
+	Message processMessage(Message msg) throws CryptoException, VerificationFailureException, IOException;
 	
 	/**
 	 * Protects the data part of the message with 
