@@ -27,45 +27,37 @@ import eu.linksmart.security.communication.CommunicationSecurityManager;
 /*
  * Core implementation of NetworkManagerCore Interface
  */
-public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageProvider{
+public class NetworkManagerCoreImpl extends NetworkManagerApplicationImpl implements NetworkManagerCore, MessageProvider {
 
-	private static final String STARTED = "started";
+	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
+	
+	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
 
-	private static final String STARTING = "Starting";
+	private static final String STARTING_MESSAGE = "Starting" + NETWORK_MGR_CORE;
 
 	Logger LOG = Logger.getLogger(NetworkManagerCoreImpl.class.getName());
 	
-	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
-	
 	public static String SUCCESSFULL_PROCESSING = "OK";	
-
-	private HID myHID;
-
-	private String myDescription;
 
 	private NetworkManagerCoreConfigurator configurator;
 	
-	private IdentityManager identityManager;
 	private CommunicationSecurityManager commSecMgr;
-	private ConnectionManager connectionManager;
-	private BackboneRouter backboneRouter;
-	
 	private Map<String,ArrayList<MessageObserver>> msgObservers = new HashMap<String,ArrayList<MessageObserver>>();
 	
 	
 protected void activate(ComponentContext context) {
 	
-	LOG.debug(STARTING + NETWORK_MGR_CORE);
+	LOG.debug(STARTING_MESSAGE);
 	
 	init(context);
 	
-	LOG.debug(NETWORK_MGR_CORE + STARTED);
+	LOG.debug(STARTED_MESSAGE);
 	
 }
 private void init(ComponentContext context) {
 	 this.configurator = new NetworkManagerCoreConfigurator(this, context.getBundleContext());
 	 this.myDescription = this.configurator.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
-	this.connectionManager = new ConnectionManager();
+	 this.connectionManager = new ConnectionManager();
 
 	
 }
@@ -75,11 +67,11 @@ protected void deactivate(ComponentContext context) {
 
 protected void bindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr){
 	this.commSecMgr = commSecMgr;
-	connectionManager.setCommunicationSecurityManager(this.commSecMgr);
+	this.connectionManager.setCommunicationSecurityManager(this.commSecMgr);
 }
 
 protected void unbindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr){
-	connectionManager.removeCommunicationSecurityManager();
+	this.connectionManager.removeCommunicationSecurityManager();
 	this.commSecMgr = null;
 }
 
@@ -104,16 +96,7 @@ protected void unbindBackboneRouter(BackboneRouter backboneRouter){
 	this.backboneRouter=null;
 }
 @Override
-public NMResponse sendData(HID sender, HID receiver, byte[] data)
-throws RemoteException {
-	
-	NMResponse response = this.backboneRouter.sendData(sender,receiver,data);
-	
-	return response;
-}
-@Override
-public NMResponse receiveData(HID sender, HID receiver, byte[] data)
-throws RemoteException {
+public NMResponse receiveData(HID sender, HID receiver, byte[] data) {
 	//get connection belonging to HIDs
 	Connection conn = connectionManager.getConnection(receiver, sender);
 	Message msg = conn.processData(data);
@@ -137,10 +120,6 @@ throws RemoteException {
 	}
 }
 
-@Override
-public HID getHID() {
-	return this.myHID;
-}
 public void setDescription(String description) {
 	
 	Properties attributes = new Properties();
@@ -148,22 +127,6 @@ public void setDescription(String description) {
 	
 	this.identityManager.update(this.myHID, attributes);
 	
-}
-
-@Override
-public NMResponse sendMessage(Message message) throws RemoteException {
-	
-	HID senderHID = message.getReceiverHID();
-	
-	HID receiverHID = message.getSenderHID();
-	
-	Connection connection = this.connectionManager.getConnection(receiverHID, senderHID);
-	
-	byte[] data = connection.processMessage(message);	
-	
-	NMResponse response = this.backboneRouter.sendData(senderHID, receiverHID, data);
-	
-	return response;
 }
 
 public void subscribe(String topic, MessageObserver observer) {
@@ -195,13 +158,6 @@ public HID createHID(byte[] data) throws RemoteException {
 		
 	Properties attributes = this.connectionManager.getHIDAttributes(data);
 		
-	HID newHID = this.identityManager.createHID(attributes);
-	
-	return newHID;
-}
-@Override
-public HID createHID(Properties attributes) throws RemoteException {
-	
 	HID newHID = this.identityManager.createHID(attributes);
 	
 	return newHID;

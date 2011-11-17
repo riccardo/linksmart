@@ -61,8 +61,6 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 
 	IdentityManager identityManager;
 	ComponentContext context;
-	private NetworkManagerCore networkManagerCore;
-	
 	/**
 	 * Constructor
 	 * 
@@ -73,7 +71,6 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 			NetworkManagerCore networkManager, IdentityManager identityManager) {
 		
 		this.identityManager =  identityManager;
-		this.networkManagerCore = networkManager;
 		this.context = context;
 	}
 	
