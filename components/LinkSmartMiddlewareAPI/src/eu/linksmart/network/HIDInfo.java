@@ -45,7 +45,6 @@ import java.util.Properties;
  */
 public class HIDInfo {
 	private HID hid;
-	private String endpoint;
 	private String description;
 	private Properties attributes;
 	
@@ -55,11 +54,10 @@ public class HIDInfo {
 	 * @param description the description
 	 * @param endpoint the endpoint
 	 */
-	public HIDInfo(HID hid, String description, String endpoint) {
+	public HIDInfo(HID hid, String description) {
 		
 		super();
 		this.hid = hid;
-		this.endpoint = endpoint;
 		this.description = description;
 		this.attributes = null;
 	}
@@ -76,7 +74,6 @@ public class HIDInfo {
 		
 		super();
 		this.hid = hid;
-		this.endpoint = endpoint;
 		this.description = description;
 		this.attributes = attributes;
 	}
@@ -88,31 +85,9 @@ public class HIDInfo {
 	 */
 	@Override
 	public String toString() {
-		return hid.toString() + ":" + description + ":" + endpoint;
+		return hid.toString() + ":" + description;
 	}
 
-
-	
-
-	
-	/**
-	 * Gets the endpoint
-	 * 
-	 * @return the endpoint
-	 */
-	public String getEndpoint() {
-		return endpoint;
-	}
-	
-	/**
-	 * Sets the endpoint
-	 * 
-	 * @param endpoint the endpoint to set
-	 */
-	public void setEndpoint(String endpoint) {
-		this.endpoint = endpoint;
-	}
-	
 	/**
 	 * Gets the description
 	 * 
