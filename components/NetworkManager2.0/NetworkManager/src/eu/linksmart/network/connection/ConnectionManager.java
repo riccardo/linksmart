@@ -1,8 +1,18 @@
 package eu.linksmart.network.connection;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Properties;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
@@ -15,12 +25,17 @@ import eu.linksmart.security.communication.CommunicationSecurityManager;
 public class ConnectionManager {
 
 	private List<Connection> connections = new ArrayList<Connection>();
+	private Connection broadcastConnection = null;
 	private CommunicationSecurityManager comSecMgr = null;
 
+	public ConnectionManager(){
+		broadcastConnection = new Connection(null, null);
+	}
+	
 	public void setCommunicationSecurityManager(CommunicationSecurityManager comSecMgr){
 		this.comSecMgr = comSecMgr;
 	}
-	
+
 	public void removeCommunicationSecurityManager(){
 		comSecMgr = null;
 	}
@@ -42,15 +57,35 @@ public class ConnectionManager {
 		}
 
 		//there was no connection found so create new connection
+		//if there was no connection that means that the sender is the client and the receiver is the server
 		Connection conn = new Connection(senderHID, receiverHID);
 		if(comSecMgr != null){
-			conn.setSecurityProtocol(comSecMgr.getSecurityProtocol());
+			conn.setSecurityProtocol(comSecMgr.getSecurityProtocol(senderHID, receiverHID));
 		}
 		return conn;
 	}
+	
+	public synchronized Connection getBroadcastConnection(HID senderHID){
+		return broadcastConnection;
+	}
 
-	public Properties getHIDAttributes(byte[] data) {
-		// TODO tranten
-		return null;
+	/**
+	 * Creates a {@Properties} object form the received data.
+	 * It is assumed that every message which does not have
+	 * a sender HID is a request for an HID as such sends attributes
+	 * @param data Received data from an entity without HID
+	 * @return Properties object unserialized from data
+	 * @throws IOException 
+	 */
+	public Properties getHIDAttributes(byte[] data) throws IOException {
+		Properties properties = new Properties();
+		try {
+			properties.loadFromXML(new ByteArrayInputStream(data));
+		} catch (Exception e) {
+			IOException ioe = new IOException("Cannot parse received data!");
+			ioe.initCause(e);
+			throw ioe;
+		}
+		return properties;
 	}
 }
