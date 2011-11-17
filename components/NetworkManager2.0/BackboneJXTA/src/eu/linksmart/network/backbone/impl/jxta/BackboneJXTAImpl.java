@@ -71,6 +71,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	private MulticastSocket msocket;
 
 	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
+	
+	protected Hashtable<HID, RemoteEndpointInformation> listOfRemoteEndpoints;
 
 	public void activate(ComponentContext context) {
 		logger.info("**** Activating JXTA backbone!");
@@ -143,6 +145,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		pipeSyncHandler = new PipeSyncHandler(this);
 		socketHandler = new SocketHandler(this);
+		
+		listOfRemoteEndpoints = new Hashtable<HID, RemoteEndpointInformation>();
 
 		startJXTA();
 
@@ -163,6 +167,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		bbRouter = null;
 		socketHandler = null;
 		pipeSyncHandler = null;
+		listOfRemoteEndpoints = null;
 
 		logger.info("JXTA Backbone stopped succesfully");
 	}
@@ -607,10 +612,15 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 				InetAddress senderIP = receivedData.getAddress();
 				int senderPort = receivedData.getPort();
 
+				HID senderHID = GetHIDFromData(receivedData.getData());
 				// give message to BBRouter for further processing
-				bbRouter.receiveData(GetHIDFromData(receivedData.getData()),
+				bbRouter.receiveData(senderHID,
 						null, RemoveHIDFromData(receivedData.getData()),
 						(Backbone) this);
+				// add info to table of HID-Endpoint
+				RemoteEndpointInformation endpoint = new RemoteEndpointInformation(socketAddress,
+						senderIP, senderPort);
+				listOfRemoteEndpoints.put(senderHID, endpoint);
 			}
 		}
 
@@ -662,6 +672,42 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		String dataWithoutHidAsString = dataAsString.substring(
 				posHidDelimiter + 1, dataAsString.length());
 		return dataWithoutHidAsString.getBytes();
+	}
+	
+	
+	private class RemoteEndpointInformation {
+		protected SocketAddress socketAddress;
+		protected InetAddress senderIP;
+		protected int senderPort;
+		
+		
+		public RemoteEndpointInformation(SocketAddress socketAddress,
+				InetAddress senderIP, int senderPort) {
+			super();
+			this.socketAddress = socketAddress;
+			this.senderIP = senderIP;
+			this.senderPort = senderPort;
+		}
+		
+		public SocketAddress getSocketAddress() {
+			return socketAddress;
+		}
+		public void setSocketAddress(SocketAddress socketAddress) {
+			this.socketAddress = socketAddress;
+		}
+		public InetAddress getSenderIP() {
+			return senderIP;
+		}
+		public void setSenderIP(InetAddress senderIP) {
+			this.senderIP = senderIP;
+		}
+		public int getSenderPort() {
+			return senderPort;
+		}
+		public void setSenderPort(int senderPort) {
+			this.senderPort = senderPort;
+		}
+ 
 	}
 
 }
