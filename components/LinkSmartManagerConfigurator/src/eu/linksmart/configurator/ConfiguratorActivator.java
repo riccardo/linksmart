@@ -38,8 +38,11 @@
 package eu.linksmart.configurator;
 
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 
@@ -49,12 +52,13 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 
-
 import eu.linksmart.configurator.impl.ConfiguratorImpl;
 import eu.linksmart.configurator.webconf.GetConfigurationServlet;
 import eu.linksmart.configurator.webconf.LinkSmartStatus;
 import eu.linksmart.network.CryptoHIDResult;
-import eu.linksmart.network.NetworkManagerApplication;
+import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDAttribute;
+import eu.linksmart.network.networkmanager.application.NetworkManagerApplication;
 
 
 /**
@@ -62,8 +66,22 @@ import eu.linksmart.network.NetworkManagerApplication;
  */
 public class ConfiguratorActivator  {
 
-	private static String xmlAttributes;
+	/**
+	 * constants
+	 */
+	private static final String OSGI_HTTP_SERVICE_PORT_PROPERTY = System.getProperty("org.osgi.service.http.port");
+	private static final String SID ="eu.linksmart.Configuration";
+	private static final String SERVICE_URL = "http://localhost:" + OSGI_HTTP_SERVICE_PORT_PROPERTY  + "/axis/services/LinkSmartConfigurator";
 	
+	private final static String WEB_SERVLET_ALIAS = "/LinkSmartConfigurator";
+	private final static String GETCONFIGURATION_SERVLET_ALIAS =
+		"/LinkSmartConfigurator/GetConfiguration";
+	
+	private static String PID;
+	
+	/**
+	 * fields
+	 */
 	private ComponentContext context;
 	private ConfiguratorImpl configuratorImpl;
 	private ServiceRegistration configuratorReg;
@@ -73,26 +91,12 @@ public class ConfiguratorActivator  {
 	private NetworkManagerApplication nm;
 	private CryptoHIDResult cryptoHID;
 	
-	private final static String WEB_SERVLET_ALIAS = "/LinkSmartConfigurator";
-	private final static String GETCONFIGURATION_SERVLET_ALIAS =
-		"/LinkSmartConfigurator/GetConfiguration";
-	
 	static {
 		try {
-			xmlAttributes = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
-				+ "<!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">"
-				+ "<properties>"
-				+ "<entry key=\"PID\">" + InetAddress.getLocalHost().getHostName() 
-				+ "</entry>"
-				+ "<entry key=\"SID\">eu.linksmart.Configuration</entry>"
-				+ "</properties>";
+			PID = InetAddress.getLocalHost().getHostName();
+			
 		} catch (UnknownHostException e) {
-			xmlAttributes = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
-				+ "<!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">"
-				+ "<properties>"
-				+ "<entry key=\"PID\">Unknown</entry>"
-				+ "<entry key=\"SID\">eu.linksmart.Configuration</entry>"
-				+ "</properties>";
+			PID = "Unknown";
 		}
 	}
 
@@ -164,7 +168,7 @@ public class ConfiguratorActivator  {
 		
 		if ((nm != null) && (cryptoHID != null)) {
 			try {
-				nm.removeHID(cryptoHID.getHID());
+				nm.removeHID(new HID(cryptoHID.getHID()));
 			} catch (RemoteException e) {
 				logger.error(e);
 			}
@@ -180,10 +184,18 @@ public class ConfiguratorActivator  {
 		this.nm = nm;
 		if (http != null) {
 			try {
-				this.cryptoHID = nm.createCryptoHID(xmlAttributes, "http://localhost:"
-						+ System.getProperty("org.osgi.service.http.port")
-						+ "/axis/services/LinkSmartConfigurator");
+				Properties attributes = new Properties();
+				
+				attributes.setProperty(HIDAttribute.PID.name(), PID);
+				attributes.setProperty(HIDAttribute.SID.name(), SID);
+				
+				HID hid = nm.createHID(attributes, new URL(SERVICE_URL));
+				this.cryptoHID.setHID(hid.toString());
+				//TODO #NM Amro & Marc V.
+//				this.cryptoHID.setCertRef(certRef)
 			} catch (RemoteException e) {
+				logger.error(e);
+			} catch (MalformedURLException e) {
 				logger.error(e);
 			}
 		}
@@ -197,7 +209,7 @@ public class ConfiguratorActivator  {
 	protected void unregisterHID(NetworkManagerApplication nm) {
 		if (http != null) {
 			try {
-				nm.removeHID(cryptoHID.getHID());
+				nm.removeHID(new HID(cryptoHID.getHID()));
 				this.cryptoHID = null;
 			} catch (RemoteException e) {
 				logger.error(e);
