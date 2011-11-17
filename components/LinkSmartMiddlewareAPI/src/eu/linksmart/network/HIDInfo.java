@@ -69,7 +69,7 @@ public class HIDInfo {
 	 * @param endpoint the endpoint
 	 * @param attributes the properties
 	 */
-	public HIDInfo(HID hid, String description, String endpoint,
+	public HIDInfo(HID hid, String description,
 			Properties attributes) {
 		
 		super();

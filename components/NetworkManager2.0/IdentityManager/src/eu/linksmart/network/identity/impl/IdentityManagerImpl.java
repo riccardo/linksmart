@@ -15,8 +15,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
+import com.sun.xml.internal.ws.util.StringUtils;
+
 import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.BroadcastMessage;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageObserver;
 import eu.linksmart.network.identity.IdentityManager;
@@ -27,6 +30,7 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
  */
 public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	private static String IDENTITY_MGR = IdentityManagerImpl.class.getSimpleName();
+	private final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
 	
 	private ConcurrentHashMap<HID, HIDInfo> localHIDs;
 	private ConcurrentHashMap<HID, HIDInfo> remoteHIDs;
@@ -55,16 +59,14 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 
 	@Override
 	public HID createHID(Properties attributes) {
-		// TODO Auto-generated method stub
-		HID newHID = null; //TODO generate this HID!
-		
-		//idTable.put(newHID, attributes);
-		return newHID;
+		//TODO check also for other properties!
+		//StringUtils.join(attributes.values().toArray(), "|");
+		String description = attributes.getProperty(HIDAttribute.DESCRIPTION.name());
+		return createHID(description);
 	}
 
-	@Override
-	public Set<HID> getHIDs(Properties attributes) {
-/*		// TODO Auto-generated method stub
+/*	private Set<HID> getHIDs(Properties attributes) {
+		// TODO Auto-generated method stub
 		Set<HID> searchResults = null;
 		
 		for (HID hid : hidTable.keySet()) {
@@ -75,9 +77,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 		}
 		
 		return searchResults;
-*/      return null;
+      return null;
 		}
-
+*/
 
 
 //================
@@ -107,7 +109,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 		
 		Random rnd = new Random();
 		HID hid = createUniqueHID();
-		HIDInfo info = new HIDInfo(hid, description, endpoint, attr);
+		HIDInfo info = new HIDInfo(hid, description, attr);
 		long rndContext;
 		switch (level) {
 			case 1:
@@ -170,11 +172,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	 * @param endpoint the endpoint
 	 * @return the HID created
 	 */
-	public HID createHID(String description, String endpoint) {
+	public HID createHID(String description) {
 		HID hid = createUniqueHID();
-		HIDInfo info = new HIDInfo(hid, description, endpoint);
+		HIDInfo info = new HIDInfo(hid, description);
 		addLocalHID(hid, info);
-		LOG.debug("Created HID: " + hid.toString() + " for " + endpoint);		
+		LOG.debug("Created HID: " + hid.toString() );		
 		return hid;
 	} 
 	
@@ -186,7 +188,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	 * @return the HID created or null HID (0.0.0.0) if it could not be created
 	 */
 	public HID createHID() {
-		return createHID(" ", " ");
+		return createHID(" ");
 	}
 	
 	/**
@@ -198,11 +200,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	 * @param attr the properties associated to this HID
 	 * @return The HID created or null HID (0.0.0.0) if it could not be created
 	 */
-	public HID createHID(String description, String endpoint, Properties attr) {
+	public HID createHID(String description, Properties attr) {
 		HID hid = createUniqueHID();
-		HIDInfo info = new HIDInfo(hid, description, endpoint, attr);
+		HIDInfo info = new HIDInfo(hid, description, attr);
 		addLocalHID(hid, info);
-		LOG.debug("Created HID " + hid.toString() + " for " + endpoint);
+		LOG.debug("Created HID " + hid.toString() );
 		return hid;
 	}	
 	
@@ -440,7 +442,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	}
 
 	
-	public boolean updateHID(HID hid, Properties attr) {
+	public boolean updateHIDInfo(HID hid, Properties attr) {
 		HIDInfo toUpdate = localHIDs.get(hid);
 		if (toUpdate != null) {
 			synchronized (queue) { //because we need to be sure that both deletion of old and insertion of new attributes are in the queue at the same time
@@ -464,7 +466,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	 * 
 	 * @return the update
 	 */
-	private synchronized Message getHIDListUpdate() {
+	private synchronized BroadcastMessage getHIDListUpdate() {
 		
 		String update = "";
 		while (queue.peek() != null) {
@@ -474,15 +476,39 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 			update = " ";
 		}
 		
-		Message updateMsg = new Message("IDManagerHIDListUpdate", );
-		
-		return update;
+		BroadcastMessage updateMsg = new BroadcastMessage(IDMANAGER_UPDATE_HID_LIST_TOPIC, networkManagerCore.getHID(), update.getBytes());
+		return updateMsg;
 	}
 	
 	@Override
 	public Message processMessage(Message msg) {
-		
-		return null;
+		if (msg.getTopic() == IDMANAGER_UPDATE_HID_LIST_TOPIC) {
+			if (msg.getSenderHID() != networkManagerCore.getHID()) {
+				//this is not an echo of our own broadcast
+				//otherwise we do not need to do anything with it
+				//else it is a genuine update
+				String updates = msg.getData().toString();
+				for (String oneUpdate: updates.split(" ")) {
+					String[] updateData = oneUpdate.split(";");
+					//at this point updateData 0 is operation type A/D, [1] is hid, [2] is description (only if operation=A)
+					if (updateData[0] == "A") {
+						HID newHID = new HID(updateData[1]);
+						HIDInfo newInfo = new HIDInfo(newHID, updateData[1]);
+						addRemoteHID(newHID, newInfo);
+					} else if (updateData[0] == "D") {
+						HID toRemoveHID = new HID(updateData[1]);
+						removeRemoteHID(toRemoveHID);
+					} else {
+						throw new IllegalArgumentException("Unexpected update type for IDManager updates");
+					}
+				}
+			}
+			return null; //the complete message has been processed
+		} else { //other message type
+			//TODO
+			return msg; //for the moment pass it on
+		}
+	
 	}
 	
 	private class HIDUpdaterThread implements Runnable{
@@ -491,9 +517,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 		public void run() {
 			while (true){
 				if (!queue.isEmpty()){
-					Message m = getHIDListUpdate();
+					BroadcastMessage m = getHIDListUpdate();
 					if (networkManagerCore != null){
-						// TODO networkManagerCore.broadcast(m);
+						networkManagerCore.broadcastMessage(m);
 					} else {
 						LOG.warn("NetworkManagerCore not available! No Broadcast could be sent!");
 					}

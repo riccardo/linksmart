@@ -19,7 +19,7 @@ public interface IdentityManager {
 		
 	public HID createHID(Properties attributes);
 	public boolean updateHIDInfo(HID hid, Properties attr);
-	public Set<HID> getHIDs(Properties attributes);
+	//public Set<HID> getHIDs(Properties attributes);
 	
 	//public HID createHID(long contextID, int level, String description, String endpoint, Properties attr);
 	//public HID createHID(long contextID, int level);
