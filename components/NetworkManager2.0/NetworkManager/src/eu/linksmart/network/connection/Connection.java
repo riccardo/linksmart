@@ -47,7 +47,7 @@ public class Connection {
 	 * @param data Data received over network
 	 * @return Message object for further processing
 	 */
-	public Message processData(byte[] data){
+	public Message processData(HID senderHID, HID receiverHID, byte[] data){
 		//TODO #NM refactoring
 		return new Message(null, null, null, null);
 	}

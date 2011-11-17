@@ -99,19 +99,27 @@ protected void unbindBackboneRouter(BackboneRouter backboneRouter){
 public NMResponse receiveData(HID sender, HID receiver, byte[] data) {
 	//get connection belonging to HIDs
 	Connection conn = connectionManager.getConnection(receiver, sender);
-	Message msg = conn.processData(data);
+	Message msg = conn.processData(sender, receiver, data);
 	String topic = msg.getTopic();
 	//go through MsgObservers for additional processing
 	List<MessageObserver> observers = msgObservers.get(topic);
 	if(observers != null){
 		for(MessageObserver observer : observers){
-			observer.processMessage(msg);
+			msg = observer.processMessage(msg);
+			if(msg == null || msg.getData() == null){
+				NMResponse nmresp = new NMResponse();
+				nmresp.setData(SUCCESSFULL_PROCESSING);
+				return nmresp;
+			}
 		}
 	}
 	
 	//if message is still existing it has to be forwarded
-	if(msg.getData() != null && msg.getData().length != 0){
-		//TODO #NM refactoring send message over sendMessage method of self and return response of it
+	if(msg != null && msg.getData() != null && msg.getData().length != 0){
+		//TODO #NM refactoring 
+		//check if message is not intended for host HID, if yes and it has not been processed drop it
+		
+		//send message over sendMessage method of this and return response of it
 		return null;
 	}else{
 		NMResponse response = new NMResponse();
