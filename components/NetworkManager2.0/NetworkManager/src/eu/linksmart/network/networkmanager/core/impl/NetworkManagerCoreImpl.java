@@ -18,7 +18,7 @@ import eu.linksmart.network.MessageProvider;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
-import eu.linksmart.network.identity.HIDAttribute;
+import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
