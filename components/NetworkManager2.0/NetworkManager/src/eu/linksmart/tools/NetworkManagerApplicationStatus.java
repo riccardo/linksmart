@@ -34,14 +34,13 @@
 package eu.linksmart.tools;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Vector;
+import java.util.Set;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -49,19 +48,24 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentContext;
 
-
+import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
-import eu.linksmart.network.HID;
+import eu.linksmart.network.routing.BackboneRouter;
 
 /**
  * NetworkManagerApplication Servlet
  */
 public class NetworkManagerApplicationStatus extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4466023547680249135L;
 	IdentityManager identityManager;
 	ComponentContext context;
-	NetworkManagerCore nmCore;
+	private BackboneRouter backboneRouter;
 	
 	/**
 	 * Constructor
@@ -70,9 +74,10 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 	 * @param networkManagerCore the Network Manager Service implementation
 	 */
 	public NetworkManagerApplicationStatus(ComponentContext context, 
-			NetworkManagerCore networkManager, IdentityManager identityManager) {
+			NetworkManagerCore networkManagerCore, IdentityManager identityManager, BackboneRouter backboneRouter) {
 		
 		this.identityManager =  identityManager;
+		this.backboneRouter = backboneRouter;
 		this.context = context;
 	}
 	
@@ -106,7 +111,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 			+ "<td align=\"right\" width=20%>"
 			+ "<img src=\"files/0.gif\" /></td></tr></table>");
 		response.getWriter().println("<h1>" + "Total Number of HIDs in the "
-			+ "LinkSmart Network: " + identityManager.getHIDs().size() + "</h1>");
+			+ "LinkSmart Network: " + identityManager.getAllHIDs().size() + "</h1>");
 		
 		/* Print Network Managers Discovered. */
 		response.getWriter().println("<table border=1 class=\"stats\" "
@@ -115,26 +120,24 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 			+ "width=25%>HOST</td><td class=\"hed\" width=25%>ENDPOINT</td></tr>");
 		
 		String s = "";
-		Vector<String> hids = identityManager.getHIDsbyDescription("NetworkManagerCore*");
-		Iterator<String> it = hids.iterator();
-		String endpoint;
+		Set<HIDInfo> hids = identityManager.getHIDsByDescription("NetworkManagerCore*");
+		Iterator<HIDInfo> it = hids.iterator();
 		String description;
-		String ip;
+		String route;
 		
 		while (it.hasNext()) {
-			HID hid = new HID(it.next());
+			HID hid = new HID(it.next().getHID());
 			
 			try {
-				endpoint = identityManager.getHIDInfo(hid).getEndpoint();
-				if (endpoint.equals(" ")) {
-					endpoint = "-";
+				route = this.backboneRouter.getRoute(hid);
+				if (route.equals(" ")) {
+					route = "-";
 				}
 				description = identityManager.getHIDInfo(hid).getDescription();
-				ip = identityManager.getHIDInfo(hid).getIp();
+				route = this.backboneRouter.getRoute(hid);
 				s = s + "<tr><td width=25%>" + hid.toString()
 					+ "</td><td width=25%>" + description
-					+ "</td><td width=25%>" + ip
-					+ "</td><td width=25%>" + endpoint + "</td></tr>";
+					+ "</td><td width=25%>" + route + "</td></tr>";
 			}
 			catch (Exception e) {
 				System.out.println("Error printing " + hid);
@@ -150,24 +153,26 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 			+ "<td class=\"hed\" width=25%>HOST</td>"
 			+ "<td class=\"hed\" width=25%>ENDPOINT</td></tr>");
 		s = "";
-		hids = identityManager.getHostHIDs();
+		hids = identityManager.getLocalHIDs();
 		it = hids.iterator();
 		
 		while (it.hasNext()) {
-			HID hid = new HID(it.next());
+			HID hid = new HID(it.next().getHID());
 			try {
-				endpoint = identityManager.getHIDInfo(hid).getEndpoint();
-				if (endpoint.equals(" ")) {
-					endpoint = "-";
+				route = this.backboneRouter.getRoute(hid);
+				if (route.equals(" ")) {
+					route = "-";
 				}
 				description = identityManager.getHIDInfo(hid).getDescription();
 				
 				if (description.equals("")) {
-					String xmlAtributes = this.identityManager.getInformationAssociatedWithHID(
-						identityManager.getLocalNMHID(), hid.toString());
-					Properties attr = new Properties();
-					attr.loadFromXML(new ByteArrayInputStream(xmlAtributes.getBytes()));
-					Enumeration en = attr.keys();
+					
+					HIDInfo hidInfo = identityManager.getHIDInfo(hid);
+					
+					Properties attr = hidInfo.getAttributes();
+					
+					
+					Enumeration<Object> en = attr.keys();
 					while (en.hasMoreElements()) {
 						String key = (String) en.nextElement();
 						if (key.equals("CN") || key.equals("DN")
@@ -177,12 +182,13 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 						String value = attr.getProperty(key);
 						description = description + key + " = " + value + "<br/>";
 					}
+										
+					
 				}
-				ip = identityManager.getHIDInfo(hid).getIp();
+				route = this.backboneRouter.getRoute(hid);
 				s = s + "<tr><td width=25%>" + hid.toString()
 					+ "</td><td width=25%>" + description
-					+ "</td><td width=25%>" + ip
-					+ "</td><td width=25%>" + endpoint + "</td></tr>";
+					+ "</td><td width=25%>" + route + "</td></tr>";
 			} catch (Exception e) {
 				System.out.println("Error printing " + hid);
 			}
@@ -197,22 +203,21 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 			+ "<td class=\"hed\" width=25%>HOST</td>"
 			+ "<td class=\"hed\" width=25%>ENDPOINT</td></tr>");
 		s = "";
-		hids = identityManager.getHIDs();
+		hids = identityManager.getAllHIDs();
 		it = hids.iterator();
 		
 		while (it.hasNext()) {
-			HID hid = new HID(it.next());
+			HID hid = new HID(it.next().getHID());
 			try {
-				endpoint = identityManager.getHIDInfo(hid).getEndpoint();
-				if (endpoint == " ") {
-					endpoint = "-";
+				route = this.backboneRouter.getRoute(hid);
+				if (route == " ") {
+					route = "-";
 				}
 				description = identityManager.getHIDInfo(hid).getDescription();
-				ip = identityManager.getHIDInfo(hid).getIp();
+				route = this.backboneRouter.getRoute(hid);
 				s = s + "<tr><td width=25%>" + hid.toString() 
 					+ "</td><td width=25%>" + description
-					+ "</td><td width=25%>" + ip
-					+ "</td><td width=25%>" + endpoint + "</td></tr>";
+					+ "</td><td width=25%>" + route + "</td></tr>";
 			}
 			catch (Exception e) {
 				System.out.println("Error printing " + hid);
