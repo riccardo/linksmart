@@ -199,4 +199,12 @@ public NMResponse sendMessage(Message message) {
 	return response;
 }
 
+/**
+ * Sets the number of minutes before a connection is closed 
+ * @param timeout
+ */
+protected void setConnectionTimeout(int timeout) {
+	this.connectionManager.setConnectionTimeout(timeout);	
+}
+
 }

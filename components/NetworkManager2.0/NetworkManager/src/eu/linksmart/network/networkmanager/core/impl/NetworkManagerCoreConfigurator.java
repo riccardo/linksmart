@@ -82,6 +82,8 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 //	public static final String SESSION_CLEANING_FREQ = "Session.CleaningFrequency";
 //	public static final String SESSION_SYNC_FREQ = "Session.SyncFrequency";
 	
+	public static final String CONNECTION_TIMEOUT = "NetworkManagerCore.ConnectionTimeout";
+	
 	public static final String SECURITY_PROTOCOL = "Security.Protocol";
 	
 	
@@ -117,6 +119,10 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 		
 		if (updates.containsKey(NetworkManagerCoreConfigurator.NM_DESCRIPTION)){
 			this.networkManagerCoreImpl.setDescription((String)updates.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION));
+		}
+		if(updates.containsKey(NetworkManagerCoreConfigurator.CONNECTION_TIMEOUT)){
+			this.networkManagerCoreImpl.setConnectionTimeout(Integer.valueOf(
+					(String)updates.get(NetworkManagerCoreConfigurator.CONNECTION_TIMEOUT)));
 		}
 		
 //				

@@ -23,7 +23,7 @@ import eu.linksmart.security.communication.VerificationFailureException;
  */
 public class Connection {
 
-	private static final String APPLICATOIN_DATA = "applicationData";
+	private static final String APPLICATION_DATA = "applicationData";
 
 	Logger logger = Logger.getLogger(Connection.class.getName());
 	private SecurityProtocol securityProtocol = null;
@@ -64,32 +64,15 @@ public class Connection {
 	public Message processData(HID senderHID, HID receiverHID, byte[] data){
 		Message msg = new Message("", senderHID, receiverHID, data);
 
-		if(securityProtocol.isInitialized()){
+		if(securityProtocol != null && securityProtocol.isInitialized()){
 			//if protocol is initialized than open message with it
 			try{
 				msg = securityProtocol.unprotectMessage(msg);
 			}catch(Exception e){
 				logger.debug("Cannot unprotect message from HID: " + senderHID.toString());
+				return null;
 			}
-			try{
-				//open data and divide it into properties of the message and application data
-				Properties properties = new Properties();
-				properties.loadFromXML(new ByteArrayInputStream(msg.getData()));
-
-				//read the application data field from the message and add it as the data field
-				msg.setData(((String)properties.remove(APPLICATOIN_DATA)).getBytes());
-				//go through the properties and add them to the message
-				Iterator<Object> i = properties.keySet().iterator();
-				while(i.hasNext()){
-					String key = (String)i.next();
-					msg.setProperty(key, properties.getProperty(key));
-				}
-				return msg;
-			}catch(Exception e){
-				logger.debug("Cannot parse message from HID: " + senderHID.toString());
-			}
-			return null;
-		} else {
+		} else if(securityProtocol != null){
 			//if protocol not initialized then pass it for processing
 			try {
 				msg = securityProtocol.processMessage(msg);
@@ -103,6 +86,25 @@ public class Connection {
 			}
 			return null;
 		}	
+		
+		try{
+			//open data and divide it into properties of the message and application data
+			Properties properties = new Properties();
+			properties.loadFromXML(new ByteArrayInputStream(msg.getData()));
+
+			//read the application data field from the message and add it as the data field
+			msg.setData(((String)properties.remove(APPLICATION_DATA)).getBytes());
+			//go through the properties and add them to the message
+			Iterator<Object> i = properties.keySet().iterator();
+			while(i.hasNext()){
+				String key = (String)i.next();
+				msg.setProperty(key, properties.getProperty(key));
+			}
+			return msg;
+		}catch(Exception e){
+			logger.debug("Cannot parse message from HID: " + senderHID.toString());
+		}
+		return null;
 	}
 
 	/**
@@ -120,7 +122,7 @@ public class Connection {
 			props.put(key, msg.getProperty(key));
 		}
 		//put application data into properties
-		props.put(APPLICATOIN_DATA, msg.getData());
+		props.put(APPLICATION_DATA, msg.getData());
 
 		//convert props into xml and encode it
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
