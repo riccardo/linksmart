@@ -17,14 +17,16 @@ public interface IdentityManager {
 	}
 		
 	public HID createHID(Properties attributes);
-	
 	public Set<HID> getHIDs(Properties attributes);
-	
-	public Set<HIDInfo> getHIDsByAttributes(String query, int maxNum);
-	
-	public Set<HIDInfo> getHIDsByDescription(String description);
-	
+	//public HID createHID(long contextID, int level, String description, String endpoint, Properties attr);
+	//public HID createHID(long contextID, int level);
+	//public HID createHID(String description, String endpoint);
+	//public HID createHID();
+	//public HID createHID(String description, String endpoint, Properties attr);
+	public HIDInfo getHIDInfo(HID hid);
 	public Set<HIDInfo> getAllHIDs();
-	
-	public  HIDInfo getHIDInfo(HID hid);
+	public Set<HIDInfo> getLocalHIDs();
+	public Set<HIDInfo> getRemoteHIDs();
+	public Set<HIDInfo> getHIDsByDescription(String description);
+	public Set<HIDInfo> getHIDsByAttributes(String query, int maxNum);
 }

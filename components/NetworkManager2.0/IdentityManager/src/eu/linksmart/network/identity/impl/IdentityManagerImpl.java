@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -26,17 +24,19 @@ import eu.linksmart.network.HIDInfo;
  * TODO #NM refactoring
  */
 public class IdentityManagerImpl implements IdentityManager {
-	private static String IDENTITY_MGR = IdentityManagerImpl.class
-			.getSimpleName();
+	private static String IDENTITY_MGR = IdentityManagerImpl.class.getSimpleName();
 	
-	private ConcurrentHashMap<HID, HIDInfo> idTable;
+	private ConcurrentHashMap<HID, HIDInfo> localHIDs;
+	private ConcurrentHashMap<HID, HIDInfo> remoteHIDs;
+
 	private static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 	public ConcurrentLinkedQueue<String> queue;
 
 	
 	
 	protected void activate(ComponentContext context) {
-		this.idTable = new ConcurrentHashMap<HID, HIDInfo>();
+		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
+		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
 		LOG.info(IDENTITY_MGR + "started");
 	}
@@ -105,7 +105,7 @@ public class IdentityManagerImpl implements IdentityManager {
 			case 1:
 				hid.setContextID1(contextID);
 				hid.setLevel(1);
-				addHID(hid, info);
+				addLocalHID(hid, info);
 				break;
 			case 2:	
 				rndContext = Math.abs(rnd.nextLong());
@@ -115,7 +115,7 @@ public class IdentityManagerImpl implements IdentityManager {
 				hid.setContextID1(rndContext);
 				hid.setContextID2(contextID);
 				hid.setLevel(2);
-				addHID(hid, info);
+				addLocalHID(hid, info);
 				break;
 			case 3:
 				rndContext = Math.abs(rnd.nextLong());
@@ -130,7 +130,7 @@ public class IdentityManagerImpl implements IdentityManager {
 				hid.setContextID2(rndContext);
 				hid.setContextID3(contextID);
 				hid.setLevel(3);
-				addHID(hid, info);
+				addLocalHID(hid, info);
 				break;
 			default: 
 				LOG.error("Invalid level when creating a new HID");
@@ -139,7 +139,6 @@ public class IdentityManagerImpl implements IdentityManager {
 		}
 		
 		LOG.debug("Created HID: " + hid.toString());
-		queue.add("A;"+ hid + ";" + info.getDescription());
 		return hid;
 	} 
 
@@ -166,8 +165,7 @@ public class IdentityManagerImpl implements IdentityManager {
 	public HID createHID(String description, String endpoint) {
 		HID hid = createUniqueHID();
 		HIDInfo info = new HIDInfo(hid, description, endpoint);
-		addHID(hid, info);
-		queue.add("A;" + hid + ";" + info.getDescription());
+		addLocalHID(hid, info);
 		LOG.debug("Created HID: " + hid.toString() + " for " + endpoint);		
 		return hid;
 	} 
@@ -195,8 +193,7 @@ public class IdentityManagerImpl implements IdentityManager {
 	public HID createHID(String description, String endpoint, Properties attr) {
 		HID hid = createUniqueHID();
 		HIDInfo info = new HIDInfo(hid, description, endpoint, attr);
-		addHID(hid, info);
-		queue.add("A;" + hid + ";" + info.getDescription());
+		addLocalHID(hid, info);
 		LOG.debug("Created HID " + hid.toString() + " for " + endpoint);
 		return hid;
 	}	
@@ -204,16 +201,30 @@ public class IdentityManagerImpl implements IdentityManager {
 	/**
 	 * Adds a local HID to the IdTable
 	 * 
-	 * @param id the peer id
 	 * @param hid The HID to be added
 	 * @param info the HIDInfo
 	 * @return The previous value associated with that HID, null otherwise
 	 */
-	private  HIDInfo addHID(HID hid, HIDInfo info) {
-		if (!idTable.containsKey(hid)) {
-			idTable.put(hid, info);
+	private  HIDInfo addLocalHID(HID hid, HIDInfo info) {
+		if (!localHIDs.containsKey(hid)) {
+			localHIDs.put(hid, info);
+			queue.add("A;"+ hid.toString() + ";" + info.getDescription());
 		}
-		return idTable.get(hid);
+		return localHIDs.get(hid);
+	}
+	
+	/**
+	 * Adds a remote HID to the IdTable
+	 * 
+	 * @param hid The HID to be added
+	 * @param info the HIDInfo
+	 * @return The previous value associated with that HID, null otherwise
+	 */
+	private  HIDInfo addRemoteHID(HID hid, HIDInfo info) {
+		if (!remoteHIDs.containsKey(hid)) {
+			remoteHIDs.put(hid, info);
+		}
+		return remoteHIDs.get(hid);
 	}
 	
 	/**
@@ -222,11 +233,20 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * @param hid The HID to be removed
 	 * @return the result
 	 */
-	private String removeHID(HID hid) {
-		queue.add("D;" + hid);
-		return idTable.remove(hid).toString();
+	private String removeLocalHID(HID hid) {
+		queue.add("D;" + hid.toString());
+		return localHIDs.remove(hid).toString();
 	}	
 	
+	/**
+	 * Removes a remote HID from the IdTable
+	 * 
+	 * @param hid The HID to be removed
+	 * @return the result
+	 */
+	private String removeRemoteHID(HID hid) {
+		return remoteHIDs.remove(hid).toString();
+	}	
 	
 	/**
 	 * Gets the endpoint address from an HID from idTable
@@ -235,7 +255,14 @@ public class IdentityManagerImpl implements IdentityManager {
 	 * @return The endpoint address associated
 	 */
 	public HIDInfo getHIDInfo(HID hid) {
-		return idTable.get(hid);
+		HIDInfo answer = localHIDs.get(hid); 
+		
+		if (answer != null) {
+			return answer;
+		}
+		//else, look into the remote list
+		answer = remoteHIDs.get(hid);
+		return answer;
 	}
 
 
@@ -249,7 +276,7 @@ public class IdentityManagerImpl implements IdentityManager {
 	private boolean existsDeviceID(long deviceID) {
 		boolean is = false;
 		Enumeration<HID> hids;
-		hids = idTable.keys();
+		hids = localHIDs.keys();
 		while (hids.hasMoreElements()) {
 			if (hids.nextElement().getDeviceID() == deviceID) {
 				is = true;
@@ -262,13 +289,34 @@ public class IdentityManagerImpl implements IdentityManager {
 	
 	
 	/**
-	 * Returns a vector containing all the HID inside idTable
+	 * Returns a vector containing all the HID inside local+remote Table
+	 * 
+	 * @return a vector containing all the HIDs inside local + remote idTable
+	 */	
+	public Set<HIDInfo> getAllHIDs() {
+		Set<HIDInfo> union = getLocalHIDs();
+		union.addAll(getRemoteHIDs());
+		return union;
+	}
+	
+	/**
+	 * Returns a vector containing all the local HID inside localHIDs Table
 	 * 
 	 * @return a vector containing all the HIDs inside idTable
 	 */	
-	public Set<HIDInfo> getAllHIDs() {
-		return new HashSet<HIDInfo>(idTable.values());
+	public Set<HIDInfo> getLocalHIDs() {
+		return new HashSet<HIDInfo>(localHIDs.values());
 	}
+	
+	/**
+	 * Returns a vector containing all the remote HID inside idTable
+	 * 
+	 * @return a vector containing all the remote HIDs inside idTable
+	 */	
+	public Set<HIDInfo> getRemoteHIDs() {
+		return new HashSet<HIDInfo>(localHIDs.values());
+	}
+	
 	
 
 	/**
@@ -303,7 +351,9 @@ public class IdentityManagerImpl implements IdentityManager {
 			 */
 			
 			
-		Collection<HIDInfo> allDescriptions = idTable.values();
+		Collection<HIDInfo> allDescriptions = localHIDs.values();
+		allDescriptions.addAll(remoteHIDs.values()); //because we are searching in ALL hids, local and remote
+		
 		String oneDescription;
 		for (int i = 0; i < toMatch.length; i++) { //when having an exact Match, length=1, so it will only be executed once, which is the desired behavior
 			for (Iterator<HIDInfo> it = allDescriptions.iterator(); it.hasNext();) {
@@ -374,7 +424,10 @@ public class IdentityManagerImpl implements IdentityManager {
 		LinkedList<String> parsedQuery = AttributeQueryParser.parseQuery(query);
 		/* Parse the query. */
 		HashSet<HIDInfo> results = new HashSet<HIDInfo>();
-		Iterator<Map.Entry<HID, HIDInfo>> it = idTable.entrySet().iterator();
+		
+		Set<Map.Entry<HID, HIDInfo>> allHIDs = localHIDs.entrySet();
+		allHIDs.addAll(remoteHIDs.entrySet()); //because we are checking ALL hids
+		Iterator<Map.Entry<HID, HIDInfo>> it = allHIDs.iterator();
 		
 		while (it.hasNext()) {
 			Map.Entry<HID, HIDInfo> entry = it.next();
