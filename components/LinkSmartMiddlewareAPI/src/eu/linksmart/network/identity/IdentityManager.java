@@ -22,14 +22,25 @@ public interface IdentityManager {
 	}
 
 	/**
-	 * Creates an HID with the given attributes and stores it. Attributes should
-	 * be one of {@link HIDAttribute}.
+	 * Creates a local {@link HID} with the given attributes and stores it. It
+	 * creates a random deviceID. The result will be 0.0.0.randomDeviceId.
+	 * Attributes should be one of {@link HIDAttribute}.
 	 * 
 	 * @param attributes
 	 *            Attributes describing the HID. E.g. description.
 	 * @return the {@link HID} that has been created.
 	 */
 	public HID createHID(Properties attributes);
+
+	/**
+	 * Creates a local {@link HID} without any context and stores. It creates a
+	 * random deviceID. The result will be 0.0.0.randomDeviceId.
+	 * 
+	 * @param description
+	 *            the description
+	 * @return the HID created
+	 */
+	public HID createHID(String description);
 
 	/**
 	 * Updates the attributes of the given {@link HID}.
@@ -46,7 +57,7 @@ public interface IdentityManager {
 	// public HID createHID(long contextID, int level, String description,
 	// String endpoint, Properties attr);
 	// public HID createHID(long contextID, int level);
-	// public HID createHID(String description, String endpoint);
+
 	// public HID createHID();
 	// public HID createHID(String description, String endpoint, Properties
 	// attr);
@@ -86,8 +97,7 @@ public interface IdentityManager {
 
 	/**
 	 * Return all {@link HIDInfo}s that match the given description. Wildcards
-	 * can be used.
-	 * TODO Explain the use of wildcards
+	 * can be used. TODO Explain the use of wildcards
 	 * 
 	 * @param description
 	 * @return
@@ -95,8 +105,8 @@ public interface IdentityManager {
 	public Set<HIDInfo> getHIDsByDescription(String description);
 
 	/**
-	 * Returns all {@link HIDInfo}s that match the given query.
-	 * TODO Explian the query language
+	 * Returns all {@link HIDInfo}s that match the given query. TODO Explian the
+	 * query language
 	 * 
 	 * @param query
 	 * @param maxNum
@@ -105,7 +115,8 @@ public interface IdentityManager {
 	public Set<HIDInfo> getHIDsByAttributes(String query, int maxNum);
 
 	/**
-	 * Removes the given {@link HID} from the internal HID-store.
+	 * Removes the given {@link HID} from the internal HID-store. Does nothing
+	 * if the hid is not stored by this IdentityManager
 	 * 
 	 * @param hid
 	 * @return true, if {@link HID} has been removed successfully.
