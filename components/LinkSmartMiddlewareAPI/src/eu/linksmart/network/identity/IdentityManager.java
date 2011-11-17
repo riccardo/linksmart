@@ -14,14 +14,6 @@ import eu.linksmart.network.HIDInfo;
 public interface IdentityManager {
 
 	/**
-	 * Attributes describing an HID.
-	 * 
-	 */
-	public enum HIDAttribute {
-		PID, SID, DESCRIPTION
-	}
-
-	/**
 	 * Creates a local {@link HID} with the given attributes and stores it. It
 	 * creates a random deviceID. The result will be 0.0.0.randomDeviceId.
 	 * Attributes should be one of {@link HIDAttribute}.
