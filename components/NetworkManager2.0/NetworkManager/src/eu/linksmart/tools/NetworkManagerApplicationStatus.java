@@ -61,6 +61,8 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 
 	IdentityManager identityManager;
 	ComponentContext context;
+	NetworkManagerCore nmCore;
+	
 	/**
 	 * Constructor
 	 * 

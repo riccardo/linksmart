@@ -39,19 +39,17 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.osgi.service.component.ComponentContext;
-
-
+import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
-import eu.linksmart.network.networkmanager.impl.NetworkManagerCoreImpl;
-import eu.linksmart.network.HID;
 
 /**
  * NetworkManagerStatus Servlet
@@ -89,15 +87,15 @@ public class GetNetworkManagerStatus extends HttpServlet {
 		if(params.containsKey("method")) {
 			Object s = params.get("method");
 			if (((String[]) params.get("method"))[0].equals("getNetworkManagers")) {
-				Vector<String> hids = identityManager.getHIDs("NetworkManagerCore*");
+				Set<HIDInfo> hids = identityManager.getAllHIDs();
 
-				Iterator<String> it = hids.iterator();
+				Iterator<HIDInfo> it = hids.iterator();
 				String endpoint;
 				String description = "";
 				String host;
 				
 				while (it.hasNext()) {
-					HID HID = new HID(it.next());
+					HID HID = new HID(it.next().getHID());
 					String hid = HID.toString();
 
 					try {
