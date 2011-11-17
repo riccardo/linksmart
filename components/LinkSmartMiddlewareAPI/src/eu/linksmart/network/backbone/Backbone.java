@@ -43,4 +43,10 @@ public interface Backbone {
 	public NMResponse broadcastData(HID senderHID, byte[] data);
 
 	
+	/**
+	 * 
+	 * @param hid
+	 * @return the backbone address represented by the Hid
+	 */
+	public String getAddresse(HID hid); 
 }
