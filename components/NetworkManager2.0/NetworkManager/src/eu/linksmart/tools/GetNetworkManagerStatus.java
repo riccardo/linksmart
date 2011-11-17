@@ -39,19 +39,17 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.osgi.service.component.ComponentContext;
-
-
+import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
-import eu.linksmart.network.networkmanager.impl.NetworkManagerCoreImpl;
-import eu.linksmart.network.HID;
 
 /**
  * NetworkManagerStatus Servlet
@@ -59,147 +57,168 @@ import eu.linksmart.network.HID;
 public class GetNetworkManagerStatus extends HttpServlet {
 
 	IdentityManager identityManager;
-	
+
 	private NetworkManagerCore networkManagerCore;
-	
+
 	/**
 	 * Constructor
 	 * 
-	 * @param context the bundle's context
-	 * @param nmServiceImpl the Network Manager Service implementation
+	 * @param context
+	 *            the bundle's context
+	 * @param nmServiceImpl
+	 *            the Network Manager Service implementation
 	 */
-	public GetNetworkManagerStatus(NetworkManagerCore networkManagerCore, IdentityManager identityManager) {
-		
+	public GetNetworkManagerStatus(NetworkManagerCore networkManagerCore,
+			IdentityManager identityManager) {
+
 		this.networkManagerCore = networkManagerCore;
-		
+
 		this.identityManager = identityManager;
-		
+
 	}
-	
+
 	/**
 	 * Performs the HTTP GET operation
 	 * 
-	 * @param request HttpServletRequest that encapsulates the request to the servlet 
-	 * @param response HttpServletResponse that encapsulates the response from the servlet
+	 * @param request
+	 *            HttpServletRequest that encapsulates the request to the
+	 *            servlet
+	 * @param response
+	 *            HttpServletResponse that encapsulates the response from the
+	 *            servlet
 	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-		
-		Map params  = request.getParameterMap();
-		if(params.containsKey("method")) {
-			Object s = params.get("method");
-			if (((String[]) params.get("method"))[0].equals("getNetworkManagers")) {
-				Vector<String> hids = identityManager.getHIDs("NetworkManagerCore*");
 
-				Iterator<String> it = hids.iterator();
+		Map params = request.getParameterMap();
+		if (params.containsKey("method")) {
+			Object s = params.get("method");
+			if (((String[]) params.get("method"))[0]
+					.equals("getNetworkManagers")) {
+				Set<HIDInfo> hids = identityManager
+						.getHIDsByDescription("NetworkManagerCore*");
+
+				Iterator<HIDInfo> it = hids.iterator();
 				String endpoint;
 				String description = "";
 				String host;
-				
+
 				while (it.hasNext()) {
-					HID HID = new HID(it.next());
+					HID HID = it.next().getHID();
 					String hid = HID.toString();
 
 					try {
-						endpoint = identityManager.getHIDInfo(HID).getEndpoint();
-						description = identityManager.getHIDInfo(HID).getDescription();
+						HIDInfo hidInfo = identityManager.getHIDInfo(HID);
+						// endpoint =
+						// identityManager.getHIDInfo(HID).getEndpoint();
+						description = identityManager.getHIDInfo(HID)
+								.getDescription();
 						if (description.equals("")) {
 							description = "";
-							String xmlAtributes = identityManager.getHIDInfo(networkManagerCore.getHID().toString(), hid.toString());
-							Properties attr = new Properties();
-							attr.loadFromXML(new ByteArrayInputStream(
-								xmlAtributes.getBytes()));
-							Enumeration en = attr.keys();
+							HIDInfo nmInfo = identityManager
+									.getHIDInfo(networkManagerCore.getHID());
+
+							Properties attr = nmInfo.getAttributes();
+							Enumeration<Object> en = attr.keys();
 							while (en.hasMoreElements()) {
 								String key = (String) en.nextElement();
 								if (key.equals("CN") || key.equals("DN")
-										|| key.equals("C") || key.equals("Pseudonym")) {
+										|| key.equals("C")
+										|| key.equals("Pseudonym")) {
 									continue;
 								}
 								String value = attr.getProperty(key);
-								description = description + key +" = " + value + ";";
+								description = description + key + " = " + value
+										+ ";";
 							}
 						}
-						
-						host = identityManager.getHIDInfo(HID).getIp();
-						response.getWriter().write(hid + "|" + description
-							+ "|" + host + "|" + endpoint);
-						if (it.hasNext()) {
-							response.getWriter().write("<br>");
-						}
-					}
-					catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			else if (((String[]) params.get("method"))[0].equals("getLocalHids")) {
-				Vector<String> hids = identityManager.getHostHIDs();
-				Iterator<String> it = hids.iterator();
-				String endpoint;
-				String description;
-				String host;
-				
-				while (it.hasNext()) {
-					HID HID = new HID(it.next());
-					String hid = HID.toString();
-					
-					try {
-						endpoint = identityManager.getHIDInfo(HID).getEndpoint();
-						description = identityManager.getHIDInfo(HID).getDescription();
-						if (description.equals("")) {
-							description = "";
-							String xmlAtributes = identityManager.getInformationAssociatedWithHID(
-								identityManager.getLocalNMHID(), hid.toString());
-							Properties attr = new Properties();
-							attr.loadFromXML(new ByteArrayInputStream(
-								xmlAtributes.getBytes()));
-							Enumeration en = attr.keys();
-							while (en.hasMoreElements()) {
-								String key = (String) en.nextElement();
-								if (key.equals("CN") || key.equals("DN")
-										|| key.equals("C") || key.equals("Pseudonym")) {
-									continue;
-								}
-								String value = attr.getProperty(key);
-								description = description + key +" = " + value + ";";
-							}
-						}
-						host = identityManager.getHIDInfo(HID).getIp();
-						response.getWriter().write(hid + "|" + description
-							+ "|" + host + "|" + endpoint);
+
+						// host = identityManager.getHIDInfo(HID).getIp();
+						response.getWriter().write(
+								hid + "|" + description /*+ "|" + host + "|"
+										+ endpoint */);
 						if (it.hasNext()) {
 							response.getWriter().write("<br>");
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				}				
-			}
-			else if (((String[]) params.get("method"))[0].equals("getRemoteHids")) {
-				Vector<String> hids = identityManager.getHIDs();
-				Iterator<String> it = hids.iterator();
+				}
+			} else if (((String[]) params.get("method"))[0]
+					.equals("getLocalHids")) {
+				Set<HIDInfo> hids = identityManager.getLocalHIDs();
+				Iterator<HIDInfo> it = hids.iterator();
 				String endpoint;
 				String description;
 				String host;
-				
+
 				while (it.hasNext()) {
-					HID HID = new HID(it.next());
+					HID HID = it.next().getHID();
 					String hid = HID.toString();
-					boolean out = identityManager.getHostHIDs().contains(hid);
+
+					try {
+						// endpoint = identityManager.getHIDInfo(HID)
+						// .getEndpoint();
+						description = identityManager.getHIDInfo(HID)
+								.getDescription();
+						if (description.equals("")) {
+							description = "";
+
+							Properties attr = identityManager.getHIDInfo(
+									networkManagerCore.getHID())
+									.getAttributes();
+
+							Enumeration<Object> en = attr.keys();
+							while (en.hasMoreElements()) {
+								String key = (String) en.nextElement();
+								if (key.equals("CN") || key.equals("DN")
+										|| key.equals("C")
+										|| key.equals("Pseudonym")) {
+									continue;
+								}
+								String value = attr.getProperty(key);
+								description = description + key + " = " + value
+										+ ";";
+							}
+						}
+//						host = identityManager.getHIDInfo(HID).getIp();
+						response.getWriter().write(
+								hid + "|" + description/* + "|" + host + "|"
+										+ endpoint */);
+						if (it.hasNext()) {
+							response.getWriter().write("<br>");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (((String[]) params.get("method"))[0]
+					.equals("getRemoteHids")) {
+				Set<HIDInfo> hids = identityManager.getRemoteHIDs();
+				Iterator<HIDInfo> it = hids.iterator();
+				String endpoint;
+				String description;
+				String host;
+
+				while (it.hasNext()) {
+					HIDInfo hidInfo = it.next();
+					HID hid = hidInfo.getHID();
+					boolean out = identityManager.getLocalHIDs().contains(hid);
 					if (out) {
 						continue;
 					}
-					
+
 					try {
-						endpoint = identityManager.getHIDInfo(HID).getEndpoint();
-						description = identityManager.getHIDInfo(HID).getDescription();
+//						endpoint = identityManager.getHIDInfo(HID)
+//								.getEndpoint();
+						description = hidInfo.getDescription();
 						if (description.equals("")) {
 							description = "HID entity not adapted to security issues";
 						}
-						host = identityManager.getHIDInfo(HID).getIp();
-						response.getWriter().write(hid + "|" + description
-							+ "|" + host + "|" + endpoint);
+//						host = hidInfo.getIp();
+						response.getWriter().write(
+								hid + "|" + description /*+ "|" + host + "|"
+										+ endpoint*/);
 						if (it.hasNext()) {
 							response.getWriter().write("<br>");
 						}
@@ -207,53 +226,54 @@ public class GetNetworkManagerStatus extends HttpServlet {
 						e.printStackTrace();
 					}
 				}
-			}
-			else if (((String[]) params.get("method"))[0].equals("getNetworkManagerSearch")) {
-				Vector<String> hids = identityManager.getHIDs();
-				Iterator<String> it = hids.iterator();
+			} else if (((String[]) params.get("method"))[0]
+					.equals("getNetworkManagerSearch")) {
+				Set<HIDInfo> hids = identityManager.getAllHIDs();
+				Iterator<HIDInfo> it = hids.iterator();
 				String endpoint;
 				String description;
 				String host;
-				
+
 				while (it.hasNext()) {
-					HID HID = new HID(it.next());
-					String hid = HID.toString();
-					
+					HIDInfo hidInfo = it.next();
+					HID hid = hidInfo.getHID();
+
 					try {
-						endpoint = identityManager.getHIDInfo(HID).getEndpoint();
-						description = identityManager.getHIDInfo(HID).getDescription();
+//						endpoint = identityManager.getHIDInfo(HID)
+//								.getEndpoint();
+						description = hidInfo.getDescription();
 						if (description.equals("")) {
 							description = "HID entity not adapted to security issues";
-							boolean in = identityManager.getHostHIDs().contains(hid);
+							boolean in = identityManager.getAllHIDs()
+									.contains(hid);
 							if (in) {
 								description = "";
-								String xmlAtributes = this.identityManager.getInformationAssociatedWithHID(
-									identityManager.getLocalNMHID(), hid.toString());
-								Properties attr = new Properties();
-								attr.loadFromXML(new ByteArrayInputStream(
-									xmlAtributes.getBytes()));
-								Enumeration en = attr.keys();
+								Properties attr = identityManager.getHIDInfo(networkManagerCore.getHID()).getAttributes();
+								Enumeration<Object> en = attr.keys();
 								while (en.hasMoreElements()) {
 									String key = (String) en.nextElement();
 									if (key.equals("CN") || key.equals("DN")
-											|| key.equals("C") || key.equals("Pseudonym")) {
+											|| key.equals("C")
+											|| key.equals("Pseudonym")) {
 										continue;
 									}
 									String value = attr.getProperty(key);
-									description = description + key +" = " + value + ";";
+									description = description + key + " = "
+											+ value + ";";
 								}
 							}
 						}
-						host = identityManager.getHIDInfo(HID).getIp();
-						response.getWriter().write(hid + "|" + description
-							+ "|" + host + "|" + endpoint);
+//						host = hidInfo.getIp();
+						response.getWriter().write(
+								hid + "|" + description /* + "|" + host + "|"
+										+ endpoint */);
 						if (it.hasNext()) {
 							response.getWriter().write("<br>");
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				}	
+				}
 			}
 		}
 	}
