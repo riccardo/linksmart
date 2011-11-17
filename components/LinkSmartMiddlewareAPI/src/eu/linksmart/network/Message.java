@@ -1,6 +1,9 @@
 package eu.linksmart.network;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -47,6 +50,19 @@ public class Message {
 	 */
 	public String getProperty(String key){
 		return properties.getProperty(key);
+	}
+	
+	/**
+	 * Returns the properties saved in the message
+	 * @return Set with the keys
+	 */
+	public Set<String> getKeySet(){
+		Set<String> stringSet = new HashSet<String>();
+		Iterator<Object> i = properties.keySet().iterator();
+		while(i.hasNext()){
+			stringSet.add((String)i.next());
+		}
+		return stringSet;
 	}
 	
 	public String getTopic(){

@@ -76,4 +76,6 @@ public interface SecurityProtocol {
 	 * @return Message with unprotected body
 	 */
 	Message unprotectMessage(Message msg) throws Exception;
+	
+	
 }

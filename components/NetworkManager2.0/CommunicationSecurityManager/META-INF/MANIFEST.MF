@@ -7,5 +7,15 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: eu.linksmart.security.communication,
  eu.linksmart.security.cryptomanager;version="1.1.0",
  eu.linksmart.security.trustmanager;version="1.1.0",
+ org.apache.log4j;version="1.2.15",
+ org.apache.xml.security;version="1.4.4",
+ org.apache.xml.security.encryption,
+ org.apache.xml.security.keys,
+ org.apache.xml.security.signature,
+ org.apache.xml.security.transforms,
+ org.apache.xml.security.utils,
+ org.apache.xpath;version="2.7.1",
+ org.osgi.framework,
  org.osgi.service.component
 Service-Component: OSGI-INF/DS_CommunicationSecurityManager.xml
+Require-Bundle: LinkSmartMiddlewareAPI
