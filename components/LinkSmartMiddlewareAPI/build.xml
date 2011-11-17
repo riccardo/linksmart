@@ -1,27 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Build file for LinkSmartMiddlewareAPI
-	 author: Marco Tiemann -->
-
-<!-- The following properties must be pre-defined in the parent ant script:
-	 - javaLibDir          directory containing 3rd party Java libraries
-	 - rootBuildDir        base directory for all intermediate outputs
-	 - rootDistributionDir directory for compiled bundles -->
-
 <project name="LinkSmartMiddlewareAPI" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
-
-	<property name="moduleName" value="LinkSmartMiddlewareAPI" />
-	<property name="revision" value="1.0.0" />
+	<property name="moduleName" value="eu.linksmart.network.linksmartmiddlewareapi" />
+	<property name="revision" value="2.0.0" />
 	<property name="src.dir" value="${basedir}/src" />
-	<property name="test.dir" value="${basedir}/test" />
-	<property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test" />
-	<property name="build.dir" value="${rootBuildDir}/${moduleName}" />
-	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
 	<property name="javadoc.dir" value="${basedir}/doc" />
 	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
+	<property name="antlib.dir" value="${basedir}/../../antlibs" />
 
 	<!-- paths -->
 
@@ -33,17 +22,6 @@
 			<include name="**/*.jar" />
 		</fileset>
 		<pathelement path="${build.dir}" />
-	</path>
-
-	<path id="test-classpath">
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="${targetPlatform.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-		<pathelement path="${build.dir}" />
-		<pathelement path="${test.build.dir}" />
 	</path>
 
 	<!-- targets -->
@@ -69,12 +47,6 @@
 		<antcall target="make" />
 	</target>
 
-	<!-- local test -->
-	<target name="test-local" depends="setup-local">
-		<echo message="Calling test locally" />
-		<antcall target="test" />
-	</target>
-
 	<!-- set up build environment -->
 	<target name="resolve">
 		<echo message="Setting up build environment" />
@@ -98,11 +70,13 @@
 		<echo message="Packaging" />
 		<mkdir dir="${dist.dir}" />
 		<jar jarfile="${dist.dir}/${moduleName}-${revision}.jar" manifest="${basedir}/META-INF/MANIFEST.MF">
+			<!--
 			<fileset dir="${build.dir}">
 				<patternset>
 					<include name="**/*.class" />
 				</patternset>
 			</fileset>
+			-->
 			<fileset dir="${basedir}">
 				<patternset>
 					<include name="lib/sunxacml-1.2.jar" />
@@ -126,12 +100,6 @@
 		<echo message="Published as: ${rootDistributionDir}/${moduleName}-${revision}.jar" />
 	</target>
 
-	<!-- test -->
-	<target name="test" depends="make">
-		<echo message="Testing" />
-		<mkdir dir="${test.build.dir}" />
-	</target>
-	
 	<!-- javadoc -->
 	<target name="javadoc">
 		<javadoc access="public" destdir="${javadoc.dir}" author="true" version="true" use="true" windowtitle="LinkSmartMiddleware API">
@@ -149,8 +117,6 @@
 		<!-- files in distribution directory -->
 		<delete dir="${dist.dir}" includeEmptyDirs="true" failonerror="false" />
 		<delete file="${rootDistributionDir}/${moduleName}.jar" failonerror="false" />
-		<!-- files in test directory -->
-		<delete dir="${test.build.dir}" includeEmptyDirs="true" failonerror="false" />
 	</target>
 
 </project>
