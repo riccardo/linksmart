@@ -29,13 +29,18 @@ import eu.linksmart.security.communication.CommunicationSecurityManager;
  */
 public class NetworkManagerCoreImpl extends NetworkManagerApplicationImpl implements NetworkManagerCore, MessageProvider {
 
+	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
 	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
 	private static final String STARTING_MESSAGE = "Starting" + NETWORK_MGR_CORE;	
 	public static String SUCCESSFULL_PROCESSING = "OK";	
 
+	/*
+	 * logger
+	 */
 	Logger LOG = Logger.getLogger(NetworkManagerCoreImpl.class.getName());
 	
+	/* fields */
 	private NetworkManagerCoreConfigurator configurator;	
 	private CommunicationSecurityManager commSecMgr;
 	private Map<String,ArrayList<MessageObserver>> msgObservers = new HashMap<String,ArrayList<MessageObserver>>();
