@@ -29,14 +29,16 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
  * TODO #NM refactoring
  */
 public class IdentityManagerImpl implements IdentityManager, MessageObserver {
+	
 	private static String IDENTITY_MGR = IdentityManagerImpl.class.getSimpleName();
 	private final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
 	
+	private static Logger LOG = Logger.getLogger(IDENTITY_MGR);
+	
 	private ConcurrentHashMap<HID, HIDInfo> localHIDs;
 	private ConcurrentHashMap<HID, HIDInfo> remoteHIDs;
-
-	private static Logger LOG = Logger.getLogger(IDENTITY_MGR);
-	public ConcurrentLinkedQueue<String> queue;
+	
+	private ConcurrentLinkedQueue<String> queue;
 	
 	private NetworkManagerCore networkManagerCore;
 	// Time in milliseconds to wait between broadcasts
@@ -511,6 +513,12 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	
 	}
 	
+	@Override
+	public boolean removeHID(HID hid) {
+		// TODO Implement
+		return false;
+	}
+	
 	private class HIDUpdaterThread implements Runnable{
 
 		@Override
@@ -542,5 +550,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore){
 		this.networkManagerCore = null;
 	}
+
+	
 
 }
