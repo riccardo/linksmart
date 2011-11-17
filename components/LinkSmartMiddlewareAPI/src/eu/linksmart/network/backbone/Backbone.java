@@ -15,10 +15,10 @@ public interface Backbone {
 	 * 
 	 * @param senderHID
 	 * @param receiverHID
-	 * @param message
+	 * @param data
 	 * @return
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] message);
+	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data);
 	
 
 	
@@ -27,10 +27,20 @@ public interface Backbone {
 	 * 
 	 * @param senderHID
 	 * @param receiverHID
-	 * @param message
+	 * @param data
 	 * @return
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] message);
+	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data);
+
+	
+	/**
+	 * Broadcasts a message over the specific communication channel.
+	 * 
+	 * @param senderHID
+	 * @param data
+	 * @return
+	 */
+	public NMResponse broadcastData(HID senderHID, byte[] data);
 
 	
 }
