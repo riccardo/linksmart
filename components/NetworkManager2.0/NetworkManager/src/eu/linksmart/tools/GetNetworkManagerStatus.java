@@ -33,23 +33,22 @@
 
 package eu.linksmart.tools;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.network.routing.BackboneRouter;
+import eu.linksmart.network.service.registry.ServiceRegistry;
 
 /**
  * NetworkManagerStatus Servlet
@@ -59,6 +58,8 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	IdentityManager identityManager;
 
 	private NetworkManagerCore networkManagerCore;
+	private BackboneRouter backboneRouter;
+	private ServiceRegistry serviceRegistry;
 
 	/**
 	 * Constructor
@@ -69,11 +70,13 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	 *            the Network Manager Service implementation
 	 */
 	public GetNetworkManagerStatus(NetworkManagerCore networkManagerCore,
-			IdentityManager identityManager) {
+			IdentityManager identityManager, BackboneRouter backboneRouter,
+			ServiceRegistry serviceRegistry) {
 
 		this.networkManagerCore = networkManagerCore;
-
 		this.identityManager = identityManager;
+		this.backboneRouter = backboneRouter;
+		this.serviceRegistry = serviceRegistry;
 
 	}
 
@@ -90,191 +93,78 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 
-		Map params = request.getParameterMap();
+		Map<String, String[]> params = request.getParameterMap();
 		if (params.containsKey("method")) {
-			Object s = params.get("method");
-			if (((String[]) params.get("method"))[0]
-					.equals("getNetworkManagers")) {
+			String method = params.get("method")[0];
+			if (method.equals("getNetworkManagers")) {
 				Set<HIDInfo> hids = identityManager
 						.getHIDsByDescription("NetworkManagerCore*");
-
-				Iterator<HIDInfo> it = hids.iterator();
-				String endpoint;
-				String description = "";
-				String host;
-
-				while (it.hasNext()) {
-					HID HID = it.next().getHID();
-					String hid = HID.toString();
-
-					try {
-						HIDInfo hidInfo = identityManager.getHIDInfo(HID);
-						// endpoint =
-						// identityManager.getHIDInfo(HID).getEndpoint();
-						description = identityManager.getHIDInfo(HID)
-								.getDescription();
-						if (description.equals("")) {
-							description = "";
-							HIDInfo nmInfo = identityManager
-									.getHIDInfo(networkManagerCore.getHID());
-
-							Properties attr = nmInfo.getAttributes();
-							Enumeration<Object> en = attr.keys();
-							while (en.hasMoreElements()) {
-								String key = (String) en.nextElement();
-								if (key.equals("CN") || key.equals("DN")
-										|| key.equals("C")
-										|| key.equals("Pseudonym")) {
-									continue;
-								}
-								String value = attr.getProperty(key);
-								description = description + key + " = " + value
-										+ ";";
-							}
-						}
-
-						// host = identityManager.getHIDInfo(HID).getIp();
-						response.getWriter().write(
-								hid + "|" + description /*+ "|" + host + "|"
-										+ endpoint */);
-						if (it.hasNext()) {
-							response.getWriter().write("<br>");
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			} else if (((String[]) params.get("method"))[0]
-					.equals("getLocalHids")) {
+				processHIDs(hids, response, null);
+			} else if (method.equals("getLocalHids")) {
 				Set<HIDInfo> hids = identityManager.getLocalHIDs();
-				Iterator<HIDInfo> it = hids.iterator();
-				String endpoint;
-				String description;
-				String host;
-
-				while (it.hasNext()) {
-					HID HID = it.next().getHID();
-					String hid = HID.toString();
-
-					try {
-						// endpoint = identityManager.getHIDInfo(HID)
-						// .getEndpoint();
-						description = identityManager.getHIDInfo(HID)
-								.getDescription();
-						if (description.equals("")) {
-							description = "";
-
-							Properties attr = identityManager.getHIDInfo(
-									networkManagerCore.getHID())
-									.getAttributes();
-
-							Enumeration<Object> en = attr.keys();
-							while (en.hasMoreElements()) {
-								String key = (String) en.nextElement();
-								if (key.equals("CN") || key.equals("DN")
-										|| key.equals("C")
-										|| key.equals("Pseudonym")) {
-									continue;
-								}
-								String value = attr.getProperty(key);
-								description = description + key + " = " + value
-										+ ";";
-							}
-						}
-//						host = identityManager.getHIDInfo(HID).getIp();
-						response.getWriter().write(
-								hid + "|" + description/* + "|" + host + "|"
-										+ endpoint */);
-						if (it.hasNext()) {
-							response.getWriter().write("<br>");
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			} else if (((String[]) params.get("method"))[0]
-					.equals("getRemoteHids")) {
+				processHIDs(hids, response, null);
+			} else if (method.equals("getRemoteHids")) {
 				Set<HIDInfo> hids = identityManager.getRemoteHIDs();
-				Iterator<HIDInfo> it = hids.iterator();
-				String endpoint;
-				String description;
-				String host;
-
-				while (it.hasNext()) {
-					HIDInfo hidInfo = it.next();
-					HID hid = hidInfo.getHID();
-					boolean out = identityManager.getLocalHIDs().contains(hid);
-					if (out) {
-						continue;
-					}
-
-					try {
-//						endpoint = identityManager.getHIDInfo(HID)
-//								.getEndpoint();
-						description = hidInfo.getDescription();
-						if (description.equals("")) {
-							description = "HID entity not adapted to security issues";
-						}
-//						host = hidInfo.getIp();
-						response.getWriter().write(
-								hid + "|" + description /*+ "|" + host + "|"
-										+ endpoint*/);
-						if (it.hasNext()) {
-							response.getWriter().write("<br>");
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			} else if (((String[]) params.get("method"))[0]
-					.equals("getNetworkManagerSearch")) {
+				processHIDs(hids, response,
+						"HID entity not adapted to security issues");
+			} else if (method.equals("getNetworkManagerSearch")) {
 				Set<HIDInfo> hids = identityManager.getAllHIDs();
-				Iterator<HIDInfo> it = hids.iterator();
-				String endpoint;
-				String description;
-				String host;
-
-				while (it.hasNext()) {
-					HIDInfo hidInfo = it.next();
-					HID hid = hidInfo.getHID();
-
-					try {
-//						endpoint = identityManager.getHIDInfo(HID)
-//								.getEndpoint();
-						description = hidInfo.getDescription();
-						if (description.equals("")) {
-							description = "HID entity not adapted to security issues";
-							boolean in = identityManager.getAllHIDs()
-									.contains(hid);
-							if (in) {
-								description = "";
-								Properties attr = identityManager.getHIDInfo(networkManagerCore.getHID()).getAttributes();
-								Enumeration<Object> en = attr.keys();
-								while (en.hasMoreElements()) {
-									String key = (String) en.nextElement();
-									if (key.equals("CN") || key.equals("DN")
-											|| key.equals("C")
-											|| key.equals("Pseudonym")) {
-										continue;
-									}
-									String value = attr.getProperty(key);
-									description = description + key + " = "
-											+ value + ";";
-								}
-							}
-						}
-//						host = hidInfo.getIp();
-						response.getWriter().write(
-								hid + "|" + description /* + "|" + host + "|"
-										+ endpoint */);
-						if (it.hasNext()) {
-							response.getWriter().write("<br>");
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
+				processHIDs(hids, response, null);
+				// TODO should be "HID entity not adapted to security issues"
+				// instead of null for remote HIDs; check with Mark?
 			}
 		}
 	}
+
+	private void processHIDs(Set<HIDInfo> hids, HttpServletResponse response,
+			String defaultDescription) {
+
+		Iterator<HIDInfo> it = hids.iterator();
+		String endpoint;
+		String description = "";
+		String host;
+
+		while (it.hasNext()) {
+			HIDInfo hidInfo = it.next();
+
+			try {
+				endpoint = serviceRegistry.getServiceURL(hidInfo.getHID()).toString();
+				description = hidInfo.getDescription();
+				if (description.equals("")) {
+					if (defaultDescription != null) {
+						description = defaultDescription;
+					} else {
+						description = "";
+						HIDInfo nmInfo = identityManager
+								.getHIDInfo(networkManagerCore.getHID());
+
+						Properties attr = nmInfo.getAttributes();
+						Enumeration<Object> en = attr.keys();
+						while (en.hasMoreElements()) {
+							String key = (String) en.nextElement();
+							if (key.equals("CN") || key.equals("DN")
+									|| key.equals("C")
+									|| key.equals("Pseudonym")) {
+								continue;
+							}
+							String value = attr.getProperty(key);
+							description = description + key + " = " + value
+									+ ";";
+						}
+					}
+				}
+
+				host = this.backboneRouter.getRoute(hidInfo.getHID());
+				response.getWriter().write(
+						hidInfo.getHID().toString() + "|" + description + "|"
+								+ host + "|" + endpoint);
+				if (it.hasNext()) {
+					response.getWriter().write("<br>");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 }
