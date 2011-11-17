@@ -2,6 +2,8 @@ package eu.linksmart.network;
 
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * An OO representation of a message received over
  * the network. This class is used for internal processing
@@ -18,8 +20,8 @@ public class Message {
 	private HID receiverHID = null;
 	
 	public Message(String topic, HID senderHID, HID receiverHID, byte[] data){
-		if(topic == null || senderHID == null || receiverHID == null || data == null)
-			throw new NullPointerException("Message cannot have null for required fields");
+		if(StringUtils.isEmpty(topic) || senderHID == null || receiverHID == null || data == null || data.length == 0)
+			throw new IllegalArgumentException("Message cannot have null for required fields");
 		this.topic = topic;
 		this.senderHID = senderHID;
 		this.receiverHID = receiverHID;
