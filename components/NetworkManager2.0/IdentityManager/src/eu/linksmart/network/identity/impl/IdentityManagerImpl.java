@@ -16,6 +16,7 @@ import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.BroadcastMessage;
 import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageObserver;
