@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="InsideSecurity">
-   <implementation class="eu.linksmart.security.communication.inside.impl.InsideHydraSecLib"/>
-   <service>
-      <provide interface="eu.linksmart.security.communication.inside.InsideHydra"/>
-   </service>
-   <reference bind="bindCryptoManager" cardinality="1..1" interface="eu.linksmart.security.cryptomanager.CryptoManager" name="CryptoManager" policy="static" unbind="unbindCryptoManager"/>
-</scr:component>
