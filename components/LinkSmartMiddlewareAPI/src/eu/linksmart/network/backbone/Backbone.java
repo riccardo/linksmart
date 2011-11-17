@@ -8,8 +8,7 @@ import eu.linksmart.network.NMResponse;
  * A Backbone needs to be implemented if a new communication channel (e.g. P2P, JMS, ...) should be used by LinkSmart.
  */
 public interface Backbone {
-	
-	
+
 	/**
 	 * Sends a message over the specific communication channel.
 	 * 
@@ -19,9 +18,7 @@ public interface Backbone {
 	 * @return
 	 */
 	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data);
-	
 
-	
 	/**
 	 * Receives a message over the specific communication channel.
 	 * 
@@ -32,7 +29,6 @@ public interface Backbone {
 	 */
 	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data);
 
-	
 	/**
 	 * Broadcasts a message over the specific communication channel.
 	 * 
@@ -42,11 +38,12 @@ public interface Backbone {
 	 */
 	public NMResponse broadcastData(HID senderHID, byte[] data);
 
-	
 	/**
+	 * Return the destination address as string that will be used for display
+	 * purposes.
 	 * 
 	 * @param hid
 	 * @return the backbone address represented by the Hid
 	 */
-	public String getAddresse(HID hid); 
+	public String getDestinationAddressAsString(HID hid);
 }

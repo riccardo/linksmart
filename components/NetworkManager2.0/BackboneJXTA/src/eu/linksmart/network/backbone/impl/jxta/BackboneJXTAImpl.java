@@ -37,6 +37,7 @@ import net.jxta.socket.JxtaMulticastSocket;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.http.HttpService;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
@@ -61,30 +62,25 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	private BackboneRouter bbRouter;
 
-	/**
-	 * Apply the configuration changes
-	 * 
-	 * @param updates
-	 *            the configuration changes
-	 */
-	public void applyConfigurations(Hashtable updates) {
-		if (updates.containsKey(BackboneJXTAConfigurator.JXTA_LOGS)) {
-			if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals("OFF")) {
-				System.setProperty(Logging.JXTA_LOGGING_PROPERTY,
-						Level.OFF.toString());
-			} else if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals(
-					"ON")) {
-				System.setProperty(Logging.JXTA_LOGGING_PROPERTY,
-						Level.ALL.toString());
-			}
-		}
+	private HttpService http;
+	private String httpPort;
+	public PipeSyncHandler pipeSyncHandler;
+
+	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
+
+	public void init() {
+		pipeSyncHandler = new PipeSyncHandler(this);
 	}
 
 	public void activate(ComponentContext context) {
+		logger.info("**** Activating JXTA backbone!");
+
 		this.context = context;
 
 		this.bbRouter = (BackboneRouter) context
 				.locateService(BackboneRouter.class.getSimpleName());
+
+		configurator.registerConfiguration();
 
 		try {
 			this.configurator = new BackboneJXTAConfigurator(this,
@@ -92,6 +88,16 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			configurator.registerConfiguration();
 		} catch (NullPointerException e) {
 			logger.fatal("Wrong configuration mode + " + mode.toString());
+		}
+
+		// Status Servlet Registration
+		http = (HttpService) context.locateService("HttpService");
+		httpPort = System.getProperty("org.osgi.service.http.port");
+		try {
+			http.registerServlet(BackboneJXTAStatusServletName,
+					new BackboneJXTAStatus(context), null, null);
+		} catch (Exception e) {
+			logger.error("BackboneJXTA - Error registering servlets", e);
 		}
 
 		boolean logs = Boolean.parseBoolean((String) configurator
@@ -118,14 +124,24 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		this.synched = (String) configurator.getConfiguration().get(
 				BackboneJXTAConfigurator.SYNCHRONIZED);
 
-		logger.info("JXTA Backbone started succesfully");
+		logger.info("**** JXTA Backbone started succesfully");
 	}
 
 	public void deactivate(ComponentContext context) {
 		stopJXTA();
+
+		// Unregister servlets
+		http.unregister(BackboneJXTAStatusServletName);
+
+		configurator.stop();
+
 		bbRouter = null;
 		logger.info("JXTA Backbone stopped succesfully");
 	}
+
+	/*
+	 * Now follow the methods from the interface
+	 */
 
 	/**
 	 * Sends a message over the JXTA communication channel.
@@ -134,9 +150,16 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param receiverHID
 	 * @param message
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] message) {
+	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data) {
 		// TODO implement this
-		return new NMResponse();
+
+		NMResponse response = new NMResponse();
+
+		logger.info("Sending data over pipe to HID= " + receiverHID);
+		response = pipeSyncHandler.sendData(senderHID.toString(),
+				receiverHID.toString(), data, peerID);
+
+		return response;
 	}
 
 	/**
@@ -146,7 +169,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param receiverHID
 	 * @param message
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] message) {
+	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data) {
 		// TODO implement this
 		return new NMResponse();
 	}
@@ -160,13 +183,50 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 */
 	public NMResponse broadcastData(HID senderHID, byte[] data) {
 		// TODO implement this
+
+		// send message as multicast message
+
 		return new NMResponse();
+	}
+
+	/**
+	 * Return the destination address as string that will be used for display
+	 * purposes.
+	 * 
+	 * @param hid
+	 * @return the backbone address represented by the Hid
+	 */
+	public String getDestinationAddressAsString(HID hid) {
+		return "this is not a real address";
+	}
+
+	/*
+	 * Now follow methods that are not part of the interface
+	 */
+
+	/**
+	 * Apply the configuration changes
+	 * 
+	 * @param updates
+	 *            the configuration changes
+	 */
+	public void applyConfigurations(Hashtable updates) {
+		if (updates.containsKey(BackboneJXTAConfigurator.JXTA_LOGS)) {
+			if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals("OFF")) {
+				System.setProperty(Logging.JXTA_LOGGING_PROPERTY,
+						Level.OFF.toString());
+			} else if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals(
+					"ON")) {
+				System.setProperty(Logging.JXTA_LOGGING_PROPERTY,
+						Level.ALL.toString());
+			}
+		}
 	}
 
 	public Dictionary getConfiguration() {
 		return configurator.getConfiguration();
 	}
-	
+
 	// ***************************************************************************************
 	// here follows the JXTA specific stuff coming from the old NetworkManager
 	// Backbone.
