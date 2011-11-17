@@ -1,5 +1,6 @@
 package eu.linksmart.network.networkmanager.core.impl;
 
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Properties;
 
@@ -11,6 +12,7 @@ import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.application.NetworkManagerApplication;
 import eu.linksmart.network.routing.BackboneRouter;
+import eu.linksmart.network.service.registry.ServiceRegistry;
 	
 	public class NetworkManagerApplicationImpl implements NetworkManagerApplication {
 		
@@ -27,6 +29,8 @@ import eu.linksmart.network.routing.BackboneRouter;
 		protected ConnectionManager connectionManager;
 
 		protected String myDescription;
+
+		private ServiceRegistry serviceRegistry;
 	
 		public NetworkManagerApplicationImpl(){
 			LOG.info(CREATED_MESSAGE);
@@ -38,9 +42,11 @@ import eu.linksmart.network.routing.BackboneRouter;
 		}
 	
 		@Override
-		public HID createHID(Properties attributes) throws RemoteException {
+		public HID createHID(Properties attributes, URL url) throws RemoteException {
 			
 			HID newHID = this.identityManager.createHID(attributes);
+			
+			this.serviceRegistry.registerService(newHID, url);
 			
 			return newHID;
 		}
@@ -56,10 +62,12 @@ import eu.linksmart.network.routing.BackboneRouter;
 
 		@Override
 		public Boolean removeHID(HID hid) throws RemoteException {
+						
+			Boolean serviceRemoved =this.serviceRegistry.removeService(hid);
 			
-			Boolean val = this.identityManager.removeHID(hid);
+			Boolean hidRemoved = this.identityManager.removeHID(hid);
 			
-			return val;
+			return (serviceRemoved && hidRemoved);
 		}
 
 }
