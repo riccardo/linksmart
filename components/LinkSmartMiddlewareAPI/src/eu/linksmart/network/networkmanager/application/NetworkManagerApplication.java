@@ -1,5 +1,6 @@
 package eu.linksmart.network.networkmanager.application;
 
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Properties;
 
@@ -24,11 +25,12 @@ public interface NetworkManagerApplication {
 	
 	/**
 	 * Creates HID for particular service.
-	 * @param attribute Attributes as description, PID etc
-	 * @return HID object
+	 * @param attributes Attributes as description, PID etc
+	 * @param url URL for executing SOAP Tunneling.
+	 * @return HID instance.
 	 * @throws RemoteException
 	 */
-	public HID createHID(Properties attributes) throws RemoteException;
+	public HID createHID(Properties attributes, URL url) throws RemoteException;
 	
 	/**
 	 * Note: Boolean instead of boolean for .NET compatibility
