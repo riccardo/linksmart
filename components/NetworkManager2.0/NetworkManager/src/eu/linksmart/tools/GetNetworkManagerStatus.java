@@ -98,7 +98,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 			String method = params.get("method")[0];
 			if (method.equals("getNetworkManagers")) {
 				Set<HIDInfo> hids = identityManager
-						.getHIDsByDescription("NetworkManagerCore*");
+						.getHIDsByDescription("NetworkManager*");
 				processHIDs(hids, response, null);
 			} else if (method.equals("getLocalHids")) {
 				Set<HIDInfo> hids = identityManager.getLocalHIDs();
