@@ -1,6 +1,6 @@
 package eu.linksmart.network.networkmanager.core;
 
-import java.rmi.RemoteException;
+import java.io.IOException;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
@@ -14,12 +14,12 @@ public interface NetworkManagerCore extends NetworkManagerApplication{
 	/**
 	 * Receive data from one LinkSmart node to another node.
 	 */
-	public NMResponse receiveData(HID sender, HID receiver, byte [] data)	throws RemoteException;
+	public NMResponse receiveData(HID sender, HID receiver, byte [] data);
 
 	/**
 	 * Creates an HID based on byte array data
 	 */
-	public HID createHID(byte [] data)	throws RemoteException;
+	public HID createHID(byte [] data) throws IOException;
 	
 
 }
