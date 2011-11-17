@@ -25,9 +25,17 @@ public interface NetworkManagerApplication {
 	/**
 	 * Creates HID for particular service.
 	 * @param attribute Attributes as description, PID etc
-	 * @return 
+	 * @return HID object
 	 * @throws RemoteException
 	 */
 	public HID createHID(Properties attributes) throws RemoteException;
+	
+	/**
+	 * Note: Boolean instead of boolean for .NET compatibility
+	 * @param hid for particular service.
+	 * @return TRUE if operation succeeded and FALSE if not.
+	 * @throws RemoteException
+	 */
+	Boolean removeHID(HID hid) throws RemoteException;
 
 }
