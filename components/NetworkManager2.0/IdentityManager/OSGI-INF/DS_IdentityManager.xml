@@ -4,4 +4,5 @@
    <service>
       <provide interface="eu.linksmart.network.identity.IdentityManager"/>
    </service>
+   <reference bind="bindNetworkManagerCore" cardinality="1..1" interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore" name="NetworkManagerCore" policy="static" unbind="unbindNetworkManagerCore"/>
 </scr:component>

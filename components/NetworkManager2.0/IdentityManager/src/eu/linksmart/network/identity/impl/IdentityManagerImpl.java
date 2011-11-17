@@ -16,10 +16,11 @@ import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.HID;
-import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageObserver;
+import eu.linksmart.network.identity.IdentityManager;
+import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 
 /*
  * TODO #NM refactoring
@@ -32,13 +33,18 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 
 	private static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 	public ConcurrentLinkedQueue<String> queue;
-
+	
+	private NetworkManagerCore networkManagerCore;
+	// Time in milliseconds to wait between broadcasts
+	private int broadcastSleepMillis = 3000;  
 	
 	
 	protected void activate(ComponentContext context) {
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
+		Thread broadcastingThread = new Thread(new HIDUpdaterThread());
+		broadcastingThread.start();
 		LOG.info(IDENTITY_MGR + "started");
 	}
 
@@ -403,15 +409,15 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 	 * 
 	 * @return the update
 	 */
-	private String getHIDsUpdate() {
-		String update = "";
-		while (queue.peek() != null) {
-			update = update + queue.poll() + " ";
-		}
-		if (update.equals("")) {
-			update = " ";
-		}
-		return update;
+	private Message getHIDListUpdate() {
+//		String update = "";
+//		while (queue.peek() != null) {
+//			update = update + queue.poll() + " ";
+//		}
+//		if (update.equals("")) {
+//			update = " ";
+//		}
+		return null;
 	}
 
 	/**
@@ -470,7 +476,36 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 		return null;
 	}
 	
+	private class HIDUpdaterThread implements Runnable{
 
-
+		@Override
+		public void run() {
+			while (true){
+				if (!queue.isEmpty()){
+					Message m = getHIDListUpdate();
+					if (networkManagerCore != null){
+						// TODO networkManagerCore.broadcast(m);
+					} else {
+						LOG.warn("NetworkManagerCore not available! No Broadcast could be sent!");
+					}
+				}
+				try {
+					Thread.sleep(broadcastSleepMillis);
+				} catch (InterruptedException e) {
+					LOG.error("Error while waiting", e);
+				}
+			}
+			
+		}
+		
+	}
+	
+	public void bindNetworkManagerCore(NetworkManagerCore networkManagerCore){
+		this.networkManagerCore = networkManagerCore;
+	}
+	
+	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore){
+		this.networkManagerCore = null;
+	}
 
 }
