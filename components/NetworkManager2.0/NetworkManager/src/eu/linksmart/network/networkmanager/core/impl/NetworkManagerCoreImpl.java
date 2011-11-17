@@ -1,7 +1,7 @@
 package eu.linksmart.network.networkmanager.core.impl;
 
 
-import java.rmi.RemoteException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -133,7 +133,7 @@ public void setDescription(String description) {
 	Properties attributes = new Properties();
 	attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.myDescription);
 	
-	this.identityManager.update(this.myHID, attributes);
+	this.identityManager.updateHIDInfo(this.myHID, attributes);
 	
 }
 
@@ -162,13 +162,34 @@ public void unsubscribe(String topic, MessageObserver observer) {
 }
 
 @Override
-public HID createHID(byte[] data) throws RemoteException {
+public HID createHID(byte[] data) throws IOException {
 		
 	Properties attributes = this.connectionManager.getHIDAttributes(data);
 		
 	HID newHID = this.identityManager.createHID(attributes);
 	
 	return newHID;
+}
+@Override
+public NMResponse broadcastMessage(Message message) {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public NMResponse sendMessage(Message message) {
+	
+	HID senderHID = message.getReceiverHID();
+	
+	HID receiverHID = message.getSenderHID();
+	
+	Connection connection = this.connectionManager.getConnection(receiverHID, senderHID);
+	
+	byte[] data = connection.processMessage(message);	
+	
+	NMResponse response = this.backboneRouter.sendData(senderHID, receiverHID, data);
+	
+	return response;
 }
 
 }
