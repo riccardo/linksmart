@@ -30,17 +30,13 @@ import eu.linksmart.security.communication.CommunicationSecurityManager;
 public class NetworkManagerCoreImpl extends NetworkManagerApplicationImpl implements NetworkManagerCore, MessageProvider {
 
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
-	
 	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
-
-	private static final String STARTING_MESSAGE = "Starting" + NETWORK_MGR_CORE;
+	private static final String STARTING_MESSAGE = "Starting" + NETWORK_MGR_CORE;	
+	public static String SUCCESSFULL_PROCESSING = "OK";	
 
 	Logger LOG = Logger.getLogger(NetworkManagerCoreImpl.class.getName());
 	
-	public static String SUCCESSFULL_PROCESSING = "OK";	
-
-	private NetworkManagerCoreConfigurator configurator;
-	
+	private NetworkManagerCoreConfigurator configurator;	
 	private CommunicationSecurityManager commSecMgr;
 	private Map<String,ArrayList<MessageObserver>> msgObservers = new HashMap<String,ArrayList<MessageObserver>>();
 	
@@ -172,8 +168,14 @@ public HID createHID(byte[] data) throws IOException {
 }
 @Override
 public NMResponse broadcastMessage(Message message) {
-	// TODO Auto-generated method stub
-	return null;
+	
+	HID receiverHID = message.getReceiverHID();
+	HID senderHID = message.getSenderHID();
+	byte [] data = this.connectionManager.getConnection(receiverHID, senderHID).processMessage(message);
+	
+	NMResponse response = this.backboneRouter.broadcastData(senderHID, data);
+	
+	return response;
 }
 
 @Override
