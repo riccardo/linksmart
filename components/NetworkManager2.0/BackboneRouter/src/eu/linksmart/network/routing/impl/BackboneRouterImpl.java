@@ -58,14 +58,32 @@ public class BackboneRouterImpl implements BackboneRouter {
 	protected void unbindNMCore(NetworkManagerCore core) {
 		nmCore = null;
 	}
-
+	
+	/**
+	 * Receives a message over the communication channel from which the Hid came.
+	 * 
+	 * @param senderHID
+	 * @param receiverHID
+	 * @param data
+	 * @return
+	 */
 	@Override
 	public NMResponse sendData(HID senderHID, HID receiverHID,
 			byte[] data) {
 		Backbone b = (Backbone)hidBackboneMap.get(receiverHID);
 		return b.sendData(senderHID, receiverHID, data);		
 	}
-
+	
+	/**
+	 * Receives a message which also specifies the communication channel used by
+	 * the sender. This will then update the list of HIDs and which backbone
+	 * they use.
+	 * 
+	 * @param senderHID
+	 * @param receiverHID
+	 * @param data
+	 * @param originatingBackbone
+	 */
 	@Override
 	public NMResponse receiveData(HID senderHID, HID receiverHID,
 			byte[] data, Backbone originatingBackbone) {
@@ -77,6 +95,16 @@ public class BackboneRouterImpl implements BackboneRouter {
 		
 	}
 
+	/**
+	 * this method is invoked by backbone when a service requests a new HID to the network manager. 
+	 * this msg will be firstly accepted by backbone, and then propagated to the NMCore and IdManager
+	 * 
+	 * @param tempId
+	 * @param receiverHID
+	 * @param data
+	 * @param originatingBackbone
+	 * @return
+	 */
 	@Override
 	public NMResponse createHid(HID tempId, HID receiverHID,
 			byte[] data, Backbone originatingBackbone) {
@@ -95,11 +123,22 @@ public class BackboneRouterImpl implements BackboneRouter {
 		
 	}
 
+	/**
+	 * Returns a list of communication channels available to the network
+	 * manager.
+	 * 
+	 * @return list of communication channels
+	 */	
 	@Override
 	public List<Backbone> getAvailableCommunicationChannels() {
 		return availableBackbones;
 	}
 	
+	
+	/**
+	 * This function is called when the configuration is updated from the web page.
+	 * @param updates
+	 */
 	@Override
 	public void applyConfigurations(Hashtable updates) {
 		if(updates.containsKey(BackboneRouterImpl.BACKBONE_ROUTER)){
@@ -107,6 +146,13 @@ public class BackboneRouterImpl implements BackboneRouter {
 		}			 
 	}
 
+	/**
+	 * Broadcasts a message over the all communication channel.
+	 * 
+	 * @param senderHid
+	 * @param data
+	 * @return
+	 */
 	@Override
 	public NMResponse broadcastData(HID senderHid, byte[] data) {
 		boolean success = true;
@@ -122,10 +168,16 @@ public class BackboneRouterImpl implements BackboneRouter {
 		else return new NMResponse(NMResponse.STATUS_SUCCESS);
 	}
 
+	/**
+	 * this function return information about the backbone from which the hid come from 
+	 * the format is BackboneType:BackboneAddresse e.g.: WS;http://202.12.11.11/axis/services
+	 * @param hid
+	 * @return BackboneType:BackboneAddresse
+	 */
 	@Override
 	public String getRoute(HID hid) {
-		// TODO Auto-generated method stub
-		return null;
+		Backbone b = hidBackboneMap.get(hid);
+		return b.toString() + ";" + b.getDestinationAddressAsString(hid);
 	}
 
 
