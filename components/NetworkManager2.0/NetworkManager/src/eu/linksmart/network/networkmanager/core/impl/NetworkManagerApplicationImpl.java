@@ -54,4 +54,12 @@ import eu.linksmart.network.routing.BackboneRouter;
 			return response;
 		}
 
+		@Override
+		public Boolean removeHID(HID hid) throws RemoteException {
+			
+			Boolean val = this.identityManager.removeHID(hid);
+			
+			return val;
+		}
+
 }
