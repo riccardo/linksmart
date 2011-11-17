@@ -16,15 +16,7 @@ public interface NetworkManagerApplication {
 	 * Send data from one LinkSmart node to another node.
 	 */
 	public NMResponse sendData(HID sender, HID receiver, byte [] data)	throws RemoteException;
-	
-	/**
-	 * Send message from one LinkSmart node to another node.
-	 * @param message
-	 * @return
-	 * @throws RemoteException
-	 */
-	public NMResponse sendMessage(Message message)	throws RemoteException;
-	
+		
 	/**
 	 * Retrieves HID of NetworkManagerCore.
 	 * @return
