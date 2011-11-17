@@ -12,6 +12,6 @@ public interface ServiceRegistry {
 	
 	public boolean updateServiceHID(URL url);
 	
-	public URL getServiceURL();
+	public URL getServiceURL(HID hid);
 
 }
