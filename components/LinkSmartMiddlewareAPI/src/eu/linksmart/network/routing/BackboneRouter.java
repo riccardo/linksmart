@@ -69,6 +69,16 @@ public interface BackboneRouter {
 	 */
 	public NMResponse broadcastData(HID sender, byte[] data); 
 	
+	/**
+	 * 
+	 * @param updates
+	 */
 	public void applyConfigurations(Hashtable updates);
-
+	
+	/** 
+	 * @param hid
+	 * @return "BackboneType:BackboneAddresse"
+	 */
+	public String getRoute(HID hid);
+	
 }
