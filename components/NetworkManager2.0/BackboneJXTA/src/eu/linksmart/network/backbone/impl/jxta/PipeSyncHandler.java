@@ -47,7 +47,6 @@
 
 package eu.linksmart.network.backbone.impl.jxta;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -94,15 +93,11 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private InputPipe inputPipe;
 	private ConcurrentHashMap<ID, PipeInfo> pipeTable;
 	private PipeTableUpdater pipeTableUpdater;
-	private String connected = "-1";
 	public NMResponse response;
-	private int count = 0;
-	private int ok = 0;
 	private Hashtable<Integer, PipeSender> h;
 	Integer i = 0;
 
 	private int MAXTIMERESPONSE = 200000;
-	private boolean firstStart = true;
 
 	private BackboneJXTAImpl bbjxta;
 
@@ -601,9 +596,6 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				Long currentTime = System.currentTimeMillis();
 				while (en.hasMoreElements()) {
 					ID id = en.nextElement();
-					Long time = pipeTable.get(id).getTime() - currentTime;
-					time = pipeTable.get(id).getTime();
-
 					if ((currentTime - pipeTable.get(id).getTime()) > Long
 							.parseLong((String) bbjxta.getConfiguration().get(
 									BackboneJXTAConfigurator.PIPE_LIFETIME))) {

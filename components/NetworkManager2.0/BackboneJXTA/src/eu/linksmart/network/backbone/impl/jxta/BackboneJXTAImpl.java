@@ -3,20 +3,17 @@ package eu.linksmart.network.backbone.impl.jxta;
 import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
 
-import net.jxta.socket.JxtaMulticastSocket;
 import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
-import net.jxta.document.AdvertisementFactory;
 import net.jxta.document.MimeMediaType;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.IDFactory;
@@ -40,7 +37,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 
 import eu.linksmart.network.HID;
-import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.routing.BackboneRouter;
@@ -60,17 +56,21 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	protected static String JXTA_HOME_DIR = "Backbone/.jxta/";
 
+	private String jxtaHome = JXTA_HOME_DIR + this.name;
+
 	private BackboneRouter bbRouter;
 
 	private HttpService http;
 	private String httpPort;
 	public PipeSyncHandler pipeSyncHandler;
+	public SocketHandler socketHandler;
+	public ConfigMode jxtaMode;
+	public static String MODE_NODE_AS_STRING = "Node";
+	public static String MODE_SUPERNODE_AS_STRING = "SuperNode";
+	private String synched;
+	private MulticastSocket msocket;
 
 	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
-
-	public void init() {
-		pipeSyncHandler = new PipeSyncHandler(this);
-	}
 
 	public void activate(ComponentContext context) {
 		logger.info("**** Activating JXTA backbone!");
@@ -111,8 +111,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 					Level.ALL.toString());
 		}
 
-		this.jxtaHome = JXTA_HOME_DIR + this.name;
-
 		this.announcementValidityTime = Long.parseLong((String) configurator
 				.getConfiguration().get(
 						BackboneJXTAConfigurator.ANNOUNCE_VALIDITY));
@@ -124,18 +122,48 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		this.synched = (String) configurator.getConfiguration().get(
 				BackboneJXTAConfigurator.SYNCHRONIZED);
 
+		String jxtaMode = ((String) configurator.getConfiguration().get(
+				BackboneJXTAConfigurator.MODE));
+		/*
+		 * Depending on the mode of configuration the node can act as a
+		 * RDV(SuperNode) or as EDGE(Node)
+		 */
+		if (mode.equals(MODE_NODE_AS_STRING)) {
+			this.jxtaMode = NetworkManager.ConfigMode.EDGE;
+			logger.info("LinkSmart Network Manager configured as Node");
+		}
+		if (mode.equals(MODE_SUPERNODE_AS_STRING)) {
+			this.jxtaMode = NetworkManager.ConfigMode.SUPER;
+			logger.info("LinkSmart Network Manager configured as Super Node");
+		}
+		if ((!mode.equals(MODE_NODE_AS_STRING))
+				&& (!mode.equals(MODE_SUPERNODE_AS_STRING))) {
+			logger.error("Wrong node mode format. Please choose between Node or SuperNode");
+		}
+
+		pipeSyncHandler = new PipeSyncHandler(this);
+		socketHandler = new SocketHandler(this);
+
+		startJXTA();
+
 		logger.info("**** JXTA Backbone started succesfully");
 	}
 
 	public void deactivate(ComponentContext context) {
-		stopJXTA();
-
 		// Unregister servlets
 		http.unregister(BackboneJXTAStatusServletName);
 
+		// stop JXTA traffic
 		configurator.stop();
+		pipeSyncHandler.stopPipes();
+		socketHandler.stopSockets();
+		stopJXTA();
 
+		// remove objects
 		bbRouter = null;
+		socketHandler = null;
+		pipeSyncHandler = null;
+
 		logger.info("JXTA Backbone stopped succesfully");
 	}
 
@@ -183,10 +211,16 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 */
 	public NMResponse broadcastData(HID senderHID, byte[] data) {
 		// TODO implement this
+		NMResponse response = new NMResponse();
 
 		// send message as multicast message
+		synchronized (msocket) {
+			msocket.sendData(multicastSocket, new DatagramPacket(data,
+					data.length));
+		}
+		response.setData("Broadcast successful");
 
-		return new NMResponse();
+		return response;
 	}
 
 	/**
@@ -232,7 +266,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	// Backbone.
 	// ***************************************************************************************
 
-	private String jxtaHome;
 	public String name;
 	public PeerGroup netPeerGroup;
 	private DiscoveryService netPGDiscoveryService;
@@ -248,10 +281,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	private NetworkConfigurator jxtaNetworkConfigurator;
 
 	public long announcementValidityTime, factor;
-	private String synched;
 
 	private JxtaMulticastSocket multicastSocket;
-	private MulticastSocket msocket;
 	private MulticastSocketListener listener;
 
 	/**
@@ -560,7 +591,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			setName("MulticastListener");
 			byte[] buffer;
 			DatagramPacket receivedData;
-			String sw;
 			while (running) {
 				buffer = new byte[64000];
 				receivedData = new DatagramPacket(buffer, buffer.length);
@@ -573,10 +603,14 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 									+ m.toString(), e2);
 				}
 
-				sw = new String(receivedData.getData(), 0,
-						receivedData.getLength());
+				SocketAddress socketAddress = receivedData.getSocketAddress();
+				InetAddress senderIP = receivedData.getAddress();
+				int senderPort = receivedData.getPort();
 
-				// TODO: give message to BBRouter for further processing
+				// give message to BBRouter for further processing
+				bbRouter.receiveData(GetHIDFromData(receivedData.getData()),
+						null, RemoveHIDFromData(receivedData.getData()),
+						(Backbone) this);
 			}
 		}
 
@@ -589,20 +623,45 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		}
 	}
 
-	/**
-	 * Sends a multicast message
-	 * 
-	 * @param message
-	 *            the message
-	 * @return the HIDs
-	 */
-	public void sendMulticastMessage(String message) {
-		synchronized (msocket) {
-			msocket.sendData(multicastSocket,
-					new DatagramPacket(message.getBytes(), message.length()));
-		}
+	private static final String HID_DELIMITER = "##";
 
-		logger.debug("Multicast msg sent: " + message);
+	/**
+	 * Adds an HID to the data package so that the next JXTA backbone can get it without the need to unpack the payload.
+	 * 
+	 * @param aHID This is the HID of the sender.
+	 * @param origData
+	 * @return
+	 */
+	private static byte[] AddHIDToData(HID aHID, byte[] origData) {
+		String ret = aHID.toString() + HID_DELIMITER + origData.toString();
+		return ret.getBytes();
+	}
+
+	/**
+	 * Gets the HID of the sender of the data package.
+	 * 
+	 * @param origData
+	 * @return The HID from the sender.
+	 */
+	private static HID GetHIDFromData(byte[] origData) {
+		String dataAsString = origData.toString();
+		int posHidDelimiter = dataAsString.indexOf(HID_DELIMITER);
+		String hidAsString = dataAsString.substring(0, posHidDelimiter);
+		return new HID(hidAsString);
+	}
+
+	/**
+	 * Removes the HID from the data package so that the payload can be processed regularly e.g. unencrypted.
+	 * 
+	 * @param origData
+	 * @return The original payload of the data package.
+	 */
+	private static byte[] RemoveHIDFromData(byte[] origData) {
+		String dataAsString = origData.toString();
+		int posHidDelimiter = dataAsString.indexOf(HID_DELIMITER);
+		String dataWithoutHidAsString = dataAsString.substring(
+				posHidDelimiter + 1, dataAsString.length());
+		return dataWithoutHidAsString.getBytes();
 	}
 
 }
