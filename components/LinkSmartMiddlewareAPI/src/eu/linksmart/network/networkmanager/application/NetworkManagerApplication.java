@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.util.Properties;
 
 import eu.linksmart.network.HID;
-import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 
 /*
