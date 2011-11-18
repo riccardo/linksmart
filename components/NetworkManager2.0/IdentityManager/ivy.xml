@@ -3,17 +3,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
-	<info organisation="eu.linksmart.network" module="eu.linksmart.network.identity" />
+	<info organisation="eu.linksmart.network" module="eu.linksmart.network.identitymanager" />
 
 	<publications>
-		<artifact name="eu.linksmart.network.identity" type="jar" />
+		<artifact name="eu.linksmart.network.identitymanager" type="jar" />
 	</publications>
 
 	<dependencies>
 		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
+		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi"	rev="3.6.2" />
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi.services" rev="3.2.100" />
-		<dependency org="eu.linksmart.network" name="networkmanager" rev="latest.integration" changing="true"  />
-		<dependency org="eu.linksmart.network" name="linksmartmiddlewareapi" rev="latest.integration" changing="true"  />
+		<dependency org="eu.linksmart.network" name="eu.linksmart.network.networkmanager" rev="2.0.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.middlewareapi" rev="2.0.0" />
 	</dependencies>
 
 </ivy-module>
