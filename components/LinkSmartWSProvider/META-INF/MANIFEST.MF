@@ -17,7 +17,7 @@ Import-Package: eu.linksmart.network,
  eu.linksmart.utils,
  eu.linksmart.wsprovider,
  javax.servlet;version="2.4.0",
- javax.servlet.http,
+ javax.servlet.http;version="2.4.0",
  javax.xml.messaging,
  javax.xml.namespace,
  javax.xml.rpc,
@@ -101,4 +101,4 @@ Export-Package: eu.linksmart.security.communication.core,
  org.apache.axis.wsdl.gen,
  org.apache.axis.wsdl.symbolTable,
  org.apache.axis.wsdl.toJava
-Require-Bundle: org.apache.servicemix.bundles.xmlsec
+Require-Bundle: org.apache.servicemix.bundles.xmlsec;bundle-version="1.4.4"
