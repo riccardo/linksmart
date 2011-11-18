@@ -3,9 +3,10 @@
 <project name="LinkSmartMiddlewareAPI" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
-	<property name="moduleName" value="eu.linksmart.network.linksmartmiddlewareapi" />
+	<property name="moduleName" value="eu.linksmart.middlewareapi" />
 	<property name="revision" value="2.0.0" />
 	<property name="src.dir" value="${basedir}/src" />
+	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
 	<property name="javadoc.dir" value="${basedir}/doc" />
@@ -70,13 +71,11 @@
 		<echo message="Packaging" />
 		<mkdir dir="${dist.dir}" />
 		<jar jarfile="${dist.dir}/${moduleName}-${revision}.jar" manifest="${basedir}/META-INF/MANIFEST.MF">
-			<!--
 			<fileset dir="${build.dir}">
 				<patternset>
 					<include name="**/*.class" />
 				</patternset>
 			</fileset>
-			-->
 			<fileset dir="${basedir}">
 				<patternset>
 					<include name="lib/sunxacml-1.2.jar" />

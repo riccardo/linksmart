@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LinkSmart Middleware API
-Bundle-SymbolicName: LinkSmartMiddlewareAPI
-Bundle-Version: 1.1.0
+Bundle-SymbolicName: eu.linksmart.middlewareapi
+Bundle-Version: 2.0.0
 Bundle-Vendor: TID
-Import-Package: org.apache.commons.lang;version="2.4.0",
+Import-Package: org.apache.commons.lang;version="2.5.0",
  org.apache.log4j,
  org.osgi.framework,
  org.osgi.service.cm
@@ -57,3 +57,4 @@ Export-Package: com.sun.xacml,
  eu.linksmart.wsprovider,
  eu.linksmart.wsprovider.test;uses:="eu.linksmart.wsprovider.test.types,eu.linksmart.network",
  eu.linksmart.wsprovider.test.types
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
