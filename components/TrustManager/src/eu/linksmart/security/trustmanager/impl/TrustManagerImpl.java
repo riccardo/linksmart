@@ -35,9 +35,7 @@ package eu.linksmart.security.trustmanager.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.List;
@@ -46,18 +44,20 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.clients.RemoteWSClientProvider;
 import eu.linksmart.network.CryptoHIDResult;
-import eu.linksmart.network.NetworkManagerApplication;
+import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDAttribute;
+import eu.linksmart.network.networkmanager.application.NetworkManagerApplication;
+import eu.linksmart.security.trustmanager.TrustManager;
+import eu.linksmart.security.trustmanager.TrustManagerConfiguration;
 import eu.linksmart.security.trustmanager.trustmodel.TrustModel;
 import eu.linksmart.security.trustmanager.trustmodel.TrustModelRegistry;
 import eu.linksmart.security.trustmanager.util.Base64;
 import eu.linksmart.security.trustmanager.util.Util;
-import eu.linksmart.security.trustmanager.TrustManager;
-import eu.linksmart.security.trustmanager.TrustManagerConfiguration;
 
 /**
  * This class encapsulates the web service used to verify the authenticity of
@@ -359,7 +359,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		
 		if(nm != null){
 			try {
-				nm.removeHID(trustManagerHID);
+				nm.removeHID(new HID(trustManagerHID));
 			} catch (Exception e) {
 				LOG.error(e);
 			}
@@ -370,9 +370,9 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 	private String getXMLAttributeProperties(String pid, String sid, String desc)throws IOException
 	{
 		Properties descProps = new Properties();
-		descProps.setProperty(NetworkManagerApplication.PID, pid);
-		descProps.setProperty(NetworkManagerApplication.DESCRIPTION, desc);
-		descProps.setProperty(NetworkManagerApplication.SID, sid);
+		descProps.setProperty(HIDAttribute.PID.name(), pid);
+		descProps.setProperty(HIDAttribute.DESCRIPTION.name(), desc);
+		descProps.setProperty(HIDAttribute.SID.name(), sid);
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		descProps.storeToXML(bos, "");
