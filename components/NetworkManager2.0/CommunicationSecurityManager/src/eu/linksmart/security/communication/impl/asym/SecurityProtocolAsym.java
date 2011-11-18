@@ -58,7 +58,7 @@ import eu.linksmart.utils.Base64;
 public class SecurityProtocolAsym implements SecurityProtocol {
 
 	private static Logger logger = Logger.getLogger(SecurityProtocolAsym.class);
-	
+
 	/**
 	 * {@CryptoManager} used to store certificates and keys
 	 */
@@ -79,7 +79,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 * The threshold between 0 and 1 needed for a certificate to be accepted
 	 */
 	private double trustThreshold;
-	
+
 	/**
 	 * NonceGenerator used for creating nonces in this protocol
 	 */
@@ -100,6 +100,10 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 * Indicates for a server state machine that it has already sent keys to the client
 	 */
 	private boolean sentKeyToClient = false;
+	/**
+	 * Indicates for a client state machine that the acknowledgement has been sent
+	 */
+	private boolean sentAcknowledgement = false;
 	/**
 	 * Message which has to be sent when handshake is finished
 	 */
@@ -152,67 +156,74 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 				return startProtocol();
 			}
 			if(isClient){
-				//response from the server which should contain a certificate
-				Command command = getCommand(msg);
-				if(Integer.parseInt(command.getProperty("command")) == Command.SERVER_SEND_KEY){
-					String signedAndEncryptedPayload = command.getProperty(Command.SIGNED_AND_ENCRYPTED_PAYLOAD);
+				if(!sentAcknowledgement){
+					//response from the server which should contain a certificate
+					Command command = getCommand(msg);
+					if(Integer.parseInt(command.getProperty("command")) == Command.SERVER_SEND_KEY){
+						String signedAndEncryptedPayload = command.getProperty(Command.SIGNED_AND_ENCRYPTED_PAYLOAD);
 
-					//verify signature on message
-					logger.debug("Verifying message " + signedAndEncryptedPayload);
-					String verifiedMessage = cryptoMgr.verify(signedAndEncryptedPayload);
-					logger.debug("Signature of Message from Server verified: " + (verifiedMessage!=null));
+						//verify signature on message
+						logger.debug("Verifying message " + signedAndEncryptedPayload);
+						String verifiedMessage = cryptoMgr.verify(signedAndEncryptedPayload);
+						logger.debug("Signature of Message from Server verified: " + (verifiedMessage!=null));
 
-					//if signature is valid extract symmetric key
-					if (verifiedMessage!=null && verifiedMessage!="") {
-						// Convert input String to XML document
-						logger.debug("Encrypted message is: " + verifiedMessage);
-						//save received certificate
-						Certificate cert = XMLMessageUtil.getCertificate(signedAndEncryptedPayload);
-						String serverKeyidentifier;
-						try {
-							serverKeyidentifier = cryptoMgr.storePublicKey(Base64.encodeBytes(cert.getEncoded()), "RSA");
-						} catch (CertificateEncodingException e) {
-							IOException ioe = new IOException("Cannot parse received message!");
-							ioe.initCause(e);
-							throw ioe;
-						}
-						saveServerPk(serverKeyidentifier);			
+						//if signature is valid extract symmetric key
+						if (verifiedMessage!=null && verifiedMessage!="") {
+							// Convert input String to XML document
+							logger.debug("Encrypted message is: " + verifiedMessage);
+							//save received certificate
+							Certificate cert = XMLMessageUtil.getCertificate(signedAndEncryptedPayload);
+							String serverKeyidentifier;
+							try {
+								serverKeyidentifier = cryptoMgr.storePublicKey(Base64.encodeBytes(cert.getEncoded()), "RSA");
+							} catch (CertificateEncodingException e) {
+								IOException ioe = new IOException("Cannot parse received message!");
+								ioe.initCause(e);
+								throw ioe;
+							}
+							saveServerPk(serverKeyidentifier);			
 
-						//open message
-						String originalMessage = cryptoMgr.decrypt(verifiedMessage);
+							//open message
+							String originalMessage = cryptoMgr.decrypt(verifiedMessage);
 
-						logger.debug("Verified: " + verifiedMessage);
-						logger.debug("Original: " + originalMessage);
+							logger.debug("Verified: " + verifiedMessage);
+							logger.debug("Original: " + originalMessage);
 
-						//check if encrypted message and signed message are the same
-						Properties props = new Properties();
-						props.loadFromXML(new ByteArrayInputStream(originalMessage.getBytes()));
-						String client = props.getProperty(Command.CLIENT);
-						String server = props.getProperty(Command.SERVER);
-						String cmd = props.getProperty(Command.COMMAND);
-						if ((client.equals(command.getProperty(Command.CLIENT))) && (server.equals(command.getProperty(Command.SERVER))) && (cmd.equals(command.getProperty(Command.COMMAND)))) {
-							logger.debug("Signed Headers are the same as outer Headers");
-							//store received symmetric key
-							storeSymKey(props.getProperty(Command.SYMMETRIC_KEY));
+							//check if encrypted message and signed message are the same
+							Properties props = new Properties();
+							props.loadFromXML(new ByteArrayInputStream(originalMessage.getBytes()));
+							String client = props.getProperty(Command.CLIENT);
+							String server = props.getProperty(Command.SERVER);
+							String cmd = props.getProperty(Command.COMMAND);
+							if ((client.equals(command.getProperty(Command.CLIENT))) && (server.equals(command.getProperty(Command.SERVER))) && (cmd.equals(command.getProperty(Command.COMMAND)))) {
+								logger.debug("Signed Headers are the same as outer Headers");
+								//store received symmetric key
+								storeSymKey(props.getProperty(Command.SYMMETRIC_KEY));
+							} else {
+								logger.debug("Signed Headers are not the same as outer Headers, aborting!");
+								throw new VerificationFailureException("Signature from HID: " + serverHID + " not matching to required fields!");
+							}
 						} else {
-							logger.debug("Signed Headers are not the same as outer Headers, aborting!");
-							throw new VerificationFailureException("Signature from HID: " + serverHID + " not matching to required fields!");
+							logger.debug("Signature not valid, aborting");
+							throw new VerificationFailureException("Signature from HID: " + serverHID + " not valid!");
+						} 
+						//send acknowledgment to server of receiving key
+						Command cmd = new Command(Command.CLIENT_ACK);
+						cmd.setProperty(Command.CLIENT, clientHID.toString());
+						cmd.setProperty(Command.SERVER, serverHID.toString());
+						try {
+							return createMessage(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, clientHID, serverHID, cmd);
+						} catch (IOException e) {
+							//this exception cannot happen
+							logger.error("Error creating acknowledgment for server",e);
+							return null;
 						}
-					} else {
-						logger.debug("Signature not valid, aborting");
-						throw new VerificationFailureException("Signature from HID: " + serverHID + " not valid!");
-					} 
-					//send acknowledgment to server of receiving key
-					Command cmd = new Command(Command.CLIENT_ACK);
-					cmd.setProperty(Command.CLIENT, clientHID.toString());
-					cmd.setProperty(Command.SERVER, serverHID.toString());
-					try {
+					}else{
 						isInitialized = true;
-						return createMessage(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, clientHID, serverHID, cmd);
-					} catch (IOException e) {
-						//this exception cannot happen
-						logger.error("Error creating acknowledgment for server",e);
-						return null;
+						//handshake is finished send stored message
+						Message toSend = storedMessage;
+						storedMessage = null;
+						return toSend;
 					}
 				}
 			}else{
@@ -252,8 +263,10 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 					}
 				}else if(sentKeyToClient && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_ACK){
 					isInitialized = true;
-					//indicate that this message has been processed
-					return null;
+					//return stored message although as this is the server there should be none
+					Message toSend = storedMessage;
+					storedMessage = null;
+					return toSend;
 				}
 			}
 		}
@@ -274,11 +287,11 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		return msg;
 	}
 
-	
+
 	/*
 	 * Methods needed for the secure session handshake protocol
 	 */
-	
+
 	/**
 	 * Creates a Message object from a prepared Command object
 	 */
@@ -439,11 +452,11 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		}
 		return key;
 	}
-	
+
 	/*
 	 * Methods needed for the protection and unprotection of messages
 	 */
-	
+
 	public String AsDecrypt(String encrData) throws Exception, CryptoException {
 		String result = "";
 		try {
@@ -472,12 +485,12 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 				// Retrieve information about the Public Key used to encrypt the
 				// DEK
 				EncryptedKey ek = encryptedDataObject.getKeyInfo().itemEncryptedKey(0);
-				 String receiverHID =
-				 encryptedDataObject.getKeyInfo().getTextFromTextChild().trim();
+				String receiverHID =
+					encryptedDataObject.getKeyInfo().getTextFromTextChild().trim();
 
 				// Try to retrieve the corresponding Private Key
 				PrivateKey kek = loadKeyDecryptionKey(receiverHID);
-				
+
 				// Set the cipher to "Unwrap" mode and use the Private Key to
 				// extract the DEK
 				xmlCipher.init(XMLCipher.UNWRAP_MODE, kek);
@@ -523,7 +536,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 		return result;
 	}
-	
+
 	public String asymEncrypt(String encstr, String receiverHID) throws Exception {
 		String result = "";
 		try {
@@ -606,7 +619,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Returns a symmetric secret key that can be used for encryption.
 	 * 
@@ -622,7 +635,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 * @throws NoSuchProviderException
 	 */
 	private SecretKey loadDataEncryptionKey(String keystoreAlias) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
-			UnrecoverableKeyException, NoSuchProviderException {
+	UnrecoverableKeyException, NoSuchProviderException {
 		SecretKey secretKey = null;
 
 		if (secretKey == null) {
@@ -665,7 +678,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		PrivateKey signingKey = cryptoMgr.getPrivateKeyByIdentifier("hydrademo-rsa");
 		return signingKey;
 	}
-	
+
 	/**
 	 * Load the public key of the receiver from the {@link CryptoManager}
 	 * @param receiverHID
