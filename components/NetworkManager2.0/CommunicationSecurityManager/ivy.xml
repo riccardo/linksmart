@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ivy-module version="2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+	<info organisation="eu.linksmart.security" module="eu.linksmart.security.communication" />
+
+	<publications>
+		<artifact name="eu.linksmart.security.communication" type="jar" />
+	</publications>
+
+	<dependencies>
+		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
+		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi.services" rev="3.2.100" />
+		<dependency org="org.apache.xml" name="com.springsource.org.apache.xml.security" rev="1.4.2" />
+		<dependency org="org.apache.xalan" name="com.springsource.org.apache.xalan" rev="2.7.1" />
+		<dependency org="eu.linksmart.network" name="eu.linksmart.network.linksmartmiddlewareapi" rev="2.0.0"  />
+	</dependencies>
+
+</ivy-module>
