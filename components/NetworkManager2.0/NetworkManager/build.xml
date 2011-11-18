@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Build file for NetworkManager
-	 author: Marco Tiemann -->
-
-<!--
-		The following properties must be pre-defined in the parent ant script:
-		- javaLibDir directory containing 3rd party Java libraries -
-		rootBuildDir base directory for all intermediate outputs -
-		rootDistributionDir directory for compiled bundles
-	-->
-
 <project name="NetworkManager" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
