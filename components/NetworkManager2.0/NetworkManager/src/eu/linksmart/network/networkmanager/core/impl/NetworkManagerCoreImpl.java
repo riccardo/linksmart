@@ -20,6 +20,7 @@ import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.identity.IdentityManager;
+import eu.linksmart.network.networkmanager.application.impl.NetworkManagerApplicationImpl;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.CommunicationSecurityManager;

@@ -58,22 +58,6 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 	public static final String CERTIFICATE_REF = "Network.CertificateRef";
 	public static final String COMMUNICATION_TYPE = "Network.CommunicationType";
 	
-	public static final String MULTIMEDIA_PORT = "Network.MultimediaPort";
-		
-	public static final String JXTA_LOGS = "Backbone.JXTALogs";
-	public static final String PEER_NAME = "Backbone.PeerName";
-	public static final String ANNOUNCE_VALIDITY = "Backbone.AnnounceValidity";
-	public static final String FACTOR = "Backbone.Factor";
-	public static final String WAIT_FOR_RDV_TIME = "Backbone.WaitForRdvTime";
-	public static final String SYNCHRONIZED = "Backbone.Synchronized";
-	public static final String MODE = "Backbone.Mode";
-	public static final String RELAYED = "Backbone.Relayed";
-	public static final String EXT_TCP_ADDR = "Backbone.ExtTcpAddr";
-	public static final String MULTICAST = "Backbone.Multicast";
-	public static final String JXTA_TCP_PORT = "Backbone.TcpPort";
-	public static final String JXTA_HTTP_PORT = "Backbone.HttpPort";
-	public static final String PIPE_LIFETIME = "Backbone.PipeLifeTime";
-	
 //	public static final String SESSION_ID_GENERATOR = "Session.GeneratorName";
 //	public static final String SESSION_DELAY = "Session.Delay";
 //	public static final String SESSION_DATA_PATH = "Session.DataPath";
@@ -125,7 +109,7 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 					(String)updates.get(NetworkManagerCoreConfigurator.CONNECTION_TIMEOUT)));
 		}
 		
-//				
+//				TODO #NM Mark & Amro check certificate issue
 //				|| (updates.containsKey(NetworkManagerCoreConfigurator.CERTIFICATE_REF)
 //					&& updates.get(NetworkManagerCoreConfigurator.CERTIFICATE_REF).equals(""))) {
 //			

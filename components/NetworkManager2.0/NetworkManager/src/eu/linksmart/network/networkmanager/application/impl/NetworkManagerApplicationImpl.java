@@ -1,4 +1,4 @@
-package eu.linksmart.network.networkmanager.core.impl;
+package eu.linksmart.network.networkmanager.application.impl;
 
 import java.net.URL;
 import java.rmi.RemoteException;
