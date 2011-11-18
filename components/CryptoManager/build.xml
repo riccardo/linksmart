@@ -3,13 +3,13 @@ Local build file for the Linksmart Crypto Manager
 -->
 <project name="CryptoManager" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
-	<property name="moduleName" value="CryptoManager" />
-	<property name="revision" value="1.0.0" />
+	<property name="moduleName" value="eu.linksmart.security.cryptomanager" />
+	<property name="revision" value="2.0.0" />
 	<property name="src.dir" value="${basedir}/src" />
-	<property name="test.dir" value="${basedir}/test" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
+	<property name="antbuild.lib.dir" value="${basedir}/../../antlibs" />
 	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
 
 	<path id="classpath">
@@ -28,7 +28,6 @@ Local build file for the Linksmart Crypto Manager
 
 	<!-- Local versions of targets, setting properties so it may be called from this directory -->
 	<target name="setup-local">
-		<property name="antbuild.lib.dir" value="${basedir}/../antlibs" />
 		<path id="antlib.path">
 			<fileset dir="${antbuild.lib.dir}" includes="*.jar" />
 		</path>
@@ -60,7 +59,6 @@ Local build file for the Linksmart Crypto Manager
 		<mkdir dir="${build.dir}" />
 		<javac destdir="${build.dir}" classpathref="classpath">
 			<src path="${src.dir}" />
-			<!-- <src path="${test.dir}"/> -->
 		</javac>
 	</target>
 
@@ -97,28 +95,14 @@ Local build file for the Linksmart Crypto Manager
 		<echo message="Published as: ${rootDistributionDir}/${moduleName}-${revision}.jar" />
 	</target>
 
-
-
-
-	<target name="test-local" depends="setup-local">
-		<antcall target="test" />
-	</target>
-
+	<!-- clean -->
 	<target name="clean">
+		<echo message="Cleaning" />
+		<!-- files in build directory -->			
 		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
+		<!-- files in distribution directory -->
+		<delete dir="${dist.dir}" includeEmptyDirs="true" failonerror="false" />
+		<delete file="${rootDistributionDir}/${moduleName}-${revision}.jar" failonerror="false" />
 	</target>
 
-	<target name="test" depends="make">
-		<!--<junit fork="yes" haltonfailure="yes">
-      <classpath>
-	 <path refid="classpath"/>
-      </classpath>
-      <formatter type="brief" usefile="false"/>
-      <batchtest fork="yes">
-	 <fileset dir="${test.dir}">
-	   <include name="**/*Test*.java"/>
-	 </fileset>
-      </batchtest>
-    </junit>-->
-	</target>
 </project>
