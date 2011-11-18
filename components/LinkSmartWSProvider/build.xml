@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Build file for LinkSmartWSProvider
-	 author: Marco Tiemann -->
-
-<!--
-		The following properties must be pre-defined in the parent ant script:
-		- javaLibDir directory containing 3rd party Java libraries -
-		rootBuildDir base directory for all intermediate outputs -
-		rootDistributionDir directory for compiled bundles
-	-->
-
 <project name="LinkSmartWSProvider" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
 
-	<property name="moduleName" value="LinkSmartWSProvider" />
-	<property name="revision" value="1.0.0" />
-
+	<property name="moduleName" value="eu.linksmart.wsprovider" />
+	<property name="revision" value="2.0.0" />
 	<property name="src.dir" value="${basedir}/src" />
-	<property name="test.dir" value="${basedir}/test" />
-	<property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
+	<property name="antlib.dir" value="${basedir}/../../antlibs" />
 	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
 
 	<!-- paths -->
@@ -37,17 +25,6 @@
 		<pathelement path="${build.dir}" />
 	</path>
 
-	<path id="test-classpath">
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="${targetPlatform.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-		<pathelement path="${build.dir}" />
-		<pathelement path="${test.build.dir}" />
-	</path>
-
 	<!-- targets -->
 
 	<!-- default target fails -->
@@ -58,7 +35,6 @@
 	<!-- set up local build environment -->
 	<target name="setup-local">
 		<echo message="Setting up local build environment" />
-		<property name="antlib.dir" value="${basedir}/../antlibs" />
 		<path id="antlib.path">
 			<fileset dir="${antlib.dir}" includes="*.jar" />
 		</path>
@@ -69,12 +45,6 @@
 	<target name="make-local" depends="setup-local">
 		<echo message="Calling make locally" />
 		<antcall target="make" />
-	</target>
-
-	<!-- local test -->
-	<target name="test-local" depends="setup-local">
-		<echo message="Calling test locally" />
-		<antcall target="test" />
 	</target>
 
 	<!-- set up build environment -->
@@ -127,12 +97,6 @@
 		<echo message="Published as: ${rootDistributionDir}/${moduleName}-${revision}.jar" />
 	</target>
 
-	<!-- test -->
-	<target name="test" depends="make">
-		<echo message="Testing" />
-		<mkdir dir="${test.build.dir}" />
-	</target>
-
 	<!-- clean -->
 	<target name="clean">
 		<echo message="Cleaning" />
@@ -141,8 +105,6 @@
 		<!-- files in distribution directory -->
 		<delete dir="${dist.dir}" includeEmptyDirs="true" failonerror="false" />
 		<delete file="${rootDistributionDir}/${moduleName}-${revision}.jar" failonerror="false" />
-		<!-- files in test directory -->
-		<delete dir="${test.build.dir}" includeEmptyDirs="true" failonerror="false" />
 	</target>
 
 </project>
