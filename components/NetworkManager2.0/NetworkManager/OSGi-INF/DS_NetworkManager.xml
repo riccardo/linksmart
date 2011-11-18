@@ -10,5 +10,5 @@
  <reference cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="static"/>
  <reference bind="bindCommunicationSecurityManager" cardinality="0..n" interface="eu.linksmart.security.communication.CommunicationSecurityManager" name="CommunicationSecurityManager" policy="dynamic" unbind="unbindCommunicationSecurityManager"/>
  <reference bind="bindBackboneRouter" cardinality="1..1" interface="eu.linksmart.network.routing.BackboneRouter" name="BackboneRouter" policy="dynamic" unbind="unbindBackboneRouter"/>
- <reference bind="bindIdentityManager" cardinality="1..n" interface="eu.linksmart.network.identity.IdentityManager" name="IdentityManager" policy="dynamic" unbind="unbindIdentityManager"/>
+ <reference bind="bindIdentityManager" cardinality="1..1" interface="eu.linksmart.network.identity.IdentityManager" name="IdentityManager" policy="dynamic" unbind="unbindIdentityManager"/>
 </scr:component>
