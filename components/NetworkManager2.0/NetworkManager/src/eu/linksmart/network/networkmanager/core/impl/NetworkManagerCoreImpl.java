@@ -13,8 +13,8 @@ import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
-import eu.linksmart.network.MessageObserver;
-import eu.linksmart.network.MessageProvider;
+import eu.linksmart.network.MessageProcessor;
+import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
@@ -28,7 +28,7 @@ import eu.linksmart.security.communication.CommunicationSecurityManager;
 /*
  * Core implementation of NetworkManagerCore Interface
  */
-public class NetworkManagerCoreImpl extends NetworkManagerApplicationImpl implements NetworkManagerCore, MessageProvider {
+public class NetworkManagerCoreImpl extends NetworkManagerApplicationImpl implements NetworkManagerCore, MessageDistributor {
 
 	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
@@ -45,7 +45,7 @@ public class NetworkManagerCoreImpl extends NetworkManagerApplicationImpl implem
 	/* fields */
 	private NetworkManagerCoreConfigurator configurator;	
 	private CommunicationSecurityManager commSecMgr;
-	private Map<String,ArrayList<MessageObserver>> msgObservers = new HashMap<String,ArrayList<MessageObserver>>();
+	private Map<String,ArrayList<MessageProcessor>> msgObservers = new HashMap<String,ArrayList<MessageProcessor>>();
 	
 	
 protected void activate(ComponentContext context) {
@@ -105,9 +105,9 @@ public NMResponse receiveData(HID sender, HID receiver, byte[] data) {
 	Message msg = conn.processData(sender, receiver, data);
 	String topic = msg.getTopic();
 	//go through MsgObservers for additional processing
-	List<MessageObserver> observers = msgObservers.get(topic);
+	List<MessageProcessor> observers = msgObservers.get(topic);
 	if(observers != null){
-		for(MessageObserver observer : observers){
+		for(MessageProcessor observer : observers){
 			msg = observer.processMessage(msg);
 			if(msg == null || msg.getData() == null){
 				NMResponse nmresp = new NMResponse();
@@ -144,7 +144,7 @@ public void setDescription(String description) {
 	
 }
 
-public void subscribe(String topic, MessageObserver observer) {
+public void subscribe(String topic, MessageProcessor observer) {
 	//check if topic already exists
 	if(msgObservers.containsKey(topic)){
 		//add new observer to topic
@@ -156,13 +156,13 @@ public void subscribe(String topic, MessageObserver observer) {
 		}
 	}else{
 		//create topic and add observer
-		msgObservers.put(topic, new ArrayList<MessageObserver>());
+		msgObservers.put(topic, new ArrayList<MessageProcessor>());
 		msgObservers.get(topic).add(observer);
 	}
 
 }
 
-public void unsubscribe(String topic, MessageObserver observer) {
+public void unsubscribe(String topic, MessageProcessor observer) {
 	if(msgObservers.containsKey(topic)){
 		msgObservers.get(topic).remove(observer);
 	}

@@ -5,7 +5,7 @@ package eu.linksmart.network;
  * @author Vinkovits
  *
  */
-public interface MessageObserver {
+public interface MessageProcessor {
 
 	/**
 	 * {@link Message} of topic this MessageObserver subscribed to.

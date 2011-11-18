@@ -19,11 +19,11 @@ import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
-import eu.linksmart.network.MessageObserver;
+import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 
-public class IdentityManagerImpl implements IdentityManager, MessageObserver {
+public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	private static String IDENTITY_MGR = IdentityManagerImpl.class
 			.getSimpleName();

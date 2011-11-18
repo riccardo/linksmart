@@ -1,23 +1,23 @@
 package eu.linksmart.network;
 
 /**
- * Holds references of {@link MessageObserver} objects
+ * Holds references of {@link MessageProcessor} objects
  * and passes them received {@link Message} of topic
  * their subscribed to. 
  * @author Vinkovits
  *
  */
-public interface MessageProvider {
+public interface MessageDistributor {
 
 	/**
 	 * Method to subscribe to {@link Message} of specific topic
 	 * @param topic String name of topic to listen to
 	 */
-	void subscribe(String topic, MessageObserver observer);
+	void subscribe(String topic, MessageProcessor observer);
 	
 	/**
-	 * Removes observer from {@link MessageProvider}'s list.
+	 * Removes observer from {@link MessageDistributor}'s list.
 	 * @param observer
 	 */
-	void unsubscribe(String topic, MessageObserver observer);
+	void unsubscribe(String topic, MessageProcessor observer);
 }
