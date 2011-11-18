@@ -54,7 +54,7 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 	public static String NM_PID = "eu.linksmart.network";
 	public static String CONFIGURATION_FILE = "/NM.properties";
 	
-	public static final String NM_DESCRIPTION = "NetworkManagerCore.Description";
+	public static final String NM_DESCRIPTION = "NetworkManager.Description";
 	public static final String CERTIFICATE_REF = "Network.CertificateRef";
 	public static final String COMMUNICATION_TYPE = "Network.CommunicationType";
 	
@@ -66,7 +66,7 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 //	public static final String SESSION_CLEANING_FREQ = "Session.CleaningFrequency";
 //	public static final String SESSION_SYNC_FREQ = "Session.SyncFrequency";
 	
-	public static final String CONNECTION_TIMEOUT = "NetworkManagerCore.ConnectionTimeout";
+	public static final String CONNECTION_TIMEOUT = "NetworkManager.ConnectionTimeout";
 	
 	public static final String SECURITY_PROTOCOL = "Security.Protocol";
 	
