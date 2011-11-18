@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: NetworkManagerCore
-Bundle-SymbolicName: eu.linksmart.network.networkmanager.core.impl
+Bundle-Name: NetworkManager
+Bundle-SymbolicName: NetworkManager
 Bundle-Version: 2.0.0
 Import-Package: eu.linksmart.network;version="1.0.0",
  eu.linksmart.network.identity,
