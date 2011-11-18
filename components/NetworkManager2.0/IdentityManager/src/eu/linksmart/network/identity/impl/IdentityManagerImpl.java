@@ -409,8 +409,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageObserver {
 		public void run() {
 			while (true) {
 				if (!queue.isEmpty()) {
-					BroadcastMessage m = getHIDListUpdate();
+					
 					if (networkManagerCore != null) {
+						BroadcastMessage m = getHIDListUpdate();
 						networkManagerCore.broadcastMessage(m);
 					} else {
 						LOG
