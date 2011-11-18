@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: BackboneRouter
-Bundle-SymbolicName: BackboneRouter
-Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: eu.linksmart.network.backbone.backbonerouter
+Bundle-Version: 2.0.0
 Import-Package: eu.linksmart.network;version="1.0.0",
  eu.linksmart.network.backbone,
  eu.linksmart.network.networkmanager.application,
