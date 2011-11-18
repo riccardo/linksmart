@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LinkSmartManagerConfigurator
-Bundle-SymbolicName: LinkSmartManagerConfigurator
-Bundle-Version: 1.0.0
+Bundle-SymbolicName: eu.linksmart.config.managerconfigurator
+Bundle-Version: 2.0.0
 Service-Component: OSGI-INF/*.xml
 Import-Package: eu.linksmart.network,
  eu.linksmart.network.networkmanager.application,
