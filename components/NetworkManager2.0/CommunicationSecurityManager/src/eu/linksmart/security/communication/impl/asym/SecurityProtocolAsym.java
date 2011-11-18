@@ -38,6 +38,7 @@ import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -57,25 +58,56 @@ import eu.linksmart.utils.Base64;
 public class SecurityProtocolAsym implements SecurityProtocol {
 
 	private static Logger logger = Logger.getLogger(SecurityProtocolAsym.class);
-
-	public static final String FILE_SEPERATOR = System.getProperty("file.separator");
-	private String KEYSTORE_PASS;
-	private String KEYSTORE_FILE;
-	private String KEYSTORE_TYPE;
-	private String INSIDE_KEY_ALIAS;
-	private String KEYSTORE_DEPLOY_DIR;
 	
+	/**
+	 * {@CryptoManager} used to store certificates and keys
+	 */
 	private CryptoManager cryptoMgr = null;
+	/**
+	 * {@TrustManager} used to check validity of certificates
+	 */
 	private TrustManager trustMgr = null;
+	/**
+	 * The client of this protocol run meaning who started the communication
+	 */
 	private HID clientHID = null;
+	/**
+	 * The server of this protocol run meaning who received the request
+	 */
 	private HID serverHID = null;
+	/**
+	 * The threshold between 0 and 1 needed for a certificate to be accepted
+	 */
 	private double trustThreshold;
 	
+	/**
+	 * NonceGenerator used for creating nonces in this protocol
+	 */
 	private NonceGenerator nonceGenerator = null;
-	private KeyStore keyStore = null;
+	/**
+	 * Indicates whether the handshake has already been completed successfully
+	 */
 	private boolean isInitialized = false;
+	/**
+	 * Indicates whether there has been sent already a message
+	 */
+	private boolean isStarted = false;
+	/**
+	 * Indicates whether this party is the client
+	 */
 	private boolean isClient = false;
+	/**
+	 * Indicates for a server state machine that it has already sent keys to the client
+	 */
 	private boolean sentKeyToClient = false;
+	/**
+	 * Message which has to be sent when handshake is finished
+	 */
+	private Message storedMessage = null;
+	/**
+	 * Does not provide security but kept for compatibility
+	 */
+	private String lastNonce;
 
 	public SecurityProtocolAsym(HID clientHID, HID serverHID, CryptoManager cryptoMgr, TrustManager trustMgr, double trustThreshold){
 		this.clientHID = clientHID;
@@ -84,11 +116,8 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		this.trustMgr = trustMgr;
 		this.trustThreshold = trustThreshold;
 		nonceGenerator = NonceGeneratorFactory.getInstance();
-		//TODO get keystore and preferences to it
-		//not used anyway so not implemented so far
 	}
 
-	@Override
 	public Message startProtocol() throws CryptoException {
 		isClient = true;
 
@@ -111,14 +140,17 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		}
 	}
 
-	@Override
 	public boolean isInitialized() {
 		return isInitialized;
 	}
 
-	@Override
 	public Message processMessage(Message msg) throws CryptoException, VerificationFailureException, IOException{
 		if(!isInitialized){
+			if(!isStarted){
+				isStarted = true;
+				storedMessage = msg;
+				return startProtocol();
+			}
 			if(isClient){
 				//response from the server which should contain a certificate
 				Command command = getCommand(msg);
@@ -230,16 +262,16 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 	@Override
 	public Message protectMessage(Message msg) throws Exception {
-		String encryptedMessage = asymEncrypt(String.valueOf(msg.getData()), clientHID.toString());
-		// String signedMessage = asymSign(encryptedMessage, senderHID);
+		String encryptedMessage = asymEncrypt(String.valueOf(msg.getData()), msg.getReceiverHID().toString());
 		msg.setData(encryptedMessage.getBytes());
 		return msg;
 	}
 
 	@Override
 	public Message unprotectMessage(Message msg) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String decryptedMessage = AsDecrypt(String.valueOf(msg.getData()));
+		msg.setData(decryptedMessage.getBytes());
+		return msg;
 	}
 
 	
@@ -247,6 +279,9 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 * Methods needed for the secure session handshake protocol
 	 */
 	
+	/**
+	 * Creates a Message object from a prepared Command object
+	 */
 	private Message createMessage(String topic, HID senderHID, HID receiverHID, Command command) throws IOException{
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		byte[] serializedCommand = null;
@@ -260,6 +295,12 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		return new Message(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, clientHID, serverHID, serializedCommand);
 	}
 
+	/**
+	 * Parses the incoming message's data field into a Command object
+	 * @param msg
+	 * @return The command included in the data field
+	 * @throws IOException If the data is not a command or cannot be parsed
+	 */
 	private Command getCommand(Message msg) throws IOException{
 		Command command = new Command();
 		ByteArrayInputStream bis = new ByteArrayInputStream(msg.getData());
@@ -403,6 +444,86 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 * Methods needed for the protection and unprotection of messages
 	 */
 	
+	public String AsDecrypt(String encrData) throws Exception, CryptoException {
+		String result = "";
+		try {
+			// Convert input string to XML document
+
+			javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+			javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
+
+			ByteArrayInputStream bis = new ByteArrayInputStream(encrData.getBytes());
+			Document document = db.parse(bis);
+
+			// Get the "EncryptedData" element from DOM tree.
+			XMLCipher xmlCipher = XMLCipher.getInstance();
+			xmlCipher.init(XMLCipher.DECRYPT_MODE, null);
+			Element encryptedDataElement = (Element) document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,
+					EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+			EncryptedData encryptedDataObject = xmlCipher.loadEncryptedData(document, encryptedDataElement);
+
+			// Load the key to be used for decrypting the xml data encryption
+			// key.
+			// need to get the key from keystore
+
+			Key dek = null;
+			if (encryptedDataObject.getKeyInfo().itemEncryptedKey(0) != null) {
+				// Retrieve information about the Public Key used to encrypt the
+				// DEK
+				EncryptedKey ek = encryptedDataObject.getKeyInfo().itemEncryptedKey(0);
+				 String receiverHID =
+				 encryptedDataObject.getKeyInfo().getTextFromTextChild().trim();
+
+				// Try to retrieve the corresponding Private Key
+				PrivateKey kek = loadKeyDecryptionKey(receiverHID);
+				
+				// Set the cipher to "Unwrap" mode and use the Private Key to
+				// extract the DEK
+				xmlCipher.init(XMLCipher.UNWRAP_MODE, kek);
+				dek = xmlCipher.decryptKey(ek, encryptedDataObject.getEncryptionMethod().getAlgorithm());
+			} else {
+				logger.error("Message does not contain an encrypted key element. Using only symmetric encryption is not implemented yet");
+				// TODO Implement pure symmetric encryption: Get symmetric key
+				// from keystore by alias (receiverHID XOR senderHID).
+				// String identifier =
+				// encryptedDataObject.getKeyInfo().getTextFromTextChild();
+				// dek = loadSymmetricKey(identifier);
+				// cipher = XMLCipher.getInstance();
+				// cipher.init(XMLCipher.DECRYPT_MODE, dek);
+			}
+
+			/*
+			 * The key to be used for decrypting xml data would be obtained from
+			 * the keyinfo of the EncrypteData using the kek.
+			 */
+
+			xmlCipher.init(XMLCipher.DECRYPT_MODE, dek);
+
+			// replace the encrypted data with decrypted contents in the
+			// document.
+			xmlCipher.doFinal(document, encryptedDataElement);
+
+			// check the nonce
+			String nonce = document.getElementsByTagName(INSIDE_NONCE_ELEMENT).item(0).getTextContent();
+			if (this.lastNonce.equals(nonce)) {
+				throw new VerificationFailureException("Message contained a nonce seen before. Maybe this was a replay attack?");
+			}
+			lastNonce = nonce;
+			result = document.getElementsByTagName(INSIDE_CONTENT_ELEMENT).item(0).getTextContent();
+
+		} catch (Exception e) {
+			if (!(e instanceof VerificationFailureException)) {
+				throw e;
+			} else {
+				throw (VerificationFailureException) e;
+			}
+			// EXPILICITY stating a verification failure exception
+		}
+
+		return result;
+	}
+	
 	public String asymEncrypt(String encstr, String receiverHID) throws Exception {
 		String result = "";
 		try {
@@ -504,16 +625,6 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 			UnrecoverableKeyException, NoSuchProviderException {
 		SecretKey secretKey = null;
 
-		// First try: get it from keystore
-		if (keyStore.containsAlias(keystoreAlias)) {
-			try {
-				secretKey = (SecretKey) keyStore.getKey(keystoreAlias, this.KEYSTORE_PASS.toCharArray());
-			} catch (ClassCastException e) {
-				logger.warn("Unexpected: When looking for secret key " + keystoreAlias
-						+ " I found an entry but it could not be casted to SecretKey. Will continue with a generated key", e);
-			}
-		}
-
 		if (secretKey == null) {
 			// Second try: generate the symmetric key by myself
 			logger.warn("Keystore does not contain alias " + keystoreAlias + " for symmetric key. Generating one on my own");
@@ -526,31 +637,47 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 	}
 
-	// private keys for decryption
+	/**
+	 * Private keys for decryption
+	 * @param hid
+	 * @return PrivateKey object which can be used to open mesasge
+	 * @throws NoSuchAlgorithmException
+	 * @throws CertificateException
+	 * @throws IOException
+	 * @throws KeyStoreException
+	 * @throws UnrecoverableKeyException
+	 */
 	private PrivateKey loadKeyDecryptionKey(String hid) throws NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException, UnrecoverableKeyException {
 		String identifier = cryptoMgr.getPrivateKeyReference(hid);
 		return cryptoMgr.getPrivateKeyByIdentifier(identifier);
 	}
 
-	// sign using private key
+	/**
+	 * Private keys used for signing
+	 * @return PrivateKey object which can be used to sign a message
+	 * @throws KeyStoreException
+	 * @throws NoSuchAlgorithmException
+	 * @throws CertificateException
+	 * @throws IOException
+	 * @throws UnrecoverableKeyException
+	 */
 	private PrivateKey loadSigningKey() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException {
 		PrivateKey signingKey = cryptoMgr.getPrivateKeyByIdentifier("hydrademo-rsa");
 		return signingKey;
 	}
 	
+	/**
+	 * Load the public key of the receiver from the {@link CryptoManager}
+	 * @param receiverHID
+	 * @return
+	 * @throws InvalidKeySpecException
+	 * @throws KeyStoreException
+	 * @throws NoSuchAlgorithmException
+	 * @throws FileNotFoundException
+	 * @throws CertificateException
+	 */
 	private PublicKey loadKeyEncryptionKey(String receiverHID) throws InvalidKeySpecException, KeyStoreException, NoSuchAlgorithmException, FileNotFoundException, CertificateException{
-		loadKeyStore();
 		String identifier = cryptoMgr.getCertificateReference(receiverHID);
 		return cryptoMgr.getCertificateByIdentifier(identifier).getPublicKey();
-	}
-	
-	private void loadKeyStore() throws KeyStoreException, FileNotFoundException, NoSuchAlgorithmException, CertificateException {
-		keyStore = KeyStore.getInstance(KEYSTORE_TYPE);
-		InputStream fis = new FileInputStream(KEYSTORE_DEPLOY_DIR + "/" + KEYSTORE_FILE);
-		try {
-			keyStore.load(fis, KEYSTORE_PASS.toCharArray());
-		} catch (IOException e) {
-			logger.error(e);
-		}
 	}
 }

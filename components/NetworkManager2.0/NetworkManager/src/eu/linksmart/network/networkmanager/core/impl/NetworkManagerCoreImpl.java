@@ -35,6 +35,7 @@ public class NetworkManagerCoreImpl extends NetworkManagerApplicationImpl implem
 	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
 	private static final String STARTING_MESSAGE = "Starting" + NETWORK_MGR_CORE;	
 	public static String SUCCESSFULL_PROCESSING = "OK";	
+	public static String ERROR_PROCESSING = "ERROR";
 
 	/*
 	 * logger
@@ -118,11 +119,15 @@ public NMResponse receiveData(HID sender, HID receiver, byte[] data) {
 	
 	//if message is still existing it has to be forwarded
 	if(msg != null && msg.getData() != null && msg.getData().length != 0){
-		//TODO #NM refactoring 
 		//check if message is not intended for host HID, if yes and it has not been processed drop it
-		
+		if(msg.getReceiverHID() == this.myHID){
+			LOG.warn("Received a message which has not been processed");
+			NMResponse response = new NMResponse();
+			response.setData(ERROR_PROCESSING);
+			return response;
+		}
 		//send message over sendMessage method of this and return response of it
-		return null;
+		return sendMessage(msg);
 	}else{
 		NMResponse response = new NMResponse();
 		response.setData(SUCCESSFULL_PROCESSING);
@@ -177,7 +182,15 @@ public NMResponse broadcastMessage(Message message) {
 	
 	HID receiverHID = message.getReceiverHID();
 	HID senderHID = message.getSenderHID();
-	byte [] data = this.connectionManager.getConnection(receiverHID, senderHID).processMessage(message);
+	byte[] data;
+	try {
+		data = this.connectionManager.getConnection(receiverHID, senderHID).processMessage(message);
+	} catch (Exception e) {
+		LOG.warn("Could not create packet from message from HID: " + message.getSenderHID(),e);
+		NMResponse response = new NMResponse();
+		response.setData(ERROR_PROCESSING);
+		return response;
+	}
 	
 	NMResponse response = this.backboneRouter.broadcastData(senderHID, data);
 	
@@ -193,7 +206,15 @@ public NMResponse sendMessage(Message message) {
 	
 	Connection connection = this.connectionManager.getConnection(receiverHID, senderHID);
 	
-	byte[] data = connection.processMessage(message);	
+	byte[] data;
+	try {
+		data = connection.processMessage(message);
+	} catch (Exception e) {
+		LOG.warn("Could not create packet from message from HID: " + message.getSenderHID());
+		NMResponse response = new NMResponse();
+		response.setData(ERROR_PROCESSING);
+		return response;
+	}	
 	
 	NMResponse response = this.backboneRouter.sendData(senderHID, receiverHID, data);
 	

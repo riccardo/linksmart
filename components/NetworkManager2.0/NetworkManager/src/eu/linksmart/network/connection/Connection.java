@@ -23,11 +23,30 @@ import eu.linksmart.security.communication.VerificationFailureException;
  */
 public class Connection {
 
+	/**
+	 * Name of the property holding the applicaton data
+	 */
 	private static final String APPLICATION_DATA = "applicationData";
+	/**
+	 * Name of the property holding the topic of the message
+	 */
+	private static final String TOPIC = "topic";
 
+	/**
+	 * Logger from log4j
+	 */
 	Logger logger = Logger.getLogger(Connection.class.getName());
+	/**
+	 * {@link SecurityProtocol} used to protect and unprotect messages
+	 */
 	private SecurityProtocol securityProtocol = null;
+	/**
+	 * The initiator of this communication
+	 */
 	private HID clientHID = null;
+	/**
+	 * The called entity of this communication
+	 */
 	private HID serverHID = null;
 
 	public Connection(HID clientHID, HID serverHID){
@@ -62,21 +81,30 @@ public class Connection {
 	 * @return Message object for further processing
 	 */
 	public Message processData(HID senderHID, HID receiverHID, byte[] data){
-		Message msg = new Message("", senderHID, receiverHID, data);
-
+		Message tempMsg = null;
 		if(securityProtocol != null && securityProtocol.isInitialized()){
 			//if protocol is initialized than open message with it
 			try{
-				msg = securityProtocol.unprotectMessage(msg);
+				tempMsg = new Message("CIPHERTEXT", senderHID, receiverHID, data);
+				tempMsg = securityProtocol.unprotectMessage(tempMsg);
 			}catch(Exception e){
 				logger.debug("Cannot unprotect message from HID: " + senderHID.toString());
 				return null;
 			}
-		} else if(securityProtocol != null){
+		} else if(securityProtocol != null && !securityProtocol.isInitialized()){
 			//if protocol not initialized then pass it for processing
 			try {
-				msg = securityProtocol.processMessage(msg);
-				return msg;
+				//in this case the data is a serialized properties object
+				Properties properties = new Properties();
+				properties.loadFromXML(new ByteArrayInputStream(data));
+				tempMsg = new Message(
+						(String)properties.remove(TOPIC),
+						senderHID,
+						receiverHID,
+						((String)properties.remove(APPLICATION_DATA)).getBytes()
+				);
+				tempMsg = securityProtocol.processMessage(tempMsg);
+				return tempMsg;
 			} catch (CryptoException e) {
 				logger.warn("Error during cryptographic operation",e);
 			} catch (VerificationFailureException e) {
@@ -86,21 +114,25 @@ public class Connection {
 			}
 			return null;
 		}	
-		
+
 		try{
 			//open data and divide it into properties of the message and application data
 			Properties properties = new Properties();
-			properties.loadFromXML(new ByteArrayInputStream(msg.getData()));
+			properties.loadFromXML(new ByteArrayInputStream(tempMsg.getData()));
 
-			//read the application data field from the message and add it as the data field
-			msg.setData(((String)properties.remove(APPLICATION_DATA)).getBytes());
+			//create real message
+			Message message = new Message(
+					(String)properties.remove(TOPIC),
+					senderHID,
+					receiverHID,
+					((String)properties.remove(APPLICATION_DATA)).getBytes());
 			//go through the properties and add them to the message
 			Iterator<Object> i = properties.keySet().iterator();
 			while(i.hasNext()){
 				String key = (String)i.next();
-				msg.setProperty(key, properties.getProperty(key));
+				message.setProperty(key, properties.getProperty(key));
 			}
-			return msg;
+			return message;
 		}catch(Exception e){
 			logger.debug("Cannot parse message from HID: " + senderHID.toString());
 		}
@@ -112,8 +144,14 @@ public class Connection {
 	 * Message object which can be sent over network
 	 * @param msg Message to convert
 	 * @return Serialized version of the message including all properties
+	 * @throws Exception When message cannot be processed for sending
 	 */
-	public byte[] processMessage(Message msg){
+	public byte[] processMessage(Message msg) throws Exception{
+		if(securityProtocol != null && !securityProtocol.isInitialized()){
+			//set the message to be sent by security protocol
+			msg = securityProtocol.processMessage(msg);
+			//the message has to be processed for sending now by the regular code
+		}
 		//read the properties of the message and put them into one properties object
 		Properties props = new Properties();
 		Iterator<String> i = msg.getKeySet().iterator();
@@ -123,7 +161,7 @@ public class Connection {
 		}
 		//put application data into properties
 		props.put(APPLICATION_DATA, msg.getData());
-
+		props.put(TOPIC, msg.getTopic());
 		//convert props into xml and encode it
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		byte[] serializedCommand = null;
@@ -140,6 +178,15 @@ public class Connection {
 			}
 		}
 
-		return serializedCommand;
+		if(securityProtocol != null && securityProtocol.isInitialized()){
+			/*this could also be a message which has been stored by the security protocol
+			* until now and is becoming sent at last */
+			//set all data of the message as data part and protect it
+			msg.setData(serializedCommand);
+			msg = securityProtocol.protectMessage(msg);
+			return msg.getData();
+		}else{
+			return serializedCommand;
+		}
 	}
 }
