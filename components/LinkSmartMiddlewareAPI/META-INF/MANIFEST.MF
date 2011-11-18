@@ -4,7 +4,7 @@ Bundle-Name: LinkSmart Middleware API
 Bundle-SymbolicName: eu.linksmart.middlewareapi
 Bundle-Version: 2.0.0
 Bundle-Vendor: TID
-Import-Package: org.apache.commons.lang;version="2.5.0",
+Import-Package: org.apache.commons.lang;version="[2.4.0,2.5.0]",
  org.apache.log4j,
  org.osgi.framework,
  org.osgi.service.cm
