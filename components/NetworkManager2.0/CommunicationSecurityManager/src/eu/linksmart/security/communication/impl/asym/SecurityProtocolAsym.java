@@ -2,13 +2,10 @@ package eu.linksmart.security.communication.impl.asym;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.security.Key;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -55,8 +52,18 @@ import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.security.trustmanager.TrustManager;
 import eu.linksmart.utils.Base64;
 
+/**
+ * Implementation of {@link SecurityProtocol} interface which
+ * uses hybrid encryption based on certificates associated
+ * with {@link HID}
+ * @author Vinkovits
+ *
+ */
 public class SecurityProtocolAsym implements SecurityProtocol {
 
+	/*
+	 * The Log4j logger of this class
+	 */
 	private static Logger logger = Logger.getLogger(SecurityProtocolAsym.class);
 
 	/**

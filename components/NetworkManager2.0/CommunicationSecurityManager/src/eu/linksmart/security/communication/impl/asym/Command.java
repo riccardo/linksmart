@@ -45,7 +45,6 @@ import java.util.Properties;
  * @author Stephan Heuser - stephan.heuser@sit.fraunhofer.de
  * 
  */
-
 public class Command extends Properties {
 	/**
 	 * Serialization UID
