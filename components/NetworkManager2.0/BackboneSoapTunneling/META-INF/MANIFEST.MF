@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BackboneSoapTunneling
+Bundle-SymbolicName: eu.linksmart.network.backbone.impl.soaptunneling
+Bundle-Version: 1.0.0.qualifier
+Import-Package: eu.linksmart.network,
+ eu.linksmart.network.backbone,
+ eu.linksmart.network.routing,
+ javax.servlet;version="2.4.0",
+ javax.servlet.http;version="2.5.0",
+ org.apache.log4j;version="1.2.15",
+ org.osgi.framework;version="1.5.0",
+ org.osgi.service.component,
+ org.osgi.service.http;version="1.2.1"
+Service-Component: OSGI-INF/DS_BackboneSoapTunneling.xml
