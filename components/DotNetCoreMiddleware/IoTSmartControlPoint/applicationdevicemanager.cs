@@ -79,6 +79,7 @@ namespace IoT
         public void SetSmartControlPoint(IoTSmartControlPoint scp)
         {
             m_smartcontrolpoint = scp;
+            m_smartcontrolpoint.SetApplicationDeviceManager(this);
         }
 
         override public void Start()

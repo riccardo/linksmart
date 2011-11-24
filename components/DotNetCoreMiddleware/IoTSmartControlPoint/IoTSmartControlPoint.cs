@@ -73,6 +73,8 @@ namespace IoT
         private List<UPnPDevice> m_nonIoTdevices;//List of all UPnP devices whcih are nto IoT devices
         private List<IoTGateway> m_gateways;//List of all gateways know by this HSCP
 
+        private UPnPDevice m_applicationdevicemgr;
+
         IoTApplicationOntologyManager m_ontology = null;//The ontology manager
 
         public string m_IoTserviceid = "urn:upnp-org:serviceId:1";
@@ -113,6 +115,7 @@ namespace IoT
         public string m_callbacktransform = "";
 
         private Object m_IoTlock = new Object();
+        private Object m_IoTdevicelock = new Object();
 
         public string m_soaptunnelprefix = "/SOAPTunneling/0/";
         public string m_soaptunnelsuffix = "/0/hola";
@@ -280,6 +283,11 @@ namespace IoT
         {
             m_bindingsurl = url;
         }
+
+        public void SetApplicationDeviceManager(UPnPDevice appDevmgr)
+        {
+            m_applicationdevicemgr = appDevmgr;
+        }
         //**************************End set functions************************************
 
         /// <summary>
@@ -379,6 +387,57 @@ namespace IoT
             return returnstring;
         }
 
+        private UPnPDevice[] GetIoTdevices()
+        {
+            List<UPnPDevice> theDevices = new List<UPnPDevice>();
+            lock (m_IoTdevicelock)
+            {
+                try
+                {
+                    foreach (UPnPDevice device in m_IoTdevices)
+                    {
+                        theDevices.Add(device);
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    ReportError("IoT SCP error copying IoTDe3vices:" + e.Message);
+                }
+
+            }
+            return theDevices.ToArray();
+        }
+
+        private void AddIoTdevice(UPnPDevice theDevice)
+        {
+            lock (m_IoTdevicelock)
+            {
+                try
+                {
+                    m_IoTdevices.Add(theDevice);
+                }
+                catch (Exception e)
+                {
+                }
+
+            }
+        }
+
+        private void RemoveIoTdevice(UPnPDevice theDevice)
+        {
+            lock (m_IoTdevicelock)
+            {
+                try
+                {
+                    m_IoTdevices.Remove(theDevice);
+                }
+                catch (Exception e)
+                {
+                }
+
+            }
+        }
 
         /// <summary>
         /// Returns a list of IoT devices that matches a friendly name
@@ -386,7 +445,7 @@ namespace IoT
         /// <param name="friendlyname">A non-empty string</param>
         public UPnPDevice GetIoTDeviceByFriendlyName(string friendlyname)
         {
-            foreach (UPnPDevice thedevice in m_IoTdevices)
+            foreach (UPnPDevice thedevice in GetIoTdevices())
             {
                 if (thedevice.FriendlyName == friendlyname)
                     return thedevice;
@@ -418,7 +477,7 @@ namespace IoT
         {
             if (!usecache)
             {
-                foreach (UPnPDevice thedevice in m_IoTdevices)
+                foreach (UPnPDevice thedevice in GetIoTdevices())
                 {
                     object objectHID;
                     string stringHID = "";
@@ -434,7 +493,7 @@ namespace IoT
             }
             else
             {
-                foreach (UPnPDevice thedevice in m_IoTdevices)
+                foreach (UPnPDevice thedevice in GetIoTdevices())
                 {
                     if (thedevice.GetCustomFieldFromDescription("IoTid","IoT")==HID) //Just checks with the cache on the client side
                         return thedevice;
@@ -449,7 +508,7 @@ namespace IoT
         /// <param name="UDN">A non-empty string</param>
         public UPnPDevice GetIoTDeviceByUDN(string UDN)
         {
-            foreach (UPnPDevice thedevice in m_IoTdevices)
+            foreach (UPnPDevice thedevice in GetIoTdevices())
             {
                 if (thedevice.UniqueDeviceName == UDN)
                     return thedevice;
@@ -466,7 +525,7 @@ namespace IoT
         {
             if (!usecache)
             {
-                foreach (UPnPDevice thedevice in m_IoTdevices)
+                foreach (UPnPDevice thedevice in GetIoTdevices())
                 {
                     try
                     {
@@ -490,7 +549,7 @@ namespace IoT
 
             else
             {
-                foreach (UPnPDevice thedevice in m_IoTdevices)
+                foreach (UPnPDevice thedevice in GetIoTdevices())
                 {
                     try
                     {
@@ -516,7 +575,7 @@ namespace IoT
         {
             List<UPnPDevice> theDevices = new List<UPnPDevice>();
 
-            foreach (UPnPDevice device in m_IoTdevices)
+            foreach (UPnPDevice device in GetIoTdevices())
             {
 
                 XmlDocument innerdoc = new XmlDocument();
@@ -552,7 +611,7 @@ namespace IoT
             List<UPnPDevice> theDevices = new List<UPnPDevice>();
 
 
-            foreach (UPnPDevice device in m_IoTdevices)
+            foreach (UPnPDevice device in GetIoTdevices())
             {
 
                 XmlDocument innerdoc = new XmlDocument();
@@ -660,7 +719,7 @@ namespace IoT
             string resultstring = "";
             if (usecache)
             {
-                foreach (UPnPDevice theDevice in m_IoTdevices)
+                foreach (UPnPDevice theDevice in GetIoTdevices())
                 {
                     string devicegateway = theDevice.GetCustomFieldFromDescription("gateway", "IoT");
                     if (gateway == devicegateway)
@@ -696,7 +755,7 @@ namespace IoT
             string resultstring = "<localdevices gateway=\""+gateway+"\">";
             if (usecache)
             {
-                foreach (UPnPDevice theDevice in m_IoTdevices)
+                foreach (UPnPDevice theDevice in GetIoTdevices())
                 {
                     string devicegateway = theDevice.GetCustomFieldFromDescription("gateway", "IoT");
                     if (gateway == devicegateway||gateway=="")
@@ -1455,7 +1514,9 @@ namespace IoT
 
             lock (m_IoTlock)
             {
-                
+
+                if (m_applicationdevicemgr != null)
+                    m_applicationdevicemgr.AddDevice(device);
                 try
                 {string dynamicwsendpoint="";
 
@@ -1629,7 +1690,7 @@ namespace IoT
 
                             if (!device.UniqueDeviceName.Contains("IoTStorageDevice") && !device.UniqueDeviceName.Contains("StorageManagerDevice"))
                             {
-                                m_IoTdevices.Add(device);
+                                AddIoTdevice(device);
                                 if (devicegateway == "")
                                     myGateway = GetGatewayFromString(m_gateway);
                                 myGateway.AddDevice(device, "IoTdevice");
@@ -1965,7 +2026,7 @@ namespace IoT
                     try
                     {
 
-                        m_IoTdevices.Remove(device);
+                        RemoveIoTdevice(device);
                         
                     }
                     catch (Exception e)

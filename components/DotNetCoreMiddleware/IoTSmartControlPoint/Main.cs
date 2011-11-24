@@ -48,92 +48,101 @@ namespace IoT
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
-        
 
-		[STAThread]
 
-        
+        [STAThread]
 
-		static void Main(string[] args)
+
+
+        static void Main(string[] args)
         {
-            ApplicationDeviceManagerDevice m_devicemanager;
-            ApplicationServiceManagerDevice m_servicemanager;
-           
-            string m_soaptunnelprefix="/SOAPTunneling/0/";
-            string m_soaptunnelsuffix="/0/hola";
-            string m_soaptunnelIPaddress="127.0.0.1";
-            string m_soaptunnelport="8082";
-            bool m_externalonly = false;
+            try
+            {
+                ApplicationDeviceManagerDevice m_devicemanager;
+                ApplicationServiceManagerDevice m_servicemanager;
 
-            string m_IoTserviceid = "urn:upnp-org:serviceId:1";
-            string m_limboIoTserviceid = "urn:upnp-org:serviceId:IoTServicePort";//KOOL Changed from "urn:upnp-org:serviceId:IoTservice";
- 
+                string m_soaptunnelprefix = "/SOAPTunneling/0/";
+                string m_soaptunnelsuffix = "/0/hola";
+                string m_soaptunnelIPaddress = "127.0.0.1";
+                string m_soaptunnelport = "8082";
+                bool m_externalonly = false;
 
-            bool m_automaticdiscovery = false;
-            bool m_automaticresolve = true;
-            string m_discoveryresolveperiod = "12000";
-
-            m_devicemanager = new ApplicationDeviceManagerDevice("0", "ApplicationDeviceManager", "CNet", "urn:schemas-upnp-org:IoTdevice:devicemanager:1");
-            string tmpGateway = System.Configuration.ConfigurationSettings.AppSettings["gateway"];
-            if (tmpGateway == "") tmpGateway = System.Environment.MachineName;
-
-            m_devicemanager.SetGateway(tmpGateway);
-            m_devicemanager.Start();
-
-            m_servicemanager = new ApplicationServiceManagerDevice("1", "ApplicationServiceManager", "CNet", "urn:schemas-upnp-org:IoTdevice:servicemanager:1");
-
-            m_servicemanager.SetGateway(tmpGateway);
-            m_servicemanager.Start();
+                string m_IoTserviceid = "urn:upnp-org:serviceId:1";
+                string m_limboIoTserviceid = "urn:upnp-org:serviceId:IoTServicePort";//KOOL Changed from "urn:upnp-org:serviceId:IoTservice";
 
 
-            IoTSmartControlPoint scp = new IoTSmartControlPoint();
+                bool m_automaticdiscovery = false;
+                bool m_automaticresolve = true;
+                string m_discoveryresolveperiod = "12000";
+
+                m_devicemanager = new ApplicationDeviceManagerDevice("0", "ApplicationDeviceManager", "CNet", "urn:schemas-upnp-org:IoTdevice:devicemanager:1");
+                string tmpGateway = System.Configuration.ConfigurationSettings.AppSettings["gateway"];
+                if (tmpGateway == "") tmpGateway = System.Environment.MachineName;
+
+                m_devicemanager.SetGateway(tmpGateway);
+                m_devicemanager.Start();
+
+                m_servicemanager = new ApplicationServiceManagerDevice("1", "ApplicationServiceManager", "CNet", "urn:schemas-upnp-org:IoTdevice:servicemanager:1");
+
+                m_servicemanager.SetGateway(tmpGateway);
+                m_servicemanager.Start();
 
 
-            /*this.scp.SetFormDeviceHandler(this.HandleAddedDevice);
-            this.scp.SetFormRemoveDeviceHandler(this.HandleRemovedDevice);
-            this.scp.SetFormUpdatedDeviceHandler(this.HandleUpdatedDevice);
-            */
-
-            scp.SetGateway(tmpGateway);
-            scp.SetDiscoveryRules(System.Configuration.ConfigurationSettings.AppSettings["usexslfordiscovery"], System.Configuration.ConfigurationSettings.AppSettings["discovertransform"]);
-            scp.SetOntologyUrl(System.Configuration.ConfigurationSettings.AppSettings["ontologyurl"]);
-            scp.SetAutomaticDiscoveryAndResolve(m_automaticdiscovery, m_automaticresolve, m_discoveryresolveperiod);
-            scp.SetAutomaticDeviceStorage(System.Configuration.ConfigurationSettings.AppSettings["automaticdevicestorage"]);
-            scp.SetEnergyPolicyEnforcement(System.Configuration.ConfigurationSettings.AppSettings["energypolicyenforcement"]);
-            scp.SetCallBackTransform(System.Configuration.ConfigurationSettings.AppSettings["callbacktransform"]);
-
-            scp.SetRemoveHIDsOnStop(System.Configuration.ConfigurationSettings.AppSettings["removehidsonstop"]);
-            //this.scp.AddSubscribeUrl("http://212.214.80.175:81/IoTServiceBrowser/callBackDAC.php");
-
-            scp.SetApplicationBindingsUrl(System.Configuration.ConfigurationSettings.AppSettings["appdevicebindings"]);
-            //this.scp.OnRemovedDevice += new UPnPSmartControlPoint.DeviceHandler(this.HandleRemovedDevice);
-            //m_devicemanager.CreateWS();
-            scp.SetNetworkManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["networkmanagerurl"]);
-            scp.SetEventManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["eventmanagerurl"]);
-            scp.SetStorageManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["storagemanagerurl"]);
-            scp.SetSOAPTunnelAddress(m_soaptunnelIPaddress, m_soaptunnelprefix, m_soaptunnelsuffix, m_soaptunnelport);
-
-            m_devicemanager.SetSmartControlPoint(scp);
-            m_devicemanager.SetNetworkManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["networkmanagerurl"]);
-            m_devicemanager.SetEventManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["eventmanagerurl"]);
+                IoTSmartControlPoint scp = new IoTSmartControlPoint();
 
 
+                /*this.scp.SetFormDeviceHandler(this.HandleAddedDevice);
+                this.scp.SetFormRemoveDeviceHandler(this.HandleRemovedDevice);
+                this.scp.SetFormUpdatedDeviceHandler(this.HandleUpdatedDevice);
+                */
 
-            m_servicemanager.SetSmartControlPoint(scp);
-            m_servicemanager.SetNetworkManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["networkmanagerurl"]);
-            m_servicemanager.SetEventManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["eventmanagerurl"]);
+                scp.SetGateway(tmpGateway);
+                scp.SetDiscoveryRules(System.Configuration.ConfigurationSettings.AppSettings["usexslfordiscovery"], System.Configuration.ConfigurationSettings.AppSettings["discovertransform"]);
+                scp.SetOntologyUrl(System.Configuration.ConfigurationSettings.AppSettings["ontologyurl"]);
+                scp.SetAutomaticDiscoveryAndResolve(m_automaticdiscovery, m_automaticresolve, m_discoveryresolveperiod);
+                scp.SetAutomaticDeviceStorage(System.Configuration.ConfigurationSettings.AppSettings["automaticdevicestorage"]);
+                scp.SetEnergyPolicyEnforcement(System.Configuration.ConfigurationSettings.AppSettings["energypolicyenforcement"]);
+                scp.SetCallBackTransform(System.Configuration.ConfigurationSettings.AppSettings["callbacktransform"]);
 
-            string DACEndPoint = m_devicemanager.CreateWS();
-            NetworkManager.NetworkManagerApplicationService nm = new NetworkManager.NetworkManagerApplicationService();
-            nm.Url = System.Configuration.ConfigurationSettings.AppSettings["networkmanagerurl"];
-            string dacHID = nm.createHIDwDesc("ApplicationDeviceManager:" + tmpGateway + ":StaticWS",DACEndPoint);
-            m_servicemanager.CreateWS();
+                scp.SetRemoveHIDsOnStop(System.Configuration.ConfigurationSettings.AppSettings["removehidsonstop"]);
+                //this.scp.AddSubscribeUrl("http://212.214.80.175:81/IoTServiceBrowser/callBackDAC.php");
 
-            System.Console.WriteLine("Press return to stop Application Device Manager");
-            System.Console.ReadLine();
-		}
+                scp.SetApplicationBindingsUrl(System.Configuration.ConfigurationSettings.AppSettings["appdevicebindings"]);
+                //this.scp.OnRemovedDevice += new UPnPSmartControlPoint.DeviceHandler(this.HandleRemovedDevice);
+                //m_devicemanager.CreateWS();
+                scp.SetNetworkManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["networkmanagerurl"]);
+                scp.SetEventManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["eventmanagerurl"]);
+                scp.SetStorageManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["storagemanagerurl"]);
+                scp.SetSOAPTunnelAddress(m_soaptunnelIPaddress, m_soaptunnelprefix, m_soaptunnelsuffix, m_soaptunnelport);
 
-        
+                m_devicemanager.SetSmartControlPoint(scp);
+                m_devicemanager.SetNetworkManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["networkmanagerurl"]);
+                m_devicemanager.SetEventManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["eventmanagerurl"]);
+
+
+
+                m_servicemanager.SetSmartControlPoint(scp);
+                m_servicemanager.SetNetworkManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["networkmanagerurl"]);
+                m_servicemanager.SetEventManagerUrl(System.Configuration.ConfigurationSettings.AppSettings["eventmanagerurl"]);
+
+                string DACEndPoint = m_devicemanager.CreateWS();
+                NetworkManager.NetworkManagerApplicationService nm = new NetworkManager.NetworkManagerApplicationService();
+                nm.Url = System.Configuration.ConfigurationSettings.AppSettings["networkmanagerurl"];
+                string dacHID = nm.createHIDwDesc("ApplicationDeviceManager:" + tmpGateway + ":StaticWS", DACEndPoint);
+                m_servicemanager.CreateWS();
+
+                System.Console.WriteLine("Press return to stop Application Device Manager");
+                System.Console.ReadLine();
+            }
+
+
+            catch (Exception e)
+            {
+                System.Console.WriteLine("IoTSmartControlPoint stopped working, exception:" + e.Message);
+                System.Console.WriteLine("Press return to stop Application Device Manager");
+                System.Console.ReadLine();
+            }
+        }
 	}
 }
 
