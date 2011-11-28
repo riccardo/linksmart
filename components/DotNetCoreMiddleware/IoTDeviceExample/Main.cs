@@ -24,7 +24,7 @@ namespace IoTDeviceExample
 	/// <summary>
 	/// Summary description for Main.
 	/// </summary>
-	class SampleHydraDeviceMain
+	class SampleIoTDeviceMain
 	{
 		/// <summary>
 		/// The main entry point for the application.
@@ -35,7 +35,7 @@ namespace IoTDeviceExample
 			// Starting UPnP Device
 			System.Console.WriteLine("UPnP .NET Framework Stack");
 			System.Console.WriteLine("Device Builder Build#1.0.3896.16026");
-			MyIoTDevice device = new MyIoTDevice("1","MyComputer", "CNet OpenSource", "urn:schemas-upnp-org:hydradevice:1");
+			MyIoTDevice device = new MyIoTDevice("1","MyComputer", "CNet OpenSource", "urn:schemas-upnp-org:IoTdevice:1");
 			device.AddServices();
 			device.Start();
 			System.Console.WriteLine("Press return to stop device.");

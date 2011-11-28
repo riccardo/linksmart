@@ -519,7 +519,7 @@ namespace OpenSource.Utilities
             this.tabPage1.Controls.Add(this.instanceListView);
             this.tabPage1.Location = new System.Drawing.Point(4, 4);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(472, 390);
+            this.tabPage1.Size = new System.Drawing.Size(472, 387);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Instances";
             // 
@@ -536,7 +536,7 @@ namespace OpenSource.Utilities
             this.instanceListView.Location = new System.Drawing.Point(0, 0);
             this.instanceListView.MultiSelect = false;
             this.instanceListView.Name = "instanceListView";
-            this.instanceListView.Size = new System.Drawing.Size(472, 390);
+            this.instanceListView.Size = new System.Drawing.Size(472, 387);
             this.instanceListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.instanceListView.TabIndex = 1;
             this.instanceListView.UseCompatibleStateImageBehavior = false;

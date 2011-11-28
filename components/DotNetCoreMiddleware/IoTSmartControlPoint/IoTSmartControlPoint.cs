@@ -1321,6 +1321,7 @@ namespace IoT
 
                 try
                 {
+                    System.Console.WriteLine("UPnP Call: device:" + theDevice.FriendlyName + " serviceid:" + myService.ServiceID + "method:" + method + " Endpoint:" + myService.ControlURL);
                     myResult = myService.InvokeSync(method, myArgs);
                     if (isLimboSpecial)
                     {
@@ -1329,7 +1330,7 @@ namespace IoT
                 }
                 catch (Exception e)
                 {
-                    myResult = "IoTsmart 3 Error in Normal UPnP Call: device:" + theDevice.FriendlyName + " serviceid:" + myService .ServiceID+ "method:" + method + " args:" + arguments + " error:" + e.Message;
+                    myResult = "IoTsmart 3 Error in Normal UPnP Call: device:" + theDevice.FriendlyName + " Endpoint:" + myService.ControlURL + " serviceid:" + myService .ServiceID+ "method:" + method + " args:" + arguments + " error:" + e.Message;
                         System.Console.WriteLine(myResult.ToString());
                         
                         ReportError(myResult.ToString());
@@ -1516,7 +1517,7 @@ namespace IoT
             {
 
                 if (m_applicationdevicemgr != null)
-                    m_applicationdevicemgr.AddDevice(device);
+                   // m_applicationdevicemgr.AddDevice(device);
                 try
                 {string dynamicwsendpoint="";
 
@@ -2451,9 +2452,9 @@ namespace IoT
 
                 if (serviceendpoint == "" || device.ParentDevice != null)
                     serviceendpoint = dynamicwsendpoint;
-
+               
                 if (theService.__controlurl.Contains("http://"))
-                    serviceendpoint = theService.__controlurl;
+                    serviceendpoint = theService.__controlurl.Substring(theService.__controlurl.IndexOf("http://"));
                 else
                     serviceendpoint = serviceendpoint + "/" + theService.__controlurl;
 
