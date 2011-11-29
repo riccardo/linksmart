@@ -1321,8 +1321,7 @@ namespace IoT
 
                 try
                 {
-                    System.Console.WriteLine("UPnP Call: device:" + theDevice.FriendlyName + " serviceid:" + myService.ServiceID + "method:" + method + " Endpoint:" + myService.ControlURL);
-                    myResult = myService.InvokeSync(method, myArgs);
+                     myResult = myService.InvokeSync(method, myArgs);
                     if (isLimboSpecial)
                     {
                         myResult = myArgs[limboIndex].DataValue;

@@ -155,10 +155,6 @@
       <Project>{584ED187-8F2A-4B58-A266-85F3F212B092}</Project>
       <Name>UPnP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\IoTSmartControlPoint\IoTSmartControlPoint.csproj">
-      <Project>{3257D3C2-3C6C-4721-B763-13FD7C123129}</Project>
-      <Name>IoTSmartControlPoint</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
