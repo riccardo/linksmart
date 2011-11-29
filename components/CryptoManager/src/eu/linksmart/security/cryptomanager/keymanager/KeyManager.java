@@ -33,6 +33,7 @@
 
 package eu.linksmart.security.cryptomanager.keymanager;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
@@ -40,12 +41,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Vector;
+
+import javax.crypto.SecretKey;
 
 /**
  * Interface for key management.
@@ -186,7 +191,8 @@ public interface KeyManager {
 
 	public abstract void close();
 
-	public abstract boolean generateSymmetricKey(String friendlyName, int keySize, String algo) throws NoSuchAlgorithmException, SQLException;
+	public abstract boolean generateSymmetricKey(String friendlyName, int keySize, String algo) 
+	throws NoSuchAlgorithmException, SQLException;
 
 	public abstract boolean storeSymmetricKey(String friendlyName, String algo,
 			String key) throws SQLException;
@@ -199,4 +205,7 @@ public interface KeyManager {
 	
 	public abstract String generateKeyFromPassword(
 			String password, int keySize, String algo);
+	
+	public SecretKey loadSymmetricKey(String identifier, String algorithm_name) 
+	throws NoSuchAlgorithmException,KeyStoreException;
 }

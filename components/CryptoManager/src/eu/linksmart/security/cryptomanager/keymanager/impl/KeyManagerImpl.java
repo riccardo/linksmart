@@ -1052,38 +1052,46 @@ public class KeyManagerImpl implements KeyManager {
 	 * Gibt einen symmetrischen geheimen Schlüssel für einen identifier zurück.
 	 * <p> Falls kein Schlüssel existiert, wird eine Exception zurückgegeben
 	 * 
-	 * @param identifier
-	 * @param algorithm_name
+	 * @param identifier Identifier of key to use
+	 * @param algorithm_name Algorithm name according to JCE
+	 * @throws KeyStoreException If given identifier with algorithm is not found in keystore or cannot be loaded
+	 * @throws NoSuchAlgorithmException If provided algorithm is not known
 	 */
-	public SecretKey loadSymmetricKey(String identifier, String algorithm_name)
-	throws InvalidKeyException, FileNotFoundException, IOException,
-	InvalidKeySpecException, NoSuchAlgorithmException,
-	KeyStoreException, CertificateException, SQLException,
-	UnrecoverableKeyException, SecurityException, SignatureException,
-	IllegalStateException, NoSuchProviderException {
+	public SecretKey loadSymmetricKey(String identifier, String algorithm_name) 
+	throws KeyStoreException, NoSuchAlgorithmException{
 
 		String alias = null;
 		SecretKey secretKey = null;
 
-		// ist der identifier gueltig?
-		if (dbase.identifierExists(identifier)) {
-			alias = dbase.getIdentifierAlias(identifier.trim(), algorithm_name);
-			logger.debug("Found alias " + alias + " for identifier "
-					+ identifier + " and algorithm " + algorithm_name);
-		} else {
-			logger.debug("identifier " + identifier + " does not exist");
-			return null;
+		//does identifier exist
+		try {
+			if (dbase.identifierExists(identifier)) {
+				alias = dbase.getIdentifierAlias(identifier.trim(), algorithm_name);
+				logger.debug("Found alias " + alias + " for identifier "
+						+ identifier + " and algorithm " + algorithm_name);
+			} else {
+				logger.debug("identifier " + identifier + " does not exist");
+				return null;
+			}
+		} catch (SQLException e) {
+			logger.error("Error using CryptoManager database",e);
 		}
 
 		if (alias == null || alias == "") {
 			throw new KeyStoreException("No alias for " + identifier + ", "
 					+ algorithm_name);
 		} else {
-			// Den Schluessel, der unter dem Alias im Keystore gespeichert ist
-			// abholen.
-			secretKey =
-				(SecretKey) ks.getKey(alias, Configuration.getInstance()
-						.getKeyStorePassword().toCharArray());
+			//load key from keystore
+			try {
+				secretKey =
+					(SecretKey) ks.getKey(alias, Configuration.getInstance()
+							.getKeyStorePassword().toCharArray());
+			} catch (UnrecoverableKeyException e) {
+				logger.error("Error in keystore when accessing key: " + alias);
+				KeyStoreException ke = new KeyStoreException("Error recovering key");
+				ke.initCause(e);
+				throw ke;
+			}
 		}
 		return secretKey;
 	}

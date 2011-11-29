@@ -5,7 +5,7 @@ Bundle-SymbolicName: eu.linksmart.security.cryptomanager
 Bundle-Version: 2.0.0
 Service-Component: OSGI-INF/component.xml, OSGI-INF/component_admin.xml
 Import-Package: eu.linksmart.clients,
- eu.linksmart.security.cryptomanager,
+ eu.linksmart.security.cryptomanager;version="1.2.0",
  eu.linksmart.utils,
  org.apache.commons.configuration;version="1.5.0",
  org.apache.commons.lang.exception,
@@ -26,4 +26,3 @@ Import-Package: eu.linksmart.clients,
 Bundle-ClassPath: resources/,
  .,
  lib/bcprov-jdk16-138.jar
-Export-Package: eu.linksmart.security.cryptomanager.impl;version="1.1.0"

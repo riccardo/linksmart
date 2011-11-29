@@ -291,4 +291,18 @@ public interface CryptoManager {
 	 * @return key length in bits
 	 */
 	public int getKeySize(SecurityLevel level, String algorithm);
+	
+	/**
+	 * Calculates the MAC on a message with a key stored in the internal
+	 * keystore of the CryptoManager. This way keys don't leave the manager.
+	 * 
+	 * @param identifier
+	 * @param data
+	 * @param algorithm Algorithm identifier according to provider
+	 * @return The calculated MAC on the data
+	 * @throws KeystoreException 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws InvalidKeyException 
+	 */
+	public byte[] calculateMac(String identifier, String data, String algorithm) throws NoSuchAlgorithmException, KeyStoreException, InvalidKeyException;
 }

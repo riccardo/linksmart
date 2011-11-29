@@ -50,6 +50,9 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.osgi.framework.BundleContext;
@@ -479,5 +482,13 @@ public class CryptoManagerImpl implements CryptoManager{
 	 */
 	public int getKeySize(SecurityLevel level, String algo){
 		return configurator.getKeySize(level, algo);
+	}
+	
+	public byte[] calculateMac(String identifier, String data, String algorithm) throws NoSuchAlgorithmException, KeyStoreException, InvalidKeyException{
+			SecretKey key = keyManager.loadSymmetricKey(identifier, algorithm);
+			Mac mac = Mac.getInstance(algorithm);
+			mac.init(key);
+			
+			return mac.doFinal(data.getBytes());
 	}
 }
