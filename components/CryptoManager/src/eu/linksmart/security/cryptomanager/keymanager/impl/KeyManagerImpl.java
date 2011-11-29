@@ -87,12 +87,11 @@ import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
+import sun.security.rsa.RSAKeyPairGenerator;
 import eu.linksmart.security.cryptomanager.impl.Configuration;
 import eu.linksmart.security.cryptomanager.impl.CryptoManagerImpl;
 import eu.linksmart.security.cryptomanager.impl.CustomCertificateAttributes;
 import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
-
-import sun.security.rsa.RSAKeyPairGenerator;
 
 /**
  * Class for managing the keystore and creating cryptographic keys. <p>
@@ -656,7 +655,6 @@ public class KeyManagerImpl implements KeyManager {
 	 * @return False if identifier already exists or 
 	 * certificate cannot be stored
 	 */
-	@Override
 	public boolean storePublicKey(String friendlyName, String encodedCert,
 			String algorithm_id) throws SQLException {
 		if(!identifierExists(friendlyName)){

@@ -33,7 +33,6 @@
 
 package eu.linksmart.security.cryptomanager.keymanager;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
@@ -41,11 +40,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Vector;
@@ -78,12 +75,27 @@ public interface KeyManager {
 	 * @throws IllegalStateException
 	 * @throws NoSuchProviderException
 	 */
-	public abstract String setupPublicPrivateKeypair() throws SQLException,
-			NoSuchAlgorithmException, IOException, KeyStoreException,
-			CertificateException, InvalidKeyException, SecurityException,
-			SignatureException, IllegalStateException, NoSuchProviderException;
+	abstract String setupPublicPrivateKeypair() throws SQLException,
+	NoSuchAlgorithmException, IOException, KeyStoreException,
+	CertificateException, InvalidKeyException, SecurityException,
+	SignatureException, IllegalStateException, NoSuchProviderException;
 
-	public abstract String generateCertificateWithAttributes(
+	/**
+	 * Generates a certificate with provided attributes
+	 * @param xmlAttributes Attributes to include into certificate
+	 * @return Identifier of certificate
+	 * @throws SQLException
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
+	 * @throws KeyStoreException
+	 * @throws CertificateException
+	 * @throws InvalidKeyException
+	 * @throws SecurityException
+	 * @throws SignatureException
+	 * @throws IllegalStateException
+	 * @throws NoSuchProviderException
+	 */
+	abstract String generateCertificateWithAttributes(
 			String xmlAttributes) throws SQLException,
 			NoSuchAlgorithmException, IOException, KeyStoreException,
 			CertificateException, InvalidKeyException, SecurityException,
@@ -91,14 +103,14 @@ public interface KeyManager {
 
 	/**
 	 * Generates a Key Encryption Key (KEK) and returns it <p> A KEK is a
-	 * self-signed certificate, i.e. a pair of public and private key.
+	 * self-signed certificate, i.e. a pair of  public and private key.
 	 * 
 	 * @param identifier
 	 * @param algorithm_name
 	 * @throws SQLException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public abstract String generateSymmetricKey(int keySize, String algo) throws NoSuchAlgorithmException, SQLException;
+	abstract String generateSymmetricKey(int keySize, String algo) throws NoSuchAlgorithmException, SQLException;
 
 	/**
 	 * Creates a unique and random identifier and stores it. <p> This identifier
@@ -109,17 +121,16 @@ public interface KeyManager {
 	 * 
 	 * @return a unique and random identifier.
 	 */
-	public abstract String createAndStoreKeyIdentifier();
+	abstract String createAndStoreKeyIdentifier();
 
 	/**
-	 * Returns all public keys that belong to the <code>identifier</code>. <p>
+	 * Returns all  public keys that belong to the <code>identifier</code>. <p>
 	 * 
 	 * @param identifier
 	 * @return
 	 * @throws KeyStoreException
 	 */
-	public abstract byte[] getEncodedPublicKeyByIdentifier(String identifier)
-			throws KeyStoreException;
+	abstract byte[] getEncodedPublicKeyByIdentifier(String identifier)	throws KeyStoreException;
 
 	/**
 	 * Stores a public key in the keystore and returns the identifier for this
@@ -131,8 +142,7 @@ public interface KeyManager {
 	 * @param algorithm_id
 	 * @return
 	 */
-	public abstract String storePublicKey(String encodedCert,
-			String algorithm_id);
+	abstract String storePublicKey(String encodedCert,	String algorithm_id);
 
 	/**
 	 * Stores a secret key in the keystore and returns the identifier for this
@@ -153,24 +163,55 @@ public interface KeyManager {
 	 * @throws IllegalStateException
 	 * @throws NoSuchProviderException
 	 */
-	public abstract String storeSymmetricKey(String algo, String key)
-			throws SQLException, NoSuchAlgorithmException, IOException,
-			KeyStoreException, CertificateException, InvalidKeyException,
-			SecurityException, SignatureException, IllegalStateException,
-			NoSuchProviderException;
+	abstract String storeSymmetricKey(String algo, String key)
+	throws SQLException, NoSuchAlgorithmException, IOException,
+	KeyStoreException, CertificateException, InvalidKeyException,
+	SecurityException, SignatureException, IllegalStateException,
+	NoSuchProviderException;
 
-	public abstract Properties getAttributesFromCertificate(String identifier)
-			throws SQLException, KeyStoreException,
-			CertificateEncodingException;
+	/**
+	 * 
+	 * @param identifier
+	 * @return
+	 * @throws SQLException
+	 * @throws KeyStoreException
+	 * @throws CertificateEncodingException
+	 */
+	abstract Properties getAttributesFromCertificate(String identifier)
+	throws SQLException, KeyStoreException,
+	CertificateEncodingException;
 
-	public abstract PrivateKey getPrivateKeyByIdentifier(String identifier);
+	/**
+	 * Returns the private key stored under provided identifier
+	 * @param identifier
+	 * @return 
+	 */
+	abstract PrivateKey getPrivateKeyByIdentifier(String identifier);
 
-	public abstract Certificate getCertificateByIdentifier(String identifier)
-			throws KeyStoreException;
+	/**
+	 * Returns the certificate stored under provided identifier
+	 * @param identifier
+	 * @return
+	 * @throws KeyStoreException
+	 */
+	abstract Certificate getCertificateByIdentifier(String identifier)
+	throws KeyStoreException;
 
-	public abstract boolean addPrivateKeyForHID(String hid, String certRef);
+	/**
+	 * Associates an HID with a stored private key
+	 * @param hid HID to be associated to
+	 * @param certRef Identifier used in store for private key
+	 * @return
+	 */
+	abstract boolean addPrivateKeyForHID(String hid, String certRef);
 
-	public abstract boolean addCertificateForHID(String hid, String certRef);
+	/**
+	 * Associates an HID with a stored certificate
+	 * @param hid HID to be associated to
+	 * @param certRef Identifier used in store for certificate
+	 * @return
+	 */
+	abstract boolean addCertificateForHID(String hid, String certRef);
 
 	/**
 	 * Returns the certificate reference for an HID or null if no certificate
@@ -179,33 +220,95 @@ public interface KeyManager {
 	 * @param receiverHID
 	 * @return
 	 */
-	public abstract String getCertRefByHID(String receiverHID);
+	abstract String getCertRefByHID(String receiverHID);
 
-	public abstract String getPrivateKeyRefByHID(String hid);
+	/**
+	 * Returns the identifier of the private key for this HID
+	 * @param hid
+	 * @return
+	 */
+	abstract String getPrivateKeyRefByHID(String hid);
 
-	public abstract boolean deleteEntry(String identifier);
+	/**
+	 * Removes an entry from local store
+	 * @param identifier
+	 * @return
+	 */
+	abstract boolean deleteEntry(String identifier);
 
-	public abstract String[] getIdentifier();
+	abstract String[] getIdentifier();
 
-	public abstract Vector<Vector<String>> getIdentifierInfo();
+	abstract Vector<Vector<String>> getIdentifierInfo();
 
-	public abstract void close();
+	abstract void close();
 
-	public abstract boolean generateSymmetricKey(String friendlyName, int keySize, String algo) 
+	/**
+	 * Generates a symmetric key for given identifier
+	 * @param friendlyName Identifier to be stored under
+	 * @param keySize
+	 * @param algo Algorithm name according to JCE
+	 * @return True if key could be generated for this identifier
+	 * @throws NoSuchAlgorithmException
+	 * @throws SQLException
+	 */
+	abstract boolean generateSymmetricKey(String friendlyName, int keySize, String algo) 
 	throws NoSuchAlgorithmException, SQLException;
 
-	public abstract boolean storeSymmetricKey(String friendlyName, String algo,
+	/**
+	 * Stores a key under provided identifier
+	 * @param friendlyName
+	 * @param algo
+	 * @param key Base64 encoded key
+	 * @return True if key could be stored
+	 * @throws SQLException
+	 */
+	abstract boolean storeSymmetricKey(String friendlyName, String algo,
 			String key) throws SQLException;
 
-	public abstract boolean storePublicKey(String friendlyName,
+	/**
+	 * Stores an encoded certificate under provided identifier
+	 * @param friendlyName
+	 * @param encodedCert
+	 * @param algorithm_id
+	 * @return
+	 * @throws SQLException
+	 */
+	abstract boolean storePublicKey(String friendlyName,
 			String encodedCert, String algorithm_id) throws SQLException;
 
-	public abstract boolean generateKeyFromPassword(
+	/**
+	 * Generates a symmetric key from provided password. Two calls with the
+	 * same password always create the same key
+	 * @param friendlyName
+	 * @param password
+	 * @param keySize
+	 * @param algo Algorithm name according to JCE
+	 * @return
+	 * @throws SQLException
+	 * @throws KeyStoreException
+	 */
+	abstract boolean generateKeyFromPassword(
 			String friendlyName, String password, int keySize, String algo) throws SQLException, KeyStoreException;
-	
-	public abstract String generateKeyFromPassword(
+
+	/**
+	 * Generates a symmetric key from provided password. Two calls with the
+	 * same password always create the same key
+	 * @param password
+	 * @param keySize
+	 * @param algo Algorithm name according to JCE
+	 * @return
+	 */
+	abstract String generateKeyFromPassword(
 			String password, int keySize, String algo);
-	
-	public SecretKey loadSymmetricKey(String identifier, String algorithm_name) 
+
+	/**
+	 * Returns the stored symmetric key
+	 * @param identifier Identifier of stored key
+	 * @param algorithm_name Algorithm name according to JCE
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws KeyStoreException
+	 */
+	abstract SecretKey loadSymmetricKey(String identifier, String algorithm_name) 
 	throws NoSuchAlgorithmException,KeyStoreException;
 }
