@@ -78,6 +78,9 @@ public class Command extends Properties {
 	public static final String SERVER = "server";
 	public static final String CLIENT = "client";
 	public static final String SYMMETRIC_KEY = "symmetrickey";
+	public static final String CLIENT_NONCE = "clientNonce";
+	public static final String SERVER_NONCE = "serverNonce";
+	public static final String APPLICATION_MESSAGE= "applicationMessage";
 
 	public static final String CLIENT_KEY_IDENTIFIER = "clientKeyIdentifier";
 	public static final String SERVER_KEY_IDENTIFIER = "serverKeyIdentifier";
