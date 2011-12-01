@@ -198,6 +198,10 @@ public class ObjectSOAPService {
 		// a (de)serializer.
 		classset.remove("byte");
 		classset.remove("boolean");
+		//#NM XXX added during refactoring
+		classset.remove("char");
+		classset.remove("[Ljava.net.Proxy$Type;");
+		//
 		classset.remove("double");
 		classset.remove("float");
 		classset.remove("int");

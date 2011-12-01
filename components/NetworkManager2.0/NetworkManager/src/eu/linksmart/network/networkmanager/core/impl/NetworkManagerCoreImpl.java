@@ -57,20 +57,23 @@ protected void activate(ComponentContext context) {
 	LOG.debug(STARTED_MESSAGE);
 	
 }
+
 private void init(ComponentContext context) {
 	 this.configurator = new NetworkManagerCoreConfigurator(this, context.getBundleContext());
 	 this.myDescription = this.configurator.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 	 this.connectionManager = new ConnectionManager();
-
-	
+	 this.connectionManager.setCommunicationSecurityManager(this.commSecMgr);
+	 Properties attributes = new Properties();
+	 attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.myDescription);
+	 this.myHID=this.identityManager.createHID(attributes);
 }
+
 protected void deactivate(ComponentContext context) {
 	System.out.println(NETWORK_MGR_CORE + "stopped");
 }
 
 protected void bindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr){
 	this.commSecMgr = commSecMgr;
-	this.connectionManager.setCommunicationSecurityManager(this.commSecMgr);
 }
 
 protected void unbindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr){
@@ -79,10 +82,7 @@ protected void unbindCommunicationSecurityManager(CommunicationSecurityManager c
 }
 
 protected void bindIdentityManager(IdentityManager identityManager){
-	this.identityManager = identityManager;
-	Properties attributes = new Properties();
-	attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.myDescription);
-	this.myHID=this.identityManager.createHID(attributes);
+	this.identityManager = identityManager;	
 	}
 
 protected void unbindIdentityManager(IdentityManager identityMgr){

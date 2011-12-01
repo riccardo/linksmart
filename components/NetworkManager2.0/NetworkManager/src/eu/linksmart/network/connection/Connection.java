@@ -50,9 +50,10 @@ public class Connection {
 	private HID serverHID = null;
 
 	public Connection(HID clientHID, HID serverHID){
-		if(clientHID == null || serverHID == null){
-			throw new IllegalArgumentException("Cannot set null for required fields.");
-		}
+		//FIXME #NM
+//		if(clientHID == null || serverHID == null){
+//			throw new IllegalArgumentException("Cannot set null for required fields.");
+//		}
 		this.clientHID = clientHID;
 		this.serverHID = serverHID;
 	}

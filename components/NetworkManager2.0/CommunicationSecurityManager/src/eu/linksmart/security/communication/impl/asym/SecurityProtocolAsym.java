@@ -135,7 +135,9 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 		Command cmd = new Command(Command.CLIENT_HELLO);	
 		cmd.setProperty(Command.CLIENT, clientHID.toString());
-		cmd.setProperty(Command.SERVER, serverHID.toString());
+		//#NM TODO Mark V.
+		if(serverHID!=null)
+			cmd.setProperty(Command.SERVER, serverHID.toString());
 		generatedNonce = nonceGenerator.getNextNonce();
 		cmd.setProperty(Command.CLIENT_NONCE, generatedNonce);
 		try {
