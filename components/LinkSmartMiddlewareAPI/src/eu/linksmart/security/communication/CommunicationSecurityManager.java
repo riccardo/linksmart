@@ -20,4 +20,20 @@ public interface CommunicationSecurityManager {
 	 * @return Object to use to protect messages belonging to one connection
 	 */
 	SecurityProtocol getSecurityProtocol(HID clientHID, HID serverHID);
+	
+	/**
+	 * Provides whether this security protocol implementation
+	 * can protect broadcast messages
+	 * @return True if broadcast methods can be called
+	 */
+	boolean canBroadcast();
+	
+	/**
+	 * Provides a specific {@link SecurityProtocol} object
+	 * for protecting a broadcast connection.
+	 * 
+	 * @param The HID which started the communication
+	 * @return Object to use to protect messages belonging to one connection
+	 */
+	SecurityProtocol getBroadcastSecurityProtocol(HID clientHID);
 }

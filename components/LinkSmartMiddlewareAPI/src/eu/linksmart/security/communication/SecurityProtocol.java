@@ -77,5 +77,32 @@ public interface SecurityProtocol {
 	 */
 	Message unprotectMessage(Message msg) throws Exception;
 	
+	/**
+	 * Provides whether this security protocol implementation
+	 * can protect broadcast messages
+	 * @return True if broadcast methods can be called
+	 */
+	boolean canBroadcast();
 	
+	/**
+	 * Protects the data part of the message with 
+	 * the specific protocol aimed for broadcasting.
+	 * Adds all necessary meta-information for opening with 
+	 * {@link unprotectBroadcastMessage()}.
+	 * 
+	 * @param msg Message to be protected
+	 * @throws Exception If message cannot be processed
+	 * @return Message with protected content
+	 */
+	Message protectBroadcastMessage(Message msg) throws Exception;
+	
+	/**
+	 * Opens a protected broadcast message body and removes all
+	 * security protocol specific meta-information from it.
+	 * 
+	 * @param msg Message to be opened
+	 * @throws Exception If message cannot be processed
+	 * @return Message with unprotected body
+	 */
+	Message unprotectBroadcastMessage(Message msg) throws Exception;
 }

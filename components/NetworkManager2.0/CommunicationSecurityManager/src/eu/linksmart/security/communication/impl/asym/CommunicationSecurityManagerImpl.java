@@ -125,4 +125,12 @@ public class CommunicationSecurityManagerImpl implements CommunicationSecurityMa
 			}
 		}
 	}
+	
+	public boolean canBroadcast() {
+		return false;
+	}
+
+	public SecurityProtocol getBroadcastSecurityProtocol(HID clientHID) {
+		throw new RuntimeException("Manager has no broadcast service");
+	}
 }

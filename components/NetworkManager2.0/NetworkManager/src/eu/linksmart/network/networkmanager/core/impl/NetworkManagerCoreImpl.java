@@ -179,19 +179,16 @@ public HID createHID(byte[] data) throws IOException {
 }
 @Override
 public NMResponse broadcastMessage(Message message) {
-	
-	HID receiverHID = message.getReceiverHID();
 	HID senderHID = message.getSenderHID();
 	byte[] data;
 	try {
-		data = this.connectionManager.getConnection(receiverHID, senderHID).processMessage(message);
+		data = this.connectionManager.getBroadcastConnection(senderHID).processMessage(message);
 	} catch (Exception e) {
 		LOG.warn("Could not create packet from message from HID: " + message.getSenderHID(),e);
 		NMResponse response = new NMResponse();
 		response.setData(ERROR_PROCESSING);
 		return response;
 	}
-	
 	NMResponse response = this.backboneRouter.broadcastData(senderHID, data);
 	
 	return response;

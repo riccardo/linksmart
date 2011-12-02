@@ -135,9 +135,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 		Command cmd = new Command(Command.CLIENT_HELLO);	
 		cmd.setProperty(Command.CLIENT, clientHID.toString());
-		//#NM TODO Mark V.
-		if(serverHID!=null)
-			cmd.setProperty(Command.SERVER, serverHID.toString());
+		cmd.setProperty(Command.SERVER, serverHID.toString());
 		generatedNonce = nonceGenerator.getNextNonce();
 		cmd.setProperty(Command.CLIENT_NONCE, generatedNonce);
 		try {
@@ -656,5 +654,17 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	private PublicKey loadKeyEncryptionKey(String receiverHID) throws InvalidKeySpecException, KeyStoreException, NoSuchAlgorithmException, FileNotFoundException, CertificateException{
 		String identifier = cryptoMgr.getCertificateReference(receiverHID);
 		return cryptoMgr.getCertificateByIdentifier(identifier).getPublicKey();
+	}
+
+	public boolean canBroadcast() {
+		return false;
+	}
+
+	public Message protectBroadcastMessage(Message msg) throws Exception{
+		throw new Exception("Broadcasting not supported by security protocol!");
+	}
+
+	public Message unprotectBroadcastMessage(Message msg) throws Exception{
+		throw new Exception("Broadcasting not supported by security protocol!");
 	}
 }

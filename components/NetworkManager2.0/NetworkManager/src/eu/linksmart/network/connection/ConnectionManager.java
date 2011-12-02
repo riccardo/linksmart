@@ -49,7 +49,6 @@ public class ConnectionManager {
 	private Timer timer = null;
 
 	public ConnectionManager(){
-		broadcastConnection = new Connection(null, null);
 		//Timer which periodically calls the clearer task
 		Timer timer = new Timer(true);
 		timer.schedule(new ConnectionClearer(), 0, timeoutMinutes * 60 * 1000 / 2);
@@ -71,12 +70,12 @@ public class ConnectionManager {
 	 * @return Connection to use for processing of communication
 	 */
 	public synchronized Connection getConnection(HID receiverHID, HID senderHID){
+		Calendar cal = Calendar.getInstance();
 		//find connection belonging to these HIDs
 		for(Connection c : connections){
 			if((c.getClientHID() == receiverHID && c.getServerHID() == senderHID)
 					|| (c.getClientHID() == senderHID && c.getServerHID() == receiverHID)){
 				//set last use date of connection
-				Calendar cal = Calendar.getInstance();
 				timeouts.put(c, cal.getTime());
 				return c;
 			}
@@ -88,6 +87,10 @@ public class ConnectionManager {
 		if(comSecMgr != null){
 			conn.setSecurityProtocol(comSecMgr.getSecurityProtocol(senderHID, receiverHID));
 		}
+		//add connection to list
+		connections.add(conn);
+		timeouts.put(conn, cal.getTime());
+		
 		return conn;
 	}
 	
@@ -98,7 +101,27 @@ public class ConnectionManager {
 	 * @return Connection to be used for getting the contents of the received data
 	 */
 	public synchronized Connection getBroadcastConnection(HID senderHID){
-		return broadcastConnection;
+		Calendar cal = Calendar.getInstance();
+		//find connection belonging to this HID
+		for(Connection c : connections){
+			if(c.getClientHID() == senderHID && c.getClass() == BroadcastConnection.class){
+				//set last use date of connection
+				timeouts.put(c, cal.getTime());
+				return c;
+			}
+		}
+
+		//there was no connection found so create new connection
+		//if there was no connection that means that the sender is the client and the receiver is the server
+		BroadcastConnection conn = new BroadcastConnection(senderHID);
+		if(comSecMgr != null && comSecMgr.canBroadcast()){
+			conn.setSecurityProtocol(comSecMgr.getBroadcastSecurityProtocol(senderHID));
+		}
+		//add connection to list
+		connections.add(conn);
+		timeouts.put(conn, cal.getTime());
+		
+		return conn;
 	}
 
 	/**
@@ -151,6 +174,7 @@ public class ConnectionManager {
 				if(calendar.getTimeInMillis() - timeouts.get(con).getTime() > timeoutMinutes * 60 * 1000){
 					//timeout has expired so delete it
 					i.remove();
+					connections.remove(con);
 				}
 			}
 		}	

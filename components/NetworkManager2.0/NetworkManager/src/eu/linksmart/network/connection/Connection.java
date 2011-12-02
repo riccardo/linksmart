@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.networkmanager.core.impl.NetworkManagerCoreImpl;
+import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.CryptoException;
 import eu.linksmart.security.communication.SecurityProtocol;
 import eu.linksmart.security.communication.VerificationFailureException;
@@ -39,7 +40,7 @@ public class Connection {
 	/**
 	 * {@link SecurityProtocol} used to protect and unprotect messages
 	 */
-	private SecurityProtocol securityProtocol = null;
+	protected SecurityProtocol securityProtocol = null;
 	/**
 	 * The initiator of this communication
 	 */
@@ -49,11 +50,17 @@ public class Connection {
 	 */
 	private HID serverHID = null;
 
+	protected Connection(HID clientHID){
+		if(clientHID == null){
+			throw new IllegalArgumentException("Cannot set null for required fields.");
+		}
+		this.clientHID = clientHID;
+	}
+	
 	public Connection(HID clientHID, HID serverHID){
-		//FIXME #NM
-//		if(clientHID == null || serverHID == null){
-//			throw new IllegalArgumentException("Cannot set null for required fields.");
-//		}
+		if(clientHID == null || serverHID == null){
+			throw new IllegalArgumentException("Cannot set null for required fields.");
+		}
 		this.clientHID = clientHID;
 		this.serverHID = serverHID;
 	}
@@ -119,7 +126,7 @@ public class Connection {
 		try{
 			//open data and divide it into properties of the message and application data
 			Properties properties = new Properties();
-			properties.loadFromXML(new ByteArrayInputStream(tempMsg.getData()));
+			properties.loadFromXML(new ByteArrayInputStream((tempMsg == null)? data : tempMsg.getData()));
 
 			//create real message
 			Message message = new Message(
@@ -161,7 +168,7 @@ public class Connection {
 			props.put(key, msg.getProperty(key));
 		}
 		//put application data into properties
-		props.put(APPLICATION_DATA, msg.getData());
+		props.put(APPLICATION_DATA, new String(msg.getData()));
 		props.put(TOPIC, msg.getTopic());
 		//convert props into xml and encode it
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -179,7 +186,9 @@ public class Connection {
 			}
 		}
 
-		if(securityProtocol != null && securityProtocol.isInitialized()){
+		if(securityProtocol != null 
+				&& securityProtocol.isInitialized() 
+				&& props.getProperty(TOPIC).equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)){
 			/*this could also be a message which has been stored by the security protocol
 			* until now and is becoming sent at last */
 			//set all data of the message as data part and protect it
