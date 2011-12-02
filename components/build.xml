@@ -56,7 +56,7 @@
 		<ant dir="Log4j" target="make" />
 		<ant dir="LinkSmartMiddlewareAPI" target="make" />
         <ant dir="LinkSmartWSProvider" target="make" />
-		<ant dir="LinkSmartMiddlewareClients" target="make" />
+		<!-- <ant dir="LinkSmartMiddlewareClients" target="make" /> -->
         <ant dir="LinkSmartManagerConfigurator" target="make" />
 		
         <ant dir="NetworkManager2.0/CommunicationSecurityManager" target="make" />
