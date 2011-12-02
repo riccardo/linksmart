@@ -3,10 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
-	<info organisation="LinkSmartMiddlewareClients" module="LinkSmartMiddlewareClients" />
+	<info organisation="eu.linksmart" module="eu.linksmart.middlewareclients" />
 
 	<publications>
-		<artifact name="LinkSmartMiddlewareClients" type="jar" />
+		<artifact name="eu.linksmart.middlewareclients" type="jar" />
 	</publications>
 
 	<dependencies>
