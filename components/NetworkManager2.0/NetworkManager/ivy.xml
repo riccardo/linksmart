@@ -14,24 +14,19 @@
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi"	rev="3.6.2" />
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi.services" rev="3.2.100" />
 		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.cm" rev="1.0.100.200911161659" />
-		<dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.4.0" />
+		<dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.5.0" />
+		<dependency org="javax.wsdl" name="com.springsource.javax.wsdl" rev="1.6.1" />
 		<dependency org="eu.linksmart" name="eu.linksmart.middlewareapi" rev="2.0.0"  />
-		
-		<!-- Runtime Bundles -->
-		<!-- TODO: 	Check which ones are still needed and where to put them. 
-					Here is perhaps not the right place
-		-->
-		<!-- 
+		<!-- TODO find OSGi platform independent jars for following -->
 		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.ds" rev="1.2.1.R36x_v20100803" />
 		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.common" rev="3.6.0.v20100503" />
 		<dependency org="org.eclipse.equinox.http" name="org.eclipse.equinox.http.jetty" rev="2.0.0.v20100503" />
+		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.util" rev="1.0.200.v20100503" />
 		<dependency org="org.eclipse.equinox.http" name="org.eclipse.equinox.http.registry" rev="1.1.1.R36x_v20101103" />
 		<dependency org="org.eclipse.equinox.http" name="org.eclipse.equinox.http.servlet" rev="1.1.0.v20100503" />
 		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.registry" rev="3.5.0.v20100503" />
-		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.util" rev="1.0.200.v20100503" />
 		<dependency org="org.mortbay.jetty" name="org.mortbay.jetty.server" rev="6.1.23.v201004211559" />
-		<dependency org="org.mortbay.jetty" name="org.mortbay.jetty.util" rev="6.1.23.v201004211559" />
-		 -->
+		<dependency org="org.mortbay.jetty" name="org.mortbay.jetty.util" rev="6.1.23.v201004211559" />	
 	</dependencies>
 
 </ivy-module>
