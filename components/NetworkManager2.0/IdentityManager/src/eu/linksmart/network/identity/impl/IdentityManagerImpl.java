@@ -41,13 +41,14 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	private int broadcastSleepMillis = 3000;
 
 	protected void activate(ComponentContext context) {
+		LOG.info("Starting " + IDENTITY_MGR);
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
 
 		Thread broadcastingThread = new Thread(new HIDUpdaterThread());
 		broadcastingThread.start();
-		LOG.info(IDENTITY_MGR + "started");
+		LOG.info(IDENTITY_MGR + " started");
 	}
 
 	protected void deactivate(ComponentContext context) {
