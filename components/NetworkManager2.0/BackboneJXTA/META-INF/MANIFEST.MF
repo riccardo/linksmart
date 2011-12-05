@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: BackboneJXTA
-Bundle-SymbolicName: BackboneJXTA
+Bundle-SymbolicName: eu.linksmart.network.backbone.jxta.BackboneJXTA
 Bundle-Version: 1.0.0.qualifier
 Import-Package: eu.linksmart.network;version="1.0.0",
  eu.linksmart.network.backbone,
