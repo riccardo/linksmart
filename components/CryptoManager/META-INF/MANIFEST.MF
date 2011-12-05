@@ -25,4 +25,5 @@ Import-Package: eu.linksmart.clients,
  org.osgi.service.component;version="1.1.0"
 Bundle-ClassPath: resources/,
  .,
- lib/bcprov-jdk16-138.jar
+ lib/bcprov-jdk16-138.jar,
+ lib/bcprov-jdk15-141.jar
