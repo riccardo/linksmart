@@ -2,6 +2,8 @@ package eu.linksmart.network.networkmanager.core.impl;
 
 
 import java.io.IOException;
+import java.net.URL;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +25,24 @@ import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.application.impl.NetworkManagerApplicationImpl;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
+import eu.linksmart.network.service.registry.ServiceRegistry;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 
 /*
  * Core implementation of NetworkManagerCore Interface
  */
-public class NetworkManagerCoreImpl extends NetworkManagerApplicationImpl implements NetworkManagerCore, MessageDistributor {
+public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistributor {
+	protected IdentityManager identityManager;
+	
+	protected BackboneRouter backboneRouter;
+	
+	protected ConnectionManager connectionManager;
+
+	private ServiceRegistry serviceRegistry;
+
+	protected HID myHID;
+	
+	protected String myDescription;
 
 	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
@@ -66,6 +80,40 @@ private void init(ComponentContext context) {
 	 Properties attributes = new Properties();
 	 attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.myDescription);
 	 this.myHID=this.identityManager.createHID(attributes);
+}
+
+@Override
+public HID getHID() {
+	return this.myHID;
+}
+
+//XXX @Override
+public HID createHID(Properties attributes, URL url) throws RemoteException {
+	
+	HID newHID = this.identityManager.createHID(attributes);
+	
+	this.serviceRegistry.registerService(newHID, url);
+	
+	return newHID;
+}
+
+@Override
+public NMResponse sendData(HID sender, HID receiver, byte[] data)
+throws RemoteException {
+	
+	NMResponse response = this.backboneRouter.sendData(sender,receiver,data);
+	
+	return response;
+}
+
+@Override
+public Boolean removeHID(HID hid) throws RemoteException {
+				
+	Boolean serviceRemoved =this.serviceRegistry.removeService(hid);
+	
+	Boolean hidRemoved = this.identityManager.removeHID(hid);
+	
+	return (serviceRemoved && hidRemoved);
 }
 
 protected void deactivate(ComponentContext context) {
