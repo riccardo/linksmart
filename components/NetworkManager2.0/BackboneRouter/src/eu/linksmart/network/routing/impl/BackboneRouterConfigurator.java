@@ -53,7 +53,7 @@ public class BackboneRouterConfigurator extends Configurator {
 	
 	public static final String COMMUNICATION_TYPE = "Network.CommunicationType";
 	
-	private static String BACKBONE_ROUTER_PID = "eu.linksmart.BackboneRouter";
+	private static String BACKBONE_ROUTER_PID = "eu.linksmart.backbone.router";
 	
 	private BackboneRouter backboneRouter;
 	

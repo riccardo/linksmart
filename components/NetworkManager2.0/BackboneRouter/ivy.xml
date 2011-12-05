@@ -3,10 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
-	<info organisation="eu.linksmart.network.backbone" module="eu.linksmart.network.backbone.backbonerouter" />
+	<info organisation="eu.linksmart.network.backbone" module="eu.linksmart.network.backbone.router" />
 
 	<publications>
-		<artifact name="eu.linksmart.network.backbone.backbonerouter" type="jar" />
+		<artifact name="eu.linksmart.network.backbone.router" type="jar" />
 	</publications>
 
 	<dependencies>
