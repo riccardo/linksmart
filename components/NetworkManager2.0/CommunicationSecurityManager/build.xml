@@ -68,7 +68,7 @@
 		<mkdir dir="${dist.dir}" />
 		<jar jarfile="${dist.dir}/${moduleName}-${revision}.jar" manifest="${basedir}/META-INF/MANIFEST.MF">
 			<fileset dir="${build.dir}" />
-			<fileset dir="${basedir}" includes="OSGi-INF/*" />
+			<fileset dir="${basedir}" includes="OSGI-INF/*" />
 			<fileset dir="${basedir}" includes="resources/**" />
 		</jar>
 	</target>
