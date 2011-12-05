@@ -253,22 +253,23 @@ public class HID {
 
 	/**
 	 * Gets the context of the given level
+	 * TODO check whether this method is referenced anywhere
 	 * 
 	 * @param level
 	 *            the level to get the context
 	 * @return the context of the given level
 	 */
-	public Long getContext(int level) {
-		switch (level) {
-		case 1:
-			return this.contextID1;
-		case 2:
-			return this.contextID2;
-		case 3:
-			return this.contextID3;
-		default:
-			return null;
-		}
-	}
+//	public Long getContext(int level) {
+//		switch (level) {
+//		case 1:
+//			return this.contextID1;
+//		case 2:
+//			return this.contextID2;
+//		case 3:
+//			return this.contextID3;
+//		default:
+//			return null;
+//		}
+//	}
 
 }
