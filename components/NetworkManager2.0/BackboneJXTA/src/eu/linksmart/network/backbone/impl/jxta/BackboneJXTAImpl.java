@@ -74,7 +74,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	
 	protected Hashtable<HID, RemoteEndpointInformation> listOfRemoteEndpoints;
 
-	public void activate(ComponentContext context) {
+	protected void activate(ComponentContext context) {
 		logger.info("**** Activating JXTA backbone!");
 
 		this.context = context;
