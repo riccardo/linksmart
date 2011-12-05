@@ -1,5 +1,7 @@
 package eu.linksmart.network.backbone;
 
+import java.util.Hashtable;
+
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
@@ -46,4 +48,11 @@ public interface Backbone {
 	 * @return the backbone address represented by the Hid
 	 */
 	public String getDestinationAddressAsString(HID hid);
+
+	/**
+	 * 
+	 * @param updates
+	 */
+	public void applyConfigurations(Hashtable updates);
+
 }

@@ -5,4 +5,5 @@
       <provide interface="eu.linksmart.network.backbone.Backbone"/>
    </service>
    <reference cardinality="1..1" interface="eu.linksmart.network.routing.BackboneRouter" name="BackboneRouter" policy="static"/>
+   <reference cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static"/>
 </scr:component>

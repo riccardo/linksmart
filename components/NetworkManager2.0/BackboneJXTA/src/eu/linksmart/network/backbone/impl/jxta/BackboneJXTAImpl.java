@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 
 import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
@@ -56,7 +57,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	protected static String JXTA_HOME_DIR = "Backbone/.jxta/";
 
-	private String jxtaHome = JXTA_HOME_DIR + this.name;
+	private String jxtaHome;
 
 	private BackboneRouter bbRouter;
 
@@ -71,7 +72,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	private MulticastSocket msocket;
 
 	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
-	
+
 	protected Hashtable<HID, RemoteEndpointInformation> listOfRemoteEndpoints;
 
 	protected void activate(ComponentContext context) {
@@ -82,25 +83,18 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		this.bbRouter = (BackboneRouter) context
 				.locateService(BackboneRouter.class.getSimpleName());
 
-		configurator.registerConfiguration();
-
 		try {
 			this.configurator = new BackboneJXTAConfigurator(this,
 					context.getBundleContext());
 			configurator.registerConfiguration();
 		} catch (NullPointerException e) {
-			logger.fatal("Wrong configuration mode + " + mode.toString());
+			logger.fatal("Configurator could not be initialized "
+					+ e.toString());
 		}
 
-		// Status Servlet Registration
-		http = (HttpService) context.locateService("HttpService");
-		httpPort = System.getProperty("org.osgi.service.http.port");
-		try {
-			http.registerServlet(BackboneJXTAStatusServletName,
-					new BackboneJXTAStatus(context), null, null);
-		} catch (Exception e) {
-			logger.error("BackboneJXTA - Error registering servlets", e);
-		}
+		this.name = (String) configurator
+				.get(BackboneJXTAConfigurator.PEER_NAME);
+		this.jxtaHome = JXTA_HOME_DIR + this.name;
 
 		boolean logs = Boolean.parseBoolean((String) configurator
 				.getConfiguration().get(BackboneJXTAConfigurator.JXTA_LOGS));
@@ -114,39 +108,35 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		}
 
 		this.announcementValidityTime = Long.parseLong((String) configurator
-				.getConfiguration().get(
-						BackboneJXTAConfigurator.ANNOUNCE_VALIDITY));
-		this.factor = Long.parseLong((String) configurator.getConfiguration()
-				.get(BackboneJXTAConfigurator.FACTOR));
-		this.waitForRdvTime = Long.parseLong((String) configurator
-				.getConfiguration().get(
-						BackboneJXTAConfigurator.WAIT_FOR_RDV_TIME));
-		this.synched = (String) configurator.getConfiguration().get(
-				BackboneJXTAConfigurator.SYNCHRONIZED);
+				.get(BackboneJXTAConfigurator.ANNOUNCE_VALIDITY));
 
-		String jxtaMode = ((String) configurator.getConfiguration().get(
-				BackboneJXTAConfigurator.MODE));
+		this.factor = Long.parseLong((String) configurator
+				.get(BackboneJXTAConfigurator.FACTOR));
+
+		this.waitForRdvTime = Long.parseLong((String) configurator
+				.get(BackboneJXTAConfigurator.WAIT_FOR_RDV_TIME));
+
+		this.synched = (String) configurator
+				.get(BackboneJXTAConfigurator.SYNCHRONIZED);
+
+		String jxtaMode = ((String) configurator
+				.get(BackboneJXTAConfigurator.MODE));
 		/*
 		 * Depending on the mode of configuration the node can act as a
 		 * RDV(SuperNode) or as EDGE(Node)
 		 */
-		if (mode.equals(MODE_NODE_AS_STRING)) {
+		if (jxtaMode.equals(MODE_NODE_AS_STRING)) {
 			this.jxtaMode = NetworkManager.ConfigMode.EDGE;
 			logger.info("LinkSmart Network Manager configured as Node");
 		}
-		if (mode.equals(MODE_SUPERNODE_AS_STRING)) {
+		if (jxtaMode.equals(MODE_SUPERNODE_AS_STRING)) {
 			this.jxtaMode = NetworkManager.ConfigMode.SUPER;
 			logger.info("LinkSmart Network Manager configured as Super Node");
 		}
-		if ((!mode.equals(MODE_NODE_AS_STRING))
-				&& (!mode.equals(MODE_SUPERNODE_AS_STRING))) {
+		if ((!jxtaMode.equals(MODE_NODE_AS_STRING))
+				&& (!jxtaMode.equals(MODE_SUPERNODE_AS_STRING))) {
 			logger.error("Wrong node mode format. Please choose between Node or SuperNode");
 		}
-
-		pipeSyncHandler = new PipeSyncHandler(this);
-		socketHandler = new SocketHandler(this);
-		
-		listOfRemoteEndpoints = new Hashtable<HID, RemoteEndpointInformation>();
 
 		startJXTA();
 
@@ -243,11 +233,12 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * Now follow methods that are not part of the interface
 	 */
 
+	@SuppressWarnings("rawtypes")
+	@Override
 	/**
 	 * Apply the configuration changes
 	 * 
-	 * @param updates
-	 *            the configuration changes
+	 * @param updates the configuration changes
 	 */
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(BackboneJXTAConfigurator.JXTA_LOGS)) {
@@ -260,8 +251,53 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 						Level.ALL.toString());
 			}
 		}
+
+		if (updates.containsKey(BackboneJXTAConfigurator.ANNOUNCE_VALIDITY)) {
+			this.announcementValidityTime = Long.parseLong((String) updates
+					.get(BackboneJXTAConfigurator.ANNOUNCE_VALIDITY));
+		}
+		if (updates.containsKey(BackboneJXTAConfigurator.FACTOR)) {
+
+			this.factor = Long.parseLong((String) updates
+					.get(BackboneJXTAConfigurator.FACTOR));
+		}
+		if (updates.containsKey(BackboneJXTAConfigurator.WAIT_FOR_RDV_TIME)) {
+			this.waitForRdvTime = Long.parseLong((String) updates
+					.get(BackboneJXTAConfigurator.WAIT_FOR_RDV_TIME));
+		}
+		if (updates.containsKey(BackboneJXTAConfigurator.SYNCHRONIZED)) {
+			this.synched = (String) updates
+					.get(BackboneJXTAConfigurator.SYNCHRONIZED);
+		}
+		if (updates.containsKey(BackboneJXTAConfigurator.MODE)) {
+
+			String jxtaMode = ((String) updates
+					.get(BackboneJXTAConfigurator.MODE));
+			/*
+			 * Depending on the mode of configuration the node can act as a
+			 * RDV(SuperNode) or as EDGE(Node)
+			 */
+			if (jxtaMode.equals(MODE_NODE_AS_STRING)) {
+				this.jxtaMode = NetworkManager.ConfigMode.EDGE;
+				logger.info("LinkSmart Network Manager configured as Node");
+			}
+			if (jxtaMode.equals(MODE_SUPERNODE_AS_STRING)) {
+				this.jxtaMode = NetworkManager.ConfigMode.SUPER;
+				logger.info("LinkSmart Network Manager configured as Super Node");
+			}
+			if ((!jxtaMode.equals(MODE_NODE_AS_STRING))
+					&& (!jxtaMode.equals(MODE_SUPERNODE_AS_STRING))) {
+				logger.error("Wrong node mode format. Please choose between Node or SuperNode");
+			}
+		}
+
 	}
 
+	/**
+	 * Returns the dictionary of configuration parameters
+	 * 
+	 * @return Dictionary
+	 */
 	public Dictionary getConfiguration() {
 		return configurator.getConfiguration();
 	}
@@ -281,7 +317,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	private long waitForRdvTime;
 
 	public PeerID peerID;
-	private ConfigMode mode;
+	// private ConfigMode mode;
 	private NetworkManager jxtaNetworkManager;
 	private NetworkConfigurator jxtaNetworkConfigurator;
 
@@ -300,7 +336,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		/* JXTA platform configuration. */
 		try {
-			jxtaNetworkManager = new NetworkManager(mode, name, new File(
+			jxtaNetworkManager = new NetworkManager(jxtaMode, name, new File(
 					jxtaHome).toURI());
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -310,7 +346,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		try {
 			jxtaNetworkConfigurator = jxtaNetworkManager.getConfigurator();
 		} catch (NullPointerException e) {
-			logger.fatal("Wrong configuration mode + " + mode.toString());
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -388,6 +424,15 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			}
 		}
 
+		// stuff coming from other places which needs to be checked if it is
+		// here in the right place
+
+		pipeSyncHandler = new PipeSyncHandler(this);
+		socketHandler = new SocketHandler(this);
+
+		listOfRemoteEndpoints = new Hashtable<HID, RemoteEndpointInformation>();
+
+		// end of stuff
 		msocket = new MulticastSocket();
 		multicastSocket = msocket.createMulticastSocket(netPeerGroup);
 
@@ -614,12 +659,12 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 				HID senderHID = GetHIDFromData(receivedData.getData());
 				// give message to BBRouter for further processing
-				bbRouter.receiveData(senderHID,
-						null, RemoveHIDFromData(receivedData.getData()),
+				bbRouter.receiveData(senderHID, null,
+						RemoveHIDFromData(receivedData.getData()),
 						(Backbone) this);
 				// add info to table of HID-Endpoint
-				RemoteEndpointInformation endpoint = new RemoteEndpointInformation(socketAddress,
-						senderIP, senderPort);
+				RemoteEndpointInformation endpoint = new RemoteEndpointInformation(
+						socketAddress, senderIP, senderPort);
 				listOfRemoteEndpoints.put(senderHID, endpoint);
 			}
 		}
@@ -636,9 +681,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	private static final String HID_DELIMITER = "##";
 
 	/**
-	 * Adds an HID to the data package so that the next JXTA backbone can get it without the need to unpack the payload.
+	 * Adds an HID to the data package so that the next JXTA backbone can get it
+	 * without the need to unpack the payload.
 	 * 
-	 * @param aHID This is the HID of the sender.
+	 * @param aHID
+	 *            This is the HID of the sender.
 	 * @param origData
 	 * @return
 	 */
@@ -661,7 +708,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	}
 
 	/**
-	 * Removes the HID from the data package so that the payload can be processed regularly e.g. unencrypted.
+	 * Removes the HID from the data package so that the payload can be
+	 * processed regularly e.g. unencrypted.
 	 * 
 	 * @param origData
 	 * @return The original payload of the data package.
@@ -673,14 +721,12 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 				posHidDelimiter + 1, dataAsString.length());
 		return dataWithoutHidAsString.getBytes();
 	}
-	
-	
+
 	private class RemoteEndpointInformation {
 		protected SocketAddress socketAddress;
 		protected InetAddress senderIP;
 		protected int senderPort;
-		
-		
+
 		public RemoteEndpointInformation(SocketAddress socketAddress,
 				InetAddress senderIP, int senderPort) {
 			super();
@@ -688,26 +734,31 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			this.senderIP = senderIP;
 			this.senderPort = senderPort;
 		}
-		
+
 		public SocketAddress getSocketAddress() {
 			return socketAddress;
 		}
+
 		public void setSocketAddress(SocketAddress socketAddress) {
 			this.socketAddress = socketAddress;
 		}
+
 		public InetAddress getSenderIP() {
 			return senderIP;
 		}
+
 		public void setSenderIP(InetAddress senderIP) {
 			this.senderIP = senderIP;
 		}
+
 		public int getSenderPort() {
 			return senderPort;
 		}
+
 		public void setSenderPort(int senderPort) {
 			this.senderPort = senderPort;
 		}
- 
+
 	}
 
 }

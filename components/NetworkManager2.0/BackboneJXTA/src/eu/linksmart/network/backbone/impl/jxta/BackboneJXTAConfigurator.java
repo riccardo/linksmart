@@ -2,6 +2,9 @@ package eu.linksmart.network.backbone.impl.jxta;
 
 import java.util.Hashtable;
 
+import net.jxta.logging.Logging;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 
@@ -11,10 +14,10 @@ public class BackboneJXTAConfigurator extends Configurator {
 
 	/* Configuration PID & file path. */
 	public static String BBJXTA_PID = "eu.linksmart.network.backbone.jxta";
-	public static String CONFIGURATION_FILE = "/BBJXTA.properties";  
+	public static String CONFIGURATION_FILE = "/resources/BBJXTA.properties";
 
 	/* Configuration Keys. */
-	public static final String JXTA_HID = "BackboneJXTA.HID";
+	// public static final String JXTA_HID = "BackboneJXTA.HID";
 	public static final String JXTA_DESCRIPTION = "BackboneJXTA.Description";
 
 	public static final String JXTA_LOGS = "BackboneJXTA.JXTALogs";
@@ -33,21 +36,26 @@ public class BackboneJXTAConfigurator extends Configurator {
 
 	public static final String MULTIMEDIA_PORT = "BackboneJXTA.MultimediaPort";
 
-	private BackboneJXTAImpl bbJXTA;
+	private BackboneJXTAImpl bbJXTAImpl;
 
 	/**
-	 * Constructor. Creates a new "NetworkManagerConfigurator" object
-	 * 
-	 * @param nm
-	 *            the network manager implementation
-	 * @param context
-	 *            the bundle's execution context
+	 * Log4j logger of this class
 	 */
-	public BackboneJXTAConfigurator(BackboneJXTAImpl bbJXTA,
+	private static Logger logger = Logger
+			.getLogger(BackboneJXTAConfigurator.class.getName());
+
+	/**
+	 * Initializes the JXTA backbone configurator.
+	 * 
+	 * @param bbJXTAImpl
+	 *            instantiation of JXTA backbone
+	 * @param context
+	 *            A bundle context
+	 */
+	public BackboneJXTAConfigurator(BackboneJXTAImpl bbJXTAImpl,
 			BundleContext context) {
-		super(context, Logger.getLogger(BackboneJXTAConfigurator.class
-				.getName()), BBJXTA_PID, CONFIGURATION_FILE);
-		this.bbJXTA = bbJXTA;
+		super(context, logger, BBJXTA_PID, CONFIGURATION_FILE);
+		this.bbJXTAImpl = bbJXTAImpl;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -58,9 +66,7 @@ public class BackboneJXTAConfigurator extends Configurator {
 	 * @param updates the configuration changes
 	 */
 	public void applyConfigurations(Hashtable updates) {
-		if (this.bbJXTA != null) {
-			this.bbJXTA.applyConfigurations(updates);
-		}
+		bbJXTAImpl.applyConfigurations(updates);
 	}
 
 }
