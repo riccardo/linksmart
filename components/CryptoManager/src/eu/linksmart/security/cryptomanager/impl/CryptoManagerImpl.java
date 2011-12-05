@@ -163,19 +163,6 @@ public class CryptoManagerImpl implements CryptoManager{
 		return cryptoProcessor.decrypt(encryptedData);
 	}
 
-	protected void configurationBind(ConfigurationAdmin ca){
-		if (configurator != null) {
-			configurator.bindConfigurationAdmin(ca);
-			if (activated == true) {
-				configurator.registerConfiguration();
-			}
-		}
-	}
-
-	protected void configurationUnbind(ConfigurationAdmin ca){
-		configurator.unbindConfigurationAdmin(ca);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
