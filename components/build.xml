@@ -63,7 +63,7 @@
 		<ant dir="NetworkManager2.0/NetworkManager" target="make" />
 		<ant dir="NetworkManager2.0/IdentityManager" target="make" />
 		<ant dir="NetworkManager2.0/BackboneRouter" target="make" />
-        <!-- <ant dir="NetworkManager2.0/BackboneJXTA" target="make" /> -->
+        <ant dir="NetworkManager2.0/BackboneJXTA" target="make" />
         <!-- <ant dir="NetworkManager2.0/BackboneWS" target="make" /> -->
         
         <ant dir="CryptoManager" target="make" />
