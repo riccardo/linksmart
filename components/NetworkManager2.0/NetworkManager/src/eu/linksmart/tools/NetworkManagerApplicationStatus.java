@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.HID;
@@ -65,6 +66,8 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 	 * Generated serial version UID
 	 */
 	private static final long serialVersionUID = -159804849704448746L;
+	
+	Logger LOG = Logger.getLogger(NetworkManagerApplicationStatus.class.getName());
 
 	IdentityManager identityManager;
 	ComponentContext context;
@@ -103,7 +106,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 
 		response.setContentType("text/html");
 		URL cssFile = context.getBundleContext().getBundle()
-				.getResource("resources/NetworkManagerCore.css");
+				.getResource("resources/NetworkManager.css");
 		BufferedReader cssReader = new BufferedReader(new InputStreamReader(
 				cssFile.openStream()));
 
@@ -147,11 +150,11 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 			HID hid = new HID(it.next().getHID());
 
 			try {
-
-				endpoint = this.serviceRegistry.getServiceURL(hid).toString();
-				if (endpoint.equals(" ")) {
-					endpoint = "-";
-				}
+//				TODO Check the ServiceRegistry
+//				endpoint = this.serviceRegistry.getServiceURL(hid).toString();
+//				if (endpoint.equals(" ")) {
+//					endpoint = "-";
+//				}
 				description = identityManager.getHIDInfo(hid).getDescription();
 
 				if (checkAttributes && description.equals("")) {
@@ -172,14 +175,14 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 					}
 
 				}
-
-				route = this.backboneRouter.getRoute(hid);
+//				TODO Check Route
+//				route = this.backboneRouter.getRoute(hid);
 				s = s + "<tr><td width=25%>" + hid.toString()
 						+ "</td><td width=25%>" + description
-						+ "</td><td width=25%>" + route + "</td><td width=25%>"
-						+ endpoint + "</td></tr>";
+						+ "</td><td width=25%>" + "ToDo: Route" + "</td><td width=25%>"
+						+ "ToDo: Endpoint" + "</td></tr>";
 			} catch (Exception e) {
-				System.out.println("Error printing " + hid);
+				LOG.warn("Error printing " + hid, e);
 			}
 		}
 		return s;

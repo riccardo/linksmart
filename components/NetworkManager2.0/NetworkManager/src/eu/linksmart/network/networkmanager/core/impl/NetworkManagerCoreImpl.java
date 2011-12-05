@@ -12,21 +12,23 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.http.HttpService;
 
 import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.Message;
-import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.MessageDistributor;
+import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
-import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.identity.IdentityManager;
-import eu.linksmart.network.networkmanager.application.impl.NetworkManagerApplicationImpl;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.network.service.registry.ServiceRegistry;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
+import eu.linksmart.tools.GetNetworkManagerStatus;
+import eu.linksmart.tools.NetworkManagerApplicationStatus;
 
 /*
  * Core implementation of NetworkManagerCore Interface
@@ -80,6 +82,19 @@ private void init(ComponentContext context) {
 	 Properties attributes = new Properties();
 	 attributes.setProperty(HIDAttribute.DESCRIPTION.name(), this.myDescription);
 	 this.myHID=this.identityManager.createHID(attributes);
+	 
+	 // Init Servlets
+	 
+		HttpService http = (HttpService) context.locateService("HttpService");
+		try {
+			http.registerServlet("/NetworkManagerStatus",
+					new NetworkManagerApplicationStatus(context, this, identityManager, backboneRouter, serviceRegistry), null, null);
+			http.registerServlet("/GetNetworkManagerStatus",
+					new GetNetworkManagerStatus(this, identityManager, backboneRouter, serviceRegistry), null, null);
+			http.registerResources("/files", "/resources", null);
+		} catch (Exception e) {
+			LOG.error("Error registering servlets", e);
+		}
 }
 
 @Override

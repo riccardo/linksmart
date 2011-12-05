@@ -44,6 +44,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
@@ -54,9 +56,10 @@ import eu.linksmart.network.service.registry.ServiceRegistry;
  * NetworkManagerStatus Servlet
  */
 public class GetNetworkManagerStatus extends HttpServlet {
+	
+	Logger LOG = Logger.getLogger(GetNetworkManagerStatus.class.getName());
 
 	IdentityManager identityManager;
-
 	private NetworkManagerCore networkManagerCore;
 	private BackboneRouter backboneRouter;
 	private ServiceRegistry serviceRegistry;
@@ -127,8 +130,8 @@ public class GetNetworkManagerStatus extends HttpServlet {
 		while (it.hasNext()) {
 			HIDInfo hidInfo = it.next();
 
-			try {
-				endpoint = serviceRegistry.getServiceURL(hidInfo.getHID()).toString();
+//				TODO Check endpoint
+//				endpoint = serviceRegistry.getServiceURL(hidInfo.getHID()).toString();
 				description = hidInfo.getDescription();
 				if (description.equals("")) {
 					if (defaultDescription != null) {
@@ -153,17 +156,20 @@ public class GetNetworkManagerStatus extends HttpServlet {
 						}
 					}
 				}
-
-				host = this.backboneRouter.getRoute(hidInfo.getHID());
-				response.getWriter().write(
-						hidInfo.getHID().toString() + "|" + description + "|"
-								+ host + "|" + endpoint);
-				if (it.hasNext()) {
-					response.getWriter().write("<br>");
+				
+//				TODO Check route
+//				host = this.backboneRouter.getRoute(hidInfo.getHID());
+				try {
+					response.getWriter().write(
+							hidInfo.getHID().toString() + "|" + description + "|"
+									+ "TODO: Host" + "|" + "TODO: Endpoint");
+					if (it.hasNext()) {
+						response.getWriter().write("<br>");
+					}
+				} catch (IOException e) {
+					LOG.error("Unable to produce HTML. ", e);
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+				
 		}
 	}
 
