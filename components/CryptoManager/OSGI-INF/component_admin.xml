@@ -5,4 +5,5 @@
     <service>
        <provide interface="eu.linksmart.security.cryptomanager.CryptoManagerAdmin"/>
     </service>
+    <reference cardinality="1..1" interface="eu.linksmart.security.cryptomanager.CryptoManager" name="CryptoManager" policy="static"/>
 </scr:component>
