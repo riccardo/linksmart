@@ -32,15 +32,16 @@ public class BackboneRouterImpl implements BackboneRouter {
 	BackboneRouterConfigurator configurator;
 	
 	protected void activate(ComponentContext context) {
-		System.out.println(BACKBONE_ROUTER + "started");
+		logger.info("Starting " + BACKBONE_ROUTER);
 		
 		hidBackboneMap = new HashMap<HID, Backbone>();
 		availableBackbones =  new ArrayList<Backbone>();
 		configurator = new BackboneRouterConfigurator(this, context.getBundleContext());
+		logger.info(BACKBONE_ROUTER + " started");
 	}
 
 	protected void deactivate(ComponentContext context) {
-		System.out.println(BACKBONE_ROUTER + "stopped");
+		logger.info(BACKBONE_ROUTER + "stopped");
 	}
 
 	protected void bindBackbone(Backbone backbone) {

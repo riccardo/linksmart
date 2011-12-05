@@ -49,7 +49,7 @@ import eu.linksmart.utils.Configurator;
 public class BackboneRouterConfigurator extends Configurator {
 
 	/* Configuration PID & file path. */
-	public static String CONFIGURATION_FILE = "/BackboneRouter.properties";
+	public static String CONFIGURATION_FILE = "/resources/BackboneRouter.properties";
 	
 	public static final String COMMUNICATION_TYPE = "Network.CommunicationType";
 	

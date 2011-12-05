@@ -6,4 +6,5 @@
    </service>
    <reference bind="bindBackbone" cardinality="0..n" interface="eu.linksmart.network.backbone.Backbone" name="Backbone" policy="dynamic" unbind="unbindBackbone"/>
    <reference bind="bindNMCore" cardinality="0..1" interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore" name="NetworkManagerCore" policy="dynamic" unbind="unbindNMCore"/>
+   <reference cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static"/>
 </scr:component>
