@@ -52,7 +52,7 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 //	private static final String OSGI_SERVICE_HTTP_PORT = System.getProperty("org.osgi.service.http.port");
 	/* Configuration PID & file path. */
 	public static String NM_PID = "eu.linksmart.network";
-	public static String CONFIGURATION_FILE = "/NM.properties";
+	public static String CONFIGURATION_FILE = "/resources/NetworkManager.properties";
 	
 	public static final String NM_DESCRIPTION = "NetworkManager.Description";
 	public static final String CERTIFICATE_REF = "Network.CertificateRef";
