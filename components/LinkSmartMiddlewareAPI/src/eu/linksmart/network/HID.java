@@ -48,7 +48,10 @@ public class HID {
 	private long contextID2 = 0;
 	private long contextID3 = 0;
 	private int level;
-	
+
+	/**
+	 * The length of a HID in binary format, as number of bytes
+	 */
 	public static final int HID_BYTE_LENGTH = 32;
 
 	Random rnd = new Random();
@@ -59,33 +62,33 @@ public class HID {
 	 * @param strHID
 	 *            The String representation of the HID to be created
 	 */
-	 public HID(String strHID) {
-	       String[] vectorHID = null;
-	       int level = 0; 
-	       vectorHID = strHID.split("\\.");
-	       long context;
-	       try {
-	           for (int i = 0; i < vectorHID.length & i < 4; i++) {
-	               context = Long.parseLong(vectorHID[i]);
-	               if (context != 0) {
-	                   level = 3 - i;
-	                   break;
-	               }
-	           }
-	           this.deviceID = Long.parseLong(vectorHID[3]);
-	           this.contextID1 = Long.parseLong(vectorHID[2]);
-	           this.contextID2 = Long.parseLong(vectorHID[1]);
-	           this.contextID3 = Long.parseLong(vectorHID[0]);
-	           this.level = level;
-	       } catch (Exception e) {
-	           this.deviceID = 0;
-	           this.contextID1 = 0;
-	           this.contextID2 = 0;
-	           this.contextID3 = 0;
-	           this.level = 0;
-	       }
-	   }
-	 
+	public HID(String strHID) {
+		String[] vectorHID = null;
+		int level = 0;
+		vectorHID = strHID.split("\\.");
+		long context;
+		try {
+			for (int i = 0; i < vectorHID.length & i < 4; i++) {
+				context = Long.parseLong(vectorHID[i]);
+				if (context != 0) {
+					level = 3 - i;
+					break;
+				}
+			}
+			this.deviceID = Long.parseLong(vectorHID[3]);
+			this.contextID1 = Long.parseLong(vectorHID[2]);
+			this.contextID2 = Long.parseLong(vectorHID[1]);
+			this.contextID3 = Long.parseLong(vectorHID[0]);
+			this.level = level;
+		} catch (Exception e) {
+			this.deviceID = 0;
+			this.contextID1 = 0;
+			this.contextID2 = 0;
+			this.contextID3 = 0;
+			this.level = 0;
+		}
+	}
+
 	/**
 	 * HID constructor. Creates an HID with a random deviceID and level = 0
 	 * 
@@ -112,7 +115,9 @@ public class HID {
 
 	/**
 	 * HID constructor. Constructs the HID from the given binary representation.
-	 * @param data the HID values, as a 32-byte array, as results from toBytes()
+	 * 
+	 * @param data
+	 *            the HID values, as a 32-byte array, as results from toBytes()
 	 */
 	public HID(byte[] data) {
 		if (data.length != HID_BYTE_LENGTH) {
@@ -126,7 +131,7 @@ public class HID {
 		this.contextID1 = buffer.getLong();
 		this.deviceID = buffer.getLong();
 	}
-	
+
 	/**
 	 * Sets the deviceID of the current HID
 	 * 
@@ -272,33 +277,31 @@ public class HID {
 	}
 
 	/**
-	 * Gets the context of the given level
-	 * TODO check whether this method is referenced anywhere
+	 * Gets the context of the given level TODO check whether this method is
+	 * referenced anywhere
 	 * 
 	 * @param level
 	 *            the level to get the context
 	 * @return the context of the given level
 	 */
-//	public Long getContext(int level) {
-//		switch (level) {
-//		case 1:
-//			return this.contextID1;
-//		case 2:
-//			return this.contextID2;
-//		case 3:
-//			return this.contextID3;
-//		default:
-//			return null;
-//		}
-//	}
-	
+	// public Long getContext(int level) {
+	// switch (level) {
+	// case 1:
+	// return this.contextID1;
+	// case 2:
+	// return this.contextID2;
+	// case 3:
+	// return this.contextID3;
+	// default:
+	// return null;
+	// }
+	// }
+
 	/**
-	 * Gets the HID in a binary representation:
-	 * * Bytes 0..7 contextID3
-	 * * Bytes 8..15 contextID2
-	 * * Bytes 16..23 contextID1
-	 * * Bytes 24..31 deviceID
-	 * @return the binary representation of the HID, as a byte[32]
+	 * Gets the HID in a binary representation: * Bytes 0..7 contextID3 * Bytes
+	 * 8..15 contextID2 * Bytes 16..23 contextID1 * Bytes 24..31 deviceID
+	 * 
+	 * @return the binary representation of the HID, as a byte[HID_BYTE_LENGTH]
 	 */
 	public byte[] getBytes() {
 		ByteBuffer buffer = ByteBuffer.allocate(HID_BYTE_LENGTH);
