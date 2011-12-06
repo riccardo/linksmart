@@ -76,7 +76,12 @@ public class HIDInfo {
 	 */
 	@Override
 	public String toString() {
-		return hid.toString() + ":" + getDescription();
+		StringBuilder sb = new StringBuilder();
+		sb.append(hid).append(": ");
+		for (Object attribute : attributes.values()){
+			sb.append(attribute).append(";");
+		}
+		return sb.toString();
 	}
 
 	/**
