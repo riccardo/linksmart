@@ -1,4 +1,4 @@
-package eu.linksmart.network.networkmanager.application.impl;
+package eu.linksmart.network.networkmanager.impl;
 
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -8,18 +8,18 @@ import org.apache.log4j.Logger;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
-import eu.linksmart.network.networkmanager.application.NetworkManagerApplication;
+import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 	
-	public class NetworkManagerApplicationImpl implements NetworkManagerApplication {
+	public class NetworkManagerImpl implements NetworkManager {
 		
 		private NetworkManagerCore core;
 		
 		private static final String CREATED_MESSAGE = "Creating Network Manager components";
 		
-		Logger LOG = Logger.getLogger(NetworkManagerApplicationImpl.class.getName());
+		Logger LOG = Logger.getLogger(NetworkManagerImpl.class.getName());
 		
-		public NetworkManagerApplicationImpl(){
+		public NetworkManagerImpl(){
 			LOG.info(CREATED_MESSAGE);
 		}
 	
