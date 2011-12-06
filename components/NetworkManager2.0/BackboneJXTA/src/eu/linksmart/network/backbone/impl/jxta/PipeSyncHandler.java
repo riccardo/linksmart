@@ -566,11 +566,11 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			 * it has received the status send it as a response using
 			 * sendMessageResponse(sessionID,source, dest, data)
 			 */
-			logger.debug("PipeSyncHandler - Receiving message.");
+			logger.info("PipeSyncHandler - Receiving message.");
 
 			try {
 				receiveData(source.toString(), dest.toString(),
-						ConvertStringToByteArray(data.toString()));
+						BackboneJXTAUtils.ConvertStringToByteArray(data.toString()));
 			} catch (RemoteException e) {
 				logger.error("Error calling receiveData " + e.getMessage());
 			}
@@ -619,15 +619,6 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		 */
 		public void stopThread() {
 			running = false;
-		}
-	}
-
-	private static byte[] ConvertStringToByteArray(String s) {
-		try {
-			return s.getBytes();
-		} catch (Exception e) {
-			logger.error("convertStringToByteArray with null string");
-			return new byte[0];
 		}
 	}
 

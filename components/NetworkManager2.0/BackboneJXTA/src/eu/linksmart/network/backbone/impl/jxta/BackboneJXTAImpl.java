@@ -73,7 +73,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
 
-	protected Hashtable<HID, RemoteEndpointInformation> listOfRemoteEndpoints;
+	protected Hashtable<HID, String> listOfRemoteEndpoints;
 
 	protected void activate(ComponentContext context) {
 		logger.info("**** Activating JXTA backbone!");
@@ -138,6 +138,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			logger.error("Wrong node mode format. Please choose between Node or SuperNode");
 		}
 
+		listOfRemoteEndpoints = new Hashtable<HID, String>();
+
 		startJXTA();
 
 		logger.info("**** JXTA Backbone started succesfully");
@@ -174,13 +176,13 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param message
 	 */
 	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data) {
-		// TODO implement this
-
 		NMResponse response = new NMResponse();
 
+		// add senderHID to data
+		byte[] payload = AddHIDToData(senderHID, data);
 		logger.info("Sending data over pipe to HID= " + receiverHID);
 		response = pipeSyncHandler.sendData(senderHID.toString(),
-				receiverHID.toString(), data, peerID);
+				receiverHID.toString(), payload, peerID);
 
 		return response;
 	}
@@ -192,9 +194,28 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param receiverHID
 	 * @param message
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data) {
-		// TODO implement this
-		return new NMResponse();
+	public NMResponse receiveData(HID senderHID, HID receiverHID,
+			byte[] receivedData) {
+		NMResponse response = new NMResponse();
+
+		logger.info("BBJXTA receiveData - senderHID: >>>"
+				+ senderHID.toString() + "<<<");
+		logger.info("BBJXTA receiveData - receiverHID: >>>"
+				+ receiverHID.toString() + "<<<");
+		logger.info("BBJXTA receiveData - received data: >>>"
+				+ receivedData.toString() + "<<<");
+
+		// give message to BBRouter for further processing
+		try {
+			response = bbRouter.receiveData(senderHID, receiverHID,
+					RemoveHIDFromData(receivedData), (Backbone) this);
+		} catch (Exception e) {
+			logger.error(
+					"BBJXTA could not give received message for processing to bbRouter",
+					e);
+		}
+
+		return response;
 	}
 
 	/**
@@ -205,13 +226,14 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @return
 	 */
 	public NMResponse broadcastData(HID senderHID, byte[] data) {
-		// TODO implement this
 		NMResponse response = new NMResponse();
+
+		byte[] payload = AddHIDToData(senderHID, data);
 
 		// send message as multicast message
 		synchronized (msocket) {
-			msocket.sendData(multicastSocket, new DatagramPacket(data,
-					data.length));
+			msocket.sendData(multicastSocket, new DatagramPacket(payload,
+					payload.length));
 		}
 		response.setData("Broadcast successful");
 
@@ -219,14 +241,16 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	}
 
 	/**
-	 * Return the destination address as string that will be used for display
-	 * purposes.
+	 * Return the destination JXTA address as string that will be used for
+	 * display purposes.
+	 * 
+	 * Returns "null" as string if no entry for the given HID could be found.
 	 * 
 	 * @param hid
 	 * @return the backbone address represented by the Hid
 	 */
 	public String getDestinationAddressAsString(HID hid) {
-		return "this is not a real address";
+		return listOfRemoteEndpoints.get(hid).toString();
 	}
 
 	/*
@@ -402,12 +426,21 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		netPGDiscoveryService.addDiscoveryListener(this);
 		peerID = netPeerGroup.getPeerID();
 
+		msocket = new MulticastSocket();
+		multicastSocket = msocket.createMulticastSocket(netPeerGroup);
+
+		listener = new MulticastSocketListener(multicastSocket, this);
+		listener.start();
+
 		/*
 		 * Add the listeners for the services in the LinkSmart group (discovery
 		 * and Rdv)
 		 */
 		myPGRdvService = netPeerGroup.getRendezVousService();
 		myPGRdvService.addListener(this);
+
+		pipeSyncHandler = new PipeSyncHandler(this);
+		socketHandler = new SocketHandler(this);
 
 		if (((String) configurator.getConfiguration().get(
 				BackboneJXTAConfigurator.MODE)).equals("SuperNode")) {
@@ -424,20 +457,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			}
 		}
 
-		// stuff coming from other places which needs to be checked if it is
-		// here in the right place
-
-		pipeSyncHandler = new PipeSyncHandler(this);
-		socketHandler = new SocketHandler(this);
-
-		listOfRemoteEndpoints = new Hashtable<HID, RemoteEndpointInformation>();
-
-		// end of stuff
-		msocket = new MulticastSocket();
-		multicastSocket = msocket.createMulticastSocket(netPeerGroup);
-
-		listener = new MulticastSocketListener(multicastSocket);
-		listener.start();
 	}
 
 	/**
@@ -531,7 +550,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 */
 	public void discoveryEvent(DiscoveryEvent event) {
 		DiscoveryResponseMsg response = event.getResponse();
-		logger.debug("Got a discovery response with "
+		logger.info("Got a discovery response with "
 				+ response.getResponseCount() + " elements from peer: "
 				+ event.getSource() + "\n");
 		NMadvertisement adv;
@@ -622,6 +641,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	public class MulticastSocketListener extends Thread {
 		JxtaMulticastSocket m;
 		boolean running;
+		BackboneJXTAImpl bbJXTA;
 
 		/**
 		 * Constructor
@@ -629,9 +649,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		 * @param m
 		 *            the JXTA multicast socket
 		 */
-		public MulticastSocketListener(JxtaMulticastSocket m) {
+		public MulticastSocketListener(JxtaMulticastSocket m,
+				BackboneJXTAImpl bbJXTA) {
 			this.running = true;
 			this.m = m;
+			this.bbJXTA = bbJXTA;
 		}
 
 		/**
@@ -653,19 +675,31 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 									+ m.toString(), e2);
 				}
 
-				SocketAddress socketAddress = receivedData.getSocketAddress();
-				InetAddress senderIP = receivedData.getAddress();
-				int senderPort = receivedData.getPort();
+				logger.info("MulticastListener data: >>>"
+						+ BackboneJXTAUtils.ConvertByteArrayToString(receivedData.getData()) + "<<<");
+
+				String senderJXTAID = receivedData.getAddress().getHostName();
+
+				logger.info("MulticastListener senderJXTAID: >>>"
+						+ senderJXTAID + "<<<");
 
 				HID senderHID = GetHIDFromData(receivedData.getData());
+				logger.info("MulticastListener senderHID: >>>" + senderHID
+						+ "<<<");
+
 				// give message to BBRouter for further processing
-				bbRouter.receiveData(senderHID, null,
-						RemoveHIDFromData(receivedData.getData()),
-						(Backbone) this);
-				// add info to table of HID-Endpoint
-				RemoteEndpointInformation endpoint = new RemoteEndpointInformation(
-						socketAddress, senderIP, senderPort);
-				listOfRemoteEndpoints.put(senderHID, endpoint);
+				try {
+					bbRouter.receiveData(senderHID, null,
+							RemoveHIDFromData(receivedData.getData()),
+							(Backbone) bbJXTA);
+				} catch (Exception e) {
+					logger.error(
+							"BBJXTA could not give received multicast message for processing to bbRouter",
+							e);
+				}
+
+				// add info to table of HID-Endpoints
+				listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 			}
 		}
 
@@ -678,7 +712,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		}
 	}
 
-	private static final String HID_DELIMITER = "##";
+	private static final String HID_DELIMITER = "#@#";
 
 	/**
 	 * Adds an HID to the data package so that the next JXTA backbone can get it
@@ -690,8 +724,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @return
 	 */
 	private static byte[] AddHIDToData(HID aHID, byte[] origData) {
-		String ret = aHID.toString() + HID_DELIMITER + origData.toString();
-		return ret.getBytes();
+		String ret = aHID.toString() + HID_DELIMITER + BackboneJXTAUtils.ConvertByteArrayToString(origData);
+		return BackboneJXTAUtils.ConvertStringToByteArray(ret);
 	}
 
 	/**
@@ -700,10 +734,14 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param origData
 	 * @return The HID from the sender.
 	 */
-	private static HID GetHIDFromData(byte[] origData) {
-		String dataAsString = origData.toString();
+	private HID GetHIDFromData(byte[] origData) {
+		String dataAsString = BackboneJXTAUtils.ConvertByteArrayToString(origData);
+		logger.info("GetHIDFromData: >>>" + dataAsString + "<<<");
 		int posHidDelimiter = dataAsString.indexOf(HID_DELIMITER);
-		String hidAsString = dataAsString.substring(0, posHidDelimiter);
+		String hidAsString = "0.0.0.0";
+		if (posHidDelimiter > 0) {
+			hidAsString = dataAsString.substring(0, posHidDelimiter);
+		}
 		return new HID(hidAsString);
 	}
 
@@ -715,50 +753,56 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @return The original payload of the data package.
 	 */
 	private static byte[] RemoveHIDFromData(byte[] origData) {
-		String dataAsString = origData.toString();
+		String dataAsString = BackboneJXTAUtils.ConvertByteArrayToString(origData);
+		String dataWithoutHidAsString;
 		int posHidDelimiter = dataAsString.indexOf(HID_DELIMITER);
-		String dataWithoutHidAsString = dataAsString.substring(
-				posHidDelimiter + 1, dataAsString.length());
-		return dataWithoutHidAsString.getBytes();
+		if (posHidDelimiter > 0) {
+			dataWithoutHidAsString = dataAsString.substring(
+					posHidDelimiter + 1, dataAsString.length());
+		} else {
+			// in case of error just return the original string
+			dataWithoutHidAsString = dataAsString;
+		}
+		return BackboneJXTAUtils.ConvertStringToByteArray(dataWithoutHidAsString);
 	}
 
-	private class RemoteEndpointInformation {
-		protected SocketAddress socketAddress;
-		protected InetAddress senderIP;
-		protected int senderPort;
-
-		public RemoteEndpointInformation(SocketAddress socketAddress,
-				InetAddress senderIP, int senderPort) {
-			super();
-			this.socketAddress = socketAddress;
-			this.senderIP = senderIP;
-			this.senderPort = senderPort;
-		}
-
-		public SocketAddress getSocketAddress() {
-			return socketAddress;
-		}
-
-		public void setSocketAddress(SocketAddress socketAddress) {
-			this.socketAddress = socketAddress;
-		}
-
-		public InetAddress getSenderIP() {
-			return senderIP;
-		}
-
-		public void setSenderIP(InetAddress senderIP) {
-			this.senderIP = senderIP;
-		}
-
-		public int getSenderPort() {
-			return senderPort;
-		}
-
-		public void setSenderPort(int senderPort) {
-			this.senderPort = senderPort;
-		}
-
-	}
+	// private class RemoteEndpointInformation {
+	// protected String jxtaID;
+	// protected InetAddress senderIP;
+	// protected int senderPort;
+	//
+	// public RemoteEndpointInformation(SocketAddress socketAddress,
+	// InetAddress senderIP, int senderPort) {
+	// super();
+	// this.socketAddress = socketAddress;
+	// this.senderIP = senderIP;
+	// this.senderPort = senderPort;
+	// }
+	//
+	// public SocketAddress getSocketAddress() {
+	// return socketAddress;
+	// }
+	//
+	// public void setSocketAddress(SocketAddress socketAddress) {
+	// this.socketAddress = socketAddress;
+	// }
+	//
+	// public InetAddress getSenderIP() {
+	// return senderIP;
+	// }
+	//
+	// public void setSenderIP(InetAddress senderIP) {
+	// this.senderIP = senderIP;
+	// }
+	//
+	// public int getSenderPort() {
+	// return senderPort;
+	// }
+	//
+	// public void setSenderPort(int senderPort) {
+	// this.senderPort = senderPort;
+	// }
+	//
+	// }
 
 }
