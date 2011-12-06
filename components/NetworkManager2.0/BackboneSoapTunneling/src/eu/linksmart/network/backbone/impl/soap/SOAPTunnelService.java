@@ -35,7 +35,7 @@
  * Interface for SOAP tunnels
  */
 
-package eu.linksmart.network.backbone.impl.soaptunneling;
+package eu.linksmart.network.backbone.impl.soap;
 
 import eu.linksmart.network.NMResponse;
 

@@ -35,7 +35,7 @@
  * An implementation of SOAP Tunnel over TCP
  */
 
-package eu.linksmart.network.backbone.impl.soaptunneling;
+package eu.linksmart.network.backbone.impl.soap;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

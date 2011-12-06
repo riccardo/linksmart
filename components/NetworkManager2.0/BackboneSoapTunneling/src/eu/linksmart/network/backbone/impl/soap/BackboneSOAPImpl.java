@@ -1,46 +1,29 @@
-package eu.linksmart.network.backbone.impl.soaptunneling;
+package eu.linksmart.network.backbone.impl.soap;
+
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
-
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
+import org.osgi.service.http.HttpService;
 
 import eu.linksmart.network.HID;
-import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
-import org.osgi.service.http.HttpService;
 /*
  * TODO #NM refactoring
  */
-public class BackboneSoapTunnelingImpl implements Backbone {
+public class BackboneSOAPImpl implements Backbone {
 	
-	private static String BACKBONE_SOAPTUNNEL = BackboneSoapTunnelingImpl.class.getSimpleName();
-	private HashMap<HID, URL> hidUrlMap;
-	private HttpService http;
-	private static Logger logger = Logger.getLogger(BackboneSoapTunnelingImpl.class.getName());
+	private static String BACKBONE_SOAP = BackboneSOAPImpl.class.getSimpleName();
+//TODO private HashMap<HID, URL> hidUrlMap;
+	private static Logger LOG = Logger.getLogger(BackboneSOAPImpl.class.getName());
 	
 	protected void activate(ComponentContext context) {
-		System.out.println(BACKBONE_SOAPTUNNEL + "started");		
-		hidUrlMap = new HashMap<HID, URL>();
-		
-		http = (HttpService) context.locateService("HttpService");
-		String httpPort = System.getProperty("org.osgi.service.http.port");
-
-		try {
-			http.registerServlet("/SOAPTunneling", 
-					new SOAPTunnelServlet(this), null, null);
-		} catch (Exception e) {
-			logger.error("Error registering servlets", e);
-		}
-		
+		LOG.info(BACKBONE_SOAP + "started");		
 	}
 
 	protected void deactivate(ComponentContext context) {
-		System.out.println(BACKBONE_SOAPTUNNEL + "stopped");
+		System.out.println(BACKBONE_SOAP + "stopped");
 	}
 
 	
@@ -92,6 +75,12 @@ public class BackboneSoapTunnelingImpl implements Backbone {
 	 */
 	public String getDestinationAddressAsString(HID hid){
 		return null;
+	}
+
+	@Override
+	public void applyConfigurations(Hashtable updates) {
+		// TODO Auto-generated method stub
+		
 	} 
 		
 }
