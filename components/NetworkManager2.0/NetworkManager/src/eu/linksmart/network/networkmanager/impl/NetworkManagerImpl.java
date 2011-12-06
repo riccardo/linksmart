@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
@@ -51,5 +52,15 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 		public HID createHID(Properties attributes, URL url)
 				throws RemoteException {
 			return this.core.createHID(attributes, url);
+		}
+
+		@Override
+		public HIDInfo createCryptoHID(String xmlAttributes) {
+			return this.core.createCryptoHID(xmlAttributes);
+		}
+
+		@Override
+		public HIDInfo createCryptoHIDFromReference(String certRef) {
+			return this.core.createCryptoHIDFromReference(certRef);
 		}
 }

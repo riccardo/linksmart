@@ -1,5 +1,6 @@
 package eu.linksmart.network.networkmanager.core.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -15,6 +16,7 @@ import org.osgi.service.http.HttpService;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDAttribute;
+import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.MessageProcessor;
@@ -26,6 +28,7 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.network.service.registry.ServiceRegistry;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
+import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.tools.GetNetworkManagerStatus;
 import eu.linksmart.tools.NetworkManagerApplicationStatus;
 
@@ -39,6 +42,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	protected BackboneRouter backboneRouter;
 
 	protected ConnectionManager connectionManager;
+
+	protected CryptoManager cryptoManager;
 
 	private ServiceRegistry serviceRegistry;
 
@@ -86,7 +91,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		Properties attributes = new Properties();
 		attributes.setProperty(HIDAttribute.DESCRIPTION.name(),
 				this.myDescription);
-		this.myHID = this.identityManager.createHID(attributes);
+		this.myHID = this.identityManager.createHIDForAttributes(attributes);
 
 		// Init Servlets
 
@@ -113,7 +118,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	@Override
 	public HID createHID(Properties attributes, URL url) throws RemoteException {
 
-		HID newHID = this.identityManager.createHID(attributes);
+		HID newHID = this.identityManager.createHIDForAttributes(attributes);
 
 		this.serviceRegistry.registerService(newHID, url);
 
@@ -133,11 +138,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	@Override
 	public Boolean removeHID(HID hid) throws RemoteException {
 
-		Boolean serviceRemoved = this.serviceRegistry.removeService(hid);
+		// TODO Check if have some kind of service registry and need to remove a
+		// service there as well
 
 		Boolean hidRemoved = this.identityManager.removeHID(hid);
 
-		return (serviceRemoved && hidRemoved);
+		return hidRemoved;
 	}
 
 	protected void deactivate(ComponentContext context) {
@@ -170,6 +176,14 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 
 	protected void unbindBackboneRouter(BackboneRouter backboneRouter) {
 		this.backboneRouter = null;
+	}
+
+	protected void bindCryptoManager(CryptoManager cryptoManager) {
+		this.cryptoManager = cryptoManager;
+	}
+
+	protected void unbindCryptoManager(CryptoManager cryptoManager) {
+		this.cryptoManager = null;
 	}
 
 	@Override
@@ -262,7 +276,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 
 		Properties attributes = this.connectionManager.getHIDAttributes(data);
 
-		HID newHID = this.identityManager.createHID(attributes);
+		HID newHID = this.identityManager.createHIDForAttributes(attributes);
 
 		return newHID;
 	}
@@ -321,6 +335,82 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	 */
 	protected void setConnectionTimeout(int timeout) {
 		this.connectionManager.setConnectionTimeout(timeout);
+	}
+
+	/**
+	 * Operation to create an crypto HID providing the persistent attributes for
+	 * this HID and the endpoint of the service behind it (for service
+	 * invocation). The crypto HID is the enhanced version of HIDs, that allow
+	 * to store persistent information on them (through certificates) and
+	 * doesn't propagate the information stored on it. In order to exchange the
+	 * stored information, the Session Domain Protocol is used. It returns a
+	 * certificate reference that point to the certificate generated. The next
+	 * time the HID needs to be created, using the same attributes, the
+	 * certificate reference can be used.
+	 * 
+	 * @param xmlAttributes
+	 *            The attributes (persistent) associated with this HID. This
+	 *            attributes are stored inside the certificate and follow the
+	 *            Java {@link java.util.Properties} xml schema.
+	 * @param endpoint
+	 *            The endpoint of the service (if there is a service behind).
+	 * @return A {@link eu.linksmart.network.ws.CrypyoHIDResult} containing
+	 *         {@link String} representation of the HID and the certificate
+	 *         reference (UUID)
+	 */
+	public HIDInfo createCryptoHID(String xmlAttributes) {
+		HID hid = null;
+		Properties attributes = new Properties();
+		try {
+			attributes.loadFromXML(new ByteArrayInputStream(xmlAttributes
+					.getBytes()));
+
+			hid = identityManager.createHIDForAttributes(attributes);
+
+			// Provide the attributes and the hid to generate the certificate
+			String certRef = cryptoManager.generateCertificateWithAttributes(
+					xmlAttributes, hid.toString());
+
+			// Add the Certificate Reference to the HID Attributes
+			attributes.put(HIDAttribute.CERT_REF.name(), certRef);
+			identityManager.updateHIDInfo(hid, attributes);
+		} catch (Exception e) {
+			LOG.error("Unable to create CryptoHID.", e);
+		}
+		return identityManager.getHIDInfo(hid);
+	}
+
+	/**
+	 * Operation to create an crypto HID providing a certificate reference (from
+	 * a previously created cryptoHID) and an endpoint The crypto HID is the
+	 * enhanced version of HIDs, that allow to store persistent information on
+	 * them (through certificates)
+	 * 
+	 * @param certRef
+	 *            The certificate reference from a previously generated
+	 *            cryptoHID.
+	 * @param endpoint
+	 *            The endpoint of the service (if there is a service behind).
+	 * @return The {@link String} representation of the HID.
+	 */
+	public HIDInfo createCryptoHIDFromReference(String certRef) {
+		HID hid = null;
+		try {
+			Properties attributes = cryptoManager
+					.getAttributesFromCertificate(certRef);
+			if (attributes.size() != 0) {
+				hid = identityManager.createHIDForAttributes(attributes);
+				cryptoManager.addPrivateKeyForHID(hid.toString(), certRef);
+				cryptoManager.addCertificateForHID(hid.toString(), certRef);
+				return identityManager.getHIDInfo(hid);
+			} else {
+				LOG.warn("Certificate reference does not exist!");
+				return null;
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+		}
+		return null;
 	}
 
 }

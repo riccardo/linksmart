@@ -46,7 +46,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
@@ -57,7 +56,7 @@ import eu.linksmart.network.service.registry.ServiceRegistry;
  * NetworkManagerStatus Servlet
  */
 public class GetNetworkManagerStatus extends HttpServlet {
-	
+
 	Logger LOG = Logger.getLogger(GetNetworkManagerStatus.class.getName());
 
 	IdentityManager identityManager;
@@ -106,13 +105,10 @@ public class GetNetworkManagerStatus extends HttpServlet {
 				processHIDs(hids, response, null);
 			} else if (method.equals("getLocalHids")) {
 				Set<HIDInfo> hids = identityManager.getLocalHIDs();
-				// TODO Remove:
-				hids.add(new HIDInfo(new HID(), "LocalTestHID"));
+				LOG.debug("Size of LocalHIDs: " + hids.size());
 				processHIDs(hids, response, null);
 			} else if (method.equals("getRemoteHids")) {
 				Set<HIDInfo> hids = identityManager.getRemoteHIDs();
-				// TODO Remove:
-				hids.add(new HIDInfo(new HID(), "RemoteTestHID"));
 				processHIDs(hids, response,
 						"HID entity not adapted to security issues");
 			} else if (method.equals("getNetworkManagerSearch")) {
@@ -128,53 +124,32 @@ public class GetNetworkManagerStatus extends HttpServlet {
 			String defaultDescription) {
 
 		Iterator<HIDInfo> it = hids.iterator();
-		String endpoint;
-		String description = "";
-		String host;
-
+		
 		while (it.hasNext()) {
 			HIDInfo hidInfo = it.next();
-
-//				TODO Check endpoint
-//				endpoint = serviceRegistry.getServiceURL(hidInfo.getHID()).toString();
-				description = hidInfo.getDescription();
-				if (description.equals("")) {
-					if (defaultDescription != null) {
-						description = defaultDescription;
-					} else {
-						description = "";
-						HIDInfo nmInfo = identityManager
-								.getHIDInfo(networkManagerCore.getHID());
-
-						Properties attr = nmInfo.getAttributes();
-						Enumeration<Object> en = attr.keys();
-						while (en.hasMoreElements()) {
-							String key = (String) en.nextElement();
-							if (key.equals("CN") || key.equals("DN")
-									|| key.equals("C")
-									|| key.equals("Pseudonym")) {
-								continue;
-							}
-							String value = attr.getProperty(key);
-							description = description + key + " = " + value
-									+ ";";
-						}
-					}
+			
+			// Create the description from all Attributes
+			String description = "";
+			Properties attr = hidInfo.getAttributes();
+			Enumeration<Object> en = attr.keys();
+			while (en.hasMoreElements()) {
+				String key = (String) en.nextElement();
+				String value = attr.getProperty(key);
+				description = description + key + " = " + value + ";";
+			}
+			
+			// Here we print one row
+			try {
+				response.getWriter().write(
+						hidInfo.getHID().toString() + "|" + description + "|"
+								+ "TODO: Host" + "|" + "TODO: Endpoint");
+				if (it.hasNext()) {
+					response.getWriter().write("<br>");
 				}
-				
-//				TODO Check route
-//				host = this.backboneRouter.getRoute(hidInfo.getHID());
-				try {
-					response.getWriter().write(
-							hidInfo.getHID().toString() + "|" + description + "|"
-									+ "TODO: Host" + "|" + "TODO: Endpoint");
-					if (it.hasNext()) {
-						response.getWriter().write("<br>");
-					}
-				} catch (IOException e) {
-					LOG.error("Unable to produce HTML. ", e);
-				}
-				
+			} catch (IOException e) {
+				LOG.error("Unable to produce HTML. ", e);
+			}
+
 		}
 	}
 
