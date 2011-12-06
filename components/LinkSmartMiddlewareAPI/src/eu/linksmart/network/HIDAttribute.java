@@ -5,5 +5,5 @@ package eu.linksmart.network;
  *
  */
 public enum HIDAttribute {
-	PID, SID, DESCRIPTION
+	PID, SID, DESCRIPTION, CERT_REF
 }
