@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
@@ -105,9 +106,13 @@ public class GetNetworkManagerStatus extends HttpServlet {
 				processHIDs(hids, response, null);
 			} else if (method.equals("getLocalHids")) {
 				Set<HIDInfo> hids = identityManager.getLocalHIDs();
+				// TODO Remove:
+				hids.add(new HIDInfo(new HID(), "LocalTestHID"));
 				processHIDs(hids, response, null);
 			} else if (method.equals("getRemoteHids")) {
 				Set<HIDInfo> hids = identityManager.getRemoteHIDs();
+				// TODO Remove:
+				hids.add(new HIDInfo(new HID(), "RemoteTestHID"));
 				processHIDs(hids, response,
 						"HID entity not adapted to security issues");
 			} else if (method.equals("getNetworkManagerSearch")) {
