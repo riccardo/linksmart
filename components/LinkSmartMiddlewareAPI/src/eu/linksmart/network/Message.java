@@ -8,11 +8,11 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * An OO representation of a message received over
- * the network. This class is used for internal processing
- * by the modules of NetworkManagerCore.
+ * An OO representation of a message received over the network. This class is
+ * used for internal processing by the modules of NetworkManagerCore.
+ * 
  * @author Vinkovits
- *
+ * 
  */
 public class Message {
 
@@ -21,67 +21,83 @@ public class Message {
 	private byte[] data = null;
 	private HID senderHID = null;
 	private HID receiverHID = null;
-	
-	public Message(String topic, HID senderHID, HID receiverHID, byte[] data){
-		if(StringUtils.isEmpty(topic) || senderHID == null || data == null || data.length == 0)
-			throw new IllegalArgumentException("Message cannot have null for required fields");
+
+	public Message(String topic, HID senderHID, HID receiverHID, byte[] data) {
+		if (StringUtils.isEmpty(topic) || senderHID == null || data == null
+				|| data.length == 0)
+			throw new IllegalArgumentException(
+					"Message cannot have null for required fields");
 		this.topic = topic;
 		this.senderHID = senderHID;
 		this.receiverHID = receiverHID;
 		this.data = data;
 	}
-	
+
 	/**
-	 * Sets a property of the message which will be included in
-	 * the data to be sent.
-	 * @param key Key to the property
-	 * @param value Value of the property in a 
-	 * serialized way in which it can be sent over network
+	 * Sets a property of the message which will be included in the data to be
+	 * sent.
+	 * 
+	 * @param key
+	 *            Key to the property
+	 * @param value
+	 *            Value of the property in a serialized way in which it can be
+	 *            sent over network
 	 * @return The previous value of the property or null if there was none
 	 */
-	public String setProperty(String key, String value){
-		return (String)properties.setProperty(key, value);
+	public String setProperty(String key, String value) {
+		return (String) properties.setProperty(key, value);
 	}
-	
+
 	/**
 	 * Returns actual value of property.
-	 * @param key Key of the property
+	 * 
+	 * @param key
+	 *            Key of the property
 	 * @return Value of the property
 	 */
-	public String getProperty(String key){
+	public String getProperty(String key) {
 		return properties.getProperty(key);
 	}
-	
+
 	/**
 	 * Returns the properties saved in the message
+	 * 
 	 * @return Set with the keys
 	 */
-	public Set<String> getKeySet(){
+	public Set<String> getKeySet() {
 		Set<String> stringSet = new HashSet<String>();
 		Iterator<Object> i = properties.keySet().iterator();
-		while(i.hasNext()){
-			stringSet.add((String)i.next());
+		while (i.hasNext()) {
+			stringSet.add((String) i.next());
 		}
 		return stringSet;
 	}
-	
-	public String getTopic(){
+
+	public String getTopic() {
 		return this.topic;
 	}
-	
-	public HID getSenderHID(){
+
+	public HID getSenderHID() {
 		return senderHID;
 	}
-	
-	public HID getReceiverHID(){
+
+	public HID getReceiverHID() {
 		return receiverHID;
 	}
-	
-	public byte[] getData(){
+
+	public byte[] getData() {
 		return data;
 	}
 
 	public void setData(byte[] data) {
 		this.data = data;
+	}
+
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("Topic: ").append(getTopic()).append(", Sender: ").append(
+				getSenderHID()).append(", Receiver: ").append(getReceiverHID())
+				.append(new String(data));
+		return sb.toString();
 	}
 }
