@@ -151,6 +151,14 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 * The master key id for this two entities
 	 */
 	private String masterKeyId;
+	/**
+	 * Increasing counter of the client messages for reorder protection
+	 */
+	private double localCounter = 0;
+	/**
+	 * Increasing counter of the server messages for reorder protection
+	 */
+	private double remoteCounter = 0;
 
 	public SecurityProtocolImpl(HID clientHID,
 			HID serverHID,
@@ -286,13 +294,17 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		rootElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:linksmart", INSIDE_SIGNED_MESSAGE_NAMESPACE);
 		//create content element
 		Element protectedElement = document.createElementNS(INSIDE_SECURITY_NAMESPACE, INSIDE_PROTECTED_ELEMENT);
-
+		//increasing counter starting from 0
+		Element counterElement = document.createElementNS(INSIDE_SECURITY_NAMESPACE, INSIDE_COUNTER_ELEMENT);
+		counterElement.appendChild(document.createTextNode(String.valueOf(localCounter)));
+		localCounter++;
 		//Do the encryption
 		//element to later encrypt
 		Element contentElement = document.createElementNS(INSIDE_SECURITY_NAMESPACE, INSIDE_CONTENT_ELEMENT);
 		contentElement.appendChild(document.createTextNode(new String(msg.getData())));
 		//append elements to root
 		protectedElement.appendChild(contentElement);
+		protectedElement.appendChild(counterElement);
 		rootElement.appendChild(protectedElement);
 		document.appendChild(rootElement);
 
@@ -320,7 +332,6 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		// Create an XML Signature object from the document, BaseURI and given
 		// signature algorithm
 		XMLSignature sig = new XMLSignature(document, BaseURI, XMLSIGNATURE_MAC_ALGORITHM);
-
 		// Append the signature element to the root element before signing
 		// to envelope the signature by the doc.
 		rootElement.appendChild(sig.getElement());
@@ -392,6 +403,14 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		// document.
 		xmlCipher.doFinal(document, encryptedDataElement);
 
+		// check the counter
+		String counter = document.getElementsByTagName(INSIDE_COUNTER_ELEMENT).item(0).getTextContent();
+		double receivedCounter = Double.parseDouble(counter);
+		if (receivedCounter < remoteCounter) {
+			throw new VerificationFailureException("Message is an older message and is not accepted");
+		}
+		remoteCounter = receivedCounter + 1;
+		
 		String result = document.getElementsByTagName(INSIDE_CONTENT_ELEMENT).item(0).getTextContent();
 		msg.setData(result.getBytes());
 		return msg;
@@ -448,30 +467,57 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		return command;
 	}
 
+	/**
+	 * 
+	 * @return The CryptoManager
+	 */
 	protected CryptoManager getCryptoMgr() {
 		return cryptoMgr;
 	}
 
+	/**
+	 * 
+	 * @return The TrustManager
+	 */
 	protected TrustManager getTrustMgr() {
 		return trustMgr;
 	}
 
+	/**
+	 * 
+	 * @return The client of the protocol run
+	 */
 	protected HID getClientHID() {
 		return clientHID;
 	}
 
+	/**
+	 * 
+	 * @return The server of the protocol run
+	 */
 	protected HID getServerHID() {
 		return serverHID;
 	}
 
+	/**
+	 * 
+	 * @return Trust threshold to accept certificates
+	 */
 	protected double getTrustThreshold() {
 		return trustThreshold;
 	}
 
+	/**
+	 * 
+	 * @return The nonce generator used
+	 */
 	protected NonceGenerator getNonceGenerator() {
 		return nonceGenerator;
 	}
 
+	/**
+	 * Sets the handshake as finished
+	 */
 	protected void setInitialized(){
 		isInitialized = true;
 	}

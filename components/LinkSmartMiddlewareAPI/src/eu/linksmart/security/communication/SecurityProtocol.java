@@ -20,7 +20,7 @@ public interface SecurityProtocol {
 	public static final String INSIDE_SIGNED_MESSAGE_NAMESPACE = "http://linksmart.eu/ns/security/inside_sig";
 	public static final String INSIDE_PROTECTED_MESSAGE_NAME = "linksmart:InsideProtectedMessage";
 	public static final String INSIDE_SIGNED_MESSAGE_NAME = "linksmart:InsideSignedProtectedMessage";
-	public static final String INSIDE_NONCE_ELEMENT = "linksmart:InsideNonce";
+	public static final String INSIDE_COUNTER_ELEMENT = "linksmart:InsideCounter";
 	public static final String INSIDE_CONTENT_ELEMENT = "linksmart:InsideContent";
 	public static final String INSIDE_PROTECTED_ELEMENT = "linksmart:InsideProtected";
 	

@@ -22,30 +22,31 @@ import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.utils.Base64;
 
 /**
- * Establishes symmetric keys from a master symmetric key
+ * Establishes symmetric keys from a master symmetric key.
  * @author Vinkovits
  *
  */
 public class SymHandshake {
 
 	/**
-	 * The Log4j logger of this class
+	 * The Log4j logger of this class.
 	 */
-	private static Logger logger = Logger.getLogger(SecurityProtocolImpl.class);
+	private static Logger logger =
+		Logger.getLogger(SecurityProtocolImpl.class);
 	/**
 	 * The owner of this handshake object
 	 */
-	SecurityProtocolImpl secProtocol = null;
+	private SecurityProtocolImpl secProtocol = null;
 	/**
-	 * States of the handshake protocol
+	 * States of the handshake protocol.
 	 */
 	private Properties properties = new Properties();
 	/**
-	 * Identifier of master key
+	 * Identifier of master key.
 	 */
 	private String masterKeyId;
 	/**
-	 * Indicates for the server that it already sent the auth token
+	 * Indicates for the server that it already sent the auth token.
 	 */
 	private boolean sentServerAuth = false;
 
@@ -54,9 +55,9 @@ public class SymHandshake {
 	}
 
 	/**
-	 * Behaves as it were the startProtocol method of {@SecurityProtocol}
+	 * Behaves as it were the startProtocol method of {@SecurityProtocol}.
 	 * @return First Message to send
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public Message startProtocol() throws IOException {
 		logger.debug("Sending client nonce");
@@ -67,8 +68,10 @@ public class SymHandshake {
 		//create client hello message
 		Command cmd = new Command(Command.CLIENT_HELLO);
 		cmd.setProperty(Command.CLIENT_NONCE, nonce);
-		cmd.setProperty(Command.CLIENT, secProtocol.getClientHID().toString());
-		cmd.setProperty(Command.SERVER, secProtocol.getServerHID().toString());
+		cmd.setProperty(Command.CLIENT, secProtocol.getClientHID()
+				.toString());
+		cmd.setProperty(Command.SERVER, secProtocol.getServerHID()
+				.toString());
 
 		Message message = SecurityProtocolImpl.createMessage(
 				CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
@@ -86,7 +89,7 @@ public class SymHandshake {
 		//get message content
 		Command command = SecurityProtocolImpl.getCommand(msg);
 		//check whether this is the correct party
-		if(!command.get(Command.CLIENT).equals(clientHID.toString()) 
+		if(!command.get(Command.CLIENT).equals(clientHID.toString())
 				|| !command.get(Command.SERVER).equals(serverHID.toString())){
 			throw new VerificationFailureException("Not appropriate sender or receiver of handshake");
 		}
@@ -106,7 +109,7 @@ public class SymHandshake {
 					logger.debug("Received server authToken: " + authToken);
 					//recalculate mac to check
 					Key serverMacKey = secProtocol.getRemoteMacKey();
-					Mac authMac = Mac.getInstance(SecurityProtocolImpl.MAC_ALGORITHM);		
+					Mac authMac = Mac.getInstance(SecurityProtocolImpl.MAC_ALGORITHM);
 					authMac.init(serverMacKey);
 					String checkAuth = getAuthenticationToken(authMac);
 
@@ -148,13 +151,13 @@ public class SymHandshake {
 						logger.debug("Received authentication token is not valid from HID: " + serverHID.toString());
 						throw new VerificationFailureException("Authentication token not valid");
 					}
-				}catch(NoSuchAlgorithmException e){
+				} catch (NoSuchAlgorithmException e) {
 					logger.error("Error getting MAC algorithm.", e);
 				}
 			} else {
 				logger.debug("Cannot interpret message from server HID: " + serverHID.toString());
 			}
-		}else{
+		} else {
 			if(!sentServerAuth && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_HELLO){
 				logger.debug("Creating server side session keys and auth token");
 				//this is the server who received a request for session keys
@@ -165,8 +168,8 @@ public class SymHandshake {
 				properties.setProperty(Command.SERVER_NONCE, serverNonce);
 				properties.setProperty(Command.CLIENT_NONCE, command.getProperty(Command.CLIENT_NONCE));
 				generateSessionKeys();
-				
-				//create auth token			
+
+				//create auth token
 				Key serverMacKey = secProtocol.getLocalMacKey();
 				try {
 					Mac authMac = null;
@@ -219,7 +222,7 @@ public class SymHandshake {
 						message = secProtocol.unprotectMessage(message);
 						return message;
 					}
-				}else{
+				} else {
 					logger.debug("Received authentication token is not valid from HID: " + clientHID.toString());
 					throw new VerificationFailureException("Authentication token not valid");
 				}
@@ -229,7 +232,7 @@ public class SymHandshake {
 	}
 
 	/**
-	 * Sets the client's nonce for the handshake
+	 * Sets the client's nonce for the handshake.
 	 * @param nonce
 	 */
 	protected void setClientNonce(String nonce){
@@ -237,7 +240,7 @@ public class SymHandshake {
 	}
 	
 	/**
-	 * Returs the client nonce stored in this handshake
+	 * Returs the client nonce stored in this handshake.
 	 * @return previously stored nonce
 	 */
 	protected String getClientNonce(){
@@ -264,32 +267,39 @@ public class SymHandshake {
 		HID clientHID = secProtocol.getClientHID();
 		HID serverHID = secProtocol.getServerHID();
 
-		String sessionKeyCreator = properties.getProperty(Command.CLIENT_NONCE) +
-		properties.getProperty(Command.SERVER_NONCE) + 
-		clientHID.toString() +
-		serverHID.toString();
+		String sessionKeyCreator = properties.getProperty(Command.CLIENT_NONCE)
+		+ properties.getProperty(Command.SERVER_NONCE)
+		+ clientHID.toString()
+		+ serverHID.toString();
 
 		try{
 		//create session keys
-		byte[] keys = cryptoMgr.calculateMac(masterKeyId, new String(sessionKeyCreator + "keys"), SecurityProtocolImpl.MAC_ALGORITHM);
+		byte[] keys = cryptoMgr.calculateMac(masterKeyId, new String(sessionKeyCreator + "keys"),
+				SecurityProtocolImpl.MAC_ALGORITHM);
 		byte[] server = BytesUtil.extractBytes(keys, 128, 0);
 		byte[] client = BytesUtil.extractBytes(keys, 128, 128);
 
-		byte[] server_temp = cryptoMgr.calculateMac(masterKeyId, new String(server), SecurityProtocolImpl.MAC_ALGORITHM);
-		byte[] server_enc = BytesUtil.extractBytes(server_temp, 128, 0);
-		byte[] server_mac = BytesUtil.extractBytes(server_temp, 128, 128);
+		byte[] serverTemp = cryptoMgr.calculateMac(masterKeyId, new String(server),
+				SecurityProtocolImpl.MAC_ALGORITHM);
+		byte[] serverEnc = BytesUtil.extractBytes(serverTemp, 128, 0);
+		byte[] serverMac = BytesUtil.extractBytes(serverTemp, 128, 128);
 
-		byte[] client_temp = cryptoMgr.calculateMac(masterKeyId, new String(client), SecurityProtocolImpl.MAC_ALGORITHM);
-		byte[] client_enc = BytesUtil.extractBytes(client_temp, 128,0);
-		byte[] client_mac = BytesUtil.extractBytes(client_temp, 128, 128);
+		byte[] clientTemp = cryptoMgr.calculateMac(masterKeyId, new String(client),
+				SecurityProtocolImpl.MAC_ALGORITHM);
+		byte[] clientEnc = BytesUtil.extractBytes(clientTemp, 128, 0);
+		byte[] clientMac = BytesUtil.extractBytes(clientTemp, 128, 128);
 
-		byte[] ivs = cryptoMgr.calculateMac(masterKeyId, new String(sessionKeyCreator + "ivs"), SecurityProtocolImpl.MAC_ALGORITHM);
-		byte[] server_iv = BytesUtil.extractBytes(keys, 128, 0);
-		byte[] client_iv = BytesUtil.extractBytes(keys, 128, 128);
+		//IVs for messages - not used at the moment
+//		byte[] ivs = cryptoMgr.calculateMac(masterKeyId, new String(sessionKeyCreator + "ivs"),
+//		SecurityProtocolImpl.MAC_ALGORITHM);
+//		byte[] server_iv = BytesUtil.extractBytes(ivs, 128, 0);
+//		byte[] client_iv = BytesUtil.extractBytes(ivs, 128, 128);
 
-		saveSessionKeys(client_enc, server_enc, client_mac, server_mac, client_iv, server_iv);
-		}catch(KeyStoreException ke){
-			logger.warn("Cannot find or load master key for HIDs: " + clientHID.toString() + "," + serverHID.toString());
+		saveSessionKeys(clientEnc, serverEnc, clientMac, serverMac, null, null);
+		} catch (KeyStoreException ke){
+			logger.warn("Cannot find or load master key for HIDs: "
+					+ clientHID.toString()
+					+ "," + serverHID.toString());
 		} catch (InvalidKeyException e) {
 			logger.error("Stored master key cannot be used for symmetric key generation for HIDs: "
 					+ clientHID.toString() + "," + serverHID.toString());
@@ -301,23 +311,23 @@ public class SymHandshake {
 
 	/**
 	 * Creates the token and calculates the MAC value which can
-	 * be sent as authentication to the other party
+	 * be sent as authentication to the other party.
 	 * @param mac The MAC object to be used for the generation
 	 * @return Token to be sent
 	 */
 	protected String getAuthenticationToken(Mac mac){
-		byte[] auth_token = mac.doFinal((properties.getProperty(Command.CLIENT_NONCE) +
-				properties.getProperty(Command.SERVER_NONCE) + 
-				secProtocol.getClientHID().toString() +
-				secProtocol.getServerHID().toString() +
-				"authentication")
+		byte[] authToken = mac.doFinal((properties.getProperty(Command.CLIENT_NONCE)
+				+ properties.getProperty(Command.SERVER_NONCE)
+				+ secProtocol.getClientHID().toString()
+				+ secProtocol.getServerHID().toString()
+				+ "authentication")
 				.getBytes());
-		return Base64.encodeBytes(auth_token);
+		return Base64.encodeBytes(authToken);
 	}
 	
 	/**
 	 * Sets the master key identifier from which session keys will
-	 * be generated
+	 * be generated.
 	 * @param identifier Certificate references XORed and Base64 encoded
 	 */
 	protected void setMasterKeyIdentifier(String identifier){
@@ -327,10 +337,10 @@ public class SymHandshake {
 	/**
 	 * Saves the session keys into the {@link SecurityProtocol} owner
 	 */
-	private void saveSessionKeys(byte[] clientEnc, byte[] serverEnc,byte[] clientMac,
+	private void saveSessionKeys(byte[] clientEnc, byte[] serverEnc, byte[] clientMac,
 			byte[] serverMac, byte[] clientIV, byte[] serverIV){
 		//save keys in security protocol object
-		if(secProtocol.isClient()){
+		if (secProtocol.isClient()) {
 			Key clientMacKey = new SecretKeySpec(clientMac, SecurityProtocolImpl.MAC_ALGORITHM);
 			secProtocol.setLocalMacKey(clientMacKey);
 			
