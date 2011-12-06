@@ -48,10 +48,10 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.clients.RemoteWSClientProvider;
-import eu.linksmart.network.CryptoHIDResult;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.networkmanager.application.NetworkManagerApplication;
+import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.security.trustmanager.TrustManager;
 import eu.linksmart.security.trustmanager.TrustManagerConfiguration;
 import eu.linksmart.security.trustmanager.trustmodel.TrustModel;
@@ -88,7 +88,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 	private ServiceRegistration trustModelConfigService = null;
 	private String trustManagerHID = null;
 	private boolean nmOsgi = false;
-	private NetworkManagerApplication nm = null;
+	private NetworkManager nm = null;
 	private RemoteWSClientProvider clientProvider;
 	private boolean createdHID;
 	private String nmAddress = null;
@@ -242,7 +242,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		LOG.debug("RemoteWSClientProvider unbound from TrustManager");
 	}
 	
-	protected void bindNM (NetworkManagerApplication netManager) {
+	protected void bindNetworkManager (NetworkManager netManager) {
 		this.nm = netManager;
 		nmOsgi = true;
 		if (activated) {
@@ -250,7 +250,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 			}
 	}
 	
-	protected void unbindNM (NetworkManagerApplication nm) {
+	protected void unbindNetworkManager (NetworkManager nm) {
 		if (activated) {
 			removeTrustManagerHID();
 			createdHID = false;
@@ -274,6 +274,8 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		//set up configurator for trust manager
 		configurator = new TrustManagerConfigurator(this, context);
 		configurator.registerConfiguration();
+		
+		createHIDForTrustManager(false);
 
 		this.activated = true;
 		LOG.debug("TrustManager activated");		
@@ -302,8 +304,8 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 						if ((configurator.get(TrustManagerConfigurator.CERTIFICATE_REF)==null) || renewCert == true) {
 							this.trustManagerHID = createCertificate();
 						}else {
-							this.trustManagerHID = nm.createCryptoHIDfromReference(configurator.get(TrustManagerConfigurator.CERTIFICATE_REF), 
-									"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH);
+							HIDInfo hidInfo = nm.createCryptoHIDFromReference(configurator.get(TrustManagerConfigurator.CERTIFICATE_REF));
+							this.trustManagerHID = hidInfo.getHID().toString();
 							if (this.trustManagerHID == null) {
 								//Certificate ref is not valid...
 								this.trustManagerHID = createCertificate();
@@ -322,16 +324,16 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 
 							if (nm == null) {
 								try {
-									this.nm = (NetworkManagerApplication)clientProvider.
-									getRemoteWSClient(NetworkManagerApplication.class.getName(), 
+									this.nm = (NetworkManager)clientProvider.
+									getRemoteWSClient(NetworkManager.class.getName(), 
 											(String)configurator.get(TrustManagerConfigurator.NETWORK_MANAGER_ADDRESS), false);
 								} catch (Exception e1) {
 									LOG.error("Error while creating client to NetworkManagerCore: " + e1.getMessage(), e1);
 								}
 							}
 							if (configurator.get(TrustManagerConfigurator.CERTIFICATE_REF)!=null) {
-								this.trustManagerHID = nm.createCryptoHIDfromReference(configurator.get(TrustManagerConfigurator.CERTIFICATE_REF), 
-										"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH);
+								HIDInfo hidInfo = nm.createCryptoHIDFromReference(configurator.get(TrustManagerConfigurator.CERTIFICATE_REF));
+								this.trustManagerHID = hidInfo.getHID().toString(); 
 								if (this.trustManagerHID == null) {
 									//Certificate ref is not valid...
 									this.trustManagerHID = createCertificate();
@@ -386,10 +388,10 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 			pid = "TrustManager:" + InetAddress.getLocalHost().getHostName();
 		}
 		String xmlAttributes = getXMLAttributeProperties(pid, "TrustManager", pid);
-		CryptoHIDResult result = nm.createCryptoHID(xmlAttributes, 
-				"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH);
-		configurator.setConfiguration(TrustManagerConfigurator.CERTIFICATE_REF, result.getCertRef());
-		return result.getHID();
+		HIDInfo hidInfo = nm.createCryptoHID(xmlAttributes);
+		String certRef = hidInfo.getAttributes().getProperty(HIDAttribute.CERT_REF.name()); 
+		configurator.setConfiguration(TrustManagerConfigurator.CERTIFICATE_REF, certRef);
+		return hidInfo.getHID().toString();
 	}
 	
 	public Class getTrustModelConfigurator(){

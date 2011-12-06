@@ -7,6 +7,6 @@
       <provide interface="eu.linksmart.security.trustmanager.TrustManager"/>
    </service>
    <reference bind="configurationBind" cardinality="0..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="dynamic" unbind="configurationUnbind"/>
-   <reference bind="bindNM" cardinality="0..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="dynamic" unbind="unbindNM"/>
+   <reference bind="bindNetworkManager" cardinality="1..1" interface="eu.linksmart.network.networkmanager.NetworkManager" name="NetworkManager" policy="static" unbind="unbindNetworkManager"/>
    
 </scr:component>
