@@ -38,7 +38,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	private NetworkManagerCore networkManagerCore;
 	// Time in milliseconds to wait between broadcasts
-	private int broadcastSleepMillis = 3000;
+	private int broadcastSleepMillis = 1000;
 
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting " + IDENTITY_MGR);
@@ -129,7 +129,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		boolean exactMatch = false;
 
 		if (description.contains("*")) { // the match means several strings to
-											// match, separated by *
+			// match, separated by *
 			toMatch = description.split("\\*");
 			exactMatch = false;
 		} else {
@@ -152,15 +152,15 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		Collection<HIDInfo> allDescriptions = localHIDs.values();
 		allDescriptions.addAll(remoteHIDs.values()); // because we are searching
-														// in ALL hids, local
-														// and remote
+		// in ALL hids, local
+		// and remote
 
 		String oneDescription;
 		for (int i = 0; i < toMatch.length; i++) { // when having an exact
-													// Match, length=1, so it
-													// will only be executed
-													// once, which is the
-													// desired behavior
+			// Match, length=1, so it
+			// will only be executed
+			// once, which is the
+			// desired behavior
 			for (Iterator<HIDInfo> it = allDescriptions.iterator(); it
 					.hasNext();) {
 				HIDInfo hidInfo = it.next();
@@ -168,10 +168,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					oneDescription = hidInfo.getDescription();
 					if ((!exactMatch && oneDescription.contains(toMatch[i]))
 							|| (exactMatch && oneDescription.equals(toMatch[i]))) { // the
-																					// match
-																					// criteria
-																					// is
-																					// satisfied
+						// match
+						// criteria
+						// is
+						// satisfied
 						// just pass to next round, this HIDInfo entry survives
 						continue;
 					} else {
@@ -188,10 +188,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 										.contains(toMatch[i]))
 										|| (exactMatch && oneDescription
 												.equals(toMatch[i]))) { // finally
-																		// we
-																		// have
-																		// a
-																		// match
+									// we
+									// have
+									// a
+									// match
 									// this HIDInfo entry is saved to the next
 									// round
 									continue;
@@ -224,7 +224,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		Set<Map.Entry<HID, HIDInfo>> allHIDs = localHIDs.entrySet();
 		allHIDs.addAll(remoteHIDs.entrySet()); // because we are checking ALL
-												// hids
+		// hids
 		Iterator<Map.Entry<HID, HIDInfo>> it = allHIDs.iterator();
 
 		while (it.hasNext()) {
@@ -249,9 +249,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		HIDInfo toUpdate = localHIDs.get(hid);
 		if (toUpdate != null) {
 			synchronized (queue) { // because we need to be sure that both
-									// deletion of old and insertion of new
-									// attributes are in the queue at the same
-									// time
+				// deletion of old and insertion of new
+				// attributes are in the queue at the same
+				// time
 				toUpdate.setAttributes(attr);
 				localHIDs.replace(hid, toUpdate);
 				queue.add("D;" + hid.toString());
@@ -319,7 +319,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	@Override
 	public boolean removeHID(HID hid) {
-		if (removeLocalHID(hid) != null || removeRemoteHID(hid) != null){
+		if (removeLocalHID(hid) != null || removeRemoteHID(hid) != null) {
 			return true;
 		}
 		return false;
@@ -362,15 +362,14 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * Removes a local HID from the IdTable
 	 * 
 	 * @param hid The HID to be removed
-	 * 
 	 */
 	private HIDInfo removeLocalHID(HID hid) {
-		if (localHIDs.containsKey(hid)){
+		if (localHIDs.containsKey(hid)) {
 			queue.add("D;" + hid.toString());
 		}
 		return localHIDs.remove(hid);
 	}
-	
+
 	/*
 	 * Removes a remote HID from the IdTable
 	 * 
@@ -410,14 +409,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		public void run() {
 			while (true) {
 				if (!queue.isEmpty()) {
-					
-					if (networkManagerCore != null) {
-						BroadcastMessage m = getHIDListUpdate();
-						networkManagerCore.broadcastMessage(m);
-					} else {
-						LOG
-								.warn("NetworkManagerCore not available! No Broadcast could be sent!");
-					}
+					BroadcastMessage m = getHIDListUpdate();
+					LOG.debug("Broadcasting Message: " + m);
+					networkManagerCore.broadcastMessage(m);
 				}
 				try {
 					Thread.sleep(broadcastSleepMillis);
