@@ -33,6 +33,7 @@
 
 package eu.linksmart.network;
 
+import java.nio.ByteBuffer;
 import java.util.Random;
 
 /**
@@ -107,6 +108,23 @@ public class HID {
 		this.level = oldHID.level;
 	}
 
+	/**
+	 * HID constructor. Constructs the HID from the given binary representation.
+	 * @param data the HID values, as a 32-byte array, as results from toBytes()
+	 */
+	public HID(byte[] data) {
+		if (data.length != 32) {
+			throw new IllegalArgumentException("HID data must be 32 bytes long");
+		}
+		ByteBuffer buffer = ByteBuffer.allocate(32);
+		buffer.put(data);
+		buffer.position(0);
+		this.contextID3 = buffer.getLong();
+		this.contextID2 = buffer.getLong();
+		this.contextID1 = buffer.getLong();
+		this.deviceID = buffer.getLong();
+	}
+	
 	/**
 	 * Sets the deviceID of the current HID
 	 * 
@@ -271,5 +289,22 @@ public class HID {
 //			return null;
 //		}
 //	}
+	
+	/**
+	 * Gets the HID in a binary representation:
+	 * * Bytes 0..7 contextID3
+	 * * Bytes 8..15 contextID2
+	 * * Bytes 16..23 contextID1
+	 * * Bytes 24..31 deviceID
+	 * @return the binary representation of the HID, as a byte[32]
+	 */
+	public byte[] getBytes() {
+		ByteBuffer buffer = ByteBuffer.allocate(32);
+		buffer.putLong(contextID3);
+		buffer.putLong(contextID2);
+		buffer.putLong(contextID1);
+		buffer.putLong(deviceID);
+		return buffer.array();
+	}
 
 }
