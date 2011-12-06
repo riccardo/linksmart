@@ -5,12 +5,12 @@ import java.io.IOException;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
-import eu.linksmart.network.networkmanager.application.NetworkManagerApplication;
+import eu.linksmart.network.networkmanager.NetworkManager;
 
 /*
  * Internal NetworkManager interface used by internal components as backbone router etc.
  */
-public interface NetworkManagerCore extends NetworkManagerApplication {
+public interface NetworkManagerCore extends NetworkManager {
 
 	/**
 	 * Broadcast a message to all other known LinkSmart nodes.

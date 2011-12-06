@@ -1,4 +1,4 @@
-package eu.linksmart.network.networkmanager.application;
+package eu.linksmart.network.networkmanager;
 
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -10,7 +10,7 @@ import eu.linksmart.network.NMResponse;
 /*
  * External Network Manager interface intended to be used by LinkSmart application developers.
  */
-public interface NetworkManagerApplication {
+public interface NetworkManager {
 	
 	/**
 	 * Send data from one LinkSmart node to another node.
