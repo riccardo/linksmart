@@ -76,8 +76,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	}
 
 	private void init(ComponentContext context) {
-		this.configurator = new NetworkManagerCoreConfigurator(this,
-				context.getBundleContext());
+		this.configurator = new NetworkManagerCoreConfigurator(this, context
+				.getBundleContext());
 		this.myDescription = this.configurator
 				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		this.connectionManager = new ConnectionManager();
@@ -216,11 +216,17 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		}
 	}
 
-	public void setDescription(String description) {
+	/**
+	 * Updates the description of this NetworkManager instance. This update
+	 * request is also forwarded to the IdentityManager
+	 * 
+	 * @param description
+	 */
+	public void updateDescription(String description) {
+		this.myDescription = description;
 
 		Properties attributes = new Properties();
-		attributes.setProperty(HIDAttribute.DESCRIPTION.name(),
-				this.myDescription);
+		attributes.setProperty(HIDAttribute.DESCRIPTION.name(), description);
 
 		this.identityManager.updateHIDInfo(this.myHID, attributes);
 

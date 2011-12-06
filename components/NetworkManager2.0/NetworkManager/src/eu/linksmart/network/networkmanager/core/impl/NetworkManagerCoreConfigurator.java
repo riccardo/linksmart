@@ -102,7 +102,7 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 	public void applyConfigurations(Hashtable updates) {
 		
 		if (updates.containsKey(NetworkManagerCoreConfigurator.NM_DESCRIPTION)){
-			this.networkManagerCoreImpl.setDescription((String)updates.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION));
+			this.networkManagerCoreImpl.updateDescription((String)updates.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION));
 		}
 		if(updates.containsKey(NetworkManagerCoreConfigurator.CONNECTION_TIMEOUT)){
 			this.networkManagerCoreImpl.setConnectionTimeout(Integer.valueOf(
