@@ -55,25 +55,12 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 	public static String CONFIGURATION_FILE = "/resources/NetworkManager.properties";
 	
 	public static final String NM_DESCRIPTION = "NetworkManager.Description";
-	public static final String CERTIFICATE_REF = "Network.CertificateRef";
 	public static final String COMMUNICATION_TYPE = "Network.CommunicationType";
-	
-//	public static final String SESSION_ID_GENERATOR = "Session.GeneratorName";
-//	public static final String SESSION_DELAY = "Session.Delay";
-//	public static final String SESSION_DATA_PATH = "Session.DataPath";
-//	public static final String SESSION_MAX_CLIENTS = "Session.MaxClients";
-//	public static final String SESSION_MAX_SERVERS = "Session.MaxServers";
-//	public static final String SESSION_CLEANING_FREQ = "Session.CleaningFrequency";
-//	public static final String SESSION_SYNC_FREQ = "Session.SyncFrequency";
-	
 	public static final String CONNECTION_TIMEOUT = "NetworkManager.ConnectionTimeout";
 	
 	public static final String SECURITY_PROTOCOL = "Security.Protocol";
-	
-	
 	//TODO Currently this functionality is not provided
 //	public static final String USE_CORE_SECURITY = "Security.UseCoreSecurity";
-	
 	public static final String DEFAULT_TO_DENY_ON_PEP_RESPONSE = "Security.Access.DefaultDeny";
 	
 	private NetworkManagerCoreImpl networkManagerCoreImpl;
