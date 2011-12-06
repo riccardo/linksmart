@@ -32,7 +32,7 @@ public interface NetworkManagerCore extends NetworkManager {
 	/**
 	 * Receive data from one LinkSmart node to another node.
 	 */
-	public NMResponse receiveData(HID sender, HID receiver, byte [] data);
+	public NMResponse receiveData(HID senderHID, HID receiverHID, byte [] data);
 
 	/**
 	 * Creates an HID based on byte array data
