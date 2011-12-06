@@ -109,6 +109,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 				processHIDs(hids, response, null);
 			} else if (method.equals("getRemoteHids")) {
 				Set<HIDInfo> hids = identityManager.getRemoteHIDs();
+				LOG.debug("Size of RemoteHIDs: " + hids.size());
 				processHIDs(hids, response,
 						"HID entity not adapted to security issues");
 			} else if (method.equals("getNetworkManagerSearch")) {
