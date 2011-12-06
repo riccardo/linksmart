@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.Properties;
 
 import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.NMResponse;
 
 /*
@@ -39,5 +40,39 @@ public interface NetworkManager {
 	 * @throws RemoteException
 	 */
 	Boolean removeHID(HID hid) throws RemoteException;
+	
+	
+	/**
+	 * Operation to create an crypto HID providing the persistent attributes for
+	 * this HID. The crypto HID is the enhanced version of HIDs, that allow
+	 * to store persistent information on them (through certificates) and
+	 * doesn't propagate the information stored on it. In order to exchange the
+	 * stored information, the Session Domain Protocol is used. It returns a
+	 * certificate reference that point to the certificate generated. The next
+	 * time the HID needs to be created, using the same attributes, the
+	 * certificate reference can be used.
+	 * 
+	 * @param xmlAttributes
+	 *            The attributes (persistent) associated with this HID. This
+	 *            attributes are stored inside the certificate and follow the
+	 *            Java {@link java.util.Properties} xml schema.
+	 * @return A {@link eu.linksmart.network.ws.CrypyoHIDResult} containing
+	 *         {@link String} representation of the HID and the certificate
+	 *         reference (UUID)
+	 */
+	public HIDInfo createCryptoHID(String xmlAttributes);
+	
+	/**
+	 * Operation to create an CryptoHID providing a certificate reference (from
+	 * a previously created CryptoHID). The CryptoHID is the
+	 * enhanced version of HIDs, that allow to store persistent information on
+	 * them (through certificates)
+	 * 
+	 * @param certRef
+	 *            The certificate reference from a previously generated
+	 *            cryptoHID.
+	 * @return The {@link String} representation of the HID.
+	 */
+	public HIDInfo createCryptoHIDFromReference(String certRef);
 
 }
