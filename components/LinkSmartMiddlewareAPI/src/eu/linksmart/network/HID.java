@@ -49,7 +49,7 @@ public class HID {
 	private long contextID3 = 0;
 	private int level;
 	
-	public static final int HIDByteLength = 32;
+	public static final int HID_BYTE_LENGTH = 32;
 
 	Random rnd = new Random();
 
@@ -115,10 +115,10 @@ public class HID {
 	 * @param data the HID values, as a 32-byte array, as results from toBytes()
 	 */
 	public HID(byte[] data) {
-		if (data.length != HIDByteLength) {
+		if (data.length != HID_BYTE_LENGTH) {
 			throw new IllegalArgumentException("HID data must be 32 bytes long");
 		}
-		ByteBuffer buffer = ByteBuffer.allocate(HIDByteLength);
+		ByteBuffer buffer = ByteBuffer.allocate(HID_BYTE_LENGTH);
 		buffer.put(data);
 		buffer.position(0);
 		this.contextID3 = buffer.getLong();
@@ -301,7 +301,7 @@ public class HID {
 	 * @return the binary representation of the HID, as a byte[32]
 	 */
 	public byte[] getBytes() {
-		ByteBuffer buffer = ByteBuffer.allocate(HIDByteLength);
+		ByteBuffer buffer = ByteBuffer.allocate(HID_BYTE_LENGTH);
 		buffer.putLong(contextID3);
 		buffer.putLong(contextID2);
 		buffer.putLong(contextID1);
