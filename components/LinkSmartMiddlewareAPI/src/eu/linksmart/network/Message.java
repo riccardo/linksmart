@@ -97,7 +97,7 @@ public class Message {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Topic: ").append(getTopic()).append(", Sender: ").append(
 				getSenderHID()).append(", Receiver: ").append(getReceiverHID())
-				.append(new String(data));
+				.append(", Data: ").append(new String(data));
 		return sb.toString();
 	}
 }
