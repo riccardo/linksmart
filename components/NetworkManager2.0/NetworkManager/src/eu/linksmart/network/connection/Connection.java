@@ -15,6 +15,7 @@ import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.CryptoException;
 import eu.linksmart.security.communication.SecurityProtocol;
 import eu.linksmart.security.communication.VerificationFailureException;
+import eu.linksmart.utils.Base64;
 
 /**
  * Holds properties and objects relevant for a connection
@@ -133,7 +134,7 @@ public class Connection {
 					(String)properties.remove(TOPIC),
 					senderHID,
 					receiverHID,
-					((String)properties.remove(APPLICATION_DATA)).getBytes());
+					(Base64.decode((String)properties.remove(APPLICATION_DATA))));
 			//go through the properties and add them to the message
 			Iterator<Object> i = properties.keySet().iterator();
 			while(i.hasNext()){
@@ -168,7 +169,7 @@ public class Connection {
 			props.put(key, msg.getProperty(key));
 		}
 		//put application data into properties
-		props.put(APPLICATION_DATA, new String(msg.getData()));
+		props.put(APPLICATION_DATA, Base64.encodeBytes(msg.getData()));
 		props.put(TOPIC, msg.getTopic());
 		//convert props into xml and encode it
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
