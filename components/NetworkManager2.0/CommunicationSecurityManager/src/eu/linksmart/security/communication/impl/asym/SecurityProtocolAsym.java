@@ -188,7 +188,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 						//if signature is valid and nonce matches store certificate
 						if (verifiedMessage!=null && verifiedMessage!="" 
-							&& generatedNonce.equals(command.getProperty(Command.SERVER_NONCE))) {
+							&& generatedNonce.equals(command.getProperty(Command.CLIENT_NONCE))) {
 							// Convert input String to XML document
 							logger.debug("Encrypted message is: " + verifiedMessage);
 							//save received certificate
@@ -226,7 +226,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 							if(storedMessage != null){
 								try{
 									Message protectedMessage = protectMessage(storedMessage);
-									cmd.setProperty(Command.APPLICATION_MESSAGE, String.valueOf(protectedMessage.getData()));
+									cmd.setProperty(Command.APPLICATION_MESSAGE, new String(protectedMessage.getData()));
 									storedMessage = null;
 								}catch(Exception e){
 									CryptoException ce = new CryptoException("Excaption protecting original message");
@@ -294,7 +294,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 						}
 					}else{
 						logger.debug("Signature or nonce not valid, aborting!");
-						throw new VerificationFailureException("Received not vlaid signature from HID: " + clientHID);
+						throw new VerificationFailureException("Received not valid signature from HID: " + clientHID);
 					}
 				}
 			}
@@ -303,13 +303,13 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	}
 
 	public Message protectMessage(Message msg) throws Exception {
-		String encryptedMessage = asymEncrypt(String.valueOf(msg.getData()), msg.getReceiverHID().toString());
+		String encryptedMessage = asymEncrypt(new String(msg.getData()), msg.getReceiverHID().toString());
 		msg.setData(encryptedMessage.getBytes());
 		return msg;
 	}
 
 	public Message unprotectMessage(Message msg) throws Exception {
-		String decryptedMessage = asymDecrypt(String.valueOf(msg.getData()));
+		String decryptedMessage = asymDecrypt(new String(msg.getData()));
 		msg.setData(decryptedMessage.getBytes());
 		return msg;
 	}

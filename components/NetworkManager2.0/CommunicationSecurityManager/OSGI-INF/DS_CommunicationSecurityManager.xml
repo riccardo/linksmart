@@ -7,4 +7,5 @@
    <reference bind="bindCryptoManager" cardinality="1..1" interface="eu.linksmart.security.cryptomanager.CryptoManager" name="CryptoManager" policy="static" unbind="unbindCryptoManager"/>
    <reference bind="bindTrustManager" cardinality="0..1" interface="eu.linksmart.security.trustmanager.TrustManager" name="TrustManager" policy="dynamic" unbind="unbindTrustManager"/>
    <reference bind="bindWSProvider" cardinality="0..1" interface="eu.linksmart.clients.RemoteWSClientProvider" name="RemoteWSClientProvider" policy="dynamic" unbind="unbindWSProvider"/>
+   <reference cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static"/>
 </scr:component>

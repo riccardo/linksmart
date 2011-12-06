@@ -36,6 +36,7 @@ public class CommunicationSecurityManagerImpl implements CommunicationSecurityMa
 
 	protected void activate(ComponentContext context) {
 		this.context = context.getBundleContext();
+		configurator = new CommunicationSecurityManagerConfigurator(this, this.context);
 		logger.info(COMMUNICATION_SEC_MGR + " started");
 	}
 	protected void deactivate(ComponentContext context) {

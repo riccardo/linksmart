@@ -305,4 +305,11 @@ public interface CryptoManager {
 	 * @throws InvalidKeyException 
 	 */
 	public byte[] calculateMac(String identifier, String data, String algorithm) throws NoSuchAlgorithmException, KeyStoreException, InvalidKeyException;
+	
+	/**
+	 * To check whether the provided identifier is available
+	 * @param identifier
+	 * @return True if identifier is available
+	 */
+	public boolean identifierExists(String identifier);
 }

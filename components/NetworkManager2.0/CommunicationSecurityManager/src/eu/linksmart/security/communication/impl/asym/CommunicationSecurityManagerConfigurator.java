@@ -17,7 +17,7 @@ public class CommunicationSecurityManagerConfigurator extends Configurator {
 	/**
 	 * Unique identity under which the configuraton is registered
 	 */
-	protected final static String COMSECMGR_PID = "eu.linksmart.security.communication.impl.asym.CommunicationSecurityManager";
+	protected final static String COMSECMGR_PID = "eu.linksmart.security.communication.asym";
 	/**
 	 * Path to the default configurations
 	 */

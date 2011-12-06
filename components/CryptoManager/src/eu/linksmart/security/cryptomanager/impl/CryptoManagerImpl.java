@@ -478,4 +478,13 @@ public class CryptoManagerImpl implements CryptoManager{
 			
 			return mac.doFinal(data.getBytes());
 	}
+
+	public boolean identifierExists(String identifier){
+		try{
+		return keyManager.identifierExists(identifier);
+		}catch(SQLException e){
+			logger.error("Error in CryptoManager database",e);
+			return false;
+		}
+	}
 }

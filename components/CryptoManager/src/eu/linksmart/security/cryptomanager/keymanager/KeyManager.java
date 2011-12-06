@@ -311,4 +311,11 @@ public interface KeyManager {
 	 */
 	abstract SecretKey loadSymmetricKey(String identifier, String algorithm_name) 
 	throws NoSuchAlgorithmException,KeyStoreException;
+
+	/**
+	 * Tells whether the provided identifier exists
+	 * @param identfier
+	 * @return
+	 */
+	abstract boolean identifierExists(String identifier) throws SQLException;
 }
