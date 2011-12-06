@@ -22,7 +22,7 @@ public interface IdentityManager {
 	 *            Attributes describing the HID. E.g. description.
 	 * @return the {@link HID} that has been created.
 	 */
-	public HID createHID(Properties attributes);
+	public HID createHIDForAttributes(Properties attributes);
 
 	/**
 	 * Creates a local {@link HID} without any context and stores. It creates a
@@ -32,7 +32,7 @@ public interface IdentityManager {
 	 *            the description
 	 * @return the HID created
 	 */
-	public HID createHID(String description);
+	public HID createHIDForDescription(String description);
 
 	/**
 	 * Updates the attributes of the given {@link HID}.
