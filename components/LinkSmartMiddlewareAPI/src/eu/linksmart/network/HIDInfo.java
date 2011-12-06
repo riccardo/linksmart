@@ -44,71 +44,61 @@ import java.util.Properties;
  */
 public class HIDInfo {
 	private HID hid;
-	private String description;
 	private Properties attributes;
 
 	/**
-	 * Constructor. Creates an instance of HIDInfo with its parameters
+	 * Create an HIDInfo object with the given HID and Description.
 	 * 
+	 * @param hid
 	 * @param description
-	 *            the description
-	 * @param endpoint
-	 *            the endpoint
 	 */
 	public HIDInfo(HID hid, String description) {
-
-		super();
 		this.hid = hid;
-		this.description = description;
-		this.attributes = null;
+		this.attributes = new Properties();
+		this.attributes.put(HIDAttribute.DESCRIPTION.name(), description);
 	}
 
 	/**
-	 * Constructor. Creates an instance of HIDInfo with its parameters
+	 * Create an HIDInfo object with the given HID and Attributes. Attributes
+	 * should be key-values pairs with the key of type {@link HIDAttribute}
 	 * 
-	 * @param description
-	 *            the description
-	 * @param endpoint
-	 *            the endpoint
+	 * @param hid
 	 * @param attributes
-	 *            the properties
 	 */
-	public HIDInfo(HID hid, String description, Properties attributes) {
-
-		super();
+	public HIDInfo(HID hid, Properties attributes) {
 		this.hid = hid;
-		this.description = description;
 		this.attributes = attributes;
 	}
 
+	
 	/**
-	 * Returns a string with the HID info separated by ":"
-	 * 
-	 * @return the HID info separated by ":"
+	 * Prints the the HIDInfo like this: hid:description
 	 */
 	@Override
 	public String toString() {
-		return hid.toString() + ":" + description;
+		return hid.toString() + ":" + getDescription();
 	}
 
 	/**
-	 * Gets the description TODO: Should perhaps be removed to access all
-	 * information only via attributes
+	 * Return the attribute {@link HIDAttribute} DESCRIPTION for this HIDInfo.
 	 * 
 	 * @return the description
 	 */
 	public String getDescription() {
-		return description;
+		return this.attributes.getProperty(HIDAttribute.DESCRIPTION.name());
 	}
 
 	/**
-	 * Sets the description
+	 * Sets the {@link HIDAttribute} description for this HIDInfo
 	 * 
 	 * @param description
 	 *            the description to set
 	 */
 	public void setDescription(String description) {
-		this.description = description;
+		if (this.attributes == null){
+			this.attributes = new Properties();
+		}
+		this.attributes.put(HIDAttribute.DESCRIPTION.name(), description);
 	}
 
 	/**
