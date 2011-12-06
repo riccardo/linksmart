@@ -58,7 +58,7 @@ import eu.linksmart.configurator.webconf.LinkSmartStatus;
 import eu.linksmart.network.CryptoHIDResult;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.networkmanager.application.NetworkManagerApplication;
+import eu.linksmart.network.networkmanager.NetworkManager;
 
 
 /**
@@ -88,7 +88,7 @@ public class ConfiguratorActivator  {
 	private HttpService http;
 	private GetConfigurationServlet getConfigurationServlet;
 	private Logger logger = Logger.getLogger(ConfiguratorActivator.class.getName());
-	private NetworkManagerApplication nm;
+	private NetworkManager nm;
 	private CryptoHIDResult cryptoHID;
 	
 	static {
@@ -180,7 +180,7 @@ public class ConfiguratorActivator  {
 	 * 
 	 * @param nm the NetworkManagerApplication
 	 */
-	protected void registerHID(NetworkManagerApplication nm) {
+	protected void registerHID(NetworkManager nm) {
 		this.nm = nm;
 		if (http != null) {
 			try {
@@ -206,7 +206,7 @@ public class ConfiguratorActivator  {
 	 * 
 	 * @param nm the NetworkManagerApplication
 	 */
-	protected void unregisterHID(NetworkManagerApplication nm) {
+	protected void unregisterHID(NetworkManager nm) {
 		if (http != null) {
 			try {
 				nm.removeHID(new HID(cryptoHID.getHID()));

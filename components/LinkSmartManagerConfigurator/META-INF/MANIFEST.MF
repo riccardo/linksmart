@@ -5,7 +5,7 @@ Bundle-SymbolicName: eu.linksmart.config.managerconfigurator
 Bundle-Version: 2.0.0
 Service-Component: OSGI-INF/*.xml
 Import-Package: eu.linksmart.network,
- eu.linksmart.network.networkmanager.application,
+ eu.linksmart.network.networkmanager,
  javax.servlet;version="[2.4.0,2.5.0]",
  javax.servlet.http;version="[2.4.0,2.5.0]",
  org.apache.log4j,
