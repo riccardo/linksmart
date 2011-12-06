@@ -78,6 +78,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	private void init(ComponentContext context) {
 		this.configurator = new NetworkManagerCoreConfigurator(this, context
 				.getBundleContext());
+		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
 				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		this.connectionManager = new ConnectionManager();
