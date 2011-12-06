@@ -154,11 +154,11 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	/**
 	 * Increasing counter of the client messages for reorder protection
 	 */
-	private double localCounter = 0;
+	private int localCounter = 0;
 	/**
 	 * Increasing counter of the server messages for reorder protection
 	 */
-	private double remoteCounter = 0;
+	private int remoteCounter = 0;
 
 	public SecurityProtocolImpl(HID clientHID,
 			HID serverHID,
@@ -405,7 +405,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 
 		// check the counter
 		String counter = document.getElementsByTagName(INSIDE_COUNTER_ELEMENT).item(0).getTextContent();
-		double receivedCounter = Double.parseDouble(counter);
+		int receivedCounter = Integer.parseInt(counter);
 		if (receivedCounter < remoteCounter) {
 			throw new VerificationFailureException("Message is an older message and is not accepted");
 		}
