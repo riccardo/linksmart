@@ -119,7 +119,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * @return a vector containing all the remote HIDs inside idTable
 	 */
 	public Set<HIDInfo> getRemoteHIDs() {
-		return new HashSet<HIDInfo>(localHIDs.values());
+		return new HashSet<HIDInfo>(remoteHIDs.values());
 	}
 
 	@Override
