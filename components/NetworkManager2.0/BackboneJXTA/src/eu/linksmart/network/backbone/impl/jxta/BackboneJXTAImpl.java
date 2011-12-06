@@ -179,8 +179,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		NMResponse response = new NMResponse();
 
 		// add senderHID to data
-		byte[] payload = AddHIDToData(senderHID, data);
-		logger.info("Sending data over pipe to HID= " + receiverHID);
+		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
+		logger.debug("Sending data over pipe to HID= " + receiverHID);
 		response = pipeSyncHandler.sendData(senderHID.toString(),
 				receiverHID.toString(), payload, peerID);
 
@@ -208,7 +208,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		// give message to BBRouter for further processing
 		try {
 			response = bbRouter.receiveData(senderHID, receiverHID,
-					RemoveHIDFromData(receivedData), (Backbone) this);
+					BackboneJXTAUtils.RemoveHIDFromData(receivedData),
+					(Backbone) this);
 		} catch (Exception e) {
 			logger.error(
 					"BBJXTA could not give received message for processing to bbRouter",
@@ -228,7 +229,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	public NMResponse broadcastData(HID senderHID, byte[] data) {
 		NMResponse response = new NMResponse();
 
-		byte[] payload = AddHIDToData(senderHID, data);
+		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
 
 		// send message as multicast message
 		synchronized (msocket) {
@@ -426,12 +427,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		netPGDiscoveryService.addDiscoveryListener(this);
 		peerID = netPeerGroup.getPeerID();
 
-		msocket = new MulticastSocket();
-		multicastSocket = msocket.createMulticastSocket(netPeerGroup);
-
-		listener = new MulticastSocketListener(multicastSocket, this);
-		listener.start();
-
 		/*
 		 * Add the listeners for the services in the LinkSmart group (discovery
 		 * and Rdv)
@@ -457,6 +452,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			}
 		}
 
+		msocket = new MulticastSocket();
+		multicastSocket = msocket.createMulticastSocket(netPeerGroup);
+
+		listener = new MulticastSocketListener(multicastSocket, this);
+		listener.start();
 	}
 
 	/**
@@ -675,22 +675,16 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 									+ m.toString(), e2);
 				}
 
-				logger.info("MulticastListener data: >>>"
-						+ BackboneJXTAUtils.ConvertByteArrayToString(receivedData.getData()) + "<<<");
-
 				String senderJXTAID = receivedData.getAddress().getHostName();
 
-				logger.info("MulticastListener senderJXTAID: >>>"
-						+ senderJXTAID + "<<<");
-
-				HID senderHID = GetHIDFromData(receivedData.getData());
-				logger.info("MulticastListener senderHID: >>>" + senderHID
-						+ "<<<");
+				HID senderHID = BackboneJXTAUtils.GetHIDFromData(receivedData
+						.getData());
 
 				// give message to BBRouter for further processing
+				// receiverHID is null because this is a broadcast message
 				try {
-					bbRouter.receiveData(senderHID, null,
-							RemoveHIDFromData(receivedData.getData()),
+					bbRouter.receiveData(senderHID, null, BackboneJXTAUtils
+							.RemoveHIDFromData(receivedData.getData()),
 							(Backbone) bbJXTA);
 				} catch (Exception e) {
 					logger.error(
@@ -711,98 +705,5 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			this.running = false;
 		}
 	}
-
-	private static final String HID_DELIMITER = "#@#";
-
-	/**
-	 * Adds an HID to the data package so that the next JXTA backbone can get it
-	 * without the need to unpack the payload.
-	 * 
-	 * @param aHID
-	 *            This is the HID of the sender.
-	 * @param origData
-	 * @return
-	 */
-	private static byte[] AddHIDToData(HID aHID, byte[] origData) {
-		String ret = aHID.toString() + HID_DELIMITER + BackboneJXTAUtils.ConvertByteArrayToString(origData);
-		return BackboneJXTAUtils.ConvertStringToByteArray(ret);
-	}
-
-	/**
-	 * Gets the HID of the sender of the data package.
-	 * 
-	 * @param origData
-	 * @return The HID from the sender.
-	 */
-	private HID GetHIDFromData(byte[] origData) {
-		String dataAsString = BackboneJXTAUtils.ConvertByteArrayToString(origData);
-		logger.info("GetHIDFromData: >>>" + dataAsString + "<<<");
-		int posHidDelimiter = dataAsString.indexOf(HID_DELIMITER);
-		String hidAsString = "0.0.0.0";
-		if (posHidDelimiter > 0) {
-			hidAsString = dataAsString.substring(0, posHidDelimiter);
-		}
-		return new HID(hidAsString);
-	}
-
-	/**
-	 * Removes the HID from the data package so that the payload can be
-	 * processed regularly e.g. unencrypted.
-	 * 
-	 * @param origData
-	 * @return The original payload of the data package.
-	 */
-	private static byte[] RemoveHIDFromData(byte[] origData) {
-		String dataAsString = BackboneJXTAUtils.ConvertByteArrayToString(origData);
-		String dataWithoutHidAsString;
-		int posHidDelimiter = dataAsString.indexOf(HID_DELIMITER);
-		if (posHidDelimiter > 0) {
-			dataWithoutHidAsString = dataAsString.substring(
-					posHidDelimiter + 1, dataAsString.length());
-		} else {
-			// in case of error just return the original string
-			dataWithoutHidAsString = dataAsString;
-		}
-		return BackboneJXTAUtils.ConvertStringToByteArray(dataWithoutHidAsString);
-	}
-
-	// private class RemoteEndpointInformation {
-	// protected String jxtaID;
-	// protected InetAddress senderIP;
-	// protected int senderPort;
-	//
-	// public RemoteEndpointInformation(SocketAddress socketAddress,
-	// InetAddress senderIP, int senderPort) {
-	// super();
-	// this.socketAddress = socketAddress;
-	// this.senderIP = senderIP;
-	// this.senderPort = senderPort;
-	// }
-	//
-	// public SocketAddress getSocketAddress() {
-	// return socketAddress;
-	// }
-	//
-	// public void setSocketAddress(SocketAddress socketAddress) {
-	// this.socketAddress = socketAddress;
-	// }
-	//
-	// public InetAddress getSenderIP() {
-	// return senderIP;
-	// }
-	//
-	// public void setSenderIP(InetAddress senderIP) {
-	// this.senderIP = senderIP;
-	// }
-	//
-	// public int getSenderPort() {
-	// return senderPort;
-	// }
-	//
-	// public void setSenderPort(int senderPort) {
-	// this.senderPort = senderPort;
-	// }
-	//
-	// }
 
 }
