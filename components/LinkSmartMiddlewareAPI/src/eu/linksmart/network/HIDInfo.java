@@ -39,7 +39,6 @@ package eu.linksmart.network;
 
 import java.util.Properties;
 
-
 /**
  * Class to store information about HIDs
  */
@@ -47,37 +46,41 @@ public class HIDInfo {
 	private HID hid;
 	private String description;
 	private Properties attributes;
-	
+
 	/**
 	 * Constructor. Creates an instance of HIDInfo with its parameters
 	 * 
-	 * @param description the description
-	 * @param endpoint the endpoint
+	 * @param description
+	 *            the description
+	 * @param endpoint
+	 *            the endpoint
 	 */
 	public HIDInfo(HID hid, String description) {
-		
+
 		super();
 		this.hid = hid;
 		this.description = description;
 		this.attributes = null;
 	}
-	
+
 	/**
 	 * Constructor. Creates an instance of HIDInfo with its parameters
-	 *  
-	 * @param description the description
-	 * @param endpoint the endpoint
-	 * @param attributes the properties
+	 * 
+	 * @param description
+	 *            the description
+	 * @param endpoint
+	 *            the endpoint
+	 * @param attributes
+	 *            the properties
 	 */
-	public HIDInfo(HID hid, String description,
-			Properties attributes) {
-		
+	public HIDInfo(HID hid, String description, Properties attributes) {
+
 		super();
 		this.hid = hid;
 		this.description = description;
 		this.attributes = attributes;
 	}
-	
+
 	/**
 	 * Returns a string with the HID info separated by ":"
 	 * 
@@ -89,24 +92,25 @@ public class HIDInfo {
 	}
 
 	/**
-	 * Gets the description
+	 * Gets the description TODO: Should perhaps be removed to access all
+	 * information only via attributes
 	 * 
 	 * @return the description
 	 */
 	public String getDescription() {
 		return description;
 	}
-	
+
 	/**
 	 * Sets the description
 	 * 
-	 * @param description the description to set
+	 * @param description
+	 *            the description to set
 	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
+
 	/**
 	 * Get the properties
 	 * 
@@ -115,22 +119,26 @@ public class HIDInfo {
 	public Properties getAttributes() {
 		return attributes;
 	}
-	
+
 	/**
 	 * Set the properties
 	 * 
-	 * @param attr the properties to set
+	 * @param attr
+	 *            the properties to set
 	 */
 	public void setAttributes(Properties attr) {
 		this.attributes = attr;
+		if (attr.containsKey(HIDAttribute.DESCRIPTION.name())) {
+			setDescription(attr.getProperty(HIDAttribute.DESCRIPTION.name()));
+		}
 	}
-	
+
 	public HID getHID() {
 		return hid;
 	}
-	
+
 	public void setHID(HID hid) {
 		this.hid = hid;
 	}
-	
+
 }
