@@ -56,20 +56,20 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	@Override
-	public HID createHID(Properties attributes) {
-		// TODO check also for other properties!
-		// StringUtils.join(attributes.values().toArray(), "|");
-		String description = attributes.getProperty(HIDAttribute.DESCRIPTION
-				.name());
-		return createHID(description);
+	public HID createHIDForAttributes(Properties attributes) {
+		HID hid = createUniqueHID();
+		HIDInfo info = new HIDInfo(hid, attributes);
+		addLocalHID(hid, info);
+		LOG.debug("Created HID: " + info.toString());
+		return hid;
 	}
 
 	@Override
-	public HID createHID(String description) {
+	public HID createHIDForDescription(String description) {
 		HID hid = createUniqueHID();
 		HIDInfo info = new HIDInfo(hid, description);
 		addLocalHID(hid, info);
-		LOG.debug("Created HID: " + hid.toString());
+		LOG.debug("Created HID: " + info.toString());
 		return hid;
 	}
 
@@ -149,8 +149,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		 * our set under consideration this should be an optimization to the
 		 * (each criterion x each HIDInfo entry) approach
 		 */
-
-		Collection<HIDInfo> allDescriptions = localHIDs.values();
+		
+		Collection<HIDInfo> allDescriptions = new HashSet<HIDInfo>();   
+		allDescriptions.addAll(localHIDs.values());
 		allDescriptions.addAll(remoteHIDs.values()); // because we are searching
 		// in ALL hids, local
 		// and remote
@@ -320,6 +321,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	@Override
 	public boolean removeHID(HID hid) {
 		if (removeLocalHID(hid) != null || removeRemoteHID(hid) != null) {
+			LOG.debug("Removed HID: " + hid.toString());
 			return true;
 		}
 		return false;
@@ -431,5 +433,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
 		this.networkManagerCore = null;
 	}
+	
+	
 
 }
