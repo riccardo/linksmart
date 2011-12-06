@@ -49,7 +49,7 @@ public class HID {
 	private long contextID3 = 0;
 	private int level;
 	
-	public static int HIDByteLength = 32;
+	public static final int HIDByteLength = 32;
 
 	Random rnd = new Random();
 
