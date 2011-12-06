@@ -248,7 +248,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * Returns "null" as string if no entry for the given HID could be found.
 	 * 
 	 * @param hid
-	 * @return the backbone address represented by the Hid
+	 * @return the backbone address represented by the HID
 	 */
 	public String getDestinationAddressAsString(HID hid) {
 		return listOfRemoteEndpoints.get(hid).toString();
