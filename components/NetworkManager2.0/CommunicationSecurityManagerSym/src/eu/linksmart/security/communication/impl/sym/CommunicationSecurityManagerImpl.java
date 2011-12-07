@@ -1,6 +1,8 @@
 package eu.linksmart.security.communication.impl.sym;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
@@ -10,6 +12,7 @@ import org.osgi.service.component.ComponentContext;
 import eu.linksmart.clients.RemoteWSClientProvider;
 import eu.linksmart.network.HID;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
+import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.security.communication.SecurityProtocol;
 import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.security.trustmanager.TrustManager;
@@ -176,5 +179,18 @@ public class CommunicationSecurityManagerImpl implements CommunicationSecurityMa
 
 	public SecurityProtocol getBroadcastSecurityProtocol(HID clientHID) {
 		throw new RuntimeException("Manager has no broadcast service");
+	}
+
+	public List<SecurityProperty> getProperties() {
+		ArrayList<SecurityProperty> properties = new ArrayList<SecurityProperty>();
+		properties.add(SecurityProperty.Authenticity);
+		properties.add(SecurityProperty.Confidentiality);
+		properties.add(SecurityProperty.Integrity);
+		properties.add(SecurityProperty.KeyAgreement);
+		properties.add(SecurityProperty.Symmetric);
+		properties.add(SecurityProperty.Asymmetric);
+		properties.add(SecurityProperty.Unicast);
+		
+		return properties;
 	}
 }

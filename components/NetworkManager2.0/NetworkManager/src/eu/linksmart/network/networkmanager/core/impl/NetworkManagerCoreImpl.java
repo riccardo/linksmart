@@ -36,7 +36,7 @@ import eu.linksmart.tools.NetworkManagerApplicationStatus;
  * Core implementation of NetworkManagerCore Interface
  */
 public class NetworkManagerCoreImpl implements NetworkManagerCore,
-		MessageDistributor {
+MessageDistributor {
 	protected IdentityManager identityManager;
 
 	protected BackboneRouter backboneRouter;
@@ -53,10 +53,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 
 	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class
-			.getSimpleName();
+	.getSimpleName();
 	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
 	private static final String STARTING_MESSAGE = "Starting"
-			+ NETWORK_MGR_CORE;
+		+ NETWORK_MGR_CORE;
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
 
@@ -85,7 +85,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 				.getBundleContext());
 		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
-				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
+		.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		this.connectionManager = new ConnectionManager();
 		this.connectionManager.setCommunicationSecurityManager(this.commSecMgr);
 		Properties attributes = new Properties();
@@ -94,13 +94,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		this.myHID = this.identityManager.createHIDForAttributes(attributes);
 
 		// Init Servlets
-
 		HttpService http = (HttpService) context.locateService("HttpService");
 		try {
 			http.registerServlet("/NetworkManagerStatus",
 					new NetworkManagerApplicationStatus(context, this,
 							identityManager, backboneRouter, serviceRegistry),
-					null, null);
+							null, null);
 			http.registerServlet("/GetNetworkManagerStatus",
 					new GetNetworkManagerStatus(this, identityManager,
 							backboneRouter, serviceRegistry), null, null);
@@ -110,12 +109,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		}
 	}
 
-	@Override
 	public HID getHID() {
 		return this.myHID;
 	}
 
-	@Override
 	public HID createHID(Properties attributes, URL url) throws RemoteException {
 
 		HID newHID = this.identityManager.createHIDForAttributes(attributes);
@@ -125,9 +122,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		return newHID;
 	}
 
-	@Override
 	public NMResponse sendData(HID sender, HID receiver, byte[] data)
-			throws RemoteException {
+	throws RemoteException {
 
 		NMResponse response = this.backboneRouter.sendData(sender, receiver,
 				data);
@@ -135,13 +131,13 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		return response;
 	}
 
-	@Override
 	public Boolean removeHID(HID hid) throws RemoteException {
 
 		// TODO Check if have some kind of service registry and need to remove a
 		// service there as well
 
 		Boolean hidRemoved = this.identityManager.removeHID(hid);
+		this.connectionManager.deleteHIDPolicy(hid);
 
 		return hidRemoved;
 	}
@@ -152,12 +148,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 
 	protected void bindCommunicationSecurityManager(
 			CommunicationSecurityManager commSecMgr) {
-		this.commSecMgr = commSecMgr;
+		this.connectionManager.setCommunicationSecurityManager(commSecMgr);
 	}
 
 	protected void unbindCommunicationSecurityManager(
 			CommunicationSecurityManager commSecMgr) {
-		this.connectionManager.removeCommunicationSecurityManager();
+		this.connectionManager.removeCommunicationSecurityManager(commSecMgr);
 		this.commSecMgr = null;
 	}
 
@@ -186,16 +182,25 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		this.cryptoManager = null;
 	}
 
-	@Override
 	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data) {
 		// get connection belonging to HIDs
 		Connection conn;
-		if (receiverHID == null) {
-			// broadcast message
-			conn = connectionManager.getBroadcastConnection(senderHID);
-		} else {
-			conn = connectionManager.getConnection(receiverHID, senderHID);
+		try{
+			if (receiverHID == null) {
+				// broadcast message
+				conn = connectionManager.getBroadcastConnection(senderHID);
+			} else {
+				conn = connectionManager.getConnection(receiverHID, senderHID);
+			}
+		} catch (Exception e){
+			LOG.warn("Error getting connection for HIDs: "
+					+ senderHID.toString() + " "
+					+ receiverHID.toString(),e);
+			NMResponse response = new NMResponse();
+			response.setData(ERROR_PROCESSING);
+			return response;
 		}
+
 		Message msg = conn.processData(senderHID, receiverHID, data);
 		String topic = msg.getTopic();
 		// go through MsgObservers for additional processing
@@ -213,16 +218,16 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 
 		// if message is still existing it has to be forwarded
 		if (msg != null && msg.getData() != null && msg.getData().length != 0) {
-			// check if message is not intended for host HID, if yes and it has
-			// not been processed drop it
-			if (msg.getReceiverHID() == this.myHID) {
+			/*check if message is not intended for host HID, if yes and it has
+			not been processed drop it*/
+			if (msg.getReceiverHID() == this.myHID || msg.getReceiverHID() == null) {
 				LOG.warn("Received a message which has not been processed");
 				NMResponse response = new NMResponse();
 				response.setData(ERROR_PROCESSING);
 				return response;
 			}
-			// send message over sendMessage method of this and return response
-			// of it
+			/* send message over sendMessage method of this and return response
+			of it*/
 			return sendMessage(msg);
 		} else {
 			NMResponse response = new NMResponse();
@@ -271,7 +276,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		}
 	}
 
-	@Override
 	public HID createHID(byte[] data) throws IOException {
 
 		Properties attributes = this.connectionManager.getHIDAttributes(data);
@@ -281,13 +285,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		return newHID;
 	}
 
-	@Override
 	public NMResponse broadcastMessage(Message message) {
 		HID senderHID = message.getSenderHID();
 		byte[] data;
 		try {
 			data = this.connectionManager.getBroadcastConnection(senderHID)
-					.processMessage(message);
+			.processMessage(message);
 		} catch (Exception e) {
 			LOG.warn("Could not create packet from message from HID: "
 					+ message.getSenderHID(), e);
@@ -296,23 +299,18 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 			return response;
 		}
 		NMResponse response = this.backboneRouter
-				.broadcastData(senderHID, data);
+		.broadcastData(senderHID, data);
 
 		return response;
 	}
 
-	@Override
 	public NMResponse sendMessage(Message message) {
-
 		HID senderHID = message.getReceiverHID();
-
 		HID receiverHID = message.getSenderHID();
-
-		Connection connection = this.connectionManager.getConnection(
-				receiverHID, senderHID);
-
-		byte[] data;
+		byte[] data = null;
 		try {
+			Connection connection = this.connectionManager.getConnection(
+					receiverHID, senderHID);
 			data = connection.processMessage(message);
 		} catch (Exception e) {
 			LOG.warn("Could not create packet from message from HID: "
@@ -321,7 +319,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 			response.setData(ERROR_PROCESSING);
 			return response;
 		}
-
 		NMResponse response = this.backboneRouter.sendData(senderHID,
 				receiverHID, data);
 
@@ -329,7 +326,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	}
 
 	/**
-	 * Sets the number of minutes before a connection is closed
+	 * Sets the number of minutes before a connection is closed.
 	 * 
 	 * @param timeout
 	 */
