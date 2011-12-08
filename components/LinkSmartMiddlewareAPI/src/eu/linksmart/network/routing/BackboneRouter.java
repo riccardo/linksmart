@@ -78,12 +78,18 @@ public interface BackboneRouter {
 	 * @param backbone
 	 *            the Backbone through which the HID can be reached
 	 * @param endpoint
-	 * @return
+	 * @return whether adding the route was successful
 	 */
 	public boolean addRouteToBackbone(HID hid, String backbone,
 			String endpoint);
 
-	public boolean removeRoute(HID hid);
+	/**
+	 * Removes a route from the BackboneRouter
+	 * @param hid The HID of which the route should be removed
+	 * @param backbone The name of the backbone through which the HID was reached
+	 * @return whether removing the route was successful
+	 */
+	public boolean removeRoute(HID hid, String backbone);
 
 	/**
 	 * Returns a list of backbones available to the network manager.
