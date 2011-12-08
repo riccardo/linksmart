@@ -424,7 +424,7 @@ public class BackboneSOAPImpl implements Backbone {
 	 * @param hid
 	 * @return the backbone address represented by the Hid
 	 */
-	public String getDestinationAddressAsString(HID hid) {
+	public String getEndpoint(HID hid) {
 		return null;
 	}
 

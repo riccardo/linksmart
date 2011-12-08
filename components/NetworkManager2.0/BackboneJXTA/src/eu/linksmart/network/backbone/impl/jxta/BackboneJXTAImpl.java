@@ -250,7 +250,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param hid
 	 * @return the backbone address represented by the HID
 	 */
-	public String getDestinationAddressAsString(HID hid) {
+	public String getEndpoint(HID hid) {
 		return listOfRemoteEndpoints.get(hid).toString();
 	}
 

@@ -185,7 +185,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		if (b == null){
 			return null;
 		} else {
-			return b.toString() + ";" + b.getDestinationAddressAsString(hid);
+			return b.toString() + ";" + b.getEndpoint(hid);
 		}
 	}
 
