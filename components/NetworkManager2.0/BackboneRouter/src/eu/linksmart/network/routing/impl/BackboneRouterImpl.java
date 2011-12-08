@@ -1,11 +1,12 @@
 package eu.linksmart.network.routing.impl;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
@@ -23,8 +24,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 	private Logger logger = Logger
 			.getLogger(BackboneRouterImpl.class.getName());
-	private HashMap<HID, Backbone> hidBackboneMap;
-	private List<Backbone> availableBackbones;
+	private Map<HID, Backbone> hidBackboneMap;
+	private Map<String, Backbone> availableBackbones;
 	private NetworkManagerCore nmCore;
 	private String defaultRoute;
 
@@ -37,7 +38,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		logger.info("Starting " + BACKBONE_ROUTER);
 
 		hidBackboneMap = new HashMap<HID, Backbone>();
-		availableBackbones = new ArrayList<Backbone>();
+		availableBackbones = new HashMap<String, Backbone>();
 		configurator = new BackboneRouterConfigurator(this,
 				context.getBundleContext());
 		logger.info(BACKBONE_ROUTER + " started");
@@ -48,12 +49,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 	}
 
 	protected void bindBackbone(Backbone backbone) {
-		if (!availableBackbones.contains(backbone))
-			availableBackbones.add(backbone);
+		addBackbone(backbone);
 	}
 
 	protected void unbindBackbone(Backbone backbone) {
-		availableBackbones.remove(backbone);
+		removeBackbone(backbone);
 	}
 
 	protected void bindNMCore(NetworkManagerCore core) {
@@ -96,7 +96,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		// TODO: check why backbone would be needed - and if it is needed one
 		// has to check if receiverHID is NULL (in case of broadcast message
 		// receiverHID is NULL)
-		// 
+		//
 		// Backbone b = (Backbone)hidBackboneMap.get(receiverHID);
 		hidBackboneMap.put(senderHID, originatingBackbone);
 
@@ -115,34 +115,23 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * @param originatingBackbone
 	 * @return
 	 */
-	@Override
-	public NMResponse createHid(HID tempId, HID receiverHID, byte[] data,
-			Backbone originatingBackbone) {
-
-		try {
-			HID newHid = nmCore.createHID(data);
-			hidBackboneMap.put(newHid, originatingBackbone);
-			return nmCore.sendData(newHid, receiverHID, data);
-		} catch (RemoteException e) {
-			logger.error(e.getMessage(), e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return new NMResponse(NMResponse.STATUS_ERROR);
-
-	}
-
-	/**
-	 * Returns a list of communication channels available to the network
-	 * manager.
-	 * 
-	 * @return list of communication channels
-	 */
-	@Override
-	public List<Backbone> getAvailableCommunicationChannels() {
-		return availableBackbones;
-	}
+	// @Override
+	// public NMResponse createHid(HID tempId, HID receiverHID, byte[] data,
+	// Backbone originatingBackbone) {
+	//
+	// try {
+	// HID newHid = nmCore.createHID(data);
+	// hidBackboneMap.put(newHid, originatingBackbone);
+	// return nmCore.sendData(newHid, receiverHID, data);
+	// } catch (RemoteException e) {
+	// logger.error(e.getMessage(), e);
+	// } catch (IOException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	// return new NMResponse(NMResponse.STATUS_ERROR);
+	//
+	// }
 
 	/**
 	 * This function is called when the configuration is updated from the web
@@ -169,7 +158,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	public NMResponse broadcastData(HID senderHid, byte[] data) {
 		boolean success = true;
 		String failedBroadcast = "";
-		for (Backbone bb : availableBackbones) {
+		for (Backbone bb : availableBackbones.values()) {
 			if (bb.broadcastData(senderHid, data).getData() == NMResponse.STATUS_ERROR) {
 				failedBroadcast += " " + bb.getClass();
 				success = false;
@@ -200,4 +189,100 @@ public class BackboneRouterImpl implements BackboneRouter {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.linksmart.network.routing.BackboneRouter#addRoute(eu.linksmart.network
+	 * .HID, java.lang.String)
+	 */
+	@Override
+	public boolean addRoute(HID hid, String backboneName) {
+		if (hidBackboneMap.containsKey(hid)) {
+			return false;
+		}
+		Backbone backbone = availableBackbones.get(backboneName);
+		if (backbone == null) {
+			return false;
+		}
+		hidBackboneMap.put(hid, backbone);
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.linksmart.network.routing.BackboneRouter#addRouteToBackbone(eu.linksmart
+	 * .network.HID, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean addRouteToBackbone(HID hid, String backboneName,
+			String endpoint) {
+		if (hidBackboneMap.containsKey(hid)) {
+			return false;
+		}
+		Backbone backbone = availableBackbones.get(backboneName);
+		if (backbone == null) {
+			return false;
+		}
+		return backbone.addEndpoint(hid, endpoint);
+
+	}
+
+	@Override
+	public boolean removeRoute(HID hid, String backbone) {
+		if (!hidBackboneMap.get(hid).getClass().getName().equals(backbone)) {
+			return false;
+		}
+		hidBackboneMap.remove(hid);
+		return true;
+	}
+
+	/**
+	 * Returns a list of communication channels available to the network
+	 * manager.
+	 * 
+	 * @return list of communication channels
+	 */
+	@Override
+	public List<String> getAvailableBackbones() {
+		return new ArrayList<String>(availableBackbones.keySet());
+	}
+
+	/**
+	 * Adds a new backbone to the list of available backbones, if a backbone
+	 * with this name does not exist already.
+	 * 
+	 * @param backbone
+	 *            the Backbone to add
+	 * @return whether the Backbone was added
+	 */
+	private boolean addBackbone(Backbone backbone) {
+		if (availableBackbones.containsValue(backbone)) {
+			return false;
+		}
+		availableBackbones.put(backbone.getClass().getName(), backbone);
+		return true;
+	}
+
+	/**
+	 * Removes a backbone from the list of available backbones, if it is
+	 * contained therein
+	 * 
+	 * @param backbone
+	 *            the Backbone to remove
+	 * @return whether the Backbone was removed (i.e., whether it was present)
+	 */
+	private boolean removeBackbone(Backbone backbone) {
+		// Remove all routes; need to use Collections.singleton() for
+		// removeAll(Collection) - remove() would only remove one instance
+		hidBackboneMap.values().removeAll(Collections.singleton(backbone));
+		for (Entry<HID, Backbone> e : this.hidBackboneMap.entrySet()) {
+			if (e.getValue() == backbone) {
+				hidBackboneMap.remove(e.getKey());
+			}
+		}
+		return availableBackbones.values().remove(backbone);
+	}
 }
