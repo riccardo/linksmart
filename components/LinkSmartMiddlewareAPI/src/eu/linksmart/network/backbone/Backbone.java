@@ -47,7 +47,7 @@ public interface Backbone {
 	 * @param hid
 	 * @return the backbone address represented by the Hid
 	 */
-	public String getDestinationAddressAsString(HID hid);
+	public String getEndpoint(HID hid);
 
 	/**
 	 * Adds a new endpoint to the backbone.
