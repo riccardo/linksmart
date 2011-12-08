@@ -41,7 +41,7 @@ MessageDistributor {
 
 	protected BackboneRouter backboneRouter;
 
-	protected ConnectionManager connectionManager;
+	protected ConnectionManager connectionManager = new ConnectionManager();
 
 	protected CryptoManager cryptoManager;
 
@@ -84,7 +84,6 @@ MessageDistributor {
 		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
 		.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
-		this.connectionManager = new ConnectionManager();
 		this.connectionManager.setCommunicationSecurityManager(this.commSecMgr);
 		Properties attributes = new Properties();
 		attributes.setProperty(HIDAttribute.DESCRIPTION.name(),
