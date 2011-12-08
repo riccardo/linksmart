@@ -145,15 +145,10 @@ MessageDistributor {
 
 		NMResponse response = this.backboneRouter.sendData(sender, receiver,
 				data);
-
 		return response;
 	}
 
 	public Boolean removeHID(HID hid) throws RemoteException {
-
-		// TODO Check if have some kind of service registry and need to remove a
-		// service there as well
-
 		Boolean hidRemoved = this.identityManager.removeHID(hid);
 		this.connectionManager.deleteHIDPolicy(hid);
 
@@ -246,7 +241,7 @@ MessageDistributor {
 			}
 			/* send message over sendMessage method of this and return response
 			of it*/
-			return sendMessage(msg);
+			return sendMessage(msg, this.myHID, receiverHID);
 		} else {
 			NMResponse response = new NMResponse();
 			response.setData(SUCCESSFUL_PROCESSING);
@@ -325,6 +320,20 @@ MessageDistributor {
 	public NMResponse sendMessage(Message message) {
 		HID senderHID = message.getReceiverHID();
 		HID receiverHID = message.getSenderHID();
+		return sendMessage(message, senderHID, receiverHID);
+	}
+	
+	/**
+	 * Internal method for sending messages with more possible
+	 * parameters. The message contains the original sender and
+	 * the final receiver but the parameters determine which
+	 * connection to use for sending.
+	 * @param message Message to send
+	 * @param senderHID Sender endpoint of connection to open
+	 * @param receiverHID Receiver endpoint of connection to open
+	 * @return
+	 */
+	private NMResponse sendMessage(Message message, HID senderHID, HID receiverHID){
 		byte[] data = null;
 		try {
 			Connection connection = this.connectionManager.getConnection(
