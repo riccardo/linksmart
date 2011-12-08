@@ -2,6 +2,7 @@ package eu.linksmart.network.networkmanager.impl;
 
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -49,9 +50,9 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 		}
 
 		@Override
-		public HID createHID(Properties attributes, URL url)
+		public HID createHID(Properties attributes, String endpoint, String backboneName)
 				throws RemoteException {
-			return this.core.createHID(attributes, url);
+			return this.core.createHID(attributes, endpoint, backboneName);
 		}
 
 		@Override
@@ -62,5 +63,10 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 		@Override
 		public HIDInfo createCryptoHIDFromReference(String certRef) {
 			return this.core.createCryptoHIDFromReference(certRef);
+		}
+
+		@Override
+		public List<String> getAvailableBackbones() {
+			return this.core.getAvailableBackbones();
 		}
 }

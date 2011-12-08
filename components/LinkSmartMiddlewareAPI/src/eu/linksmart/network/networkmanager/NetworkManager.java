@@ -2,6 +2,7 @@ package eu.linksmart.network.networkmanager;
 
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Properties;
 
 import eu.linksmart.network.HID;
@@ -27,11 +28,13 @@ public interface NetworkManager {
 	/**
 	 * Creates HID for particular service.
 	 * @param attributes Attributes as description, PID etc
-	 * @param url URL for executing SOAP Tunneling.
+	 * @param endpoint Backbone specific endpoint, e.g. URL or JXTA id
+	 * @param backboneName Class name of the Backbone this service is reachable
 	 * @return HID instance.
 	 * @throws RemoteException
 	 */
-	public HID createHID(Properties attributes, URL url) throws RemoteException;
+	public HID createHID(Properties attributes, String endpoint, String backboneName)
+	throws RemoteException;
 	
 	/**
 	 * Note: Boolean instead of boolean for .NET compatibility
@@ -74,5 +77,13 @@ public interface NetworkManager {
 	 * @return The {@link String} representation of the HID.
 	 */
 	public HIDInfo createCryptoHIDFromReference(String certRef);
-
+	
+	/**
+	 * To control what communication channels or backbones the
+	 * NetworkManager supports this method provided the list of
+	 * names of them. This information can be used by a service
+	 * to decide which channel to register over.
+	 * @return Class names of the connected Backbones
+	 */
+	public List<String> getAvailableBackbones();
 }

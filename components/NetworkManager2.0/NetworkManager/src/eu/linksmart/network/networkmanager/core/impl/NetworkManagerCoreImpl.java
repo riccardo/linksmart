@@ -21,6 +21,7 @@ import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.identity.IdentityManager;
@@ -28,6 +29,7 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.network.service.registry.ServiceRegistry;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
+import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.tools.GetNetworkManagerStatus;
 import eu.linksmart.tools.NetworkManagerApplicationStatus;
@@ -110,9 +112,31 @@ MessageDistributor {
 		return this.myHID;
 	}
 
-	public HID createHID(Properties attributes, URL url) throws RemoteException {
-
+	public HID createHID(Properties attributes, String endpoint, String backboneName)
+	throws RemoteException {
+		//check if backbone exist before creating the HID
+		boolean backboneFound = false;
+		for (String backbone : this.backboneRouter.getAvailableBackbones()) {
+			if(backbone == backboneName){
+				backboneFound = true;
+				break;
+			}
+		}
+		if (!backboneFound) {
+			throw new IllegalArgumentException("Required backbone not available");
+		}
+		
 		HID newHID = this.identityManager.createHIDForAttributes(attributes);
+		//TODO #NM refactoring configurable security properties
+		ArrayList<SecurityProperty> properties = new ArrayList<SecurityProperty>();
+		properties.add(SecurityProperty.NoSecurity);
+		//register HID with backbone policies in connection manager
+		this.connectionManager.registerHIDPolicy(
+				newHID, 
+				properties);
+		//add route to selected backbone
+		this.backboneRouter.addRouteToBackbone(newHID, backboneName, endpoint);	
+		
 		return newHID;
 	}
 
@@ -402,6 +426,10 @@ MessageDistributor {
 			LOG.error(e.getMessage(), e);
 		}
 		return null;
+	}
+
+	public List<String> getAvailableBackbones() {
+		return this.backboneRouter.getAvailableBackbones();
 	}
 
 }

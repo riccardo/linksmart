@@ -70,15 +70,12 @@ public class ConfiguratorActivator  {
 	 * constants
 	 */
 	private static final String OSGI_HTTP_SERVICE_PORT_PROPERTY = System.getProperty("org.osgi.service.http.port");
-	private static final String SID ="eu.linksmart.Configuration";
-	private static final String SERVICE_URL = "http://localhost:" + OSGI_HTTP_SERVICE_PORT_PROPERTY  + "/axis/services/LinkSmartConfigurator";
-	
 	private final static String WEB_SERVLET_ALIAS = "/LinkSmartConfigurator";
 	private final static String GETCONFIGURATION_SERVLET_ALIAS =
 		"/LinkSmartConfigurator/GetConfiguration";
-	
+
 	private static String PID;
-	
+
 	/**
 	 * fields
 	 */
@@ -88,13 +85,11 @@ public class ConfiguratorActivator  {
 	private HttpService http;
 	private GetConfigurationServlet getConfigurationServlet;
 	private Logger logger = Logger.getLogger(ConfiguratorActivator.class.getName());
-	private NetworkManager nm;
-	private CryptoHIDResult cryptoHID;
-	
+
 	static {
 		try {
 			PID = InetAddress.getLocalHost().getHostName();
-			
+
 		} catch (UnknownHostException e) {
 			PID = "Unknown";
 		}
@@ -110,19 +105,16 @@ public class ConfiguratorActivator  {
 		this.configuratorImpl = new ConfiguratorImpl(context);
 		configuratorReg = context.getBundleContext().registerService(
 				Configurator.class.getName(), this.configuratorImpl, null);
-		
+
 		try {
 			if (http != null) {
 				registerServlets(http);
-			}
-			if (nm != null) {
-				registerHID(nm);
 			}
 		} catch (Exception e) {
 			logger.error(e);
 		}
 	}
-	
+
 	/**
 	 * Deactivate method
 	 * 
@@ -134,7 +126,7 @@ public class ConfiguratorActivator  {
 			unregisterServlets(http);
 		}
 	}
-		
+
 	/**
 	 * Register servlets into an Http Service
 	 * 
@@ -155,7 +147,7 @@ public class ConfiguratorActivator  {
 			}
 		}
 	}
-	
+
 	/**
 	 * Unregister servlets from an Http Service
 	 * 
@@ -165,57 +157,5 @@ public class ConfiguratorActivator  {
 		http.unregister(WEB_SERVLET_ALIAS);
 		http.unregister(GETCONFIGURATION_SERVLET_ALIAS);
 		http.unregister("/LinkSmartStatus");
-		
-		if ((nm != null) && (cryptoHID != null)) {
-			try {
-				nm.removeHID(new HID(cryptoHID.getHID()));
-			} catch (RemoteException e) {
-				logger.error(e);
-			}
-		}
 	}
-	
-	/**
-	 * Registers an HID in the Network Manager
-	 * 
-	 * @param nm the NetworkManagerApplication
-	 */
-	protected void registerHID(NetworkManager nm) {
-		this.nm = nm;
-		if (http != null) {
-			try {
-				Properties attributes = new Properties();
-				
-				attributes.setProperty(HIDAttribute.PID.name(), PID);
-				attributes.setProperty(HIDAttribute.SID.name(), SID);
-				
-				HID hid = nm.createHID(attributes, new URL(SERVICE_URL));
-				this.cryptoHID.setHID(hid.toString());
-				//TODO #NM Amro & Marc V.
-//				this.cryptoHID.setCertRef(certRef)
-			} catch (RemoteException e) {
-				logger.error(e);
-			} catch (MalformedURLException e) {
-				logger.error(e);
-			}
-		}
-	}
-	
-	/**
-	 * Unregisters an HID in the Network Manager
-	 * 
-	 * @param nm the NetworkManagerApplication
-	 */
-	protected void unregisterHID(NetworkManager nm) {
-		if (http != null) {
-			try {
-				nm.removeHID(new HID(cryptoHID.getHID()));
-				this.cryptoHID = null;
-			} catch (RemoteException e) {
-				logger.error(e);
-			}
-		}
-		this.nm = null;
-	}
-	
 }

@@ -130,17 +130,22 @@ public class ConnectionManager {
 				}
 			}
 		}
-		if(!this.communicationSecurityManagers.isEmpty()) {
-			for(CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers){
-				if(matchingPolicies(allRequirements, comSecMgr.getProperties())){
+		boolean foundComSecMgr = false;
+		if (!this.communicationSecurityManagers.isEmpty()) {
+			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
+				if (matchingPolicies(allRequirements, comSecMgr.getProperties())){
 					conn.setSecurityProtocol(comSecMgr.getSecurityProtocol(senderHID, receiverHID));
+					foundComSecMgr = true;
+					break;
 				}
 			}
-		} else if(allRequirements.size() != 0 
+		}
+		if (!foundComSecMgr 
+				&& allRequirements.size() != 0 
 				&& !(allRequirements.size() == 1 
-						&& allRequirements.contains(SecurityProperty.NoSecurity))){
-			//no available communicatino security manager although required
-			throw new Exception("Required properties not fulfilled as no ConnectionSecurityManager");
+						&& allRequirements.contains(SecurityProperty.NoSecurity))) {
+			//no available communication security manager although required
+			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
 		}
 		//add connection to list
 		connections.add(conn);
@@ -156,11 +161,11 @@ public class ConnectionManager {
 	 * @return Connection to be used for getting the contents of the received data
 	 * @throws Exception If there are policies for an HID but no CommunicationSecurityManager
 	 */
-	public synchronized Connection getBroadcastConnection(HID senderHID) throws Exception{
+	public synchronized Connection getBroadcastConnection(HID senderHID) throws Exception {
 		Calendar cal = Calendar.getInstance();
 		//find connection belonging to this HID
 		for(Connection c : connections){
-			if(c.getClientHID() == senderHID && c.getClass() == BroadcastConnection.class){
+			if(c.getClientHID() == senderHID && c.getClass() == BroadcastConnection.class) {
 				//set last use date of connection
 				timeouts.put(c, cal.getTime());
 				return c;
@@ -170,20 +175,23 @@ public class ConnectionManager {
 		//there was no connection found so create new connection
 		List<SecurityProperty> policies = this.hidPolicies.get(senderHID);
 		BroadcastConnection conn = new BroadcastConnection(senderHID);
-		if(!this.communicationSecurityManagers.isEmpty()){
+		boolean foundComSecMgr = false;
+		if(!this.communicationSecurityManagers.isEmpty()) {
 			if(policies != null){
-				for(CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers){
+				for(CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
 					if(matchingPolicies(policies, comSecMgr.getProperties())
 							&& comSecMgr.getProperties().contains(SecurityProperty.Broadcast))
 						conn.setSecurityProtocol(
 								comSecMgr.getBroadcastSecurityProtocol(senderHID));
 				}
 			}
-		} else if(policies != null 
+		}
+		if(!foundComSecMgr
+				&& policies != null 
 				&& policies.size() != 0
-				&& !(policies.size() == 1 && policies.contains(SecurityProperty.NoSecurity))){
-			//no available communicatino security manager although required
-			throw new Exception("Required properties not fulfilled as no ConnectionSecurityManager");
+				&& !(policies.size() == 1 && policies.contains(SecurityProperty.NoSecurity))) {
+			//no available communication security manager although required
+			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
 		}
 		//add connection to list
 		connections.add(conn);
