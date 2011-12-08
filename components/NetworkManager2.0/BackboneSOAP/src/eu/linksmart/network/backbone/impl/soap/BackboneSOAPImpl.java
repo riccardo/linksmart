@@ -425,7 +425,10 @@ public class BackboneSOAPImpl implements Backbone {
 	 * @return the backbone address represented by the Hid
 	 */
 	public String getEndpoint(HID hid) {
-		return null;
+		if (!hidUrlMap.containsKey(hid)) {
+			return null;
+		}
+		return hidUrlMap.get(hid).toString();
 	}
 
 	@Override
