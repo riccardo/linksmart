@@ -1,5 +1,6 @@
 package eu.linksmart.network.routing;
 
+import java.io.ObjectInputStream.GetField;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -53,22 +54,43 @@ public interface BackboneRouter {
 	 * @param originatingBackbone
 	 * @return
 	 */
-//	public NMResponse createHid(HID tempId, HID receiverHID, byte[] data,
-//			Backbone originatingBackbone);
+	// public NMResponse createHid(HID tempId, HID receiverHID, byte[] data,
+	// Backbone originatingBackbone);
 
-	public boolean addRoute(HID hid, Backbone backbone);
-	
-	public boolean addRouteToBackbone(HID hid, Backbone backbone, String endpoint);
-	
-	public boolean removeRoute(HID hid);
-	
 	/**
-	 * Returns a list of communication channels available to the network
-	 * manager.
+	 * Adds a new route to the BackboneRouter.
 	 * 
-	 * @return list of communication channels
+	 * @param hid
+	 *            the HID of which the route is added
+	 * @param backbone
+	 *            the Backbone through which the HID can be reached
+	 * @return whether adding the route was successful
+	 * @see {@link getAvailableCommunicationChannels()}
 	 */
-	public List<Backbone> getAvailableCommunicationChannels();
+	public boolean addRoute(HID hid, String backbone);
+
+	/**
+	 * Adds a new route to the BackboneRouter. In addition, the endpoint is
+	 * propagated to the Backbone.
+	 * 
+	 * @param hid
+	 *            the HID of which the route is added
+	 * @param backbone
+	 *            the Backbone through which the HID can be reached
+	 * @param endpoint
+	 * @return
+	 */
+	public boolean addRouteToBackbone(HID hid, String backbone,
+			String endpoint);
+
+	public boolean removeRoute(HID hid);
+
+	/**
+	 * Returns a list of backbones available to the network manager.
+	 * 
+	 * @return list of backbone names (IDs)
+	 */
+	public List<String> getAvailableBackbones();
 
 	/**
 	 * this method is invoked by NMCore to broadcast HIDs.
