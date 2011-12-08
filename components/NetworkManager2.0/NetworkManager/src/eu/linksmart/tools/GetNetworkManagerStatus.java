@@ -50,7 +50,6 @@ import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
-import eu.linksmart.network.service.registry.ServiceRegistry;
 
 /**
  * NetworkManagerStatus Servlet
@@ -62,7 +61,6 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	IdentityManager identityManager;
 	private NetworkManagerCore networkManagerCore;
 	private BackboneRouter backboneRouter;
-	private ServiceRegistry serviceRegistry;
 
 	/**
 	 * Constructor
@@ -78,7 +76,6 @@ public class GetNetworkManagerStatus extends HttpServlet {
 		this.networkManagerCore = networkManagerCore;
 		this.identityManager = identityManager;
 		this.backboneRouter = backboneRouter;
-		this.serviceRegistry = serviceRegistry;
 
 	}
 
