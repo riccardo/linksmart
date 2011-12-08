@@ -26,8 +26,9 @@ public interface BackboneRouter {
 	 * @param receiverHID
 	 * @param message
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] protectedData);
-	
+	public NMResponse sendData(HID senderHID, HID receiverHID,
+			byte[] protectedData);
+
 	/**
 	 * Receives a message which also specifies the communication channel used by
 	 * the sender. This will then update the list of HIDs and which backbone
@@ -38,11 +39,13 @@ public interface BackboneRouter {
 	 * @param data
 	 * @param originatingBackbone
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data, Backbone originatingBackbone);
+	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data,
+			Backbone originatingBackbone);
 
 	/**
-	 * this method is invoked by backbone when a service requests a new HID to the network manager. 
-	 * this msg will be firstly accepted by backbone, and then propagated to the NMCore and IdManager
+	 * this method is invoked by backbone when a service requests a new HID to
+	 * the network manager. this msg will be firstly accepted by backbone, and
+	 * then propagated to the NMCore and IdManager
 	 * 
 	 * @param tempId
 	 * @param receiverHID
@@ -50,7 +53,14 @@ public interface BackboneRouter {
 	 * @param originatingBackbone
 	 * @return
 	 */
-	public NMResponse createHid(HID tempId, HID receiverHID, byte[] data,  Backbone originatingBackbone);
+//	public NMResponse createHid(HID tempId, HID receiverHID, byte[] data,
+//			Backbone originatingBackbone);
+
+	public boolean addRoute(HID hid, Backbone backbone);
+	
+	public boolean addRouteToBackbone(HID hid, Backbone backbone, String endpoint);
+	
+	public boolean removeRoute(HID hid);
 	
 	/**
 	 * Returns a list of communication channels available to the network
@@ -59,26 +69,26 @@ public interface BackboneRouter {
 	 * @return list of communication channels
 	 */
 	public List<Backbone> getAvailableCommunicationChannels();
-	
+
 	/**
-	 * this method is invoked by NMCore to broadcast HIDs. 
+	 * this method is invoked by NMCore to broadcast HIDs.
 	 * 
 	 * @param sender
 	 * @param data
 	 * @return
 	 */
-	public NMResponse broadcastData(HID sender, byte[] data); 
-	
+	public NMResponse broadcastData(HID sender, byte[] data);
+
 	/**
 	 * 
 	 * @param updates
 	 */
 	public void applyConfigurations(Hashtable updates);
-	
-	/** 
+
+	/**
 	 * @param hid
 	 * @return "BackboneType:BackboneAddresse"
 	 */
 	public String getRoute(HID hid);
-	
+
 }
