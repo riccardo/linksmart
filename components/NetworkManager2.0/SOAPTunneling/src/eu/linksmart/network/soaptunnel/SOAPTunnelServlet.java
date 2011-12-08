@@ -95,7 +95,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 			 String value = request.getHeader(header);
 			 req = req.concat(header + ": " + value + "\r\n");
 		}
-		
+		//TODO sendMessage?
 		NMResponse r = this.nmCore.sendData(sHid, rHid, req.getBytes());
 		String sResp = r.getData();
 
@@ -149,6 +149,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 					for(String line = null; (line = reader.readLine()) != null;)
 						SOAPRequest = SOAPRequest.concat(line);
 					logger.debug("Sending soap request through tunnel: " + SOAPRequest);
+					//TODO sendMessage?
 					NMResponse r = this.nmCore.sendData(senderHID, receiverHID, SOAPRequest.getBytes());
 					sResp = r.getData();
 					
