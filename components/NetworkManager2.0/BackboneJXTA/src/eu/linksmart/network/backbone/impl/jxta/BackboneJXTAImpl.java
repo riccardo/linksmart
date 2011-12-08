@@ -706,4 +706,16 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		}
 	}
 
+	@Override
+	public boolean addEndpoint(HID hid, String endpoint) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeEndpoint(HID hid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

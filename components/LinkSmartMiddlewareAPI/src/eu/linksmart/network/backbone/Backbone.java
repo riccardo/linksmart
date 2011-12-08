@@ -50,6 +50,25 @@ public interface Backbone {
 	public String getDestinationAddressAsString(HID hid);
 
 	/**
+	 * Adds a new endpoint to the backbone.
+	 * 
+	 * @param hid
+	 *            the HID that represents the endpoint
+	 * @param endpoint
+	 *            the endpoint to be reached, in a format that is specific to
+	 *            the Backbone implementation, as a String
+	 * @return whether adding the endpoint was successful
+	 */
+	public boolean addEndpoint(HID hid, String endpoint);
+
+	/**
+	 * Removes an endpoint from the backbone
+	 * @param hid the HID of which the endpoint should be removed
+	 * @return whether the endpoint was removed
+	 */
+	public boolean removeEndpoint(HID hid);
+	
+	/**
 	 * 
 	 * @param updates
 	 */

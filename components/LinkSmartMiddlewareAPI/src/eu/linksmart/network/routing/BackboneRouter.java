@@ -58,7 +58,9 @@ public interface BackboneRouter {
 	// Backbone originatingBackbone);
 
 	/**
-	 * Adds a new route to the BackboneRouter.
+	 * Adds a new route to the BackboneRouter. This will succeed if (and only
+	 * if) a route to the HID does not exist yet and there is a backbone with
+	 * the given name.
 	 * 
 	 * @param hid
 	 *            the HID of which the route is added
@@ -80,13 +82,16 @@ public interface BackboneRouter {
 	 * @param endpoint
 	 * @return whether adding the route was successful
 	 */
-	public boolean addRouteToBackbone(HID hid, String backbone,
-			String endpoint);
+	public boolean addRouteToBackbone(HID hid, String backbone, String endpoint);
 
 	/**
-	 * Removes a route from the BackboneRouter
-	 * @param hid The HID of which the route should be removed
-	 * @param backbone The name of the backbone through which the HID was reached
+	 * Removes a route from the BackboneRouter, if the HID was reached through
+	 * the given backbone
+	 * 
+	 * @param hid
+	 *            The HID of which the route should be removed
+	 * @param backbone
+	 *            The name of the backbone through which the HID was reached
 	 * @return whether removing the route was successful
 	 */
 	public boolean removeRoute(HID hid, String backbone);
