@@ -73,8 +73,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	 *            the Network Manager Service implementation
 	 */
 	public GetNetworkManagerStatus(NetworkManagerCore networkManagerCore,
-			IdentityManager identityManager, BackboneRouter backboneRouter,
-			ServiceRegistry serviceRegistry) {
+			IdentityManager identityManager, BackboneRouter backboneRouter) {
 
 		this.networkManagerCore = networkManagerCore;
 		this.identityManager = identityManager;

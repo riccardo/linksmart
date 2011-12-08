@@ -45,8 +45,6 @@ MessageDistributor {
 
 	protected CryptoManager cryptoManager;
 
-	private ServiceRegistry serviceRegistry;
-
 	protected HID myHID;
 
 	protected String myDescription;
@@ -98,11 +96,11 @@ MessageDistributor {
 		try {
 			http.registerServlet("/NetworkManagerStatus",
 					new NetworkManagerApplicationStatus(context, this,
-							identityManager, backboneRouter, serviceRegistry),
+							identityManager, backboneRouter),
 							null, null);
 			http.registerServlet("/GetNetworkManagerStatus",
 					new GetNetworkManagerStatus(this, identityManager,
-							backboneRouter, serviceRegistry), null, null);
+							backboneRouter), null, null);
 			http.registerResources("/files", "/resources", null);
 		} catch (Exception e) {
 			LOG.error("Error registering servlets", e);
@@ -116,9 +114,6 @@ MessageDistributor {
 	public HID createHID(Properties attributes, URL url) throws RemoteException {
 
 		HID newHID = this.identityManager.createHIDForAttributes(attributes);
-
-		this.serviceRegistry.registerService(newHID, url);
-
 		return newHID;
 	}
 

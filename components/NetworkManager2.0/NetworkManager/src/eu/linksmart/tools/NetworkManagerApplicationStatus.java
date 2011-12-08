@@ -84,7 +84,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 	 */
 	public NetworkManagerApplicationStatus(ComponentContext context,
 			NetworkManagerCore networkManager, IdentityManager identityManager,
-			BackboneRouter backboneRouter, ServiceRegistry serviceRegistry) {
+			BackboneRouter backboneRouter) {
 
 		this.identityManager = identityManager;
 		this.backboneRouter = backboneRouter;
