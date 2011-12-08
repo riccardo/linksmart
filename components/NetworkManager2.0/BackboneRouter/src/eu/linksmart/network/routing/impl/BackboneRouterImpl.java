@@ -193,7 +193,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public String getRoute(HID hid) {
 		Backbone b = hidBackboneMap.get(hid);
-		return b.toString() + ";" + b.getDestinationAddressAsString(hid);
+		if (b == null){
+			return null;
+		} else {
+			return b.toString() + ";" + b.getDestinationAddressAsString(hid);
+		}
 	}
 
 }
