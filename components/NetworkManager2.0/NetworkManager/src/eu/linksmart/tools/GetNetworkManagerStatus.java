@@ -76,7 +76,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 		this.networkManagerCore = networkManagerCore;
 		this.identityManager = identityManager;
 		this.backboneRouter = backboneRouter;
-
+		
 	}
 
 	/**
@@ -98,27 +98,25 @@ public class GetNetworkManagerStatus extends HttpServlet {
 			if (method.equals("getNetworkManagers")) {
 				Set<HIDInfo> hids = identityManager
 						.getHIDsByDescription("NetworkManager*");
-				processHIDs(hids, response, null);
+				processHIDs(hids, response);
 			} else if (method.equals("getLocalHids")) {
 				Set<HIDInfo> hids = identityManager.getLocalHIDs();
 				LOG.debug("Size of LocalHIDs: " + hids.size());
-				processHIDs(hids, response, null);
+				processHIDs(hids, response);
 			} else if (method.equals("getRemoteHids")) {
 				Set<HIDInfo> hids = identityManager.getRemoteHIDs();
 				LOG.debug("Size of RemoteHIDs: " + hids.size());
-				processHIDs(hids, response,
-						"HID entity not adapted to security issues");
+				processHIDs(hids, response);
 			} else if (method.equals("getNetworkManagerSearch")) {
 				Set<HIDInfo> hids = identityManager.getAllHIDs();
-				processHIDs(hids, response, null);
+				processHIDs(hids, response);
 				// TODO should be "HID entity not adapted to security issues"
 				// instead of null for remote HIDs; check with Mark?
 			}
 		}
 	}
 
-	private void processHIDs(Set<HIDInfo> hids, HttpServletResponse response,
-			String defaultDescription) {
+	private void processHIDs(Set<HIDInfo> hids, HttpServletResponse response) {
 
 		Iterator<HIDInfo> it = hids.iterator();
 		
@@ -135,11 +133,14 @@ public class GetNetworkManagerStatus extends HttpServlet {
 				description = description + key + " = " + value + ";";
 			}
 			
+			// Get the Route for this HID
+			String route = backboneRouter.getRoute(hidInfo.getHID());
+			
 			// Here we print one row
 			try {
 				response.getWriter().write(
 						hidInfo.getHID().toString() + "|" + description + "|"
-								+ "TODO: Host" + "|" + "TODO: Endpoint");
+								+ "TODO: Host" + "|" + route);
 				if (it.hasNext()) {
 					response.getWriter().write("<br>");
 				}
