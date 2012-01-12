@@ -159,6 +159,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		boolean success = true;
 		String failedBroadcast = "";
 		for (Backbone bb : availableBackbones.values()) {
+			logger.debug("BBRouter broadcastData over Backbone: " + bb.getClass().getName());
 			if (bb.broadcastData(senderHid, data).getData() == NMResponse.STATUS_ERROR) {
 				failedBroadcast += " " + bb.getClass();
 				success = false;

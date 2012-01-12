@@ -36,6 +36,11 @@ public class BackboneJXTAConfigurator extends Configurator {
 
 	public static final String MULTIMEDIA_PORT = "BackboneJXTA.MultimediaPort";
 
+
+	public static final String MODE_SUPERNODE = "SuperNode";
+	public static final String MODE_NODE = "Node";
+
+	
 	private BackboneJXTAImpl bbJXTAImpl;
 
 	/**

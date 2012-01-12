@@ -235,7 +235,7 @@ public class StdPeerGroupParamAdvertisement {
 					
 					if (field.getName().equals(miaTag)) {
 						inLineAdv = (ModuleImplAdvertisement)
-							AdvertisementFactory.newAdvertisement(field);
+							AdvertisementFactory.newAdvertisement(field.toString());
 						continue;
 					}
 				}

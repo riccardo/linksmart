@@ -49,23 +49,20 @@ import net.jxta.pipe.PipeService;
 import net.jxta.protocol.PipeAdvertisement;
 import net.jxta.socket.JxtaMulticastSocket;
 
-
 public class MulticastSocket {
-	public final static String SOCKETIDSTR =
-		"urn:jxta:uuid-59616261646162614E5047205032503393B5C2F6CA7A41FDB0F890173088E79404";
+	public final static String SOCKETIDSTR = "urn:jxta:uuid-59616261646162614E5047205032503393B5C2F6CA7A41FDB0F890173088E79404";
 	public PeerGroup pg;
 	public InetAddress localAddr;
-	
+
 	private Logger logger = Logger.getLogger(MulticastSocket.class.getName());
 
-	
 	/**
 	 * Constructor
 	 */
 	public MulticastSocket() {
 		super();
 	}
-	
+
 	/**
 	 * Gets the socket advertisement
 	 * 
@@ -73,51 +70,55 @@ public class MulticastSocket {
 	 */
 	public static PipeAdvertisement getSocketAdvertisement() {
 		PipeID socketID = null;
-		
+
 		try {
 			socketID = (PipeID) IDFactory.fromURI(new URI(SOCKETIDSTR));
 		} catch (URISyntaxException use) {
 			use.printStackTrace();
 		}
-		
-		PipeAdvertisement advertisement = 
-			(PipeAdvertisement) AdvertisementFactory.newAdvertisement(
-				PipeAdvertisement.getAdvertisementType());
-		
+
+		PipeAdvertisement advertisement = (PipeAdvertisement) AdvertisementFactory
+				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
+
 		advertisement.setPipeID(socketID);
 		/* Set to type to propagate. */
 		advertisement.setType(PipeService.PropagateType);
 		advertisement.setName("Socket tutorial");
 		return advertisement;
 	}
-	
+
 	/**
 	 * Creates a Multicast Socket
 	 * 
-	 * @param pg the peer group
+	 * @param pg
+	 *            the peer group
 	 * @return the Multicast Socket
 	 */
 	public JxtaMulticastSocket createMulticastSocket(PeerGroup pg) {
 		logger.debug("Creating JxtaMulticastSocket");
 		JxtaMulticastSocket mcastSocket = null;
-		
+
 		try {
 			mcastSocket = new JxtaMulticastSocket(pg, getSocketAdvertisement());
 			logger.debug("LocalAddress :" + mcastSocket.getLocalAddress());
-			logger.debug("LocalSocketAddress :" + mcastSocket.getLocalSocketAddress());
+			logger.debug("LocalSocketAddress :"
+					+ mcastSocket.getLocalSocketAddress());
 			localAddr = mcastSocket.getLocalAddress();
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
+		} catch (IOException e) {
+			logger.fatal("createMulticastSocket failed", e);
+			e.printStackTrace();
+			System.exit(-1);
+		}
 		return mcastSocket;
 	}
-	
+
 	/**
 	 * Sends data over a JXTA Multicast Socket
 	 * 
-	 * @param mcastSocket the Multicast Socket
-	 * @param packet the data to send
+	 * @param mcastSocket
+	 *            the Multicast Socket
+	 * @param packet
+	 *            the data to send
 	 */
 	public void sendData(JxtaMulticastSocket mcastSocket, DatagramPacket packet) {
 		try {

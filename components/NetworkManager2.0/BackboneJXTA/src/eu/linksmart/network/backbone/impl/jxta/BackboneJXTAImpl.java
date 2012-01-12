@@ -66,8 +66,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	public PipeSyncHandler pipeSyncHandler;
 	public SocketHandler socketHandler;
 	public ConfigMode jxtaMode;
-	public static String MODE_NODE_AS_STRING = "Node";
-	public static String MODE_SUPERNODE_AS_STRING = "SuperNode";
 	private String synched;
 	private MulticastSocket msocket;
 
@@ -119,23 +117,19 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		this.synched = (String) configurator
 				.get(BackboneJXTAConfigurator.SYNCHRONIZED);
 
-		String jxtaMode = ((String) configurator
+		String jxtaConfMode = ((String) configurator
 				.get(BackboneJXTAConfigurator.MODE));
 		/*
 		 * Depending on the mode of configuration the node can act as a
 		 * RDV(SuperNode) or as EDGE(Node)
 		 */
-		if (jxtaMode.equals(MODE_NODE_AS_STRING)) {
-			this.jxtaMode = NetworkManager.ConfigMode.EDGE;
-			logger.info("LinkSmart Network Manager configured as Node");
-		}
-		if (jxtaMode.equals(MODE_SUPERNODE_AS_STRING)) {
+		if (jxtaConfMode.equals(BackboneJXTAConfigurator.MODE_SUPERNODE)) {
 			this.jxtaMode = NetworkManager.ConfigMode.SUPER;
 			logger.info("LinkSmart Network Manager configured as Super Node");
-		}
-		if ((!jxtaMode.equals(MODE_NODE_AS_STRING))
-				&& (!jxtaMode.equals(MODE_SUPERNODE_AS_STRING))) {
-			logger.error("Wrong node mode format. Please choose between Node or SuperNode");
+		} else {
+			// if it not a super node it must be an edge
+			this.jxtaMode = NetworkManager.ConfigMode.EDGE;
+			logger.info("LinkSmart Network Manager configured as Node");
 		}
 
 		listOfRemoteEndpoints = new Hashtable<HID, String>();
@@ -229,6 +223,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	public NMResponse broadcastData(HID senderHID, byte[] data) {
 		NMResponse response = new NMResponse();
 
+		logger.debug("BBJXTA - broadcastData: "
+				+ BackboneJXTAUtils.ConvertByteArrayToString(data));
 		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
 
 		// send message as multicast message
@@ -296,23 +292,19 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		}
 		if (updates.containsKey(BackboneJXTAConfigurator.MODE)) {
 
-			String jxtaMode = ((String) updates
+			String jxtaConfMode = ((String) updates
 					.get(BackboneJXTAConfigurator.MODE));
 			/*
 			 * Depending on the mode of configuration the node can act as a
 			 * RDV(SuperNode) or as EDGE(Node)
 			 */
-			if (jxtaMode.equals(MODE_NODE_AS_STRING)) {
+			if (jxtaConfMode.equals(BackboneJXTAConfigurator.MODE_SUPERNODE)) {
+				this.jxtaMode = NetworkManager.ConfigMode.SUPER;
+				logger.info("LinkSmart Network Manager configured as SuperNode");
+			} else {
+				// if it is not a supernode it must be a node
 				this.jxtaMode = NetworkManager.ConfigMode.EDGE;
 				logger.info("LinkSmart Network Manager configured as Node");
-			}
-			if (jxtaMode.equals(MODE_SUPERNODE_AS_STRING)) {
-				this.jxtaMode = NetworkManager.ConfigMode.SUPER;
-				logger.info("LinkSmart Network Manager configured as Super Node");
-			}
-			if ((!jxtaMode.equals(MODE_NODE_AS_STRING))
-					&& (!jxtaMode.equals(MODE_SUPERNODE_AS_STRING))) {
-				logger.error("Wrong node mode format. Please choose between Node or SuperNode");
 			}
 		}
 
@@ -427,6 +419,12 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		netPGDiscoveryService.addDiscoveryListener(this);
 		peerID = netPeerGroup.getPeerID();
 
+		msocket = new MulticastSocket();
+		multicastSocket = msocket.createMulticastSocket(netPeerGroup);
+
+		listener = new MulticastSocketListener(multicastSocket, this);
+		listener.start();
+
 		/*
 		 * Add the listeners for the services in the LinkSmart group (discovery
 		 * and Rdv)
@@ -438,11 +436,13 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		socketHandler = new SocketHandler(this);
 
 		if (((String) configurator.getConfiguration().get(
-				BackboneJXTAConfigurator.MODE)).equals("SuperNode")) {
+				BackboneJXTAConfigurator.MODE))
+				.equals(BackboneJXTAConfigurator.MODE_SUPERNODE)) {
 			myPGRdvService.startRendezVous();
 		}
 		if (((String) configurator.getConfiguration().get(
-				BackboneJXTAConfigurator.MODE)).equals("Node")) {
+				BackboneJXTAConfigurator.MODE))
+				.equals(BackboneJXTAConfigurator.MODE_NODE)) {
 			waitForRdv();
 			if (!myPGRdvService.isConnectedToRendezVous()) {
 				logger.info("Could not connect to LinkSmart Super Node. Will "
@@ -452,11 +452,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			}
 		}
 
-		msocket = new MulticastSocket();
-		multicastSocket = msocket.createMulticastSocket(netPeerGroup);
-
-		listener = new MulticastSocketListener(multicastSocket, this);
-		listener.start();
 	}
 
 	/**
@@ -620,10 +615,10 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		multicastSocket.close();
 
 		jxtaNetworkManager = null;
-		netPeerGroup.globalRegistry.unRegisterInstance(
-				netPeerGroup.getPeerGroupID(), netPeerGroup);
+		// netPeerGroup.globalRegistry.unRegisterInstance(
+		// netPeerGroup.getPeerGroupID(), netPeerGroup);
 		netPeerGroup.stopApp();
-		netPeerGroup.unref();
+		// netPeerGroup.unref();
 		netPeerGroup = null;
 
 		listener = null;
@@ -673,27 +668,42 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 					logger.error(
 							getName() + ": Unable to receive data in "
 									+ m.toString(), e2);
+					e2.printStackTrace();
 				}
 
-				String senderJXTAID = receivedData.getAddress().getHostName();
-
-				HID senderHID = BackboneJXTAUtils.GetHIDFromData(receivedData
-						.getData());
+				logger.debug("BBJXTA receive multicast message: "
+						+ BackboneJXTAUtils
+								.ConvertByteArrayToString(receivedData
+										.getData()));
 
 				// give message to BBRouter for further processing
 				// receiverHID is null because this is a broadcast message
 				try {
-					bbRouter.receiveData(senderHID, null, BackboneJXTAUtils
-							.RemoveHIDFromData(receivedData.getData()),
-							(Backbone) bbJXTA);
+					String msgAsString = BackboneJXTAUtils
+							.ConvertByteArrayToString(receivedData.getData())
+							.trim();
+
+					if (msgAsString.length() > 0) {
+						// do not process empty messages
+						String senderJXTAID = receivedData.getAddress()
+								.getHostName();
+
+						HID senderHID = BackboneJXTAUtils
+								.GetHIDFromData(receivedData.getData());
+
+						bbRouter.receiveData(senderHID, null, BackboneJXTAUtils
+								.RemoveHIDFromData(receivedData.getData()),
+								(Backbone) bbJXTA);
+
+						// add info to table of HID-Endpoints
+						listOfRemoteEndpoints.put(senderHID, senderJXTAID);
+					}
 				} catch (Exception e) {
 					logger.error(
 							"BBJXTA could not give received multicast message for processing to bbRouter",
 							e);
 				}
 
-				// add info to table of HID-Endpoints
-				listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 			}
 		}
 
@@ -702,19 +712,31 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		 */
 		public void stopThread() {
 			m.close();
+			m = null;
 			this.running = false;
 		}
 	}
 
 	@Override
 	public boolean addEndpoint(HID hid, String endpoint) {
-		// TODO Auto-generated method stub
+		try {
+			listOfRemoteEndpoints.put(hid, endpoint);
+			return true;
+		} catch (Exception e) {
+			logger.error("Unable to addEndpoint: " + endpoint.toString()
+					+ " for HID: " + hid, e);
+		}
 		return false;
 	}
 
 	@Override
 	public boolean removeEndpoint(HID hid) {
-		// TODO Auto-generated method stub
+		try {
+			listOfRemoteEndpoints.remove(hid);
+			return true;
+		} catch (Exception e) {
+			logger.error("Unable to remove endpoint for HID: " + hid, e);
+		}
 		return false;
 	}
 

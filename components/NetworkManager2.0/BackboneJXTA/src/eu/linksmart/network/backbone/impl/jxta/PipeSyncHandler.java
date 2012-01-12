@@ -131,18 +131,26 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 * @return a pipe advertisement
 	 */
 	private PipeAdvertisement createPipeAdv() {
+		// String ppidSeed =
+		// "urn:jxta:uuid-79B6A084D3264DF8B641867D926C48D9F3C29CB8709F4D7EB39D92335B61D4CE04";
+		// PipeID pipeID =
+		// IDFactory.newPipeID(bbjxta.netPeerGroup.getPeerGroupID() ,
+		// ppidSeed.getBytes());
+
 		PipeID pipeID = IDFactory.newPipeID(bbjxta.netPeerGroup
 				.getPeerGroupID());
+
 		PipeAdvertisement pipeAdv = (PipeAdvertisement) AdvertisementFactory
 				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
-		System.err.println(pipeID.toString());
-		String ppid = "urn:jxta:uuid-79B6A084D3264DF8B641867D926C48D9F3C29CB8709F4D7EB39D92335B61D4CE04";
 
-		try {
-			pipeID = (PipeID) IDFactory.fromURI(new URI(ppid));
-		} catch (URISyntaxException e) {
-			logger.error("Imposible to create PipeID for the pipe advertisement");
-		}
+//		try {
+//			// pipeID = (PipeID) IDFactory.fromURI(new URI(ppid));
+//			pipeID = IDFactory.newPipeID(bbjxta.netPeerGroup.getPeerGroupID(),
+//					ppidSeed.getBytes());
+//		} catch (Exception e) {
+//			logger.error(
+//					"Imposible to create PipeID for the pipe advertisement", e);
+//		}
 
 		pipeAdv.setPipeID(pipeID);
 		pipeAdv.setName("Input Pipe Advertisement for Network Manager");
@@ -162,20 +170,25 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		return i;
 	}
 
-	
 	/**
 	 * Creates an asynchronous message
-	 * @param source the source HID
-	 * @param dest the destination HID
-	 * @param data the data
-	 * @param messageType the type of the message
+	 * 
+	 * @param source
+	 *            the source HID
+	 * @param dest
+	 *            the destination HID
+	 * @param data
+	 *            the data
+	 * @param messageType
+	 *            the type of the message
 	 * @return the asynchronous message
 	 */
-	private Message createAsyncMessage(HID source, HID dest, byte[] data, 
+	private Message createAsyncMessage(HID source, HID dest, byte[] data,
 			String messageType) {
-		
+
 		Message msg = new Message();
-		MessageElement elem = new StringMessageElement("Data", data.toString(), null);
+		MessageElement elem = new StringMessageElement("Data", data.toString(),
+				null);
 		msg.addMessageElement(null, elem);
 		elem = new StringMessageElement("Dest", dest.toString(), null);
 		msg.addMessageElement(null, elem);
@@ -188,18 +201,24 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 
 	/**
 	 * Creates a request message
-	 * @param sessionID the session ID
-	 * @param source the source HID
-	 * @param dest the destination HID
-	 * @param data the data
-	 * @param i the index
+	 * 
+	 * @param sessionID
+	 *            the session ID
+	 * @param source
+	 *            the source HID
+	 * @param dest
+	 *            the destination HID
+	 * @param data
+	 *            the data
+	 * @param i
+	 *            the index
 	 * @return the request message
 	 */
-	private Message createRequestMessage(HID source, 
-			HID dest, byte[] data) {
-		
+	private Message createRequestMessage(HID source, HID dest, byte[] data) {
+
 		Message msg = new Message();
-		MessageElement elem = new StringMessageElement("Data", data.toString(), null);
+		MessageElement elem = new StringMessageElement("Data", data.toString(),
+				null);
 		msg.addMessageElement(null, elem);
 		elem = new StringMessageElement("Dest", dest.toString(), null);
 		msg.addMessageElement(null, elem);
@@ -209,7 +228,6 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		msg.addMessageElement(null, elem);
 		return msg;
 	}
-
 
 	/**
 	 * Sends an asynchronous message
@@ -277,7 +295,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			}
 		} else {
 			Message message = createAsyncMessage(source, dest, data,
-					 messageType);
+					messageType);
 
 			try {
 				outPipe.send(message);
@@ -379,7 +397,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		 *            the data to send
 		 * @return the response
 		 */
-		public NMResponse sendDataOverPipe(String s, String d, byte[] data, PeerID pID) {
+		public NMResponse sendDataOverPipe(String s, String d, byte[] data,
+				PeerID pID) {
 
 			HID dest = new HID(d);
 			HID source = new HID(s);
@@ -416,8 +435,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					outPipe = createOutputPipe(pID);
 					logger.debug("The pipe to " + pID.toString()
 							+ " was closed or never created before");
-					Message message = createRequestMessage(source,
-							dest, data);
+					Message message = createRequestMessage(source, dest, data);
 
 					try {
 						outPipe.send(message);
@@ -438,8 +456,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					return resp;
 				}
 			} else {
-				Message message = createRequestMessage(source, dest,
-						data);
+				Message message = createRequestMessage(source, dest, data);
 
 				try {
 					outPipe.send(message);
@@ -570,7 +587,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 
 			try {
 				receiveData(source.toString(), dest.toString(),
-						BackboneJXTAUtils.ConvertStringToByteArray(data.toString()));
+						BackboneJXTAUtils.ConvertStringToByteArray(data
+								.toString()));
 			} catch (RemoteException e) {
 				logger.error("Error calling receiveData " + e.getMessage());
 			}

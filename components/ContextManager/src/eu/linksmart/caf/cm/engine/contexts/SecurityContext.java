@@ -38,8 +38,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import eu.linksmart.network.NetworkManagerApplication;
-
 /**
  * The {@link SecurityContext} represents the active mechanisms and
  * configurations for LinkSmart Security within the LinkSmart-defined Security Boundary.
