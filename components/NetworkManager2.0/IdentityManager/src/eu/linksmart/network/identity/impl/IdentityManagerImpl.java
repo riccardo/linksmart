@@ -25,20 +25,20 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 
 public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
-	private static String IDENTITY_MGR = IdentityManagerImpl.class
+	protected static String IDENTITY_MGR = IdentityManagerImpl.class
 			.getSimpleName();
-	private final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
+	protected final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
 
-	private static Logger LOG = Logger.getLogger(IDENTITY_MGR);
+	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
-	private ConcurrentHashMap<HID, HIDInfo> localHIDs;
-	private ConcurrentHashMap<HID, HIDInfo> remoteHIDs;
+	protected ConcurrentHashMap<HID, HIDInfo> localHIDs;
+	protected ConcurrentHashMap<HID, HIDInfo> remoteHIDs;
 
-	private ConcurrentLinkedQueue<String> queue;
+	protected ConcurrentLinkedQueue<String> queue;
 
-	private NetworkManagerCore networkManagerCore;
-	// Time in milliseconds to wait between broadcasts
-	private int broadcastSleepMillis = 1000;
+	protected NetworkManagerCore networkManagerCore;
+	/** Time in milliseconds to wait between broadcasts */
+	protected int broadcastSleepMillis = 1000;
 
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting " + IDENTITY_MGR);
@@ -73,7 +73,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		return hid;
 	}
 
-	private HID createUniqueHID() {
+	protected HID createUniqueHID() {
 		HID hid;
 		do {
 			hid = new HID();
@@ -272,7 +272,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * 
 	 * @return the update
 	 */
-	private synchronized BroadcastMessage getHIDListUpdate() {
+	protected synchronized BroadcastMessage getHIDListUpdate() {
 		String update = "";
 		while (queue.peek() != null) {
 			update = update + queue.poll() + " ";
@@ -336,7 +336,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * 
 	 * @return The previous value associated with that HID, null otherwise
 	 */
-	private HIDInfo addLocalHID(HID hid, HIDInfo info) {
+	protected HIDInfo addLocalHID(HID hid, HIDInfo info) {
 		if (!localHIDs.containsKey(hid)) {
 			localHIDs.put(hid, info);
 			queue.add("A;" + hid.toString() + ";" + info.getDescription());
@@ -353,7 +353,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * 
 	 * @return The previous value associated with that HID, null otherwise
 	 */
-	private HIDInfo addRemoteHID(HID hid, HIDInfo info) {
+	protected HIDInfo addRemoteHID(HID hid, HIDInfo info) {
 		if (!remoteHIDs.containsKey(hid)) {
 			remoteHIDs.put(hid, info);
 		}
@@ -365,7 +365,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * 
 	 * @param hid The HID to be removed
 	 */
-	private HIDInfo removeLocalHID(HID hid) {
+	protected HIDInfo removeLocalHID(HID hid) {
 		if (localHIDs.containsKey(hid)) {
 			queue.add("D;" + hid.toString());
 		}
@@ -379,7 +379,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * 
 	 * @return the result, null if
 	 */
-	private HIDInfo removeRemoteHID(HID hid) {
+	protected HIDInfo removeRemoteHID(HID hid) {
 		return remoteHIDs.remove(hid);
 	}
 
@@ -391,7 +391,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * @return Returns true if deviceID has already been assigned. False
 	 * otherwise.
 	 */
-	private boolean existsDeviceID(long deviceID) {
+	protected boolean existsDeviceID(long deviceID) {
 		boolean is = false;
 		Enumeration<HID> hids;
 		hids = localHIDs.keys();
@@ -405,7 +405,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		return is;
 	}
 
-	private class HIDUpdaterThread implements Runnable {
+	protected class HIDUpdaterThread implements Runnable {
 
 		@Override
 		public void run() {
