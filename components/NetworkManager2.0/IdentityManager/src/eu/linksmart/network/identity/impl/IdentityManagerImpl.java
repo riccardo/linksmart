@@ -28,6 +28,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
 			.getSimpleName();
 	protected final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
+	protected final static String IDMANAGER_NMADVERTISMENT_TOPIC = "NMAdvertisement";
 
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
@@ -37,17 +38,22 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected ConcurrentLinkedQueue<String> queue;
 
 	protected NetworkManagerCore networkManagerCore;
-	/** Time in milliseconds to wait between broadcasts */
+
+	/* Thread that checks for updated in HIDList and sends respective broadcasts */
+	protected Thread hidUpdaterThread;
+	/* Time in milliseconds to wait between broadcasts */
 	protected int broadcastSleepMillis = 1000;
+
+	/* Thread that sends network manager advertisement broadcasts */
+	protected Thread advertisingThread;
+	/* Time in milliseconds to wait between advertisements */
+	protected int advertisementSleepMillis = 60000;
 
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting " + IDENTITY_MGR);
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
-
-		Thread broadcastingThread = new Thread(new HIDUpdaterThread());
-		broadcastingThread.start();
 		LOG.info(IDENTITY_MGR + " started");
 	}
 
@@ -149,8 +155,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		 * our set under consideration this should be an optimization to the
 		 * (each criterion x each HIDInfo entry) approach
 		 */
-		
-		Collection<HIDInfo> allDescriptions = new HashSet<HIDInfo>();   
+
+		Collection<HIDInfo> allDescriptions = new HashSet<HIDInfo>();
 		allDescriptions.addAll(localHIDs.values());
 		allDescriptions.addAll(remoteHIDs.values()); // because we are searching
 		// in ALL hids, local
@@ -268,7 +274,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	// keep the following two methods near each other
 	// because they refer to the same format
 	/**
-	 * Gets HIDs update
+	 * Looks for updates in the list of HIDs and transforms them into a
+	 * {@link BroadcastMessage}
 	 * 
 	 * @return the update
 	 */
@@ -405,6 +412,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		return is;
 	}
 
+	/*
+	 * Thread sends broadcast message if there is an update in HIDList
+	 */
 	protected class HIDUpdaterThread implements Runnable {
 
 		@Override
@@ -418,22 +428,58 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				try {
 					Thread.sleep(broadcastSleepMillis);
 				} catch (InterruptedException e) {
-					LOG.error("Error while waiting", e);
+					Thread.currentThread().interrupt();
+					LOG.info("Interrupt Thread");
+					break;
 				}
 			}
+		}
 
+	}
+
+	/*
+	 * Thread sends NMAdvertisement broadcast message
+	 */
+	protected class AdvertisingThread implements Runnable {
+
+		@Override
+		public void run() {
+			while (true) {
+				if (networkManagerCore != null) {
+					// Send an empty NMAdvertisement broadcast
+					BroadcastMessage m = new BroadcastMessage(
+							IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
+									.getHID(), new byte[] {});
+					networkManagerCore.broadcastMessage(m);
+				}
+				try {
+					Thread.sleep(advertisementSleepMillis);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					LOG.info("Interrupt Thread");
+					break;
+				}
+			}
 		}
 
 	}
 
 	public void bindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
 		this.networkManagerCore = networkManagerCore;
+
+		// Start the threads once NetworkManagerCore is available
+		hidUpdaterThread = new Thread(new HIDUpdaterThread());
+		hidUpdaterThread.start();
+
+		advertisingThread = new Thread(new AdvertisingThread());
+		advertisingThread.start();
+
 	}
 
 	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
+		advertisingThread.interrupt();
+		hidUpdaterThread.interrupt();
 		this.networkManagerCore = null;
 	}
-	
-	
 
 }
