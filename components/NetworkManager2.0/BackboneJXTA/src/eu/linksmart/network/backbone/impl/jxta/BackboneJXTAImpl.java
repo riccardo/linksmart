@@ -42,8 +42,41 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.routing.BackboneRouter;
 
-/*
- * TODO #NM refactoring
+/**
+ * The class BackboneJXTAImpl implements the LinkSmart backbone that uses JXTA.
+ * 
+ * The class implements the methods defined in the respective interface class
+ * {@Backbone}.
+ * 
+ * The goal is that the communication for LinkSmart applications is transparent
+ * to the underlying protocol. Therefore BackboneJXTA manages everything related
+ * to JXTA communication and uses standardized interface methods. The
+ * BackboneJXTA does not know about the content of data exchanged.
+ * 
+ * On the other hand in order to transport important information (such as the
+ * senderHID) additional information will be added to the payload sent over the
+ * JXTA network. On the receiving side this information is extracted and the
+ * original payload is given to the Backbone manager component which in turn is
+ * responsible for further processing of the received data package.
+ * 
+ * JXTA is an implementation of the peer-to-peer (P2P) communication style. You
+ * can use JXTA to implement a P2P communication with Java.
+ * 
+ * Currently v2.5 of the JXTA java library is in use. One can find further
+ * information on the following pages:
+ * 
+ * http://java.sun.com/othertech/jxta/index.jsp or
+ * http://download.java.net/jxta/
+ * 
+ * On http://jxta.kenai.com/ one can find further information together with
+ * newer versions of the library. The development has been pushed by volunteers.
+ * 
+ * Oracle as the owner of SUN und Java has withdrawn from the JXTA project and
+ * currently no further development takes place.
+ * 
+ * 
+ * @author Schneider
+ * 
  */
 public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		DiscoveryListener {
@@ -163,7 +196,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 */
 
 	/**
-	 * Sends a message over the JXTA communication channel.
+	 * Sends a message for one specific recipient over the JXTA communication
+	 * channel.
 	 * 
 	 * @param senderHID
 	 * @param receiverHID
@@ -184,7 +218,9 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	}
 
 	/**
-	 * Receives a message over the JXTA communication channel.
+	 * Receives a message over the JXTA communication channel. In case of a
+	 * broadcast message the receiverHID is null (since the sender does not
+	 * specify who should receive this message).
 	 * 
 	 * @param senderHID
 	 * @param receiverHID
@@ -223,10 +259,10 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 				+ BackboneJXTAUtils.ConvertByteArrayToString(data));
 		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
 
-		logger.debug("BBJXTA broadcastData - senderHID: " + senderHID.toString());
+		logger.debug("BBJXTA broadcastData - senderHID: "
+				+ senderHID.toString());
 		logger.debug("BBJXTA - broadcastData with HID: "
-			+ BackboneJXTAUtils
-						.ConvertByteArrayToString(payload));
+				+ BackboneJXTAUtils.ConvertByteArrayToString(payload));
 
 		// send message as multicast message
 		synchronized (msocket) {
@@ -376,23 +412,24 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		//
 		// jxtaNetworkConfigurator.addRdvSeedingURI(uri);
 
-		
 		try {
 			URI superNodeTCPURI = new URI((String) configurator
 					.getConfiguration().get(
 							BackboneJXTAConfigurator.SUPERNODE_TCP_URI));
 			jxtaNetworkConfigurator.addSeedRendezvous(superNodeTCPURI);
-			logger.debug("Added SuperNode-TCP-URI: " + superNodeTCPURI.toString());
+			logger.debug("Added SuperNode-TCP-URI: "
+					+ superNodeTCPURI.toString());
 
 			URI superNodeHTTPURI = new URI((String) configurator
 					.getConfiguration().get(
 							BackboneJXTAConfigurator.SUPERNODE_HTTP_URI));
 			jxtaNetworkConfigurator.addSeedRendezvous(superNodeHTTPURI);
-			logger.debug("Added SuperNode-H-URI: " + superNodeHTTPURI.toString());
-			
-			if (Boolean.parseBoolean((String) configurator.getConfiguration().get(
-					BackboneJXTAConfigurator.RELAYED))) {
-//				jxtaNetworkConfigurator.addRelaySeedingURI(uri);
+			logger.debug("Added SuperNode-H-URI: "
+					+ superNodeHTTPURI.toString());
+
+			if (Boolean.parseBoolean((String) configurator.getConfiguration()
+					.get(BackboneJXTAConfigurator.RELAYED))) {
+				// jxtaNetworkConfigurator.addRelaySeedingURI(uri);
 				jxtaNetworkConfigurator.addRelaySeedingURI(superNodeTCPURI);
 				jxtaNetworkConfigurator.addRelaySeedingURI(superNodeHTTPURI);
 
@@ -408,7 +445,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		} catch (Exception e) {
 			logger.error("Could not add URI for SuperNode...", e);
 		}
-
 
 		if (Boolean.parseBoolean((String) configurator.getConfiguration().get(
 				BackboneJXTAConfigurator.MULTICAST))) {
