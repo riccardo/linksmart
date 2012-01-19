@@ -104,7 +104,7 @@ public interface EventManagerPort extends java.rmi.Remote {
 	 * @throws java.rmi.RemoteException
 	 */
 	public boolean publish(java.lang.String topicPattern, 
-		eu.linksmart.eventmanager.Part[] event) throws java.rmi.RemoteException;
+		eu.linksmart.utils.Part[] event) throws java.rmi.RemoteException;
 	
 	/**
 	 * setPriority method - Sets the priority to the given topic.

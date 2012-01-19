@@ -1,13 +1,11 @@
 package eu.linksmart.network.networkmanager;
 
-import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.Properties;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.utils.Part;
 
 /*
  * External Network Manager interface intended to be used by LinkSmart application developers.
@@ -33,16 +31,15 @@ public interface NetworkManager {
 	 * @return HID instance.
 	 * @throws RemoteException
 	 */
-	public HID createHID(Properties attributes, String endpoint, String backboneName)
+	public HID createHID(Part[] attributes, String endpoint, String backboneName)
 	throws RemoteException;
 	
 	/**
-	 * Note: Boolean instead of boolean for .NET compatibility
 	 * @param hid for particular service.
 	 * @return TRUE if operation succeeded and FALSE if not.
 	 * @throws RemoteException
 	 */
-	Boolean removeHID(HID hid) throws RemoteException;
+	boolean removeHID(HID hid) throws RemoteException;
 	
 	
 	/**
@@ -63,7 +60,7 @@ public interface NetworkManager {
 	 *         {@link String} representation of the HID and the certificate
 	 *         reference (UUID)
 	 */
-	public HIDInfo createCryptoHID(String xmlAttributes);
+//	public HIDInfo createCryptoHID(String xmlAttributes);
 	
 	/**
 	 * Operation to create an CryptoHID providing a certificate reference (from
@@ -85,5 +82,5 @@ public interface NetworkManager {
 	 * to decide which channel to register over.
 	 * @return Class names of the connected Backbones
 	 */
-	public List<String> getAvailableBackbones();
+	public String[] getAvailableBackbones();
 }
