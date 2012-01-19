@@ -39,7 +39,7 @@ public class NetworkManagerServiceLocator extends org.apache.axis.client.Service
         NetworkManagerWSDDServiceName = name;
     }
 
-    public eu.linksmart.network.networkmanager.client.NetworkManager getNetworkManager() throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.network.networkmanager.NetworkManager getNetworkManager() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
             endpoint = new java.net.URL(NetworkManager_address);
@@ -50,7 +50,7 @@ public class NetworkManagerServiceLocator extends org.apache.axis.client.Service
         return getNetworkManager(endpoint);
     }
 
-    public eu.linksmart.network.networkmanager.client.NetworkManager getNetworkManager(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.network.networkmanager.NetworkManager getNetworkManager(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
             eu.linksmart.network.networkmanager.client.NetworkManagerSoapBindingStub _stub = new eu.linksmart.network.networkmanager.client.NetworkManagerSoapBindingStub(portAddress, this);
             _stub.setPortName(getNetworkManagerWSDDServiceName());
@@ -72,7 +72,7 @@ public class NetworkManagerServiceLocator extends org.apache.axis.client.Service
      */
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
-            if (eu.linksmart.network.networkmanager.client.NetworkManager.class.isAssignableFrom(serviceEndpointInterface)) {
+            if (eu.linksmart.network.networkmanager.NetworkManager.class.isAssignableFrom(serviceEndpointInterface)) {
                 eu.linksmart.network.networkmanager.client.NetworkManagerSoapBindingStub _stub = new eu.linksmart.network.networkmanager.client.NetworkManagerSoapBindingStub(new java.net.URL(NetworkManager_address), this);
                 _stub.setPortName(getNetworkManagerWSDDServiceName());
                 return _stub;

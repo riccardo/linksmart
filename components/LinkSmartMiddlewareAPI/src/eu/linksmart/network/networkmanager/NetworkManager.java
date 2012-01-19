@@ -10,7 +10,7 @@ import eu.linksmart.utils.Part;
 /*
  * External Network Manager interface intended to be used by LinkSmart application developers.
  */
-public interface NetworkManager {
+public interface NetworkManager extends java.rmi.Remote {
 	
 	/**
 	 * Send data from one LinkSmart node to another node.
@@ -21,7 +21,7 @@ public interface NetworkManager {
 	 * Retrieves HID of NetworkManagerCore.
 	 * @return
 	 */
-	public HID getHID();
+	public HID getHID() throws RemoteException;
 	
 	/**
 	 * Creates HID for particular service.
@@ -62,7 +62,7 @@ public interface NetworkManager {
 	 *         reference (UUID)
 	 */
 	@Deprecated
-	public HIDInfo createCryptoHID(String xmlAttributes);
+	public HIDInfo createCryptoHID(String xmlAttributes) throws RemoteException;
 	
 	/**
 	 * Operation to create an CryptoHID providing a certificate reference (from
@@ -77,7 +77,7 @@ public interface NetworkManager {
 	 * @return The {@link String} representation of the HID.
 	 */
 	@Deprecated
-	public HIDInfo createCryptoHIDFromReference(String certRef);
+	public HIDInfo createCryptoHIDFromReference(String certRef) throws RemoteException;
 	
 	/**
 	 * To control what communication channels or backbones the
@@ -86,5 +86,5 @@ public interface NetworkManager {
 	 * to decide which channel to register over.
 	 * @return Class names of the connected Backbones
 	 */
-	public String[] getAvailableBackbones();
+	public String[] getAvailableBackbones() throws RemoteException;
 }

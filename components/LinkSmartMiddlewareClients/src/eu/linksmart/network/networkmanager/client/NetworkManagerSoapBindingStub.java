@@ -7,7 +7,7 @@
 
 package eu.linksmart.network.networkmanager.client;
 
-public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub implements eu.linksmart.network.networkmanager.client.NetworkManager {
+public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub implements eu.linksmart.network.networkmanager.NetworkManager {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
     private java.util.Vector cachedSerFactories = new java.util.Vector();

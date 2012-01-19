@@ -10,7 +10,7 @@ package eu.linksmart.network.networkmanager.client;
 public interface NetworkManagerService extends javax.xml.rpc.Service {
     public java.lang.String getNetworkManagerAddress();
 
-    public eu.linksmart.network.networkmanager.client.NetworkManager getNetworkManager() throws javax.xml.rpc.ServiceException;
+    public eu.linksmart.network.networkmanager.NetworkManager getNetworkManager() throws javax.xml.rpc.ServiceException;
 
-    public eu.linksmart.network.networkmanager.client.NetworkManager getNetworkManager(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
+    public eu.linksmart.network.networkmanager.NetworkManager getNetworkManager(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
 }
