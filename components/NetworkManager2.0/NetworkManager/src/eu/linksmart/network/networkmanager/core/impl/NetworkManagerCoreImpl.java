@@ -30,12 +30,13 @@ import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.tools.GetNetworkManagerStatus;
 import eu.linksmart.tools.NetworkManagerApplicationStatus;
+import eu.linksmart.utils.Part;
 
 /*
  * Core implementation of NetworkManagerCore Interface
  */
 public class NetworkManagerCoreImpl implements NetworkManagerCore,
-MessageDistributor {
+		MessageDistributor {
 	/** The used identity manager **/
 	protected IdentityManager identityManager;
 	/** The used backbone router **/
@@ -49,10 +50,10 @@ MessageDistributor {
 
 	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class
-	.getSimpleName();
+			.getSimpleName();
 	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
 	private static final String STARTING_MESSAGE = "Starting"
-		+ NETWORK_MGR_CORE;
+			+ NETWORK_MGR_CORE;
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
 	/** The name of the class implementing CryptoHID **/
@@ -79,11 +80,11 @@ MessageDistributor {
 	}
 
 	private void init(ComponentContext context) {
-		this.configurator = new NetworkManagerCoreConfigurator(this, context
-				.getBundleContext());
+		this.configurator = new NetworkManagerCoreConfigurator(this,
+				context.getBundleContext());
 		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
-		.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
+				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		this.connectionManager.setCommunicationSecurityManager(this.commSecMgr);
 		Properties attributes = new Properties();
 		attributes.setProperty(HIDAttribute.DESCRIPTION.name(),
@@ -95,8 +96,7 @@ MessageDistributor {
 		try {
 			http.registerServlet("/NetworkManagerStatus",
 					new NetworkManagerApplicationStatus(context, this,
-							identityManager, backboneRouter),
-							null, null);
+							identityManager, backboneRouter), null, null);
 			http.registerServlet("/GetNetworkManagerStatus",
 					new GetNetworkManagerStatus(this, identityManager,
 							backboneRouter), null, null);
@@ -110,22 +110,24 @@ MessageDistributor {
 		return this.myHID;
 	}
 
-	public HID createHID(Properties attributes, String endpoint, String backboneName)
-	throws RemoteException {
-		//check if backbone exist before creating the HID
+	@Override
+	public HID createHID(Part[] attributes, String endpoint,
+			String backboneName) throws RemoteException {
+		// check if backbone exist before creating the HID
 		boolean backboneFound = false;
 		for (String backbone : this.backboneRouter.getAvailableBackbones()) {
-			if(backbone == backboneName){
+			if (backbone == backboneName) {
 				backboneFound = true;
 				break;
 			}
 		}
 		if (!backboneFound) {
-			throw new IllegalArgumentException("Required backbone not available");
+			throw new IllegalArgumentException(
+					"Required backbone not available");
 		}
 
-		HID newHID = this.identityManager.createHIDForAttributes(attributes);
-		//TODO #NM refactoring configurable security properties
+		HID newHID = this.identityManager.createHIDForAttributes(new Properties() /* attributes */);
+		// TODO #NM refactoring configurable security properties
 		ArrayList<SecurityProperty> properties = new ArrayList<SecurityProperty>();
 		properties.add(SecurityProperty.NoSecurity);
 		//register HID with backbone policies in connection manager
@@ -134,19 +136,18 @@ MessageDistributor {
 				properties);
 		//add route to selected backbone
 		this.backboneRouter.addRouteToBackbone(newHID, backboneName, endpoint);	
-
 		return newHID;
 	}
 
 	public NMResponse sendData(HID sender, HID receiver, byte[] data)
-	throws RemoteException {
+			throws RemoteException {
 
 		NMResponse response = this.backboneRouter.sendData(sender, receiver,
 				data);
 		return response;
 	}
 
-	public Boolean removeHID(HID hid) throws RemoteException {
+	public boolean removeHID(HID hid) throws RemoteException {
 		Boolean hidRemoved = this.identityManager.removeHID(hid);
 		this.connectionManager.deleteHIDPolicy(hid);
 
@@ -188,17 +189,18 @@ MessageDistributor {
 	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data) {
 		// get connection belonging to HIDs
 		Connection conn;
-		try{
+		try {
 			if (receiverHID == null) {
 				// broadcast message
 				conn = connectionManager.getBroadcastConnection(senderHID);
 			} else {
 				conn = connectionManager.getConnection(receiverHID, senderHID);
 			}
-		} catch (Exception e){
-			LOG.warn("Error getting connection for HIDs: "
-					+ senderHID.toString() + " "
-					+ receiverHID.toString(),e);
+		} catch (Exception e) {
+			LOG.warn(
+					"Error getting connection for HIDs: "
+							+ senderHID.toString() + " "
+							+ receiverHID.toString(), e);
 			NMResponse response = new NMResponse();
 			response.setData(ERROR_PROCESSING);
 			return response;
@@ -221,16 +223,21 @@ MessageDistributor {
 
 		// if message is still existing it has to be forwarded
 		if (msg != null && msg.getData() != null && msg.getData().length != 0) {
-			/*check if message is not intended for host HID, if yes and it has
-			not been processed drop it*/
-			if (msg.getReceiverHID() == this.myHID || msg.getReceiverHID() == null) {
+			/*
+			 * check if message is not intended for host HID, if yes and it has
+			 * not been processed drop it
+			 */
+			if (msg.getReceiverHID() == this.myHID
+					|| msg.getReceiverHID() == null) {
 				LOG.warn("Received a message which has not been processed");
 				NMResponse response = new NMResponse();
 				response.setData(ERROR_PROCESSING);
 				return response;
 			}
-			/* send message over sendMessage method of this and return response
-			of it*/
+			/*
+			 * send message over sendMessage method of this and return response
+			 * of it
+			 */
 			return sendMessage(msg, this.myHID, receiverHID);
 		} else {
 			NMResponse response = new NMResponse();
@@ -293,7 +300,7 @@ MessageDistributor {
 		byte[] data;
 		try {
 			data = this.connectionManager.getBroadcastConnection(senderHID)
-			.processMessage(message);
+					.processMessage(message);
 		} catch (Exception e) {
 			LOG.warn("Could not create packet from message from HID: "
 					+ message.getSenderHID(), e);
@@ -302,7 +309,7 @@ MessageDistributor {
 			return response;
 		}
 		NMResponse response = this.backboneRouter
-		.broadcastData(senderHID, data);
+				.broadcastData(senderHID, data);
 
 		return response;
 	}
@@ -314,16 +321,20 @@ MessageDistributor {
 	}
 
 	/**
-	 * Internal method for sending messages with more possible
-	 * parameters. The message contains the original sender and
-	 * the final receiver but the parameters determine which
-	 * connection to use for sending.
-	 * @param message Message to send
-	 * @param senderHID Sender endpoint of connection to open
-	 * @param receiverHID Receiver endpoint of connection to open
+	 * Internal method for sending messages with more possible parameters. The
+	 * message contains the original sender and the final receiver but the
+	 * parameters determine which connection to use for sending.
+	 * 
+	 * @param message
+	 *            Message to send
+	 * @param senderHID
+	 *            Sender endpoint of connection to open
+	 * @param receiverHID
+	 *            Receiver endpoint of connection to open
 	 * @return
 	 */
-	private NMResponse sendMessage(Message message, HID senderHID, HID receiverHID){
+	private NMResponse sendMessage(Message message, HID senderHID,
+			HID receiverHID) {
 		byte[] data = null;
 		try {
 			Connection connection = this.connectionManager.getConnection(
@@ -419,8 +430,9 @@ MessageDistributor {
 		return identityManager.getHIDInfo(hid);
 	}
 
-	public List<String> getAvailableBackbones() {
-		return this.backboneRouter.getAvailableBackbones();
+	public String[] getAvailableBackbones() {
+		return (String[]) this.backboneRouter.getAvailableBackbones().toArray();
 	}
+
 
 }

@@ -1,9 +1,6 @@
 package eu.linksmart.network.networkmanager.impl;
 
-import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -12,6 +9,7 @@ import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.utils.Part;
 	
 	public class NetworkManagerImpl implements NetworkManager {
 		
@@ -45,12 +43,12 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 		}
 
 		@Override
-		public Boolean removeHID(HID hid) throws RemoteException {
+		public boolean removeHID(HID hid) throws RemoteException {
 			return this.core.removeHID(hid);
 		}
 
 		@Override
-		public HID createHID(Properties attributes, String endpoint, String backboneName)
+		public HID createHID(Part[] attributes, String endpoint, String backboneName)
 				throws RemoteException {
 			return this.core.createHID(attributes, endpoint, backboneName);
 		}
@@ -66,7 +64,7 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 		}
 
 		@Override
-		public List<String> getAvailableBackbones() {
+		public String[] getAvailableBackbones() {
 			return this.core.getAvailableBackbones();
 		}
 }
