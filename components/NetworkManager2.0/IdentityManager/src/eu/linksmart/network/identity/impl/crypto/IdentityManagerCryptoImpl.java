@@ -44,7 +44,7 @@ public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
 			attributes.storeToXML(bos, "");
 			String xmlAttributes = bos.toString();
 			//if attributes contains certificate reference try to load it
-			if(attributes.containsKey(HIDAttribute.CERT_REF)) {
+			if(attributes.containsKey(HIDAttribute.CERT_REF.name())) {
 				String certRef = attributes.getProperty(HIDAttribute.CERT_REF.name());
 				Properties certAttributes = cryptoManager.getAttributesFromCertificate(certRef);
 				if (certAttributes.size() != 0) {
