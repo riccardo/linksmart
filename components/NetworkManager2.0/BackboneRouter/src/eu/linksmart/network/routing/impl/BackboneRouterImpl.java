@@ -23,7 +23,7 @@ import eu.linksmart.network.routing.BackboneRouter;
 public class BackboneRouterImpl implements BackboneRouter {
 
 	private Logger logger = Logger
-	.getLogger(BackboneRouterImpl.class.getName());
+			.getLogger(BackboneRouterImpl.class.getName());
 	protected ComponentContext context;
 
 	private Map<HID, Backbone> hidBackboneMap;
@@ -32,7 +32,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	private String defaultRoute;
 
 	private static String BACKBONE_ROUTER = BackboneRouterImpl.class
-	.getSimpleName();
+			.getSimpleName();
 	private static String ROUTING_JXTA = "JXTA";
 	BackboneRouterConfigurator configurator;
 
@@ -83,6 +83,10 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data) {
 		Backbone b = (Backbone) hidBackboneMap.get(receiverHID);
+		if (b == null) {
+			throw new IllegalArgumentException(
+					"No Backbone found to reach HID " + receiverHID);
+		}
 		return b.sendData(senderHID, receiverHID, data);
 	}
 
@@ -106,8 +110,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 		//
 		// Backbone b = (Backbone)hidBackboneMap.get(receiverHID);
 		hidBackboneMap.put(senderHID, originatingBackbone);
-		//TODO #NM refactoring check case when there is no core what to do
-		if(nmCore != null) {
+		// TODO #NM refactoring check case when there is no core what to do
+		if (nmCore != null) {
 			return nmCore.receiveData(senderHID, receiverHID, data);
 		} else {
 			return new NMResponse("ERROR: No NMCore available!");
@@ -154,7 +158,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(BackboneRouterImpl.BACKBONE_ROUTER)) {
 			this.defaultRoute = (String) configurator
-			.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
+					.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
 		}
 	}
 
@@ -172,7 +176,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 		for (Backbone bb : availableBackbones.values()) {
 			logger.debug("BBRouter broadcastData over Backbone: "
 					+ bb.getClass().getName());
-			if (bb.broadcastData(senderHid, data).getData() == NMResponse.STATUS_ERROR) {
+			NMResponse response = bb.broadcastData(senderHid, data);
+			if (response == null) {
+				continue;
+			}
+			if (response.getData() == NMResponse.STATUS_ERROR) {
 				failedBroadcast += " " + bb.getClass();
 				success = false;
 			}
@@ -211,14 +219,17 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 */
 	@Override
 	public boolean addRoute(HID hid, String backboneName) {
-		if (hidBackboneMap.containsKey(hid)) {
-			return false;
+		synchronized (hidBackboneMap) {
+
+			if (hidBackboneMap.containsKey(hid)) {
+				return false;
+			}
+			Backbone backbone = availableBackbones.get(backboneName);
+			if (backbone == null) {
+				return false;
+			}
+			hidBackboneMap.put(hid, backbone);
 		}
-		Backbone backbone = availableBackbones.get(backboneName);
-		if (backbone == null) {
-			return false;
-		}
-		hidBackboneMap.put(hid, backbone);
 		return true;
 	}
 
@@ -232,23 +243,31 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public boolean addRouteToBackbone(HID hid, String backboneName,
 			String endpoint) {
-		if (hidBackboneMap.containsKey(hid)) {
-			return false;
+		synchronized (hidBackboneMap) {
+			if (hidBackboneMap.containsKey(hid)) {
+				return false;
+			}
+			Backbone backbone = availableBackbones.get(backboneName);
+			if (backbone == null) {
+				return false;
+			}
+			if (!backbone.addEndpoint(hid, endpoint)) {
+				return false;
+			}
+			hidBackboneMap.put(hid, backbone);
 		}
-		Backbone backbone = availableBackbones.get(backboneName);
-		if (backbone == null) {
-			return false;
-		}
-		return backbone.addEndpoint(hid, endpoint);
-
+		return true;
 	}
 
 	@Override
 	public boolean removeRoute(HID hid, String backbone) {
-		if (!hidBackboneMap.get(hid).getClass().getName().equals(backbone)) {
-			return false;
+		synchronized (hidBackboneMap) {
+
+			if (!hidBackboneMap.get(hid).getClass().getName().equals(backbone)) {
+				return false;
+			}
+			hidBackboneMap.remove(hid);
 		}
-		hidBackboneMap.remove(hid);
 		return true;
 	}
 

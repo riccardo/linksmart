@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="BackboneWS">
-   <implementation class="eu.linksmart.network.backbone.impl.ws.BackboneWSImpl"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="BackboneSOAP">
+   <implementation class="eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl"/>
    <service>
       <provide interface="eu.linksmart.network.backbone.Backbone"/>
    </service>

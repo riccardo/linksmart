@@ -115,7 +115,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		// check if backbone exist before creating the HID
 		boolean backboneFound = false;
 		for (String backbone : this.backboneRouter.getAvailableBackbones()) {
-			if (backbone == backboneName) {
+			if (backbone.equals(backboneName)) {
 				backboneFound = true;
 				break;
 			}

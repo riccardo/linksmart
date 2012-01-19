@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -33,11 +34,12 @@ public class BackboneSOAPImpl implements Backbone {
 	private static final int BUFFSIZE = 16384;
 	
 	protected void activate(ComponentContext context) {
-		LOG.info(BACKBONE_SOAP + "started");
+		hidUrlMap = new HashMap<HID, URL>();
+		LOG.info(BACKBONE_SOAP + " started");
 	}
 
 	protected void deactivate(ComponentContext context) {
-		LOG.info(BACKBONE_SOAP + "stopped");
+		LOG.info(BACKBONE_SOAP + " stopped");
 	}
 
 	/**
@@ -261,7 +263,7 @@ public class BackboneSOAPImpl implements Backbone {
 		OutputStream cos = clientSocket.getOutputStream();
 		cos.write(dataproc.getBytes());
 		cos.flush();	
-		cos.close();
+//		cos.close();
 	}
 
 	/**
