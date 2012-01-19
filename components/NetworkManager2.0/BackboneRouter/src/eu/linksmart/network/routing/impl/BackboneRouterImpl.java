@@ -110,7 +110,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		if(nmCore != null) {
 			return nmCore.receiveData(senderHID, receiverHID, data);
 		} else {
-			return null;
+			return new NMResponse("ERROR: No NMCore available!");
 		}
 
 	}

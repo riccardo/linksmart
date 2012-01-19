@@ -178,6 +178,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		response = pipeSyncHandler.sendData(senderHID.toString(),
 				receiverHID.toString(), payload, peerID);
 
+		logger.debug("sendData Response: " + response.toString());
+
 		return response;
 	}
 
@@ -194,18 +196,10 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		// give message to BBRouter for further processing
 		try {
-			logger.info("BBJXTA receiveData - senderHID: >>>"
-					+ senderHID.toString() + "<<<");
-			if (receiverHID != null) {
-				logger.info("BBJXTA receiveData - receiverHID: >>>"
-						+ receiverHID.toString() + "<<<");
-			}
-			logger.info("BBJXTA receiveData - received data: >>>"
-					+ receivedData.toString() + "<<<");
-
 			response = bbRouter.receiveData(senderHID, receiverHID,
 					BackboneJXTAUtils.RemoveHIDFromData(receivedData),
 					(Backbone) this);
+			logger.debug("receiveData Response: " + response.toString());
 		} catch (Exception e) {
 			logger.error(
 					"BBJXTA could not give received message for processing to bbRouter",
@@ -240,6 +234,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 					payload.length));
 		}
 		response.setData("Broadcast successful");
+
+		logger.debug("broadcastData Response: " + response.toString());
 
 		return response;
 	}

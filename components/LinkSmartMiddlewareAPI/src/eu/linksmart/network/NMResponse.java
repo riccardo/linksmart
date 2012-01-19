@@ -133,5 +133,13 @@ public class NMResponse  {
 		__hashCodeCalc = false;
 		return _hashCode;
 	}
+	
+	
+	/**
+	 * Override default toString-method to display useful information (e.g. Data)
+	 */
+	public String toString() {
+		return getData() == null ? "NMResponse - No data available." : getData();
+	}
 
 }
