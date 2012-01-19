@@ -388,7 +388,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		/*as the method is implementation specific we have to check
 		 * whether the appropriate implementation class is referenced
 		 */
-		if(identityManager.getIdentifier().contentEquals(this.CRYPTO_HID_IMPLEMENTATION)){
+		if(!identityManager.getIdentifier().contentEquals(CRYPTO_HID_IMPLEMENTATION)){
 			return null;
 		}
 		HID hid = null;
@@ -421,7 +421,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		/*as the method is implementation specific we have to check
 		 * whether the appropriate implementation class is referenced
 		 */
-		if(identityManager.getIdentifier().contentEquals(this.CRYPTO_HID_IMPLEMENTATION)){
+		if(!identityManager.getIdentifier().contentEquals(CRYPTO_HID_IMPLEMENTATION)){
 			return null;
 		}
 		Properties prop = new Properties();
