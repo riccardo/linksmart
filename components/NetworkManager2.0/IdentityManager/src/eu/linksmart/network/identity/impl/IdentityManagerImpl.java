@@ -20,6 +20,7 @@ import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageProcessor;
+import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 
@@ -54,6 +55,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
+		//subscribe to messages sent by other identity managers
+		((MessageDistributor)this.networkManagerCore).subscribe(
+				IDMANAGER_NMADVERTISMENT_TOPIC, this);
+		((MessageDistributor)this.networkManagerCore).subscribe(
+				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
 		LOG.info(IDENTITY_MGR + " started");
 	}
 
@@ -293,7 +299,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	@Override
 	public Message processMessage(Message msg) {
-		if (msg.getTopic() == IDMANAGER_UPDATE_HID_LIST_TOPIC) {
+		if (msg.getTopic().contentEquals(IDMANAGER_UPDATE_HID_LIST_TOPIC)) {
 			if (msg.getSenderHID() != networkManagerCore.getHID()) {
 				// this is not an echo of our own broadcast
 				// otherwise we do not need to do anything with it
@@ -317,6 +323,16 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				}
 			}
 			return null; // the complete message has been processed
+		} else if (msg.getTopic().contentEquals(IDMANAGER_NMADVERTISMENT_TOPIC)){
+			if (msg.getSenderHID() != networkManagerCore.getHID()) {
+				//check if we already know this network manager
+				if(!getRemoteHIDs().contains(msg.getSenderHID())){
+					//if we do not know it add HIDs reachable through it
+					//TODO #NM refactoring add HIDs
+				}
+			}
+			//message is processed
+			return null;
 		} else { // other message type
 			// TODO
 			return msg; // for the moment pass it on
@@ -445,9 +461,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			while (true) {
 				if (networkManagerCore != null) {
 					// Send an empty NMAdvertisement broadcast
+					//TODO #NM refactoring put list of local HIDs into message
 					BroadcastMessage m = new BroadcastMessage(
 							IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
-									.getHID(), new byte[] {});
+									.getHID(), networkManagerCore.getHID().getBytes());
 					networkManagerCore.broadcastMessage(m);
 				}
 				try {
