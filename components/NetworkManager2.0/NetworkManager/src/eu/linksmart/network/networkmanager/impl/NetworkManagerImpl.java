@@ -38,7 +38,7 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public HID getHID() {
+		public HID getHID() throws RemoteException {
 			return this.core.getHID();
 		}
 
@@ -54,17 +54,17 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public HIDInfo createCryptoHID(String xmlAttributes) {
+		public HIDInfo createCryptoHID(String xmlAttributes) throws RemoteException {
 			return this.core.createCryptoHID(xmlAttributes);
 		}
 
 		@Override
-		public HIDInfo createCryptoHIDFromReference(String certRef) {
+		public HIDInfo createCryptoHIDFromReference(String certRef) throws RemoteException {
 			return this.core.createCryptoHIDFromReference(certRef);
 		}
 
 		@Override
-		public String[] getAvailableBackbones() {
+		public String[] getAvailableBackbones() throws RemoteException {
 			return this.core.getAvailableBackbones();
 		}
 }
