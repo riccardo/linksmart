@@ -192,15 +192,17 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			byte[] receivedData) {
 		NMResponse response = new NMResponse();
 
-		logger.info("BBJXTA receiveData - senderHID: >>>"
-				+ senderHID.toString() + "<<<");
-		logger.info("BBJXTA receiveData - receiverHID: >>>"
-				+ receiverHID.toString() + "<<<");
-		logger.info("BBJXTA receiveData - received data: >>>"
-				+ receivedData.toString() + "<<<");
-
 		// give message to BBRouter for further processing
 		try {
+			logger.info("BBJXTA receiveData - senderHID: >>>"
+					+ senderHID.toString() + "<<<");
+			if (receiverHID != null) {
+				logger.info("BBJXTA receiveData - receiverHID: >>>"
+						+ receiverHID.toString() + "<<<");
+			}
+			logger.info("BBJXTA receiveData - received data: >>>"
+					+ receivedData.toString() + "<<<");
+
 			response = bbRouter.receiveData(senderHID, receiverHID,
 					BackboneJXTAUtils.RemoveHIDFromData(receivedData),
 					(Backbone) this);
@@ -226,6 +228,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		logger.debug("BBJXTA - broadcastData: "
 				+ BackboneJXTAUtils.ConvertByteArrayToString(data));
 		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
+
+		logger.debug("BBJXTA broadcastData - senderHID: " + senderHID.toString());
+		logger.debug("BBJXTA - broadcastData with HID: "
+			+ BackboneJXTAUtils
+						.ConvertByteArrayToString(payload));
 
 		// send message as multicast message
 		synchronized (msocket) {
@@ -368,21 +375,44 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			e.printStackTrace();
 		}
 
-		URI uri = new File(JXTA_HOME_DIR + "config/seeds.txt").toURI();
-		logger.debug(uri.toString());
+		// URI uri = new File(JXTA_HOME_DIR + "config/seeds.txt").toURI();
+		// logger.debug(uri.toString());
+		//
+		// jxtaNetworkConfigurator.addRdvSeedingURI(uri);
 
-		jxtaNetworkConfigurator.addRdvSeedingURI(uri);
-		if (Boolean.parseBoolean((String) configurator.getConfiguration().get(
-				BackboneJXTAConfigurator.RELAYED))) {
-			jxtaNetworkConfigurator.addRelaySeedingURI(uri);
-		} else if ((String) configurator.getConfiguration().get(
-				BackboneJXTAConfigurator.EXT_TCP_ADDR) != null) {
-			jxtaNetworkConfigurator.setTcpPublicAddress(
-					(String) configurator.getConfiguration().get(
-							BackboneJXTAConfigurator.EXT_TCP_ADDR), true);
-			jxtaNetworkConfigurator.setTcpStartPort(-1);
-			jxtaNetworkConfigurator.setTcpEndPort(-1);
+		
+		try {
+			URI superNodeTCPURI = new URI((String) configurator
+					.getConfiguration().get(
+							BackboneJXTAConfigurator.SUPERNODE_TCP_URI));
+			jxtaNetworkConfigurator.addSeedRendezvous(superNodeTCPURI);
+			logger.debug("Added SuperNode-TCP-URI: " + superNodeTCPURI.toString());
+
+			URI superNodeHTTPURI = new URI((String) configurator
+					.getConfiguration().get(
+							BackboneJXTAConfigurator.SUPERNODE_HTTP_URI));
+			jxtaNetworkConfigurator.addSeedRendezvous(superNodeHTTPURI);
+			logger.debug("Added SuperNode-H-URI: " + superNodeHTTPURI.toString());
+			
+			if (Boolean.parseBoolean((String) configurator.getConfiguration().get(
+					BackboneJXTAConfigurator.RELAYED))) {
+//				jxtaNetworkConfigurator.addRelaySeedingURI(uri);
+				jxtaNetworkConfigurator.addRelaySeedingURI(superNodeTCPURI);
+				jxtaNetworkConfigurator.addRelaySeedingURI(superNodeHTTPURI);
+
+			} else if ((String) configurator.getConfiguration().get(
+					BackboneJXTAConfigurator.EXT_TCP_ADDR) != null) {
+				jxtaNetworkConfigurator.setTcpPublicAddress(
+						(String) configurator.getConfiguration().get(
+								BackboneJXTAConfigurator.EXT_TCP_ADDR), true);
+				jxtaNetworkConfigurator.setTcpStartPort(-1);
+				jxtaNetworkConfigurator.setTcpEndPort(-1);
+			}
+
+		} catch (Exception e) {
+			logger.error("Could not add URI for SuperNode...", e);
 		}
+
 
 		if (Boolean.parseBoolean((String) configurator.getConfiguration().get(
 				BackboneJXTAConfigurator.MULTICAST))) {
@@ -671,11 +701,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 					e2.printStackTrace();
 				}
 
-				logger.debug("BBJXTA receive multicast message: "
-						+ BackboneJXTAUtils
-								.ConvertByteArrayToString(receivedData
-										.getData()));
-
 				// give message to BBRouter for further processing
 				// receiverHID is null because this is a broadcast message
 				try {
@@ -691,16 +716,22 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 						HID senderHID = BackboneJXTAUtils
 								.GetHIDFromData(receivedData.getData());
 
-						bbRouter.receiveData(senderHID, null, BackboneJXTAUtils
-								.RemoveHIDFromData(receivedData.getData()),
-								(Backbone) bbJXTA);
+						logger.debug("BBJXTA receive multicast message: "
+								+ BackboneJXTAUtils
+										.ConvertByteArrayToString(receivedData
+												.getData()));
+						logger.debug("BBJXTA receive multicast message: senderJXTAID: "
+								+ senderJXTAID + " | senderHID: " + senderHID);
+
+						bbJXTA.receiveData(senderHID, null,
+								receivedData.getData());
 
 						// add info to table of HID-Endpoints
 						listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 					}
 				} catch (Exception e) {
 					logger.error(
-							"BBJXTA could not give received multicast message for processing to bbRouter",
+							"BBJXTA could not process received multicast message.",
 							e);
 				}
 

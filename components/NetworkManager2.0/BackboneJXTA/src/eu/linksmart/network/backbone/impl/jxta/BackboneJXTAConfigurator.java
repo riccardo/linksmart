@@ -40,6 +40,10 @@ public class BackboneJXTAConfigurator extends Configurator {
 	public static final String MODE_SUPERNODE = "SuperNode";
 	public static final String MODE_NODE = "Node";
 
+
+	public static final String SUPERNODE_TCP_URI = "BackboneJXTA.SuperNodeTCPURI";
+	public static final String SUPERNODE_HTTP_URI = "BackboneJXTA.SuperNodeHTTPURI";
+
 	
 	private BackboneJXTAImpl bbJXTAImpl;
 

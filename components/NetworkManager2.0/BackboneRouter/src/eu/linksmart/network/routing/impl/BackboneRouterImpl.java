@@ -24,6 +24,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 	private Logger logger = Logger
 			.getLogger(BackboneRouterImpl.class.getName());
+	protected ComponentContext context;
+
 	private Map<HID, Backbone> hidBackboneMap;
 	private Map<String, Backbone> availableBackbones;
 	private NetworkManagerCore nmCore;
@@ -36,6 +38,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 	protected void activate(ComponentContext context) {
 		logger.info("Starting " + BACKBONE_ROUTER);
+
+		this.context = context;
+
+		bindNMCore((NetworkManagerCore) context
+				.locateService(NetworkManagerCore.class.getSimpleName()));
 
 		hidBackboneMap = new HashMap<HID, Backbone>();
 		availableBackbones = new HashMap<String, Backbone>();
@@ -93,9 +100,9 @@ public class BackboneRouterImpl implements BackboneRouter {
 	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data,
 			Backbone originatingBackbone) {
 
-		// TODO: check why backbone would be needed - and if it is needed one
-		// has to check if receiverHID is NULL (in case of broadcast message
-		// receiverHID is NULL)
+		// TODO: check why backbone for receiverHID would be needed - and if it
+		// is needed one has to check if receiverHID is NULL (in case of
+		// broadcast messagereceiverHID is NULL)
 		//
 		// Backbone b = (Backbone)hidBackboneMap.get(receiverHID);
 		hidBackboneMap.put(senderHID, originatingBackbone);
@@ -159,7 +166,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 		boolean success = true;
 		String failedBroadcast = "";
 		for (Backbone bb : availableBackbones.values()) {
-			logger.debug("BBRouter broadcastData over Backbone: " + bb.getClass().getName());
+			logger.debug("BBRouter broadcastData over Backbone: "
+					+ bb.getClass().getName());
 			if (bb.broadcastData(senderHid, data).getData() == NMResponse.STATUS_ERROR) {
 				failedBroadcast += " " + bb.getClass();
 				success = false;
@@ -183,7 +191,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public String getRoute(HID hid) {
 		Backbone b = hidBackboneMap.get(hid);
-		if (b == null){
+		if (b == null) {
 			return null;
 		} else {
 			return b.toString() + ";" + b.getEndpoint(hid);
