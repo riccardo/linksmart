@@ -164,4 +164,53 @@ public class HIDInfo {
 		this.hid = hid;
 	}
 
+    private java.lang.Object __equalsCalc = null;
+    /* Adapted from AXIS-generated code
+     */
+    public synchronized boolean equals(java.lang.Object obj) {
+        if (!(obj instanceof HIDInfo)) return false;
+        HIDInfo other = (HIDInfo) obj;
+        if (this == obj) return true;
+        if (__equalsCalc != null) {
+            return (__equalsCalc == obj);
+        }
+        __equalsCalc = obj;
+        boolean _equals;
+        _equals = true && 
+            ((this.hid==null && other.getHID()==null) || 
+             (this.hid!=null &&
+              this.hid.equals(other.getHID()))) &&
+            ((this.attributes==null && other.getAttributes()==null) || 
+             (this.attributes!=null &&
+              java.util.Arrays.equals(this.attributes, other.getAttributes())));
+        __equalsCalc = null;
+        return _equals;
+    }
+
+    private boolean __hashCodeCalc = false;
+    public synchronized int hashCode() {
+        if (__hashCodeCalc) {
+            return 0;
+        }
+        __hashCodeCalc = true;
+        int _hashCode = 1;
+        if (getHID() != null) {
+            _hashCode += getHID().hashCode();
+        }
+        if (getAttributes() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getAttributes());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getAttributes(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
+        }
+        __hashCodeCalc = false;
+        return _hashCode;
+    }
+
+	
 }
