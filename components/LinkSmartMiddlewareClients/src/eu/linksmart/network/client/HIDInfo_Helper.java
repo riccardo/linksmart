@@ -1,5 +1,5 @@
 /**
- * NMResponse_Helper.java
+ * HIDInfo_Helper.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
@@ -7,18 +7,31 @@
 
 package eu.linksmart.network.client;
 
-import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.HIDInfo;
 
-public class NMResponse_Helper {
+public class HIDInfo_Helper {
     // Type metadata
     private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(NMResponse.class, true);
+        new org.apache.axis.description.TypeDesc(HIDInfo.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://network.linksmart.eu", "NMResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://network.linksmart.eu", "HIDInfo"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("data");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "data"));
+        elemField.setFieldName("HID");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "HID"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://network.linksmart.eu", "HID"));
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("attributes");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "attributes"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://utils.linksmart.eu", "Part"));
+        elemField.setNillable(true);
+        elemField.setItemQName(new javax.xml.namespace.QName("", "item"));
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("description");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "description"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);

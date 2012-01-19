@@ -1,24 +1,30 @@
 /**
- * NMResponse_Helper.java
+ * Part_Helper.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
  */
 
-package eu.linksmart.network.client;
+package eu.linksmart.utils.client;
 
-import eu.linksmart.network.NMResponse;
+import eu.linksmart.utils.Part;
 
-public class NMResponse_Helper {
+public class Part_Helper {
     // Type metadata
     private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(NMResponse.class, true);
+        new org.apache.axis.description.TypeDesc(Part.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://network.linksmart.eu", "NMResponse"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://utils.linksmart.eu", "Part"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("data");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "data"));
+        elemField.setFieldName("key");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "key"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("value");
+        elemField.setXmlName(new javax.xml.namespace.QName("", "value"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);

@@ -6,10 +6,10 @@
 <project name="LinkSmartMiddlewareClients" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- CHANGE HERE: provide the path to your local axis installation or wherever your axis libs are -->
-	<property name="axis1.lib.dir" value="/Users/jahnadmin/Opt/axis-1_4/lib" />
+	<property name="axis1.lib.dir" value="/Users/simon/Development/axis-1_4/lib" />
 	
 	<!-- CHANGE HERE: provide the address of the manager you want to create the axis stub for -->
-	<property name="wsdl" value="http://localhost:8082/axis/services/NetworkManagerApplication?wsdl" />
+	<property name="wsdl" value="http://localhost:8082/axis/services/NetworkManager?wsdl" />
 	
 	<!-- properties -->
 	<property name="moduleName" value="LinkSmartMiddlewareClients" />
