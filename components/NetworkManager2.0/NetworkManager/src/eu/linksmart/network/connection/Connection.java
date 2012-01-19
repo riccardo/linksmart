@@ -186,7 +186,6 @@ public class Connection {
 				logger.error("Error closing stream",e);
 			}
 		}
-
 		if(securityProtocol != null 
 				&& securityProtocol.isInitialized() 
 				&& props.getProperty(TOPIC).equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)){

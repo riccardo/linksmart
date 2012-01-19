@@ -232,6 +232,14 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		// give message to BBRouter for further processing
 		try {
+			//FIXME
+			//this is temporary code until the complete move to LS 2.0; it is there just 
+			//to ignore LS1.1 messages from supernodes and other 1.1 NM
+			if (receivedData[0]=='N' && receivedData[1]=='M') {
+				return response;
+			}
+			//end temporary code
+			
 			response = bbRouter.receiveData(senderHID, receiverHID,
 					BackboneJXTAUtils.RemoveHIDFromData(receivedData),
 					(Backbone) this);
@@ -624,6 +632,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 					rdvAdv.getPeerID();
 					logger.info("LinkSmart Super Node discovered "
 							+ rdvAdv.getPeerID());
+					//FIXME
 					logger.info("Cannot connect to it yet (Implement me!)");
 				}
 

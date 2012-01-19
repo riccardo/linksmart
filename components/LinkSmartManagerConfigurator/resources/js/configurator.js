@@ -135,6 +135,20 @@ function updateRight(configuration){
 					formElement = '<input type="text" class="text" name="' + paramName + '" id="' + paramName + '_form" value="' + paramValue + '" />';
 				}
 				break;
+			case 'multichoice':
+				if (configuration.parameters['ParamDescription.'+paramName+'.choice0']) {
+					formElement = '<select multiple="true" name="' + paramName + '" id="' + paramName + '_form" >';
+					var n=0; //start enumerating choices from config file
+					while (configuration.parameters['ParamDescription.'+paramName+'.choice'+n]) {
+						var choiceData = configuration.parameters['ParamDescription.'+paramName+'.choice'+n].split('|');
+						formElement += '<option value="' + choiceData[0] + '" ' + (paramValue.indexOf(choiceData[0]) != -1 ? 'selected': '')  + '>' + choiceData[1] + '</option>';
+						n++;
+					}
+					formElement += '</select>';
+				} else { //has said it's choice, but has not given any choice as paramdescription
+					formElement = '<input type="text" class="text" name="' + paramName + '" id="' + paramName + '_form" value="' + paramValue + '" />';
+				}
+				break;
 			case 'boolean': //select instead of checkbox, because checkbox does not get sent if unchecked, and receiver servlet then deletes the param.
 				formElement = '<select name="' + paramName + '" id="' + paramName + '_form" >';
 				formElement += '<option value="true" ' + (paramValue=='true'? 'selected': '') + '>True</option>';
@@ -191,7 +205,23 @@ function submitConfiguration(configuration){
 
 	var arraySelect = document.getElementsByTagName("select");
 	for (var i = 0; i < arraySelect.length; i++) { //after modifications for type checking and interface improvement, we include also selects
-		jsonText += '{ "name": "' + arraySelect[i].name + '","value": "' + arraySelect[i].value + '"},'
+		if (arraySelect[i].multiple == true) {
+			var selectedValues = '';
+			var count = 0;
+			var options = arraySelect[i].options;
+			for (var j = 0; j < options.length; j++) {
+			    if (options[j].selected) {
+			    	selectedValues += options[j].value + '|';
+			    	count++;
+			    }
+			}
+			if (count > 1) {
+				selectedValues = selectedValues.substring(0, selectedValues.length - 1)
+			}
+			jsonText += '{ "name": "' + arraySelect[i].name + '","value": "' + selectedValues + '"},'
+		} else {
+			jsonText += '{ "name": "' + arraySelect[i].name + '","value": "' + arraySelect[i].value + '"},'
+  		}
 	}
 
 	jsonText = jsonText.substr(0,jsonText.length -1);
@@ -240,6 +270,25 @@ function validateInputs(configuration) {
 					isThisOneInputValid = validate_text(paramFormElement, '.*');
 				}
 				break;
+			case 'multichoice':
+				var choices = [];
+				var numChoicesMin = (configuration.parameters['ParamDescription.'+paramName+'.minChoices'] ? configuration.parameters['ParamDescription.'+paramName+'.minChoices'] : null);
+				var numChoicesMax = (configuration.parameters['ParamDescription.'+paramName+'.maxChoices'] ? configuration.parameters['ParamDescription.'+paramName+'.maxChoices'] : null);
+				var positionalValidation = (configuration.parameters['ParamDescription.'+paramName+'.positionalValidator'] ? configuration.parameters['ParamDescription.'+paramName+'.positionalValidator'] : '.*');
+
+				if (configuration.parameters['ParamDescription.'+paramName+'.choice0']) { //we have at least one choice available
+					var n=0; //start enumerating choices from config file
+					while (configuration.parameters['ParamDescription.'+paramName+'.choice'+n]) {
+						var choiceData = configuration.parameters['ParamDescription.'+paramName+'.choice'+n].split('|');
+						choices.push(choiceData[0]);
+						n++;
+					}
+					isThisOneInputValid = validate_multichoice(paramFormElement, choices, numChoicesMin, numChoicesMax, positionalValidation);
+				} else { //has said it's choice, but has not given any choice as paramdescription. Default to text, accept all since we don't have an ereg
+					isThisOneInputValid = validate_text(paramFormElement, '.*');
+				}
+				break;
+
 			case 'boolean': //select instead of checkbox, because checkbox does not get sent if unchecked, and receiver servlet then deletes the param.
 				isThisOneInputValid = validate_boolean(paramFormElement);
 				break;			
@@ -281,6 +330,43 @@ function validate_choice(input, choices) {
 	var selectedValue = input.options[input.selectedIndex].value;
 	if (choices.indexOf(selectedValue) == -1) { 
 		setErrorMessageForInput(input, 'Please choose a value from the given options');
+		return false;
+	} else {
+		clearErrorMessageforInput(input);
+		return true;
+	}
+}
+
+
+function validate_multichoice(input, choices, minChoices, maxChoices, positionalValidatorEreg) {
+	var selectionMap = '';
+	var count = 0;
+	
+	for (i = 0; i < input.options.length; i++) {
+	    if (input.options[i].selected) {
+	      selectionMap += 'x';
+	      count++;
+	    } else {
+	    	selectionMap += '_'
+	    }
+	  }
+	
+	var isOK = true;
+	var cumulativeErrorMessages = '';
+	
+	if ((minChoices !== null && count < minChoices) || (maxChoices !== null && count > maxChoices)) {
+		cumulativeErrorMessages += 'Please choose between ' + minChoices + ' and ' + maxChoices + ' values. ';
+		isOK = false;
+	}
+	
+	var re = new RegExp('^' + positionalValidatorEreg + '$');
+	if (!selectionMap.match(re)) {
+		cumulativeErrorMessages += 'Please observe the limitations given in the description. ';
+		isOK = false;
+	}
+	
+	if (isOK == false) { 
+		setErrorMessageForInput(input, cumulativeErrorMessages);
 		return false;
 	} else {
 		clearErrorMessageforInput(input);

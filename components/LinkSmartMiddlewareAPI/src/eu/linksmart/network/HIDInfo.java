@@ -38,13 +38,14 @@
 package eu.linksmart.network;
 
 import java.util.Properties;
+import java.io.Serializable;
 
 import eu.linksmart.utils.Part;
 
 /**
  * Class to store information about HIDs
  */
-public class HIDInfo {
+public class HIDInfo implements Serializable {
 	private HID hid;
 	private Part[] attributes;
 

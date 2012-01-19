@@ -1,5 +1,6 @@
 package eu.linksmart.network.identity.impl;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -24,6 +25,7 @@ import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.utils.ByteArrayCodec;
 import eu.linksmart.utils.Part;
 import eu.linksmart.utils.PartConverter;
 
@@ -260,6 +262,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				// time
 				toUpdate.setAttributes(PartConverter.fromProperties(attr));
 				localHIDs.replace(hid, toUpdate);
+				//careful, D always before A, because the NMs that listen to this will 
+				//execute the actions in order, hence if A is after D, they will first update and then delete the just-entered HID.
 				queue.add("D;" + hid.toString());
 				queue.add("A;" + hid.toString() + ";"
 						+ toUpdate.getDescription());
@@ -468,15 +472,31 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		public void run() {
 			while (true) {
 				if (networkManagerCore != null) {
-					// Send an empty NMAdvertisement broadcast
-					//TODO #NM refactoring put list of local HIDs into message
+
+					//#NM refactoring put list of local HIDs into message
+					Set<HIDInfo> localHIDs = getLocalHIDs();
+					byte[] localHIDbytes = null;
+					
+					try {
+						localHIDbytes = ByteArrayCodec.encodeObjectToBytes(localHIDs);
+					} catch (IOException e) {
+						LOG.error("Cannot convert local HIDs set to bytearray; " + e);
+					
+					}
+//this is an empty version with no HID transmission
+/*					BroadcastMessage m = new BroadcastMessage(
+							IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
+									.getHID(), networkManagerCore.getHID().getBytes());
+*/
 					BroadcastMessage m = null;
+
 					try {
 						m = new BroadcastMessage(
 								IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
-										.getHID(), networkManagerCore.getHID().getBytes());
+									.getHID(), localHIDbytes);
 					} catch (RemoteException e) {
 						// local invocation
+						LOG.debug("RemoteException: " + e);
 					}
 					networkManagerCore.broadcastMessage(m);
 				}

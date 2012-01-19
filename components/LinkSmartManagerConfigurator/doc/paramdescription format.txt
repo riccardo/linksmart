@@ -1,46 +1,74 @@
-To describe parameters within a properties file, for use by ConfigurationAdmin, just add the following descriptors for each property in the same file as the property.
+To describe parameters within a properties file, for use by ConfigurationAdmin, just add the 
+following descriptors for each property in the same file as the property.
 E.g. in TM.properties (Trust manager) we have 
 
 TrustManager.trustModel=NullTrustModel
 
 The property name is "TrustManager.trustModel", the default value is "NullTrustModel"
 
-
 To describe such properties, just add the following descriptors, replacing PARAMNAME with the appropriate parameter name
 
 ParamDescription.PARAMNAME.description -- user-readable text shown on configuration page. Use to describe parameter and/or to give hints.
-ParamDescription.PARAMNAME.type -- type of parameter := boolean, integer, text, choice, readonly
+ParamDescription.PARAMNAME.type -- type of parameter := boolean, integer, text, choice, multichoice, readonly
 
 if boolean: nothing more needed
 if integer: add 
-ParamDescription.PARAMNAME.min
-ParamDescription.PARAMNAME.max
-for range validation (validation not implemented yet)
+ParamDescription.PARAMNAME.min = the minimum value
+ParamDescription.PARAMNAME.max = the maximum value
+Configurator will return the value typed in from the user
 
 if text: add
 ParamDescription.PARAMNAME.ereg -- regular expresion to test string
+this will be implicitly entered between ^ and $, i.e. the string should be fully matched.
+Configurator will return the string entered by the user
 
 if choice: add
-ParamDescription.PARAMNAME.choice0 = CHOICEVALUE|Human-readable description
-ParamDescription.PARAMNAME.choice1 = CHOICEVALUE|Human-readable description
+ParamDescription.PARAMNAME.choice0 = CHOICEVALUE0|Human-readable description0
+ParamDescription.PARAMNAME.choice1 = CHOICEVALUE1|Human-readable description1
 etc until all choices have been enumerated.
+Configurator will return the CHOICEVALUE of the selected option
+
+if multichoice (i.e. choice with multiple-selection possible): add
+ParamDescription.PARAMNAME.choice0 = CHOICEVALUE0|Human-readable description0
+ParamDescription.PARAMNAME.choice1 = CHOICEVALUE1|Human-readable description1
+etc until all choices have been enumerated.
+ParamDescription.PARAMNAME.minChoices = minimum number of choices that MUST be selected
+ParamDescription.PARAMNAME.maxChoices = maximum number of choices that MAY be selected
+ParamDescription.PARAMNAME.positionalValidator = a regular expression to validate the selection
+The user's choices will be translated to a string having an x for a chosen option and a _ (underscore) for an unchosen option
+the positionalValidator is a regular expression against which this string should match. implicitly this is enclosed between ^ and $, 
+so there is no need to put the start-of-string and end-of-string markers
+Configurator will return a pipe-separated list of chosen CHOICEVALUEs, e.g. CHOICEVALUE0|CHOICEVALUE3|CHOICEVALUE4
+
 
 to just display something, without making it configurable, set its type to readonly
 ParamDescription.PARAMNAME.type=readonly
 
-paramdescription.***.description=Lalala this is a description of so and so
-paramdescription.***.type=choice
-paramdescription.***.choice1=lala|The lala choice
-paramdescription.***.choice2=lala|The second lala choice
+ParamDescription.***.description=Lalala this is a description of so and so
+ParamDescription.***.type=choice
+ParamDescription.***.choice1=lala|The lala choice
+ParamDescription.***.choice2=lala|The second lala choice
 
-paramdescription.***.description=Lalala this is a description of so and so
-paramdescription.***.type=boolean
+ParamDescription.***.description=Lalala this is a description of so and so. Please choose either the first alone, or the second and third together.
+ParamDescription.***.type=multichoice
+ParamDescription.***.choice1=lala|The lala choice
+ParamDescription.***.choice2=lala|The second lala choice
+ParamDescription.***.choice3=lala|The second lala choice
+ParamDescription.***.minChoices=1
+ParamDescription.***.maxChoices=2
+ParamDescription.***.positionalValidator=x__|_xx
+(remember that the positional validator will be implicitly in ^ and $, so it becomes ^x__|_xx$, i.e. will match
+only the strings x__ and _xx, thus fulfilling the validation as above. Similarly, ._. will match any combination where the middle option is unselected)
 
-paramdescription.***.description=Lalala this is a description of so and so
-paramdescription.***.type=text
-paramdescription.***.ereg=x?dr
 
-paramdescription.***.description=Lalala this is a description of so and so
-paramdescription.***.type=integer
-paramdescription.***.min=0
-paramdescription.***.max=1000
+ParamDescription.***.description=Lalala this is a description of so and so
+ParamDescription.***.type=boolean
+
+ParamDescription.***.description=Lalala this is a description of so and so
+ParamDescription.***.type=text
+ParamDescription.***.ereg=x?dr
+
+ParamDescription.***.description=Lalala this is a description of so and so
+ParamDescription.***.type=integer
+ParamDescription.***.min=0
+ParamDescription.***.max=1000

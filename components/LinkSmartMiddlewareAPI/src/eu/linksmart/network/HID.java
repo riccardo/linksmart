@@ -35,13 +35,14 @@ package eu.linksmart.network;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
+import java.io.Serializable;
 
 /**
  * Class to store HID information. An HID consists of three context ids and a
  * device ID. It looks like this: contextID-3.contextID-2.contextID-1.deviceID.
  * An example is 0.0.0.8248725583067352822.
  */
-public class HID {
+public class HID implements Serializable {
 
 	private long deviceID = 0;
 	private long contextID1 = 0;
