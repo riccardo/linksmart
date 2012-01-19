@@ -23,7 +23,7 @@ import eu.linksmart.network.routing.BackboneRouter;
 public class BackboneRouterImpl implements BackboneRouter {
 
 	private Logger logger = Logger
-			.getLogger(BackboneRouterImpl.class.getName());
+	.getLogger(BackboneRouterImpl.class.getName());
 	protected ComponentContext context;
 
 	private Map<HID, Backbone> hidBackboneMap;
@@ -32,7 +32,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	private String defaultRoute;
 
 	private static String BACKBONE_ROUTER = BackboneRouterImpl.class
-			.getSimpleName();
+	.getSimpleName();
 	private static String ROUTING_JXTA = "JXTA";
 	BackboneRouterConfigurator configurator;
 
@@ -106,8 +106,12 @@ public class BackboneRouterImpl implements BackboneRouter {
 		//
 		// Backbone b = (Backbone)hidBackboneMap.get(receiverHID);
 		hidBackboneMap.put(senderHID, originatingBackbone);
-
-		return nmCore.receiveData(senderHID, receiverHID, data);
+		//TODO #NM refactoring check case when there is no core what to do
+		if(nmCore != null) {
+			return nmCore.receiveData(senderHID, receiverHID, data);
+		} else {
+			return null;
+		}
 
 	}
 
@@ -150,7 +154,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(BackboneRouterImpl.BACKBONE_ROUTER)) {
 			this.defaultRoute = (String) configurator
-					.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
+			.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
 		}
 	}
 
