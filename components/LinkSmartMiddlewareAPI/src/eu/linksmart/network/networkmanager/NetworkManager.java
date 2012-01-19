@@ -52,6 +52,7 @@ public interface NetworkManager {
 	 * time the HID needs to be created, using the same attributes, the
 	 * certificate reference can be used.
 	 * 
+	 * @deprecated The implementation independent createHID method should be used
 	 * @param xmlAttributes
 	 *            The attributes (persistent) associated with this HID. This
 	 *            attributes are stored inside the certificate and follow the
@@ -60,7 +61,8 @@ public interface NetworkManager {
 	 *         {@link String} representation of the HID and the certificate
 	 *         reference (UUID)
 	 */
-//	public HIDInfo createCryptoHID(String xmlAttributes);
+	@Deprecated
+	public HIDInfo createCryptoHID(String xmlAttributes);
 	
 	/**
 	 * Operation to create an CryptoHID providing a certificate reference (from
@@ -68,11 +70,13 @@ public interface NetworkManager {
 	 * enhanced version of HIDs, that allow to store persistent information on
 	 * them (through certificates)
 	 * 
+	 * @deprecated The more general createHID method should be used
 	 * @param certRef
 	 *            The certificate reference from a previously generated
 	 *            cryptoHID.
 	 * @return The {@link String} representation of the HID.
 	 */
+	@Deprecated
 	public HIDInfo createCryptoHIDFromReference(String certRef);
 	
 	/**
