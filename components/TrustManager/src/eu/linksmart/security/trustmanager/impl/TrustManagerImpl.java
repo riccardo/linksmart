@@ -58,6 +58,7 @@ import eu.linksmart.security.trustmanager.trustmodel.TrustModel;
 import eu.linksmart.security.trustmanager.trustmodel.TrustModelRegistry;
 import eu.linksmart.security.trustmanager.util.Base64;
 import eu.linksmart.security.trustmanager.util.Util;
+import eu.linksmart.utils.Part;
 
 /**
  * This class encapsulates the web service used to verify the authenticity of
@@ -389,8 +390,13 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		}
 		String xmlAttributes = getXMLAttributeProperties(pid, "TrustManager", pid);
 		HIDInfo hidInfo = nm.createCryptoHID(xmlAttributes);
-		String certRef = hidInfo.getAttributes().getProperty(HIDAttribute.CERT_REF.name()); 
-		configurator.setConfiguration(TrustManagerConfigurator.CERTIFICATE_REF, certRef);
+		Part[] attributes = hidInfo.getAttributes();
+		for (Part attr : attributes) {
+			if(attr.getKey().contentEquals(HIDAttribute.CERT_REF.name())){
+				configurator.setConfiguration(
+						TrustManagerConfigurator.CERTIFICATE_REF, attr.getValue());
+			}
+		}		
 		return hidInfo.getHID().toString();
 	}
 	
