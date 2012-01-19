@@ -1,5 +1,6 @@
 package eu.linksmart.network.identity.impl;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -285,45 +286,58 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		if (update.equals("")) {
 			update = " ";
 		}
-		BroadcastMessage updateMsg = new BroadcastMessage(
-				IDMANAGER_UPDATE_HID_LIST_TOPIC, networkManagerCore.getHID(),
-				update.getBytes());
+		BroadcastMessage updateMsg = null;
+		try {
+			updateMsg = new BroadcastMessage(
+					IDMANAGER_UPDATE_HID_LIST_TOPIC, networkManagerCore.getHID(),
+					update.getBytes());
+		} catch (RemoteException e) {
+			// local invocation
+		}
 		return updateMsg;
 	}
 
 	@Override
 	public Message processMessage(Message msg) {
 		if (msg.getTopic().contentEquals(IDMANAGER_UPDATE_HID_LIST_TOPIC)) {
-			if (msg.getSenderHID() != networkManagerCore.getHID()) {
-				// this is not an echo of our own broadcast
-				// otherwise we do not need to do anything with it
-				// else it is a genuine update
-				String updates = msg.getData().toString();
-				for (String oneUpdate : updates.split(" ")) {
-					String[] updateData = oneUpdate.split(";");
-					// at this point updateData 0 is operation type A/D, [1] is
-					// hid, [2] is description (only if operation=A)
-					if (updateData[0] == "A") {
-						HID newHID = new HID(updateData[1]);
-						HIDInfo newInfo = new HIDInfo(newHID, updateData[1]);
-						addRemoteHID(newHID, newInfo);
-					} else if (updateData[0] == "D") {
-						HID toRemoveHID = new HID(updateData[1]);
-						removeRemoteHID(toRemoveHID);
-					} else {
-						throw new IllegalArgumentException(
-								"Unexpected update type for IDManager updates");
+			try {
+				if (msg.getSenderHID() != networkManagerCore.getHID()) {
+					// this is not an echo of our own broadcast
+					// otherwise we do not need to do anything with it
+					// else it is a genuine update
+					String updates = msg.getData().toString();
+					for (String oneUpdate : updates.split(" ")) {
+						String[] updateData = oneUpdate.split(";");
+						// at this point updateData 0 is operation type A/D, [1] is
+						// hid, [2] is description (only if operation=A)
+						if (updateData[0] == "A") {
+							HID newHID = new HID(updateData[1]);
+							HIDInfo newInfo = new HIDInfo(newHID, updateData[1]);
+							addRemoteHID(newHID, newInfo);
+						} else if (updateData[0] == "D") {
+							HID toRemoveHID = new HID(updateData[1]);
+							removeRemoteHID(toRemoveHID);
+						} else {
+							throw new IllegalArgumentException(
+									"Unexpected update type for IDManager updates");
+						}
 					}
 				}
+			} catch (RemoteException e) {
+				// local invocation
 			}
 			return null; // the complete message has been processed
 		} else if (msg.getTopic().contentEquals(IDMANAGER_NMADVERTISMENT_TOPIC)){
-			if (msg.getSenderHID() != networkManagerCore.getHID()) {
-				//check if we already know this network manager
-				if(!getRemoteHIDs().contains(msg.getSenderHID())){
-					//if we do not know it add HIDs reachable through it
-					//TODO #NM refactoring add HIDs
+			try {
+				if (msg.getSenderHID() != networkManagerCore.getHID()) {
+					//check if we already know this network manager
+					if(!getRemoteHIDs().contains(msg.getSenderHID())){
+						//if we do not know it add HIDs reachable through it
+						//TODO #NM refactoring add HIDs
+					}
 				}
+			} catch (RemoteException e) {
+				// local invocation
 			}
 			//message is processed
 			return null;
@@ -456,9 +470,14 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				if (networkManagerCore != null) {
 					// Send an empty NMAdvertisement broadcast
 					//TODO #NM refactoring put list of local HIDs into message
-					BroadcastMessage m = new BroadcastMessage(
-							IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
-									.getHID(), networkManagerCore.getHID().getBytes());
+					BroadcastMessage m = null;
+					try {
+						m = new BroadcastMessage(
+								IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
+										.getHID(), networkManagerCore.getHID().getBytes());
+					} catch (RemoteException e) {
+						// local invocation
+					}
 					networkManagerCore.broadcastMessage(m);
 				}
 				try {
