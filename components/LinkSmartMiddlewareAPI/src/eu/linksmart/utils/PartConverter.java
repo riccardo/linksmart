@@ -3,7 +3,7 @@ package eu.linksmart.utils;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-public class PartConverter {
+@Deprecated public class PartConverter {
 	@Deprecated public static Part[] fromProperties(Properties attributes) {
 			@SuppressWarnings("unchecked")
 			Entry<String, String>[] entries = (Entry<String, String>[]) attributes
