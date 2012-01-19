@@ -55,11 +55,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
-		//subscribe to messages sent by other identity managers
-		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_NMADVERTISMENT_TOPIC, this);
-		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
 		LOG.info(IDENTITY_MGR + " started");
 	}
 
@@ -489,12 +484,23 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		advertisingThread = new Thread(new AdvertisingThread());
 		advertisingThread.start();
 
+		//subscribe to messages sent by other identity managers
+		((MessageDistributor)this.networkManagerCore).subscribe(
+				IDMANAGER_NMADVERTISMENT_TOPIC, this);
+		((MessageDistributor)this.networkManagerCore).subscribe(
+				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
 	}
 
 	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
 		advertisingThread.interrupt();
 		hidUpdaterThread.interrupt();
 		this.networkManagerCore = null;
+		
+		//unsubscribe to messages sent by other identity managers
+		((MessageDistributor)this.networkManagerCore).unsubscribe(
+				IDMANAGER_NMADVERTISMENT_TOPIC, this);
+		((MessageDistributor)this.networkManagerCore).unsubscribe(
+				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
 	}
 
 	public String getIdentifier() {
