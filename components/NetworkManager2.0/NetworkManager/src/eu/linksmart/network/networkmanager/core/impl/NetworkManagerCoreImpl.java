@@ -27,10 +27,10 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.SecurityProperty;
-import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.tools.GetNetworkManagerStatus;
 import eu.linksmart.tools.NetworkManagerApplicationStatus;
 import eu.linksmart.utils.Part;
+import eu.linksmart.utils.PartConverter;
 
 /*
  * Core implementation of NetworkManagerCore Interface
@@ -45,7 +45,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	protected ConnectionManager connectionManager = new ConnectionManager();
 	/** The HID of this NetworkManager and IdentityManager **/
 	protected HID myHID;
-	
+
 	protected String myDescription;
 
 	/* Constants */
@@ -86,9 +86,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		this.myDescription = this.configurator
 				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		this.connectionManager.setCommunicationSecurityManager(this.commSecMgr);
-		Properties attributes = new Properties();
-		attributes.setProperty(HIDAttribute.DESCRIPTION.name(),
-				this.myDescription);
+		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
+				this.myDescription) };
 		this.myHID = this.identityManager.createHIDForAttributes(attributes);
 
 		// Init Servlets
@@ -111,8 +110,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	}
 
 	@Override
-	public HID createHID(Part[] attributes, String endpoint,
-			String backboneName) throws RemoteException {
+	public HID createHID(Part[] attributes, String endpoint, String backboneName)
+			throws RemoteException {
 		// check if backbone exist before creating the HID
 		boolean backboneFound = false;
 		for (String backbone : this.backboneRouter.getAvailableBackbones()) {
@@ -126,16 +125,14 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 					"Required backbone not available");
 		}
 
-		HID newHID = this.identityManager.createHIDForAttributes(new Properties() /* attributes */);
+		HID newHID = this.identityManager.createHIDForAttributes(attributes);
 		// TODO #NM refactoring configurable security properties
 		ArrayList<SecurityProperty> properties = new ArrayList<SecurityProperty>();
 		properties.add(SecurityProperty.NoSecurity);
-		//register HID with backbone policies in connection manager
-		this.connectionManager.registerHIDPolicy(
-				newHID, 
-				properties);
-		//add route to selected backbone
-		this.backboneRouter.addRouteToBackbone(newHID, backboneName, endpoint);	
+		// register HID with backbone policies in connection manager
+		this.connectionManager.registerHIDPolicy(newHID, properties);
+		// add route to selected backbone
+		this.backboneRouter.addRouteToBackbone(newHID, backboneName, endpoint);
 		return newHID;
 	}
 
@@ -286,14 +283,14 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		}
 	}
 
-	public HID createHID(byte[] data) throws IOException {
-
-		Properties attributes = this.connectionManager.getHIDAttributes(data);
-
-		HID newHID = this.identityManager.createHIDForAttributes(attributes);
-
-		return newHID;
-	}
+	// public HID createHID(byte[] data) throws IOException {
+	//
+	// Properties attributes = this.connectionManager.getHIDAttributes(data);
+	//
+	// HID newHID = this.identityManager.createHIDForAttributes(attributes);
+	//
+	// return newHID;
+	// }
 
 	public NMResponse broadcastMessage(Message message) {
 		HID senderHID = message.getSenderHID();
@@ -381,28 +378,32 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	 *            The endpoint of the service (if there is a service behind).
 	 * @return A {@link eu.linksmart.network.ws.CrypyoHIDResult} containing
 	 *         {@link String} representation of the HID and the certificate
-	 *         reference (UUID)
-	 *         Null if no CryptoHID implementation referenced
+	 *         reference (UUID) Null if no CryptoHID implementation referenced
 	 */
 	public HIDInfo createCryptoHID(String xmlAttributes) {
-		/*as the method is implementation specific we have to check
-		 * whether the appropriate implementation class is referenced
+		/*
+		 * as the method is implementation specific we have to check whether the
+		 * appropriate implementation class is referenced
 		 */
+
 		if(!identityManager.getIdentifier().contentEquals(CRYPTO_HID_IMPLEMENTATION)){
 			return null;
 		}
 		HID hid = null;
 		Properties attributes = new Properties();
 		try {
-		attributes.loadFromXML(new ByteArrayInputStream(xmlAttributes
-				.getBytes()));
-		} catch (IOException e){
+			attributes.loadFromXML(new ByteArrayInputStream(xmlAttributes
+					.getBytes()));
+		} catch (IOException e) {
 			LOG.error("Cannot parse attributes!", e);
 			return null;
 		}
-		hid = identityManager.createHIDForAttributes(attributes);
+		Part[] newAttributes = PartConverter.fromProperties(attributes);
+		hid = identityManager.createHIDForAttributes(newAttributes);
 		return identityManager.getHIDInfo(hid);
 	}
+
+
 
 	/**
 	 * Operation to create an crypto HID providing a certificate reference (from
@@ -418,21 +419,20 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	 * @return The {@link String} representation of the HID.
 	 */
 	public HIDInfo createCryptoHIDFromReference(String certRef) {
-		/*as the method is implementation specific we have to check
-		 * whether the appropriate implementation class is referenced
+		/*
+		 * as the method is implementation specific we have to check whether the
+		 * appropriate implementation class is referenced
 		 */
 		if(!identityManager.getIdentifier().contentEquals(CRYPTO_HID_IMPLEMENTATION)){
 			return null;
 		}
-		Properties prop = new Properties();
-		prop.put(HIDAttribute.CERT_REF, certRef);
-		HID hid = identityManager.createHIDForAttributes(prop);
+		Part[] attributes = { new Part(HIDAttribute.CERT_REF.name(), certRef) };
+		HID hid = identityManager.createHIDForAttributes(attributes);
 		return identityManager.getHIDInfo(hid);
 	}
 
 	public String[] getAvailableBackbones() {
 		return (String[]) this.backboneRouter.getAvailableBackbones().toArray();
 	}
-
 
 }

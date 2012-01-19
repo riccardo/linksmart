@@ -208,17 +208,17 @@ public class ConnectionManager {
 	 * @return Properties object unserialized from data
 	 * @throws IOException 
 	 */
-	public Properties getHIDAttributes(byte[] data) throws IOException {
-		Properties properties = new Properties();
-		try {
-			properties.loadFromXML(new ByteArrayInputStream(data));
-		} catch (Exception e) {
-			IOException ioe = new IOException("Cannot parse received data!");
-			ioe.initCause(e);
-			throw ioe;
-		}
-		return properties;
-	}
+//	public Part[] getHIDAttributes(byte[] data) throws IOException {
+//		Properties properties = new Properties();
+//		try {
+//			properties.loadFromXML(new ByteArrayInputStream(data));
+//		} catch (Exception e) {
+//			IOException ioe = new IOException("Cannot parse received data!");
+//			ioe.initCause(e);
+//			throw ioe;
+//		}
+//		return properties;
+//	}
 
 	/**
 	 * Sets the number of minutes before a connection is closed

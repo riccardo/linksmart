@@ -19,10 +19,12 @@ import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
-import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.MessageDistributor;
+import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.utils.Part;
+import eu.linksmart.utils.PartConverter;
 
 public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
@@ -63,7 +65,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	@Override
-	public HID createHIDForAttributes(Properties attributes) {
+	public HID createHIDForAttributes(Part[] attributes) {
 		HID hid = createUniqueHID();
 		HIDInfo info = new HIDInfo(hid, attributes);
 		addLocalHID(hid, info);
@@ -73,9 +75,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	@Override
 	public HID createHIDForDescription(String description) {
-		Properties prop = new Properties();
-		prop.put(HIDAttribute.DESCRIPTION, description);
-		return createHIDForAttributes(prop);
+		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(), description)};
+		return createHIDForAttributes(attributes);
 	}
 
 	protected HID createUniqueHID() {
@@ -186,9 +187,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						// but let's do a last check on CryptoHID just in case
 						// it matches
 						if (hidInfo.getAttributes() != null) {
-							oneDescription = hidInfo.getAttributes()
-									.getProperty(
-											HIDAttribute.DESCRIPTION.name());
+							oneDescription = hidInfo.getDescription();
 							if (oneDescription != null) {
 								if ((!exactMatch && oneDescription
 										.contains(toMatch[i]))
@@ -235,7 +234,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		while (it.hasNext()) {
 			Map.Entry<HID, HIDInfo> entry = it.next();
-			Properties attr = entry.getValue().getAttributes();
+			Part[] attr = entry.getValue().getAttributes();
 			if (attr != null) {
 				if (AttributeQueryParser.checkAttributes(attr, parsedQuery)) {
 					results.add(entry.getValue());
@@ -258,7 +257,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				// deletion of old and insertion of new
 				// attributes are in the queue at the same
 				// time
-				toUpdate.setAttributes(attr);
+				toUpdate.setAttributes(PartConverter.fromProperties(attr));
 				localHIDs.replace(hid, toUpdate);
 				queue.add("D;" + hid.toString());
 				queue.add("A;" + hid.toString() + ";"

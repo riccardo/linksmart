@@ -40,7 +40,6 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServlet;
@@ -56,6 +55,7 @@ import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.network.service.registry.ServiceRegistry;
+import eu.linksmart.utils.Part;
 
 /**
  * NetworkManagerApplication Servlet
@@ -160,17 +160,16 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 				if (checkAttributes && description.equals("")) {
 					HIDInfo hidInfo = identityManager.getHIDInfo(hid);
 
-					Properties attr = hidInfo.getAttributes();
+					Part[] attr = hidInfo.getAttributes();
 
-					Enumeration<Object> en = attr.keys();
-					while (en.hasMoreElements()) {
-						String key = (String) en.nextElement();
+					
+					for (Part part: attr) {
+						String key = part.getKey();
 						if (key.equals("CN") || key.equals("DN")
 								|| key.equals("C") || key.equals("Pseudonym")) {
 							continue;
 						}
-						String value = attr.getProperty(key);
-						description = description + key + " = " + value
+						description = description + key + " = " + part.getValue()
 								+ "<br/>";
 					}
 

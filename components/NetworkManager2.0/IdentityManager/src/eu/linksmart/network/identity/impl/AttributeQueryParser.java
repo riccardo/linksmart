@@ -4,6 +4,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import eu.linksmart.utils.Part;
+import eu.linksmart.utils.PartConverter;
+
 public class AttributeQueryParser {
 
 	private static void removeRedundantBrackets(LinkedList<String> values) {
@@ -31,12 +34,12 @@ public class AttributeQueryParser {
 	 * Checks attributes
 	 * 
 	 * TODO Student: check if method cannot be written easier or less complex
-	 * 
+	 * XXX This method needs refactoring (in particular for new Attributes type - Part[])
 	 * @param attr the attributes
 	 * @param query the query
 	 * @return true or false depending on the result
 	 */
-	public static boolean checkAttributes(Properties attr, LinkedList<String> query) {
+	@Deprecated public static boolean checkAttributes(Properties attr, LinkedList<String> query) {
 		LinkedList<String> values = (LinkedList<String>) query.clone();
 		boolean result = false;
 		
@@ -149,6 +152,10 @@ public class AttributeQueryParser {
 		return result;
 	}
 	
+	public static boolean checkAttributes(Part[] attr, LinkedList<String> query) {
+		return checkAttributes(PartConverter.toProperties(attr), query);
+	}
+	
 	/**
 	 * Parses a query
 	 * 
@@ -226,5 +233,5 @@ public class AttributeQueryParser {
 		}
 		return values;
 	}
-
+	
 }

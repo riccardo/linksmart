@@ -4,7 +4,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
+import eu.linksmart.utils.Part;
 
 /**
  * The IdentityManager is responsible for creating and storing {@link HID}.
@@ -22,7 +24,7 @@ public interface IdentityManager {
 	 *            Attributes describing the HID. E.g. description.
 	 * @return the {@link HID} that has been created.
 	 */
-	public HID createHIDForAttributes(Properties attributes);
+	public HID createHIDForAttributes(Part[] attributes);
 
 	/**
 	 * Creates a local {@link HID} without any context and stores. It creates a

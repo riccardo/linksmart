@@ -13,7 +13,7 @@
  * stipulating liability clauses corresponding to German law.
  */
 /**
- * Copyright (C) 2006-2010 [Telefonica I+D]
+ * Copyright (C) 2006-2012 [Telefonica I+D, Fraunhofer FIT]
  *                         the HYDRA consortium, EU project IST-2005-034891
  *
  * This file is part of LinkSmart.
@@ -39,12 +39,14 @@ package eu.linksmart.network;
 
 import java.util.Properties;
 
+import eu.linksmart.utils.Part;
+
 /**
  * Class to store information about HIDs
  */
 public class HIDInfo {
 	private HID hid;
-	private Properties attributes;
+	private Part[] attributes;
 
 	/**
 	 * Create an HIDInfo object with the given HID and Description.
@@ -54,8 +56,9 @@ public class HIDInfo {
 	 */
 	public HIDInfo(HID hid, String description) {
 		this.hid = hid;
-		this.attributes = new Properties();
-		this.attributes.put(HIDAttribute.DESCRIPTION.name(), description);
+		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
+				description) };
+		this.attributes = attributes;
 	}
 
 	/**
@@ -65,12 +68,11 @@ public class HIDInfo {
 	 * @param hid
 	 * @param attributes
 	 */
-	public HIDInfo(HID hid, Properties attributes) {
+	public HIDInfo(HID hid, Part[] attributes) {
 		this.hid = hid;
 		this.attributes = attributes;
 	}
 
-	
 	/**
 	 * Prints the the HIDInfo like this: hid:description
 	 */
@@ -78,8 +80,8 @@ public class HIDInfo {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(hid).append(": ");
-		for (Object attribute : attributes.values()){
-			sb.append(attribute).append(";");
+		for (Part attribute : attributes) {
+			sb.append(attribute.getValue()).append(";");
 		}
 		return sb.toString();
 	}
@@ -87,10 +89,19 @@ public class HIDInfo {
 	/**
 	 * Return the attribute {@link HIDAttribute} DESCRIPTION for this HIDInfo.
 	 * 
-	 * @return the description
+	 * @return the description, or null if no description exists
 	 */
+	@Deprecated
 	public String getDescription() {
-		return this.attributes.getProperty(HIDAttribute.DESCRIPTION.name());
+		if (this.attributes == null) {
+			return null;
+		}
+		for (Part attribute : this.attributes) {
+			if (attribute.getKey().equals(HIDAttribute.DESCRIPTION.name())) {
+				return attribute.getValue();
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -99,11 +110,26 @@ public class HIDInfo {
 	 * @param description
 	 *            the description to set
 	 */
-	public void setDescription(String description) {
-		if (this.attributes == null){
-			this.attributes = new Properties();
+	@Deprecated public void setDescription(String description) {
+		if (this.attributes == null) {
+			Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
+					description) };
+			this.attributes = attributes;
+		} else {
+			for (Part attribute : attributes) {
+				if (attribute.getKey().equals(HIDAttribute.DESCRIPTION.name())) {
+					attribute.setValue(description);
+					return;
+				}
+			}
+			// description does not exist yet
+			Part[] attributes = new Part[this.attributes.length + 1];
+			System.arraycopy(this.attributes, 0, attributes, 0,
+					attributes.length);
+			attributes[this.attributes.length] = new Part(
+					HIDAttribute.DESCRIPTION.name(), description);
+			this.attributes = attributes;
 		}
-		this.attributes.put(HIDAttribute.DESCRIPTION.name(), description);
 	}
 
 	/**
@@ -111,21 +137,23 @@ public class HIDInfo {
 	 * 
 	 * @return the properties
 	 */
-	public Properties getAttributes() {
+	public Part[] getAttributes() {
 		return attributes;
 	}
 
 	/**
-	 * Set the properties
+	 * Set the properties.
 	 * 
+	 * At the moment it replaces the existing properties with the array
+	 * TODO make this method really do what it's meant to do ;)
 	 * @param attr
 	 *            the properties to set
 	 */
-	public void setAttributes(Properties attr) {
+	public void setAttributes(Part[] attr) {
 		this.attributes = attr;
-		if (attr.containsKey(HIDAttribute.DESCRIPTION.name())) {
-			setDescription(attr.getProperty(HIDAttribute.DESCRIPTION.name()));
-		}
+//		if (attr.containsKey(HIDAttribute.DESCRIPTION.name())) {
+//			setDescription(attr.getProperty(HIDAttribute.DESCRIPTION.name()));
+//		}
 	}
 
 	public HID getHID() {

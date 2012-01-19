@@ -34,9 +34,9 @@ public interface NetworkManagerCore extends NetworkManager {
 	 */
 	public NMResponse receiveData(HID senderHID, HID receiverHID, byte [] data);
 
-	/**
-	 * Creates an HID based on byte array data
-	 */
-	public HID createHID(byte [] data) throws IOException;
+//	/**
+//	 * Creates an HID based on byte array data
+//	 */
+//	public HID createHID(byte [] data) throws IOException;
 
 }

@@ -9,6 +9,7 @@ import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.impl.IdentityManagerImpl;
 import eu.linksmart.security.cryptomanager.CryptoManager;
+import eu.linksmart.utils.PartConverter;
 
 /**
  * The CryptoHID implementation of Identity Manager.
@@ -75,7 +76,7 @@ public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
 						xmlAttributes, hid.toString());
 				attributes.put(HIDAttribute.CERT_REF.name(), certRef);
 			}
-			HIDInfo info = new HIDInfo(hid, attributes);
+			HIDInfo info = new HIDInfo(hid, PartConverter.fromProperties(attributes));
 			addLocalHID(hid, info);
 			LOG.debug("Created HID: " + info.toString());
 			return hid;

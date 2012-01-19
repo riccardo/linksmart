@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServlet;
@@ -50,6 +49,7 @@ import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
+import eu.linksmart.utils.Part;
 
 /**
  * NetworkManagerStatus Servlet
@@ -76,7 +76,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 		this.networkManagerCore = networkManagerCore;
 		this.identityManager = identityManager;
 		this.backboneRouter = backboneRouter;
-		
+
 	}
 
 	/**
@@ -119,23 +119,21 @@ public class GetNetworkManagerStatus extends HttpServlet {
 	private void processHIDs(Set<HIDInfo> hids, HttpServletResponse response) {
 
 		Iterator<HIDInfo> it = hids.iterator();
-		
+
 		while (it.hasNext()) {
 			HIDInfo hidInfo = it.next();
-			
+
 			// Create the description from all Attributes
 			String description = "";
-			Properties attr = hidInfo.getAttributes();
-			Enumeration<Object> en = attr.keys();
-			while (en.hasMoreElements()) {
-				String key = (String) en.nextElement();
-				String value = attr.getProperty(key);
-				description = description + key + " = " + value + ";";
+			Part[] attr = hidInfo.getAttributes();
+			for (Part part : attr) {
+				description = description + part.getKey() + " = "
+						+ part.getValue() + ";";
 			}
-			
+
 			// Get the Route for this HID
 			String route = backboneRouter.getRoute(hidInfo.getHID());
-			
+
 			// Here we print one row
 			try {
 				response.getWriter().write(
