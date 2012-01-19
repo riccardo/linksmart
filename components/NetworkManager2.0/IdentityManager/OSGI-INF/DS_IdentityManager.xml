@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="IdentityManager">
-   <implementation class="eu.linksmart.network.identity.impl.IdentityManagerImpl"/>
+   <implementation class="eu.linksmart.network.identity.impl.crypto.IdentityManagerCryptoImpl"/>
    <service>
       <provide interface="eu.linksmart.network.identity.IdentityManager"/>
    </service>
    <reference bind="bindNetworkManagerCore" cardinality="0..1" interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore" name="NetworkManagerCore" policy="dynamic" unbind="unbindNetworkManagerCore"/>
+   <reference bind="bindCryptoManager" cardinality="1..1" interface="eu.linksmart.security.cryptomanager.CryptoManager" name="CryptoManager" policy="static" unbind="unbindCryptoManager"/>
 </scr:component>

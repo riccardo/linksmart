@@ -72,11 +72,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	@Override
 	public HID createHIDForDescription(String description) {
-		HID hid = createUniqueHID();
-		HIDInfo info = new HIDInfo(hid, description);
-		addLocalHID(hid, info);
-		LOG.debug("Created HID: " + info.toString());
-		return hid;
+		Properties prop = new Properties();
+		prop.put(HIDAttribute.DESCRIPTION, description);
+		return createHIDForAttributes(prop);
 	}
 
 	protected HID createUniqueHID() {
@@ -482,4 +480,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.networkManagerCore = null;
 	}
 
+	public String getIdentifier() {
+		return IDENTITY_MGR;
+	}
 }

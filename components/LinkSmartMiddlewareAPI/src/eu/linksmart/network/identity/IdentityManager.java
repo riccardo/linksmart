@@ -28,10 +28,13 @@ public interface IdentityManager {
 	 * Creates a local {@link HID} without any context and stores. It creates a
 	 * random deviceID. The result will be 0.0.0.randomDeviceId.
 	 * 
+	 * @deprecated The more general createHIDForAttributes should be used with 
+	 * a description attribute
 	 * @param description
 	 *            the description
 	 * @return the HID created
 	 */
+	@Deprecated
 	public HID createHIDForDescription(String description);
 
 	/**
@@ -91,9 +94,12 @@ public interface IdentityManager {
 	 * Return all {@link HIDInfo}s that match the given description. Wildcards
 	 * can be used. TODO Explain the use of wildcards
 	 * 
+	 * @deprecated The more general getHIDsByAttributes method should be used
+	 * with a description attribute
 	 * @param description
 	 * @return
 	 */
+	@Deprecated
 	public Set<HIDInfo> getHIDsByDescription(String description);
 
 	/**
@@ -114,4 +120,10 @@ public interface IdentityManager {
 	 * @return true, if {@link HID} has been removed successfully.
 	 */
 	public boolean removeHID(HID hid);
+	
+	/**
+	 * Returns the implementation name of this IdentityManager bundle.
+	 * @return Class name string.
+	 */
+	public String getIdentifier();
 }

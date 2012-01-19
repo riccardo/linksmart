@@ -36,16 +36,15 @@ import eu.linksmart.tools.NetworkManagerApplicationStatus;
  */
 public class NetworkManagerCoreImpl implements NetworkManagerCore,
 MessageDistributor {
+	/** The used identity manager **/
 	protected IdentityManager identityManager;
-
+	/** The used backbone router **/
 	protected BackboneRouter backboneRouter;
-
+	/** The used connection manager **/
 	protected ConnectionManager connectionManager = new ConnectionManager();
-
-	protected CryptoManager cryptoManager;
-
+	/** The HID of this NetworkManager and IdentityManager **/
 	protected HID myHID;
-
+	
 	protected String myDescription;
 
 	/* Constants */
@@ -56,6 +55,8 @@ MessageDistributor {
 		+ NETWORK_MGR_CORE;
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
+	/** The name of the class implementing CryptoHID **/
+	private static String CRYPTO_HID_IMPLEMENTATION = "IdentityManagerCryptoImpl";
 
 	/*
 	 * logger
@@ -122,7 +123,7 @@ MessageDistributor {
 		if (!backboneFound) {
 			throw new IllegalArgumentException("Required backbone not available");
 		}
-		
+
 		HID newHID = this.identityManager.createHIDForAttributes(attributes);
 		//TODO #NM refactoring configurable security properties
 		ArrayList<SecurityProperty> properties = new ArrayList<SecurityProperty>();
@@ -133,7 +134,7 @@ MessageDistributor {
 				properties);
 		//add route to selected backbone
 		this.backboneRouter.addRouteToBackbone(newHID, backboneName, endpoint);	
-		
+
 		return newHID;
 	}
 
@@ -182,14 +183,6 @@ MessageDistributor {
 
 	protected void unbindBackboneRouter(BackboneRouter backboneRouter) {
 		this.backboneRouter = null;
-	}
-
-	protected void bindCryptoManager(CryptoManager cryptoManager) {
-		this.cryptoManager = cryptoManager;
-	}
-
-	protected void unbindCryptoManager(CryptoManager cryptoManager) {
-		this.cryptoManager = null;
 	}
 
 	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data) {
@@ -319,7 +312,7 @@ MessageDistributor {
 		HID receiverHID = message.getSenderHID();
 		return sendMessage(message, senderHID, receiverHID);
 	}
-	
+
 	/**
 	 * Internal method for sending messages with more possible
 	 * parameters. The message contains the original sender and
@@ -378,26 +371,25 @@ MessageDistributor {
 	 * @return A {@link eu.linksmart.network.ws.CrypyoHIDResult} containing
 	 *         {@link String} representation of the HID and the certificate
 	 *         reference (UUID)
+	 *         Null if no CryptoHID implementation referenced
 	 */
 	public HIDInfo createCryptoHID(String xmlAttributes) {
+		/*as the method is implementation specific we have to check
+		 * whether the appropriate implementation class is referenced
+		 */
+		if(identityManager.getIdentifier().contentEquals(this.CRYPTO_HID_IMPLEMENTATION)){
+			return null;
+		}
 		HID hid = null;
 		Properties attributes = new Properties();
 		try {
-			attributes.loadFromXML(new ByteArrayInputStream(xmlAttributes
-					.getBytes()));
-
-			hid = identityManager.createHIDForAttributes(attributes);
-
-			// Provide the attributes and the hid to generate the certificate
-			String certRef = cryptoManager.generateCertificateWithAttributes(
-					xmlAttributes, hid.toString());
-
-			// Add the Certificate Reference to the HID Attributes
-			attributes.put(HIDAttribute.CERT_REF.name(), certRef);
-			identityManager.updateHIDInfo(hid, attributes);
-		} catch (Exception e) {
-			LOG.error("Unable to create CryptoHID.", e);
+		attributes.loadFromXML(new ByteArrayInputStream(xmlAttributes
+				.getBytes()));
+		} catch (IOException e){
+			LOG.error("Cannot parse attributes!", e);
+			return null;
 		}
+		hid = identityManager.createHIDForAttributes(attributes);
 		return identityManager.getHIDInfo(hid);
 	}
 
@@ -415,23 +407,16 @@ MessageDistributor {
 	 * @return The {@link String} representation of the HID.
 	 */
 	public HIDInfo createCryptoHIDFromReference(String certRef) {
-		HID hid = null;
-		try {
-			Properties attributes = cryptoManager
-					.getAttributesFromCertificate(certRef);
-			if (attributes.size() != 0) {
-				hid = identityManager.createHIDForAttributes(attributes);
-				cryptoManager.addPrivateKeyForHID(hid.toString(), certRef);
-				cryptoManager.addCertificateForHID(hid.toString(), certRef);
-				return identityManager.getHIDInfo(hid);
-			} else {
-				LOG.warn("Certificate reference does not exist!");
-				return null;
-			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
+		/*as the method is implementation specific we have to check
+		 * whether the appropriate implementation class is referenced
+		 */
+		if(identityManager.getIdentifier().contentEquals(this.CRYPTO_HID_IMPLEMENTATION)){
+			return null;
 		}
-		return null;
+		Properties prop = new Properties();
+		prop.put(HIDAttribute.CERT_REF, certRef);
+		HID hid = identityManager.createHIDForAttributes(prop);
+		return identityManager.getHIDInfo(hid);
 	}
 
 	public List<String> getAvailableBackbones() {
