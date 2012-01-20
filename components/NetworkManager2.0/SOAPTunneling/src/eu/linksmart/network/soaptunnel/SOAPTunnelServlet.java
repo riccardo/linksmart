@@ -37,6 +37,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.rmi.AccessException;
 import java.util.Enumeration;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServlet;
@@ -94,9 +96,31 @@ public class SOAPTunnelServlet extends HttpServlet {
 		HID sHid = new HID(parts[1]);
 		HID rHid = new HID(parts[2]);
 		String url = "";
-		if (parts.length > 3) {
-			url = parts[3].equals("wsdl") ? "?wsdl" : parts[3];
+		if (parts.length > 3 && parts[3].equals("wsdl")) {
+			url = "?wsdl";
+		} else {
+			if (parts.length > 3) {
+				url = parts[3];
+			}
+			// XXX Work in Progress
+			if (!request.getParameterMap().isEmpty()) {
+				url += "?";
+				@SuppressWarnings("unchecked")
+				Set<Entry<String, String[]>> params = request.getParameterMap()
+						.entrySet();
+				for (Entry<String, String[]> e : params) {
+					String[] values = e.getValue();
+					if (values.length == 0) {
+						url += e.getKey();
+					} else {
+						for (String s : values) {
+							url += e.getKey() + "=" + s + "&";
+						}
+					}
+				}
+			}
 		}
+
 		String req = request.getMethod() + " /" + url + " "
 				+ request.getProtocol() + "\r\n";
 		Enumeration headerNames = request.getHeaderNames();

@@ -195,11 +195,20 @@ public class BackboneSOAPImpl implements Backbone {
 			while (token.hasMoreElements()) {
 				aux = token.nextToken();
 				if (aux.toLowerCase().contains("get")) {
-					String parts[] = aux.toLowerCase().split(" ");
-					urlEndpoint = new URL(urlEndpoint.toString()
-							+ parts[1].replace("/", ""));
-					header = aux.replace(parts[1], urlEndpoint.getFile())
-							+ "\r\n";
+					String parts[] = aux.split(" ");
+					if (parts[1].startsWith("/")) {
+						parts[1] = parts[1].substring(1);
+					}
+					parts[1] = urlEndpoint.getFile() + parts[1];
+					header = "";
+					for (String part : parts) {
+						header = header + " " + part;
+					}
+					header = header.substring(1) + "\r\n";
+//					urlEndpoint = new URL(urlEndpoint.toString()
+//							+ parts[1].replace("/", ""));
+//					header = aux.replace(parts[1], urlEndpoint.getFile())
+//							+ "\r\n";
 				} else if (aux.toLowerCase().contains("host")) {
 					header = "Host: " + urlEndpoint.getHost() + ":"
 							+ urlEndpoint.getPort() + "\r\n";
@@ -208,7 +217,8 @@ public class BackboneSOAPImpl implements Backbone {
 				} else if (aux.toLowerCase().startsWith("keep-alive")) {
 					header = "";
 				} else {
-					header = "\r\n";
+					// Commented out to remove unnecessary (?) headers
+					// header = aux + "\r\n";
 				}
 				dataproc = dataproc + header;
 			}
@@ -224,7 +234,7 @@ public class BackboneSOAPImpl implements Backbone {
 			String response = parseResponse(resp, clientSocket);
 
 			String[] s = response.split("\r\n\r\n");
-			if (s.length > 0) {
+			if (s.length > 1) {
 				response = s[1];
 			} else {
 				String msg = "No SOAP response from the service";					
@@ -275,6 +285,7 @@ public class BackboneSOAPImpl implements Backbone {
 	 * @throws IOException
 	 */
 	private String parseResponse(NMResponse resp, Socket socket) throws IOException {
+		//TODO change buffer size to available bytes
 		byte[] buffer = new byte[BUFFSIZE];
 		String response="";
 		InputStream cis = socket.getInputStream();
