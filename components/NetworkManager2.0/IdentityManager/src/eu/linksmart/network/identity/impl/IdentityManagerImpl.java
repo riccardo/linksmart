@@ -337,11 +337,24 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					//check if we already know this network manager
 					if(!getRemoteHIDs().contains(msg.getSenderHID())){
 						//if we do not know it add HIDs reachable through it
-						//TODO #NM refactoring add HIDs
+						@SuppressWarnings("unchecked")
+						Set<HIDInfo> hidInfos = (Set<HIDInfo>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+						if (hidInfos != null) {
+							Iterator<HIDInfo> i = hidInfos.iterator();
+							while (i.hasNext()) {
+								HIDInfo oneHIDInfo = i.next();
+								addRemoteHID(oneHIDInfo.getHID(), oneHIDInfo);
+							}
+						}
 					}
 				}
 			} catch (RemoteException e) {
-				// local invocation
+				LOG.debug("Remote Exception " + e);
+			} catch (IOException e) {
+				LOG.debug("IO Exception in communication, message maybe damaged? " + e);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				LOG.error("Class not found in reconstructing message. Why? " + e);
 			}
 			//message is processed
 			return null;
