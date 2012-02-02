@@ -176,7 +176,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				HIDInfo hidInfo = it.next();
 				try {
 					oneDescription = hidInfo.getDescription();
-					if ((!exactMatch && oneDescription.contains(toMatch[i]))
+					if ((oneDescription != null && !exactMatch && oneDescription.contains(toMatch[i]))
 							|| (exactMatch && oneDescription.equals(toMatch[i]))) { // the
 						// match
 						// criteria
@@ -215,8 +215,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						it.remove();
 					}
 				} catch (Exception e) {
-					LOG.error("Error in getHIDsbyDescription() "
-							+ e.getMessage());
+					LOG.error("Unable to get HID for description: "
+							+ description, e);
 				}
 
 			}
@@ -323,7 +323,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 							removeRemoteHID(toRemoveHID);
 						} else {
 							throw new IllegalArgumentException(
-									"Unexpected update type for IDManager updates");
+									"Unexpected update type for IDManager updates: " + updateData[0]);
 						}
 					}
 				}
@@ -477,7 +477,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	/*
-	 * Thread sends NMAdvertisement broadcast message
+	 * Thread that broadcasts all localHIDs stored by this IdentityManager 
 	 */
 	protected class AdvertisingThread implements Runnable {
 
@@ -496,11 +496,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						LOG.error("Cannot convert local HIDs set to bytearray; " + e);
 					
 					}
-//this is an empty version with no HID transmission
-/*					BroadcastMessage m = new BroadcastMessage(
-							IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
-									.getHID(), networkManagerCore.getHID().getBytes());
-*/
 					BroadcastMessage m = null;
 
 					try {
