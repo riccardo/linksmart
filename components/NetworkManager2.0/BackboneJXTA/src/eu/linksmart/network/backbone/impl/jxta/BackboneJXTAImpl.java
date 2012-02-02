@@ -118,8 +118,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 				.locateService(BackboneRouter.class.getSimpleName());
 
 		try {
-			this.configurator = new BackboneJXTAConfigurator(this,
-					context.getBundleContext());
+			this.configurator = new BackboneJXTAConfigurator(this, context
+					.getBundleContext());
 			configurator.registerConfiguration();
 		} catch (NullPointerException e) {
 			logger.fatal("Configurator could not be initialized "
@@ -134,11 +134,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 				.getConfiguration().get(BackboneJXTAConfigurator.JXTA_LOGS));
 
 		if (!logs) {
-			System.setProperty(Logging.JXTA_LOGGING_PROPERTY,
-					Level.OFF.toString());
+			System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.OFF
+					.toString());
 		} else if (logs) {
-			System.setProperty(Logging.JXTA_LOGGING_PROPERTY,
-					Level.ALL.toString());
+			System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.ALL
+					.toString());
 		}
 
 		this.announcementValidityTime = Long.parseLong((String) configurator
@@ -212,8 +212,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		// add senderHID to data
 		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
 		logger.debug("Sending data over pipe to HID= " + receiverHID);
-		response = pipeSyncHandler.sendData(senderHID.toString(),
-				receiverHID.toString(), payload, peerID);
+		response = pipeSyncHandler.sendData(senderHID.toString(), receiverHID
+				.toString(), payload, peerID);
 
 		logger.debug("sendData Response: " + response.toString());
 
@@ -235,22 +235,26 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		// give message to BBRouter for further processing
 		try {
-			//FIXME
-			//this is temporary code until the complete move to LS 2.0; it is there just 
-			//to ignore LS1.1 messages from supernodes and other 1.1 NM
-			if (receivedData[0]=='N' && receivedData[1]=='M') {
+			// FIXME
+			// this is temporary code until the complete move to LS 2.0; it is
+			// there just
+			// to ignore LS1.1 messages from supernodes and other 1.1 NM
+			if (receivedData[0] == 'N' && receivedData[1] == 'M') {
+				logger.debug("Received LS1.1 Message: " + receivedData[0]
+						+ ". Throwing it away.");
 				return response;
 			}
-			//end temporary code
-			
+			// end temporary code
+
 			response = bbRouter.receiveData(senderHID, receiverHID,
 					BackboneJXTAUtils.RemoveHIDFromData(receivedData),
 					(Backbone) this);
 			logger.debug("receiveData Response: " + response.toString());
 		} catch (Exception e) {
-			logger.error(
-					"BBJXTA could not give received message for processing to bbRouter",
-					e);
+			logger
+					.error(
+							"BBJXTA could not give received message for processing to bbRouter",
+							e);
 		}
 
 		return response;
@@ -291,13 +295,13 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * Return the destination JXTA address as string that will be used for
 	 * display purposes.
 	 * 
-	 * Returns "null" as string if no entry for the given HID could be found.
 	 * 
 	 * @param hid
-	 * @return the backbone address represented by the HID
+	 * @return the backbone address represented by the HID, else null.
 	 */
 	public String getEndpoint(HID hid) {
-		return listOfRemoteEndpoints.get(hid).toString();
+		String remoteEndpoint = listOfRemoteEndpoints.get(hid);
+		return remoteEndpoint;
 	}
 
 	/*
@@ -314,12 +318,12 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(BackboneJXTAConfigurator.JXTA_LOGS)) {
 			if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals("OFF")) {
-				System.setProperty(Logging.JXTA_LOGGING_PROPERTY,
-						Level.OFF.toString());
+				System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.OFF
+						.toString());
 			} else if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals(
 					"ON")) {
-				System.setProperty(Logging.JXTA_LOGGING_PROPERTY,
-						Level.ALL.toString());
+				System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.ALL
+						.toString());
 			}
 		}
 
@@ -350,7 +354,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			 */
 			if (jxtaConfMode.equals(BackboneJXTAConfigurator.MODE_SUPERNODE)) {
 				this.jxtaMode = NetworkManager.ConfigMode.SUPER;
-				logger.info("LinkSmart Network Manager configured as SuperNode");
+				logger
+						.info("LinkSmart Network Manager configured as SuperNode");
 			} else {
 				// if it is not a supernode it must be a node
 				this.jxtaMode = NetworkManager.ConfigMode.EDGE;
@@ -423,10 +428,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		//
 		// jxtaNetworkConfigurator.addRdvSeedingURI(uri);
 
+		URI superNodeTCPURI = null;
 		try {
-			URI superNodeTCPURI = new URI((String) configurator
-					.getConfiguration().get(
-							BackboneJXTAConfigurator.SUPERNODE_TCP_URI));
+			String uriString = (String) configurator.getConfiguration().get(
+					BackboneJXTAConfigurator.SUPERNODE_TCP_URI);
+			superNodeTCPURI = new URI(uriString);
 			jxtaNetworkConfigurator.addSeedRendezvous(superNodeTCPURI);
 			logger.debug("Added SuperNode-TCP-URI: "
 					+ superNodeTCPURI.toString());
@@ -454,7 +460,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			}
 
 		} catch (Exception e) {
-			logger.error("Could not add URI for SuperNode...", e);
+			logger.error("Could not add URI for SuperNode. URI: "
+					+ superNodeTCPURI, e);
 		}
 
 		if (Boolean.parseBoolean((String) configurator.getConfiguration().get(
@@ -518,8 +525,9 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 				.equals(BackboneJXTAConfigurator.MODE_NODE)) {
 			waitForRdv();
 			if (!myPGRdvService.isConnectedToRendezVous()) {
-				logger.info("Could not connect to LinkSmart Super Node. Will "
-						+ "start without it (only local network communications)");
+				logger
+						.info("Could not connect to LinkSmart Super Node. Will "
+								+ "start without it (only local network communications)");
 			} else {
 				logger.info("Connected to LinkSmart Super Node succesfully");
 			}
@@ -635,7 +643,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 					rdvAdv.getPeerID();
 					logger.info("LinkSmart Super Node discovered "
 							+ rdvAdv.getPeerID());
-					//FIXME
+					// FIXME
 					logger.info("Cannot connect to it yet (Implement me!)");
 				}
 
@@ -739,9 +747,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 				try {
 					m.receive(receivedData);
 				} catch (IOException e2) {
-					logger.error(
-							getName() + ": Unable to receive data in "
-									+ m.toString(), e2);
+					logger.error(getName() + ": Unable to receive data in "
+							+ m.toString(), e2);
 					e2.printStackTrace();
 				}
 
@@ -764,19 +771,23 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 								+ BackboneJXTAUtils
 										.ConvertByteArrayToString(receivedData
 												.getData()));
-						logger.debug("BBJXTA receive multicast message: senderJXTAID: "
-								+ senderJXTAID + " | senderHID: " + senderHID);
+						logger
+								.debug("BBJXTA receive multicast message: senderJXTAID: "
+										+ senderJXTAID
+										+ " | senderHID: "
+										+ senderHID);
 
-						bbJXTA.receiveData(senderHID, null,
-								receivedData.getData());
+						bbJXTA.receiveData(senderHID, null, receivedData
+								.getData());
 
 						// add info to table of HID-Endpoints
 						listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 					}
 				} catch (Exception e) {
-					logger.error(
-							"BBJXTA could not process received multicast message.",
-							e);
+					logger
+							.error(
+									"BBJXTA could not process received multicast message.",
+									e);
 				}
 
 			}
@@ -823,19 +834,27 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @return a list of security types available
 	 */
 	public List<SecurityProperty> getSecurityTypesAvailable() {
-		String configuredSecurity = this.configurator.get(BackboneJXTAConfigurator.SECURITY_PARAMETERS);
+		String configuredSecurity = this.configurator
+				.get(BackboneJXTAConfigurator.SECURITY_PARAMETERS);
 		String[] securityTypes = configuredSecurity.split("|");
 		SecurityProperty oneProperty;
 		List<SecurityProperty> answer = new ArrayList<SecurityProperty>();
-		for (String s:securityTypes) {
-			   try {
-				   oneProperty = SecurityProperty.valueOf(s);
-				   answer.add(oneProperty);
-			   } catch (Exception e) {
-				   logger.error("Security property value from configuration is not recognized: " + s + ": "+ e);
-			   }
+		for (String s : securityTypes) {
+			try {
+				oneProperty = SecurityProperty.valueOf(s);
+				answer.add(oneProperty);
+			} catch (Exception e) {
+				logger
+						.error("Security property value from configuration is not recognized: "
+								+ s + ": " + e);
+			}
 		}
 		return answer;
+	}
+
+	@Override
+	public String getName() {
+		return BackboneJXTAImpl.class.getName();
 	}
 
 }
