@@ -305,11 +305,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	public Message processMessage(Message msg) {
 		if (msg.getTopic().contentEquals(IDMANAGER_UPDATE_HID_LIST_TOPIC)) {
 			try {
-				if (msg.getSenderHID() != networkManagerCore.getHID()) {
+				if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
 					// this is not an echo of our own broadcast
 					// otherwise we do not need to do anything with it
 					// else it is a genuine update
-					String updates = msg.getData().toString();
+					String updates = new String(msg.getData()); 
 					for (String oneUpdate : updates.split(" ")) {
 						String[] updateData = oneUpdate.split(";");
 						// at this point updateData 0 is operation type A/D, [1] is
@@ -317,10 +317,14 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						if (updateData[0] == "A") {
 							HID newHID = new HID(updateData[1]);
 							HIDInfo newInfo = new HIDInfo(newHID, updateData[1]);
+							// Add the remoteHID to the internal map of remote HIDs
 							addRemoteHID(newHID, newInfo);
+							// Add the backbone route for this remote HID
+							networkManagerCore.addForeignHID(msg.getSenderHID(),newHID);
 						} else if (updateData[0] == "D") {
 							HID toRemoveHID = new HID(updateData[1]);
 							removeRemoteHID(toRemoveHID);
+							// TODO Marco: Perhaps we should remove the dead route here as well?
 						} else {
 							throw new IllegalArgumentException(
 									"Unexpected update type for IDManager updates: " + updateData[0]);
@@ -333,7 +337,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			return null; // the complete message has been processed
 		} else if (msg.getTopic().contentEquals(IDMANAGER_NMADVERTISMENT_TOPIC)){
 			try {
-				if (msg.getSenderHID() != networkManagerCore.getHID()) {
+				if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
 					//check if we already know this network manager
 					if(!getRemoteHIDs().contains(msg.getSenderHID())){
 						//if we do not know it add HIDs reachable through it
@@ -344,6 +348,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 							while (i.hasNext()) {
 								HIDInfo oneHIDInfo = i.next();
 								addRemoteHID(oneHIDInfo.getHID(), oneHIDInfo);
+								// Add the backbone route for this remote HID
+								networkManagerCore.addForeignHID(msg.getSenderHID(), oneHIDInfo.getHID());
 							}
 						}
 					}
