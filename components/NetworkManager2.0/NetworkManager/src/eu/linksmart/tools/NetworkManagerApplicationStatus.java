@@ -193,8 +193,8 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 				+ "width=100%><tr><td class=\"hed\" width=25%>"
 				+ title
 				+ "</td>"
-				+ "<td class=\"hed\" width=25%>DESCRIPTION</td><td class=\"hed\" "
-				+ "width=25%>HOST</td><td class=\"hed\" width=25%>ENDPOINT</td></tr>\n"
+				+ "<td class=\"hed\" width=25%>ATTRIBUTES</td><td class=\"hed\" "
+				+ "width=25%>REMOVE THIS TABLE</td><td class=\"hed\" width=25%>BACKBONE</td></tr>\n"
 				+ processHIDs(hids, checkAttributes)
 				+ "\n</table></body></html>";
 	}

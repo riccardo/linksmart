@@ -132,7 +132,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 			}
 
 			// Get the Route for this HID
-			String route = backboneRouter.getRoute(hidInfo.getHID());
+			String route = backboneRouter.getBackboneType(hidInfo.getHID());
 
 			// Here we print one row
 			try {
