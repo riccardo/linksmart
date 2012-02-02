@@ -164,10 +164,10 @@ function printNetworkManagers(){
 	document.getElementById("suboptions").style.visibility = "visible";
 	document.getElementById("suboptions").style.display = "block";
 	var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>DESCRIPTION</h3></TD><TD class=\"hed\" WIDTH=10%><h3>HOST</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
+	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>ATTRIBUTES</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
 	text += "<TABLE class=\"stats\" WIDTH=100%>";
 	for (var i = 0; i < networkManagerInfo.networkManagers.length; i++) {
-		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.networkManagers[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.networkManagers[i].description,55) + "</TD><TD WIDTH=10%>" + networkManagerInfo.networkManagers[i].host + "</TD><TD WIDTH=34%>" + networkManagerInfo.networkManagers[i].endpoint + "</TD></TR>";
+		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.networkManagers[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.networkManagers[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.networkManagers[i].endpoint + "</TD></TR>";
 	}
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
@@ -218,10 +218,10 @@ function printLocalHids() {
 	document.getElementById("suboptions").style.visibility = "visible";
 	document.getElementById("suboptions").style.display = "block";
 	var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>DESCRIPTION</h3></TD><TD class=\"hed\" WIDTH=10%><h3>HOST</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
+	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>ATTRIBUTES</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
 	text += "<TABLE class=\"stats\" WIDTH=100%>";
 	for (var i = 0; i < networkManagerInfo.localHids.length; i++) {
-		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.localHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.localHids[i].description,55) + "</TD><TD WIDTH=10%>" + networkManagerInfo.localHids[i].host + "</TD><TD WIDTH=34%>" + networkManagerInfo.localHids[i].endpoint + "</TD></TR>";
+		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.localHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.localHids[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.localHids[i].endpoint + "</TD></TR>";
 	}
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
@@ -271,10 +271,10 @@ function printRemoteHids() {
 	document.getElementById("suboptions").style.visibility = "visible";
 	document.getElementById("suboptions").style.display = "block";
 	var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>DESCRIPTION</h3></TD><TD class=\"hed\" WIDTH=10%><h3>HOST</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ENDPOINT</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
+	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>ATTRIBUTES</h3></TD><TD class=\"hed\" WIDTH=34%><h3>BACKBONE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
 	text += "<TABLE class=\"stats\" WIDTH=100%>";
 	for (var i = 0; i < networkManagerInfo.remoteHids.length; i++) {
-		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.remoteHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.remoteHids[i].description,55) + "</TD><TD WIDTH=10%>" + networkManagerInfo.remoteHids[i].host + "</TD><TD WIDTH=34%>" + networkManagerInfo.remoteHids[i].endpoint + "</TD></TR>";
+		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.remoteHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.remoteHids[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.remoteHids[i].endpoint + "</TD></TR>";
 	}
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
@@ -325,16 +325,16 @@ function printNetworkManagerSearch() {
 	document.getElementById("suboptions").style.visibility = "visible";
 	document.getElementById("suboptions").style.display = "block";
 	var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>DESCRIPTION</h3></TD><TD class=\"hed\" WIDTH=10%><h3>  HOST</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
+	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>ATTRIBUTES</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
 	text += "<TABLE class=\"stats\" WIDTH=100%>";
 	for (var i = 0; i < networkManagerInfo.localHids.length; i++) {
 		if ((networkManagerInfo.localHids[i].hid.indexOf(search) != -1)||(networkManagerInfo.localHids[i].description.indexOf(search) != -1)||(networkManagerInfo.localHids[i].host.indexOf(search) != -1)||(networkManagerInfo.localHids[i].endpoint.indexOf(search) != -1)) {
-			text += "<TR><TD WIDTH=20%>" + networkManagerInfo.localHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.localHids[i].description,55) + "</TD><TD WIDTH=10%>" + networkManagerInfo.localHids[i].host + "</TD><TD WIDTH=34%>" + networkManagerInfo.localHids[i].endpoint + "</TD></TR>";
+			text += "<TR><TD WIDTH=20%>" + networkManagerInfo.localHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.localHids[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.localHids[i].endpoint + "</TD></TR>";
 		}
 	}
 	for (var i = 0; i < networkManagerInfo.remoteHids.length; i++) {
 		if ((networkManagerInfo.remoteHids[i].hid.indexOf(search) != -1)||(networkManagerInfo.remoteHids[i].description.indexOf(search) != -1)||(networkManagerInfo.remoteHids[i].host.indexOf(search) != -1)||(networkManagerInfo.remoteHids[i].endpoint.indexOf(search) != -1)) {
-			text += "<TR><TD WIDTH=20%>" + networkManagerInfo.remoteHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.remoteHids[i].description,55) + "</TD><TD WIDTH=10%>" + networkManagerInfo.remoteHids[i].host + "</TD><TD WIDTH=34%>" + networkManagerInfo.remoteHids[i].endpoint + "</TD></TR>";
+			text += "<TR><TD WIDTH=20%>" + networkManagerInfo.remoteHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.remoteHids[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.remoteHids[i].endpoint + "</TD></TR>";
 		}
 	}
 	text += "</TABLE></div>";
