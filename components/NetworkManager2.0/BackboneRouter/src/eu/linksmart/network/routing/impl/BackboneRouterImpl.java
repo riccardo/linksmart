@@ -16,6 +16,7 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
+import eu.linksmart.security.communication.SecurityProperty;
 
 /*
  * TODO #NM refactoring
