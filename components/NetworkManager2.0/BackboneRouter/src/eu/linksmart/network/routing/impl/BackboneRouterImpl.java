@@ -351,6 +351,10 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public String getBackboneType(HID hid) {
 		Backbone backbone = hidBackboneMap.get(hid);
-		return backbone.getName();
+		if (backbone != null) {
+			return backbone.getName();
+		} else {
+			return null;
+		}
 	}
 }
