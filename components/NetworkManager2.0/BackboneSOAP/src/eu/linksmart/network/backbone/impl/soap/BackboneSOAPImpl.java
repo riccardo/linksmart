@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -18,6 +19,7 @@ import org.osgi.service.component.ComponentContext;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
+import eu.linksmart.security.communication.SecurityProperty;
 
 /*
  * TODO #NM refactoring
@@ -411,6 +413,12 @@ public class BackboneSOAPImpl implements Backbone {
 	@Override
 	public String getName() {
 		return BackboneSOAPImpl.class.getName();
+	}
+	
+	@Override
+	public List<SecurityProperty> getSecurityTypesAvailable() {
+		// TODO Implement
+		return null;
 	}
 
 }

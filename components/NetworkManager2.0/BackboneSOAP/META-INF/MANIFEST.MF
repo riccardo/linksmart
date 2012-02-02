@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Import-Package: eu.linksmart.network,
  eu.linksmart.network.backbone,
  eu.linksmart.network.routing,
+ eu.linksmart.security.communication,
  javax.servlet;version="2.4.0",
  javax.servlet.http;version="2.5.0",
  org.apache.log4j;version="1.2.15",
