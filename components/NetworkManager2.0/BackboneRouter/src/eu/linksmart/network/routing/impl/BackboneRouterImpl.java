@@ -16,7 +16,6 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
-import eu.linksmart.security.communication.SecurityProperty;
 
 /*
  * TODO #NM refactoring
@@ -107,10 +106,12 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 		// TODO: check why backbone for receiverHID would be needed - and if it
 		// is needed one has to check if receiverHID is NULL (in case of
-		// broadcast messagereceiverHID is NULL)
-		//
-		// Backbone b = (Backbone)hidBackboneMap.get(receiverHID);
-		hidBackboneMap.put(senderHID, originatingBackbone);
+//		 broadcast messagereceiverHID is NULL)
+		Backbone b = (Backbone)hidBackboneMap.get(senderHID);
+		if (b == null) {
+			hidBackboneMap.put(senderHID, originatingBackbone);
+		}
+		
 		// TODO #NM refactoring check case when there is no core what to do
 		if (nmCore != null) {
 			return nmCore.receiveData(senderHID, receiverHID, data);
@@ -233,6 +234,15 @@ public class BackboneRouterImpl implements BackboneRouter {
 		}
 		return true;
 	}
+	
+	@Override 
+	public void addRouteForRemoteHID(HID senderHID, HID remoteHID) {
+		Backbone senderBackbone = hidBackboneMap.get(senderHID);
+		if (senderBackbone != null){
+			addRoute(remoteHID, senderBackbone.getName());
+		}
+		
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -318,6 +328,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		}
 		return availableBackbones.values().remove(backbone);
 	}
+	
 	/**
 	 * returns list of security properties available via a given backbone
 	 * necessary because we do not know what backbones we have, and there is no point in creating backbones on the fly to ask them
@@ -334,5 +345,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 			Backbone b = availableBackbones.get(backbone);
 			return b.getSecurityTypesAvailable();
 		}
+	}
+
+	@Override
+	public String getBackboneType(HID hid) {
+		Backbone backbone = hidBackboneMap.get(hid);
+		return backbone.getName();
 	}
 }
