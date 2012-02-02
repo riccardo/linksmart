@@ -77,6 +77,8 @@ public interface Backbone {
 	 */
 	public void applyConfigurations(Hashtable updates);
 	
+	public String getName();
+
 	
 	/**
 	 * returns security types available by using this backbone implementation. 
