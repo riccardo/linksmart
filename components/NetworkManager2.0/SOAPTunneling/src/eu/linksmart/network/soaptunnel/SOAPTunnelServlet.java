@@ -85,63 +85,50 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-		
+
+		// split path - path contains HIDs and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		String parts[] = path.split("/", 5);
-		// XXX
-		// if (parts.length != 4) {
-		// return;
-		// }
-
+		// extract HIDs from path
 		HID sHid = new HID(parts[1]);
 		HID rHid = new HID(parts[2]);
-		String url = "";
+		
+		// build parameter string
+		StringBuilder queryBuilder = new StringBuilder();
 		if (parts.length > 3 && parts[3].equals("wsdl")) {
-			url = "?wsdl";
+			queryBuilder.append("wsdl");
 		} else {
 			if (parts.length > 3) {
-				url = parts[3];
+				queryBuilder.append(parts[3]);
 			}
-			// XXX Jonathan Work in Progress
-			if (!request.getParameterMap().isEmpty()) {
-				url += "?";
-				@SuppressWarnings("unchecked")
-				Set<Entry<String, String[]>> params = request.getParameterMap()
-						.entrySet();
-				for (Entry<String, String[]> e : params) {
-					String[] values = e.getValue();
-					if (values.length == 0) {
-						url += e.getKey();
-					} else {
-						for (String s : values) {
-							url += e.getKey() + "=" + s + "&";
-						}
-					}
+			String originalQuery = request.getQueryString();
+			if (originalQuery != null) {
+				if (queryBuilder.length() > 0) {
+					queryBuilder.append("&");
 				}
+				queryBuilder.append(originalQuery);
 			}
 		}
 
-		String req = request.getMethod() + " /" + url + " "
-				+ request.getProtocol() + "\r\n";
-		Enumeration headerNames = request.getHeaderNames();
+		// build request
+		
+		StringBuilder requestBuilder = new StringBuilder();
 
-		while (headerNames.hasMoreElements()) {
-			String header = (String) headerNames.nextElement();
-			String value = request.getHeader(header);
-			req = req.concat(header + ": " + value + "\r\n");
+		// append request line
+		requestBuilder.append(request.getMethod()).append(" /");
+		if (queryBuilder.length() > 0) {
+			requestBuilder.append("?").append(queryBuilder.toString());
 		}
-		// TODO sendMessage?
-		NMResponse r = this.nmCore.sendData(sHid, rHid, req.getBytes());
-		String sResp = r.getData();
+		requestBuilder.append(" ").append(request.getProtocol()).append("\r\n");
 
-		// if
-		// (r.getSessionID().equals(RouteManagerApplication.ACCESS_DENIED_SESSIONID))
-		// throw new AccessException("Access Denied by Security Policies");
+		// append headers - no body because this is a GET request
+		requestBuilder.append(buildHeaders(request));
 
-		response.setContentLength(sResp.getBytes().length);
-		response.setContentType("text/xml");
-		response.getWriter().write(sResp);
+		// send request to NetworkManagerCore
+		sendRequest(sHid, rHid, requestBuilder.toString(), response);
+
 	}
+
 
 	/**
 	 * Performs the HTTP POST operation
@@ -155,67 +142,78 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-
-		String header;
-		String value;
-		String theSOAPAction = "";
-		HID senderHID, receiverHID, sessionID;
-
+		// split path - path contains HIDs and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		StringTokenizer token = new StringTokenizer(path, "/");
-		String soapRequest = "";
 		if (token.countTokens() > 2) {
-			senderHID = new HID(token.nextToken());
-			receiverHID = new HID(token.nextToken());
-			sessionID = new HID(token.nextToken());
+			StringBuilder requestBuilder = new StringBuilder();
+			HID senderHID = new HID(token.nextToken());
+			HID receiverHID = new HID(token.nextToken());
+			// sessionID = new HID(token.nextToken());
+			
+			// append headers and blank line for end of headers
+			requestBuilder.append(buildHeaders(request));
+			requestBuilder.append("\r\n");
 
-			Enumeration headerNames = request.getHeaderNames();
-			while (headerNames.hasMoreElements()) {
-				header = (String) headerNames.nextElement();
-				value = request.getHeader(header);
-				soapRequest = soapRequest
-						.concat(header + ": " + value + "\r\n");
-				if (header.equalsIgnoreCase("SOAPAction")) {
-					theSOAPAction = value.replaceAll("\"", "");
-				}
-			}
-			soapRequest = soapRequest + "\r\n";
-
-			String sResp = "";
-			boolean accessDenied = false;
-
+			// append content
 			if ((request.getContentLength() > 0)) {
 				try {
 					BufferedReader reader = request.getReader();
 					for (String line = null; (line = reader.readLine()) != null;)
-						soapRequest = soapRequest.concat(line);
-					logger.debug("Sending soap request through tunnel: "
-							+ soapRequest);
-					// TODO sendMessage?
-					NMResponse r = this.nmCore.sendData(senderHID, receiverHID,
-							soapRequest.getBytes());
-					sResp = r.getData();
-
-					// if
-					// (r.getSessionID().equals(RouteManagerApplication.ACCESS_DENIED_SESSIONID))
-					// accessDenied = true;
-
+						requestBuilder.append(line);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-
-			/**
-			 * If access has been denied, we throw an AccessException to report
-			 * to the caller correctly
-			 */
-			if (accessDenied)
-				throw new AccessException("Access Denied by Security Policies");
-
-			response.setContentLength(sResp.getBytes().length);
-			response.setContentType("text/xml");
-			response.getWriter().write(sResp);
+			
+			// send request to NetworkManagerCore
+			logger.debug("Sending soap request through tunnel");
+			sendRequest(senderHID, receiverHID, requestBuilder.toString(), response);
 		}
 	}
 
+	/**
+	 * Builds the string that represents the headers of a HttpServletRequest
+	 * @param request the HttpServletRequest of which to extract the headers
+	 * @return the String representing the headers
+	 */
+	public String buildHeaders(HttpServletRequest request) {
+		StringBuilder builder = new StringBuilder();
+		Enumeration headerNames = request.getHeaderNames();
+
+		while (headerNames.hasMoreElements()) {
+			String header = (String) headerNames.nextElement();
+			String value = request.getHeader(header);
+			builder.append(header + ": " + value + "\r\n");
+		}
+
+		return builder.toString();
+	}
+
+	/**
+	 * Sends a request via NetworkManagerCore and adds the response to the HttpServletResponse
+	 * @param senderHid the sender HID
+	 * @param receiverHid the receiver HID
+	 * @param requestString the request message, as a String
+	 * @param response the servlet response to add the response message to
+	 * @throws IOException
+	 */
+	private void sendRequest(HID senderHid, HID receiverHid, String requestString,
+			HttpServletResponse response) throws IOException {
+		NMResponse r = this.nmCore.sendData(senderHid, receiverHid, requestString.getBytes());
+		String sResp = r.getData();
+
+		// /**
+		// * If access has been denied, we throw an AccessException to
+		// report
+		// * to the caller correctly
+		// */
+		// if (accessDenied)
+		// throw new AccessException("Access Denied by Security Policies");
+
+		response.setContentLength(sResp.getBytes().length);
+		response.setContentType("text/xml");
+		response.getWriter().write(sResp);
+
+	}
 }
