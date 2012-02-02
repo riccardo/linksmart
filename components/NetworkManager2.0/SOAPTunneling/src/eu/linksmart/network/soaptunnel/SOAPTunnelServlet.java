@@ -85,7 +85,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-
+		
 		String path = request.getPathInfo();
 		String parts[] = path.split("/", 5);
 		// XXX
@@ -102,7 +102,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 			if (parts.length > 3) {
 				url = parts[3];
 			}
-			// XXX Work in Progress
+			// XXX Jonathan Work in Progress
 			if (!request.getParameterMap().isEmpty()) {
 				url += "?";
 				@SuppressWarnings("unchecked")
@@ -163,7 +163,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 		String path = request.getPathInfo();
 		StringTokenizer token = new StringTokenizer(path, "/");
-		String SOAPRequest = "";
+		String soapRequest = "";
 		if (token.countTokens() > 2) {
 			senderHID = new HID(token.nextToken());
 			receiverHID = new HID(token.nextToken());
@@ -173,13 +173,13 @@ public class SOAPTunnelServlet extends HttpServlet {
 			while (headerNames.hasMoreElements()) {
 				header = (String) headerNames.nextElement();
 				value = request.getHeader(header);
-				SOAPRequest = SOAPRequest
+				soapRequest = soapRequest
 						.concat(header + ": " + value + "\r\n");
 				if (header.equalsIgnoreCase("SOAPAction")) {
 					theSOAPAction = value.replaceAll("\"", "");
 				}
 			}
-			SOAPRequest = SOAPRequest + "\r\n";
+			soapRequest = soapRequest + "\r\n";
 
 			String sResp = "";
 			boolean accessDenied = false;
@@ -188,12 +188,12 @@ public class SOAPTunnelServlet extends HttpServlet {
 				try {
 					BufferedReader reader = request.getReader();
 					for (String line = null; (line = reader.readLine()) != null;)
-						SOAPRequest = SOAPRequest.concat(line);
+						soapRequest = soapRequest.concat(line);
 					logger.debug("Sending soap request through tunnel: "
-							+ SOAPRequest);
+							+ soapRequest);
 					// TODO sendMessage?
 					NMResponse r = this.nmCore.sendData(senderHID, receiverHID,
-							SOAPRequest.getBytes());
+							soapRequest.getBytes());
 					sResp = r.getData();
 
 					// if
