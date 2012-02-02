@@ -314,14 +314,14 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						String[] updateData = oneUpdate.split(";");
 						// at this point updateData 0 is operation type A/D, [1] is
 						// hid, [2] is description (only if operation=A)
-						if (updateData[0] == "A") {
+						if (updateData[0].equals("A")) {
 							HID newHID = new HID(updateData[1]);
 							HIDInfo newInfo = new HIDInfo(newHID, updateData[1]);
 							// Add the remoteHID to the internal map of remote HIDs
 							addRemoteHID(newHID, newInfo);
 							// Add the backbone route for this remote HID
 							networkManagerCore.addRemoteHID(msg.getSenderHID(),newHID);
-						} else if (updateData[0] == "D") {
+						} else if (updateData[0].equals("D")) {
 							HID toRemoveHID = new HID(updateData[1]);
 							removeRemoteHID(toRemoveHID);
 							// TODO Marco: Perhaps we should remove the dead route here as well?
