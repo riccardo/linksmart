@@ -320,7 +320,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 							// Add the remoteHID to the internal map of remote HIDs
 							addRemoteHID(newHID, newInfo);
 							// Add the backbone route for this remote HID
-							networkManagerCore.addForeignHID(msg.getSenderHID(),newHID);
+							networkManagerCore.addRemoteHID(msg.getSenderHID(),newHID);
 						} else if (updateData[0] == "D") {
 							HID toRemoveHID = new HID(updateData[1]);
 							removeRemoteHID(toRemoveHID);
@@ -349,7 +349,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 								HIDInfo oneHIDInfo = i.next();
 								addRemoteHID(oneHIDInfo.getHID(), oneHIDInfo);
 								// Add the backbone route for this remote HID
-								networkManagerCore.addForeignHID(msg.getSenderHID(), oneHIDInfo.getHID());
+								networkManagerCore.addRemoteHID(msg.getSenderHID(), oneHIDInfo.getHID());
 							}
 						}
 					}
