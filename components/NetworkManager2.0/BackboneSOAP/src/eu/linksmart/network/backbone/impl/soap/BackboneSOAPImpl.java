@@ -408,4 +408,9 @@ public class BackboneSOAPImpl implements Backbone {
 		return this.hidUrlMap.remove(hid) != null;
 	}
 
+	@Override
+	public String getName() {
+		return BackboneSOAPImpl.class.getName();
+	}
+
 }
