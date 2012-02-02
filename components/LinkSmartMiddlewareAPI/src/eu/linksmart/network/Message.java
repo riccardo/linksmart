@@ -21,10 +21,16 @@ public class Message {
 	private byte[] data = null;
 	private HID senderHID = null;
 	private HID receiverHID = null;
-
+	
+	/**
+	 * 
+	 * @param topic the topic of this message
+	 * @param senderHID HID of the sender of this message
+	 * @param receiverHID HID of the receiver of this message. Can be null e.g. in the case of a {@link BroadcastMessage}
+	 * @param data payload of the message. TODO Marco-2012-02-02: Can payload be empty? Like for advertisements
+	 */
 	public Message(String topic, HID senderHID, HID receiverHID, byte[] data) {
-		if (StringUtils.isEmpty(topic) || senderHID == null || data == null
-				|| data.length == 0)
+		if (StringUtils.isEmpty(topic) || senderHID == null || data == null)
 			throw new IllegalArgumentException(
 					"Message cannot have null for required fields");
 		this.topic = topic;
