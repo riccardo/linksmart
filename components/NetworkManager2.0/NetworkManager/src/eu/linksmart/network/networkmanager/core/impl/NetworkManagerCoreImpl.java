@@ -433,4 +433,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		return (String[]) this.backboneRouter.getAvailableBackbones().toArray();
 	}
 
+	@Override
+	public void addRemoteHID(HID senderHID, HID remoteHID) {
+		this.backboneRouter.addRouteForRemoteHID(senderHID, remoteHID);
+	}
+
+
 }
