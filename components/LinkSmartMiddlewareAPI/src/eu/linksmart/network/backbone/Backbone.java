@@ -1,10 +1,13 @@
 package eu.linksmart.network.backbone;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.security.communication.SecurityProperty;
 
 /*
  * A Backbone needs to be implemented if a new communication channel (e.g. P2P, JMS, ...) should be used by LinkSmart.
@@ -73,5 +76,13 @@ public interface Backbone {
 	 * @param updates
 	 */
 	public void applyConfigurations(Hashtable updates);
-
+	
+	
+	/**
+	 * returns security types available by using this backbone implementation. 
+	 * The security types are configured via the LS configuration interface.
+	 * See resources/BBJXTA.properties for details on configuration
+	 * @return a list of security types available
+	 */
+	public List<SecurityProperty> getSecurityTypesAvailable();
 }

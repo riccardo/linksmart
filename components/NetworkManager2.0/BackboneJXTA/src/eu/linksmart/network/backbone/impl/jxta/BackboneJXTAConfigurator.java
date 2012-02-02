@@ -44,6 +44,10 @@ public class BackboneJXTAConfigurator extends Configurator {
 	public static final String SUPERNODE_TCP_URI = "BackboneJXTA.SuperNodeTCPURI";
 	public static final String SUPERNODE_HTTP_URI = "BackboneJXTA.SuperNodeHTTPURI";
 
+	//see enum SecurityProperty in API, file SecurityProperty.java
+	//and configuration section in /resources/BBJXTA.properties
+	public static final String SECURITY_PARAMETERS = "BackboneJXTA.SecurityParameters";
+
 	
 	private BackboneJXTAImpl bbJXTAImpl;
 

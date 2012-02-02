@@ -126,9 +126,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		}
 
 		HID newHID = this.identityManager.createHIDForAttributes(attributes);
-		// TODO #NM refactoring configurable security properties
-		ArrayList<SecurityProperty> properties = new ArrayList<SecurityProperty>();
-		properties.add(SecurityProperty.NoSecurity);
+		List<SecurityProperty> properties = this.backboneRouter.getBackboneSecurityProperties(backboneName);
 		// register HID with backbone policies in connection manager
 		this.connectionManager.registerHIDPolicy(newHID, properties);
 		// add route to selected backbone

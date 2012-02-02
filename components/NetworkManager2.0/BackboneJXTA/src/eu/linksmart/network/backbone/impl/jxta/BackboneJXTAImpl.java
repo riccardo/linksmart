@@ -6,9 +6,11 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
 
 import net.jxta.discovery.DiscoveryEvent;
@@ -41,6 +43,7 @@ import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.routing.BackboneRouter;
+import eu.linksmart.security.communication.SecurityProperty;
 
 /**
  * The class BackboneJXTAImpl implements the LinkSmart backbone that uses JXTA.
@@ -810,6 +813,29 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			logger.error("Unable to remove endpoint for HID: " + hid, e);
 		}
 		return false;
+	}
+
+	@Override
+	/**
+	 * returns security types available by using this backbone implementation. 
+	 * The security types are configured via the LS configuration interface.
+	 * See resources/BBJXTA.properties for details on configuration
+	 * @return a list of security types available
+	 */
+	public List<SecurityProperty> getSecurityTypesAvailable() {
+		String configuredSecurity = this.configurator.get(BackboneJXTAConfigurator.SECURITY_PARAMETERS);
+		String[] securityTypes = configuredSecurity.split("|");
+		SecurityProperty oneProperty;
+		List<SecurityProperty> answer = new ArrayList<SecurityProperty>();
+		for (String s:securityTypes) {
+			   try {
+				   oneProperty = SecurityProperty.valueOf(s);
+				   answer.add(oneProperty);
+			   } catch (Exception e) {
+				   logger.error("Security property value from configuration is not recognized: " + s + ": "+ e);
+			   }
+		}
+		return answer;
 	}
 
 }
