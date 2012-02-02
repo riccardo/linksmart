@@ -38,5 +38,13 @@ public interface NetworkManagerCore extends NetworkManager {
 //	 * Creates an HID based on byte array data
 //	 */
 //	public HID createHID(byte [] data) throws IOException;
+	
+	/**
+	 * Adds an HID of a remote service.  
+	 * 
+	 * @param senderHID the HID of the sender. Usually a remote NetworkManager
+	 * @param remoteHID the HID of a remote service.
+	 */
+	public void addRemoteHID(HID senderHID, HID remoteHID);
 
 }

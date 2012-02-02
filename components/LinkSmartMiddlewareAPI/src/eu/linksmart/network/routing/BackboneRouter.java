@@ -71,6 +71,15 @@ public interface BackboneRouter {
 	 * @see {@link getAvailableCommunicationChannels()}
 	 */
 	public boolean addRoute(HID hid, String backbone);
+	
+	/**
+	 * Adds the backbone route for a remote HID. Uses the backbone of the senderHID,
+	 * which should be a remote NetworkManager. 
+	 * 
+	 * @param senderHID the HID of the sender. Usually a remote NetworkManager
+	 * @param remoteHID the HID of a remote service.
+	 */
+	public void addRouteForRemoteHID(HID senderHID, HID remoteHID);
 
 	/**
 	 * Adds a new route to the BackboneRouter. In addition, the endpoint is
@@ -133,5 +142,8 @@ public interface BackboneRouter {
 	 * @return "BackboneType:BackboneAddresse"
 	 */
 	public String getRoute(HID hid);
+	
+	public String getBackboneType(HID hid);
+	
 
 }
