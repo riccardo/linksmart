@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.osgi.service.component.ComponentContext;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
+import eu.linksmart.network.backbone.impl.soap.BackboneSOAPConfigurator;
 import eu.linksmart.security.communication.SecurityProperty;
 
 /*
@@ -29,14 +31,27 @@ public class BackboneSOAPImpl implements Backbone {
 	private static String BACKBONE_SOAP = BackboneSOAPImpl.class
 			.getSimpleName();
 	private Map<HID, URL> hidUrlMap;
-	private static Logger LOG = Logger.getLogger(BackboneSOAPImpl.class
+	private Logger LOG = Logger.getLogger(BackboneSOAPImpl.class
 			.getName());
 	private static final int MAXNUMRETRIES = 15;
 	private static final long SLEEPTIME = 20;
 	private static final int BUFFSIZE = 16384;
 	
+	private BackboneSOAPConfigurator configurator;
+
+	
 	protected void activate(ComponentContext context) {
 		hidUrlMap = new HashMap<HID, URL>();
+
+		try {
+			this.configurator = new BackboneSOAPConfigurator(this, context
+					.getBundleContext());
+			configurator.registerConfiguration();
+		} catch (NullPointerException e) {
+			LOG.fatal("Configurator could not be initialized "
+					+ e.toString());
+		}
+		
 		LOG.info(BACKBONE_SOAP + " started");
 	}
 
@@ -384,8 +399,8 @@ public class BackboneSOAPImpl implements Backbone {
 
 	@Override
 	public void applyConfigurations(Hashtable updates) {
-		// TODO Auto-generated method stub
-
+		//at this point there is nothing that is saved in the configurations that needs to be updated when they change
+		
 	}
 
 	@Override
@@ -416,9 +431,29 @@ public class BackboneSOAPImpl implements Backbone {
 	}
 	
 	@Override
+	/**
+	 * returns security types available by using this backbone implementation. 
+	 * The security types are configured via the LS configuration interface.
+	 * See resources/BBJXTA.properties for details on configuration
+	 * @return a list of security types available
+	 */
 	public List<SecurityProperty> getSecurityTypesAvailable() {
-		// TODO Implement
-		return null;
+		String configuredSecurity = this.configurator
+				.get(BackboneSOAPConfigurator.SECURITY_PARAMETERS);
+		String[] securityTypes = configuredSecurity.split("|");
+		SecurityProperty oneProperty;
+		List<SecurityProperty> answer = new ArrayList<SecurityProperty>();
+		for (String s : securityTypes) {
+			try {
+				oneProperty = SecurityProperty.valueOf(s);
+				answer.add(oneProperty);
+			} catch (Exception e) {
+				LOG.error("Security property value from configuration is not recognized: "
+								+ s + ": " + e);
+			}
+		}
+		return answer;
 	}
+
 
 }

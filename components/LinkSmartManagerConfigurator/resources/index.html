@@ -79,7 +79,7 @@ function startConfigurator() {
 	document.getElementById("eventTab").innerHTML = "<h3>Event Manager Status</h3>";
 	var text = "<div id=\"left\"><h2>Available Configurations</h2></div>";
     text += "<div id=\"right\"><div id=\"selectedconftitle\"><h1>No configuration selected yet</h1></div>";	
-	text +=	"<table class=\"tabletitle\"><tr><td class=\"tabletdleft\">Property</td><td class=\"tabletdright\">Value</td></tr></table>";
+//	text +=	"<table class=\"tabletitle\"><tr><td class=\"tabletdleft\">Property</td><td class=\"tabletdright\">Value</td></tr></table>";
 	text += "<div id=\"selectedconfcontent\"></div></div>";
 	document.getElementById("content").innerHTML = text;
 	timerOption = setInterval("getConfigurations()",5000);
