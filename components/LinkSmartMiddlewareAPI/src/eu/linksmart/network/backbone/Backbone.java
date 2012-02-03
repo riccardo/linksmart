@@ -78,7 +78,7 @@ public interface Backbone {
 	public void applyConfigurations(Hashtable updates);
 	
 	public String getName();
-
+	
 	
 	/**
 	 * returns security types available by using this backbone implementation. 
@@ -87,4 +87,13 @@ public interface Backbone {
 	 * @return a list of security types available
 	 */
 	public List<SecurityProperty> getSecurityTypesAvailable();
+	
+	/**
+	 * 
+	 * @param senderHID the HID of the network manager.
+	 * @param remoteHID the HID of the service that is connected to the remote network manager.
+	 * set the endpoint of remote HIDs that are sent during the backbone advertisement.
+	 * this is needed since the HIDs are packed in the message of the advertisement.
+	 */
+	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID);
 }
