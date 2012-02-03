@@ -241,6 +241,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		Backbone senderBackbone = hidBackboneMap.get(senderHID);
 		if (senderBackbone != null){
 			addRoute(remoteHID, senderBackbone.getName());
+			senderBackbone.addEndpointForRemoteHID(senderHID, remoteHID);
 		}
 		
 	}
