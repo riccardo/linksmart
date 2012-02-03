@@ -857,4 +857,17 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		return BackboneJXTAImpl.class.getName();
 	}
 
+	@Override
+	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID) {
+		
+		String endpoint = listOfRemoteEndpoints.get(senderHID);
+		
+		if(endpoint!=null){			
+			listOfRemoteEndpoints.put(remoteHID, endpoint);
+		}else{			
+			logger.error("Network Manager endpoint of HID " + senderHID + " cannot be found");
+		}
+		
+	}
+
 }
