@@ -49,6 +49,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		availableBackbones = new HashMap<String, Backbone>();
 		configurator = new BackboneRouterConfigurator(this,
 				context.getBundleContext());
+		configurator.registerConfiguration();
 		logger.info(BACKBONE_ROUTER + " started");
 	}
 
@@ -159,7 +160,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 */
 	@Override
 	public void applyConfigurations(Hashtable updates) {
-		if (updates.containsKey(BackboneRouterImpl.BACKBONE_ROUTER)) {
+		if (updates.containsKey(BackboneRouterConfigurator.COMMUNICATION_TYPE)) {
 			this.defaultRoute = (String) configurator
 					.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
 		}

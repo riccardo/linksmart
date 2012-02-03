@@ -455,9 +455,20 @@ public class BackboneSOAPImpl implements Backbone {
 		return answer;
 	}
 
+	
+	
+	
+	
 	@Override
 	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID) {
-		// TODO Auto-generated method stub
+		
+		URL endpoint = hidUrlMap.get(senderHID);
+	
+		if(endpoint!=null){			
+			hidUrlMap.put(remoteHID, endpoint);
+		}else{			
+			LOG.error("Network Manager endpoint of HID " + senderHID + " cannot be found");
+		}
 		
 	}
 
