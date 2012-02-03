@@ -455,5 +455,11 @@ public class BackboneSOAPImpl implements Backbone {
 		return answer;
 	}
 
+	@Override
+	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }
