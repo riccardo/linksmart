@@ -217,16 +217,17 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		
 		String receiverJxtaAddress = listOfRemoteEndpoints.get(receiverHID);
 		URI receiverJxtaURI;
+		PeerID receiverPeerID = null;
 		try {
 			receiverJxtaURI = new URI(receiverJxtaAddress);
-			PeerID receierPeerID = (PeerID)IDFactory.fromURI(receiverJxtaURI);
+			receiverPeerID = (PeerID)IDFactory.fromURI(receiverJxtaURI);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		response = pipeSyncHandler.sendData(senderHID.toString(), receiverHID
-				.toString(), payload, peerID);
+				.toString(), payload, receiverPeerID);
 
 		logger.debug("sendData Response: " + response.toString());
 
@@ -792,11 +793,13 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 										+ " | senderHID: "
 										+ senderHID);
 
+						// add info to table of HID-Endpoints
+						if (senderHID.getContextID1() == 0){
+							listOfRemoteEndpoints.put(senderHID, senderJXTAID);
+						}
+						
 						bbJXTA.receiveData(senderHID, null, receivedData
 								.getData());
-
-						// add info to table of HID-Endpoints
-						listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 						
 					}
 				} catch (Exception e) {
@@ -878,7 +881,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		
 		String endpoint = listOfRemoteEndpoints.get(senderHID);
 		
-		if(endpoint!=null){			
+		if(endpoint != null){			
 			listOfRemoteEndpoints.put(remoteHID, endpoint);
 		}else{			
 			logger.error("Network Manager endpoint of HID " + senderHID + " cannot be found");
