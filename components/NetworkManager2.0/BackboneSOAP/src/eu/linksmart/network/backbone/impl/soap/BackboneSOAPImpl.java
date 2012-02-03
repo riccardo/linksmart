@@ -36,7 +36,7 @@ public class BackboneSOAPImpl implements Backbone {
 	private static final int MAXNUMRETRIES = 15;
 	private static final long SLEEPTIME = 20;
 	private static final int BUFFSIZE = 16384;
-	
+
 	private BackboneSOAPConfigurator configurator;
 
 	
@@ -63,9 +63,12 @@ public class BackboneSOAPImpl implements Backbone {
 	 * Sends a message over the specific communication channel.
 	 * 
 	 * @param senderHID
+	 *            HID of sender
 	 * @param receiverHID
-	 * @param data
-	 * @return
+	 *            HID of receiver
+	 * @param rawData
+	 *            header data as String
+	 * @return SOAP response
 	 */
 	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] rawData) {
 		URL urlEndpoint = hidUrlMap.get(receiverHID);
@@ -73,15 +76,15 @@ public class BackboneSOAPImpl implements Backbone {
 			throw new IllegalArgumentException("Cannot send data to HID "
 					+ receiverHID.toString() + ", unknown endpoint");
 		}
-		//TODO how can we know how to convert data to String?
+		// We expect data to be a string
 		String data = new String(rawData);
 		LOG.debug("SOAPTunnel received this message " + data);
 		NMResponse resp = new NMResponse();
-		
-		String soapMsg ="Error in SOAP tunneling receiveData";				
+
+		String soapMsg = "Error in SOAP tunneling receiveData";
 		LOG.debug(soapMsg);
 		resp.setData(generateSoapResponse(soapMsg));
-		// resp.setSessionID("");
+
 		if (data.startsWith("GET")) {
 			// It is a GET request
 			processGetMessage(urlEndpoint, data, resp);
@@ -90,163 +93,116 @@ public class BackboneSOAPImpl implements Backbone {
 			processPostMessage(urlEndpoint, data, resp);
 		}
 		return resp;
-
 	}
 
 	/**
-	 * @param urlEndpoint
-	 * @param data
-	 * @param resp
+	 * Processes POST message
+	 * @param urlEndpoint URL of endpoint
+	 * @param data header data as String
+	 * @param resp response from SOAP service
 	 */
 	private void processPostMessage(URL urlEndpoint, String data,
 			NMResponse resp) {
-		String soapMsg;
-		try {
-			// URL urlEndpoint = new URL(endpoint);
-			String dataproc;
-			if (urlEndpoint.getQuery() != null) {
-				dataproc = "POST " + urlEndpoint.getPath() + "?"
-						+ urlEndpoint.getQuery() + " HTTP/1.0\r\n";
-			} else {
-				dataproc = "POST " + urlEndpoint.getPath() + " HTTP/1.0\r\n";
-			}
-
-			if (data.contains("<ns1:SetAVTransportURI>")) {
-				data = data
-						.replace(
-								"<ns1:SetAVTransportURI>",
-								"<ns1:SetAVTransportURI "
-										+ "xmlns:ns1=\"urn:schemas-upnp-org:service:AVTransport:1\">");
-			}
-
-			String[] headers = null;
-			if (data.contains("\r\n\r\n")) {
-				headers = data.split("\r\n\r\n");
-			} else if (data.contains("\n\n")) {
-				headers = data.split("\n\n");
-			} else {
-				LOG.error("Wrong headers!!!");
-			}
-			
-			LOG.debug("Length of headers: " + headers.length);
-			StringTokenizer token = new StringTokenizer(headers[0], "\r\n");
-			String header = "", aux = "";
-
-			while (token.hasMoreElements()) {
-				aux = token.nextToken();
-				if (aux.contains("Content-Length")) {
-					header = "Content-Length: " + headers[1].length()
-							+ "\r\n";
-				} else if (aux.contains("content-length")) {
-					header = "content-length: " + headers[1].length()
-							+ "\r\n";
-				} else if (aux.toLowerCase().contains("host")) {
-					header = "Host: " + urlEndpoint.getHost() + ":"
-							+ urlEndpoint.getPort() + "\r\n";
-				} else {
-					header = aux + "\r\n";
-				}
-
-				if ((aux.contains("Connection:"))
-						|| (aux.contains("connection:"))) {
-					header = "";
-				}
-				dataproc = dataproc + header;
-			}
-
-			String SOAPMessage = dataproc + "\r\n" + headers[1];
-			
-			LOG.debug("Received SOAP message at the end of the tunnel:\n"
-					+ SOAPMessage);
-			
-			
-			Socket clientSocket = new Socket(urlEndpoint.getHost(),
-					urlEndpoint.getPort());
-			
-			flushMessage(dataproc, clientSocket);
-			String response = parseResponse(resp, clientSocket);
-			
-			String[] s = response.split("\r\n\r\n");
-			if (s.length > 1) {
-				response = s[1];
-			} else {
-				// In case the SOAP response from the service is empty.
-				response = generateSoapResponse("No SOAP response from the service");							
-			}
-			
-			LOG.debug("Response:\n" + response);
-			resp.setData(response);			;
-
-		} catch (MalformedURLException e) {
-			soapMsg = "Error delivering the data to destination:\n"
-					+ e.getMessage();
-			LOG.debug(soapMsg);
-			resp.setData(generateSoapResponse(soapMsg));
-		} catch (UnknownHostException e) {
-			soapMsg = "Error delivering the data to destination:\n"
-					+ e.getMessage();
-			LOG.debug(soapMsg);
-			resp.setData(generateSoapResponse(soapMsg));
-		} catch (IOException e) {
-			soapMsg = "Error delivering the data to destination:\n"
-					+ e.getMessage();
-			LOG.debug(soapMsg);
-			resp.setData(generateSoapResponse(soapMsg));
+		StringBuilder dataproc;
+		if (urlEndpoint.getQuery() != null) {
+			dataproc = new StringBuilder("POST ").append(urlEndpoint.getPath()).append("?")
+					.append(urlEndpoint.getQuery()).append(" HTTP/1.0\r\n");
+		} else {
+			dataproc = new StringBuilder("POST ").append(urlEndpoint.getPath()).append(" HTTP/1.0\r\n");
 		}
+
+		if (data.contains("<ns1:SetAVTransportURI>")) {
+			data = data
+					.replace(
+							"<ns1:SetAVTransportURI>",
+							"<ns1:SetAVTransportURI "
+									+ "xmlns:ns1=\"urn:schemas-upnp-org:service:AVTransport:1\">");
+		}
+
+		String[] headers = null;
+		if (data.contains("\r\n\r\n")) {
+			headers = data.split("\r\n\r\n");
+		} else if (data.contains("\n\n")) {
+			headers = data.split("\n\n");
+		} else {
+			LOG.error("Wrong headers!!!");
+		}
+
+		LOG.debug("Length of headers: " + headers.length);
+		StringTokenizer token = new StringTokenizer(headers[0], "\r\n");
+		String header = "", aux = "";
+
+		while (token.hasMoreElements()) {
+			aux = token.nextToken();
+			if (aux.contains("Content-Length")) {
+				header = new StringBuilder("Content-Length: ").append(headers[1].length()).append("\r\n").toString();
+			} else if (aux.contains("content-length")) {
+				header = new StringBuilder("content-length: ").append(headers[1].length()).append("\r\n").toString();
+			} else if (aux.toLowerCase().contains("host")) {
+				header = new StringBuilder("Host: ").append(urlEndpoint.getHost()).append(":")
+						.append(urlEndpoint.getPort()).append("\r\n").toString();
+			} else {
+				header = aux + "\r\n";
+			}
+
+			if ((aux.contains("Connection:")) || (aux.contains("connection:"))) {
+				header = "";
+			}
+			dataproc.append(header);
+		}
+
+		String SOAPMessage = dataproc + "\r\n" + headers[1];
+		LOG.debug("Received SOAP message at the end of the tunnel:\n"
+				+ SOAPMessage);
+
+		sendResponse(urlEndpoint, resp, dataproc.toString());
 	}
 
-
 	/**
-	 * @param urlEndpoint
-	 * @param data
-	 * @param resp
+	 * Processes GET message
+	 * @param urlEndpoint URL of endpoint
+	 * @param data header data as String
+	 * @param resp response from SOAP service
 	 */
 	private void processGetMessage(URL urlEndpoint, String data, NMResponse resp) {
-		String soapMsg;
-		try {
-			// URL urlEndpoint = new URL(endpoint);
-			StringTokenizer token = new StringTokenizer(data, "\r\n");
-			String header = "", aux = "";
-			String dataproc = "";
-			String url = "";
-			while (token.hasMoreElements()) {
-				aux = token.nextToken();
-				if (aux.toLowerCase().contains("get")) {
-					String parts[] = aux.split(" ");
-					if (parts[1].startsWith("/")) {
-						parts[1] = parts[1].substring(1);
-					}
-					parts[1] = urlEndpoint.getFile() + parts[1];
-					header = "";
-					for (String part : parts) {
-						header = header + " " + part;
-					}
-					header = header.substring(1) + "\r\n";
-//					urlEndpoint = new URL(urlEndpoint.toString()
-//							+ parts[1].replace("/", ""));
-//					header = aux.replace(parts[1], urlEndpoint.getFile())
-//							+ "\r\n";
-				} else if (aux.toLowerCase().contains("host")) {
-					header = "Host: " + urlEndpoint.getHost() + ":"
-							+ urlEndpoint.getPort() + "\r\n";
-				} else if (aux.toLowerCase().startsWith("connection")) {
-					header = "Connection: close\r\n";
-				} else if (aux.toLowerCase().startsWith("keep-alive")) {
-					header = "";
-				} else {
-					// Commented out to remove unnecessary (?) headers
-					// header = aux + "\r\n";
+		StringTokenizer token = new StringTokenizer(data, "\r\n");
+		String header = "", aux = "";
+		StringBuilder dataproc = new StringBuilder();
+		
+		while (token.hasMoreElements()) {
+			aux = token.nextToken();
+			if (aux.toLowerCase().contains("get")) {
+				String parts[] = aux.split(" ");
+				if (parts[1].startsWith("/")) {
+					parts[1] = parts[1].substring(1);
 				}
-				dataproc = dataproc + header;
-			}
-			dataproc = dataproc + "\r\n";
+				parts[1] = urlEndpoint.getFile() + parts[1];
+				header = "";
+				for (String part : parts) {
+					header = header + " " + part;
+				}
+				header = header.substring(1) + "\r\n";
+			} else if (aux.toLowerCase().contains("host")) {
+				header = "Host: " + urlEndpoint.getHost() + ":"
+						+ urlEndpoint.getPort() + "\r\n";
+			} else if (aux.toLowerCase().startsWith("connection")) {
+				header = "Connection: close\r\n";
+			} else if (aux.toLowerCase().startsWith("keep-alive")) {
+				header = "";
+			} 
+			dataproc.append(header);
+		}
+		dataproc.append("\r\n");
+		LOG.debug("Received GET request at the end of the tunnel:\n" + data);
 
-			LOG.debug("Received GET request at the end of the tunnel:\n"
-					+ data);
-			
+		sendResponse(urlEndpoint, resp, dataproc.toString());
+	}
+
+	private void sendResponse(URL urlEndpoint, NMResponse resp, String dataproc) {
+		try {
 			Socket clientSocket = new Socket(urlEndpoint.getHost(),
 					urlEndpoint.getPort());
-			
+
 			flushMessage(dataproc, clientSocket);
 			String response = parseResponse(resp, clientSocket);
 
@@ -254,28 +210,22 @@ public class BackboneSOAPImpl implements Backbone {
 			if (s.length > 1) {
 				response = s[1];
 			} else {
-				String msg = "No SOAP response from the service";					
 				// In case the SOAP response from the service is empty.
-				response = generateSoapResponse(msg);
+				response = generateSoapResponse("No SOAP response from the service");
 			}
 
 			LOG.debug("Response:\n" + response);
 			resp.setData(response);
-		} catch (MalformedURLException e) {
-			String msg ="Error delivering the data to destination:\n"
-					+ e.getMessage();
-			LOG.debug(msg);
-			resp.setData(generateSoapResponse(msg));
-		} catch (UnknownHostException e) {				
-			String msg ="Error delivering the data to destination:\n"
+		} catch (UnknownHostException e) {
+			String msg = "Error delivering the data to destination:\n"
 					+ e.getMessage();
 			LOG.debug(msg);
 			resp.setData(generateSoapResponse(msg));
 		} catch (IOException e) {
-			String msg ="Error delivering the data to destination:\n"
+			String msg = "Error delivering the data to destination:\n"
 					+ e.getMessage();
 			LOG.debug(msg);
-			resp.setData(generateSoapResponse(msg));								
+			resp.setData(generateSoapResponse(msg));
 		}
 	}
 
@@ -289,8 +239,8 @@ public class BackboneSOAPImpl implements Backbone {
 			throws IOException {
 		OutputStream cos = clientSocket.getOutputStream();
 		cos.write(dataproc.getBytes());
-		cos.flush();	
-//		cos.close();
+		cos.flush();
+		// cos.close();
 	}
 
 	/**
@@ -301,10 +251,11 @@ public class BackboneSOAPImpl implements Backbone {
 	 * @return
 	 * @throws IOException
 	 */
-	private String parseResponse(NMResponse resp, Socket socket) throws IOException {
-		//TODO change buffer size to available bytes
+	private String parseResponse(NMResponse resp, Socket socket)
+			throws IOException {
+		// TODO change buffer size to available bytes
 		byte[] buffer = new byte[BUFFSIZE];
-		String response="";
+		String response = "";
 		InputStream cis = socket.getInputStream();
 		String soapMsg;
 		int bytesRead = 0;
@@ -333,8 +284,7 @@ public class BackboneSOAPImpl implements Backbone {
 			bytesRead = cis.read(buffer);
 			if (bytesRead > 0) {
 				numRetries = 0;
-				response = response.concat(new String(buffer, 0,
-						bytesRead));
+				response = response.concat(new String(buffer, 0, bytesRead));
 				total += bytesRead;
 			}
 		} while (bytesRead != -1);
@@ -352,9 +302,7 @@ public class BackboneSOAPImpl implements Backbone {
 				+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
 				+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
 				+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-				+ "<SendDataResult>"
-				+ msg
-				+ "</SendDataResult>"
+				+ "<SendDataResult>" + msg + "</SendDataResult>"
 				+ "</SendDataResponse></soap:Body></soap:Envelope>";
 	}
 
@@ -378,9 +326,9 @@ public class BackboneSOAPImpl implements Backbone {
 	 * @return
 	 */
 	public NMResponse broadcastData(HID senderHID, byte[] data) {
-//		throw new UnsupportedOperationException(this.getClass().getName()
-//				+ " does not support broadcasting messages");
-		 return null;
+		// throw new UnsupportedOperationException(this.getClass().getName()
+		// + " does not support broadcasting messages");
+		return null;
 	}
 
 	/**
