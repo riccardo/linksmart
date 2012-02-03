@@ -6,6 +6,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -19,6 +20,7 @@ import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
 import net.jxta.document.MimeMediaType;
 import net.jxta.exception.PeerGroupException;
+import net.jxta.id.ID;
 import net.jxta.id.IDFactory;
 import net.jxta.impl.protocol.RdvAdv;
 import net.jxta.logging.Logging;
@@ -212,6 +214,17 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		// add senderHID to data
 		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
 		logger.debug("Sending data over pipe to HID= " + receiverHID);
+		
+		String receiverJxtaAddress = listOfRemoteEndpoints.get(receiverHID);
+		URI receiverJxtaURI;
+		try {
+			receiverJxtaURI = new URI(receiverJxtaAddress);
+			PeerID receierPeerID = (PeerID)IDFactory.fromURI(receiverJxtaURI);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		response = pipeSyncHandler.sendData(senderHID.toString(), receiverHID
 				.toString(), payload, peerID);
 
@@ -249,6 +262,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			response = bbRouter.receiveData(senderHID, receiverHID,
 					BackboneJXTAUtils.RemoveHIDFromData(receivedData),
 					(Backbone) this);
+			
 			logger.debug("receiveData Response: " + response.toString());
 		} catch (Exception e) {
 			logger
@@ -388,7 +402,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	private boolean connected = false;
 	private long waitForRdvTime;
 
-	public PeerID peerID;
+	private PeerID peerID;
 	// private ConfigMode mode;
 	private NetworkManager jxtaNetworkManager;
 	private NetworkConfigurator jxtaNetworkConfigurator;
@@ -763,10 +777,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 						// do not process empty messages
 						String senderJXTAID = receivedData.getAddress()
 								.getHostName();
-
+						
 						HID senderHID = BackboneJXTAUtils
 								.GetHIDFromData(receivedData.getData());
-
+						
+						
 						logger.debug("BBJXTA receive multicast message: "
 								+ BackboneJXTAUtils
 										.ConvertByteArrayToString(receivedData
@@ -782,6 +797,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 						// add info to table of HID-Endpoints
 						listOfRemoteEndpoints.put(senderHID, senderJXTAID);
+						
 					}
 				} catch (Exception e) {
 					logger
