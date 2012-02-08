@@ -71,6 +71,7 @@ import eu.linksmart.aom.processor.SCPDProcessor;
 import eu.linksmart.aom.repository.AOMRepository;
 import eu.linksmart.aom.repository.PIDRuleResolver;
 import eu.linksmart.aom.repository.RepositoryFactory;
+import eu.linksmart.aom.repository.SPARQLResult;
 import eu.linksmart.aom.repository.Serializer;
 import eu.linksmart.clients.RemoteWSClientProvider;
 import eu.linksmart.network.CryptoHIDResult;
@@ -1047,5 +1048,17 @@ public class ApplicationOntologyManagerSoapBindingImpl implements
 	public boolean update(String xml) throws java.rmi.RemoteException {
 		AOMRepository repo = getRepository();
 		return repo.update(xml);
+	}
+	
+	@Override
+	public String sparql(String query) throws RemoteException {
+		String xml = "<results>\n";
+		Set<SPARQLResult> results = getRepository().sparql(query);
+		Iterator<SPARQLResult> i = results.iterator();
+		while(i.hasNext()){
+			SPARQLResult result = i.next();
+			xml += result.toXML() + "\n";
+		}
+		return xml + "</results>";		
 	}
 }
