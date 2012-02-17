@@ -43,6 +43,7 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -113,6 +114,8 @@ public class SOAPTunnelServlet extends HttpServlet {
 		// build request
 		
 		StringBuilder requestBuilder = new StringBuilder();
+		HttpServletRequestWrapper hsrw = new HttpServletRequestWrapper(request);
+//		hsrw.
 
 		// append request line
 		requestBuilder.append(request.getMethod()).append(" /");
@@ -201,7 +204,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 	private void sendRequest(HID senderHid, HID receiverHid, String requestString,
 			HttpServletResponse response) throws IOException {
 		NMResponse r = this.nmCore.sendData(senderHid, receiverHid, requestString.getBytes());
-		String sResp = r.getData();
+		String sResp = r.getMessage();
 
 		// /**
 		// * If access has been denied, we throw an AccessException to
