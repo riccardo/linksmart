@@ -115,10 +115,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 		}
 		
 		// TODO #NM refactoring check case when there is no core what to do
+		// Has to be considered as future feature for relay nodes
 		if (nmCore != null) {
 			return nmCore.receiveData(senderHID, receiverHID, data);
 		} else {
-			return new NMResponse("ERROR: No NMCore available!");
+			return new NMResponse(NMResponse.STATUS_ERROR);
 		}
 
 	}
@@ -171,29 +172,24 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * 
 	 * @param senderHid
 	 * @param data
-	 * @return
+	 * @return success if data could be delivered on at least one backbone. error if no backbone was successful
 	 */
 	@Override
 	public NMResponse broadcastData(HID senderHid, byte[] data) {
-		boolean success = true;
-		String failedBroadcast = "";
+		boolean success = false;
 		for (Backbone bb : availableBackbones.values()) {
 			logger.debug("BBRouter broadcastData over Backbone: "
 					+ bb.getClass().getName());
 			NMResponse response = bb.broadcastData(senderHid, data);
-			if (response == null) {
-				continue;
-			}
-			if (response.getData() == NMResponse.STATUS_ERROR) {
-				failedBroadcast += " " + bb.getClass();
-				success = false;
+			if (response != null || response.getStatus() == NMResponse.STATUS_SUCCESS) {
+				success = true;
 			}
 		}
 
-		if (!success)
-			return new NMResponse(NMResponse.STATUS_ERROR);
+		if (success)
+			return new NMResponse(NMResponse.STATUS_SUCCESS); 
 		else
-			return new NMResponse(NMResponse.STATUS_SUCCESS);
+			return new NMResponse(NMResponse.STATUS_ERROR);
 	}
 
 	/**
