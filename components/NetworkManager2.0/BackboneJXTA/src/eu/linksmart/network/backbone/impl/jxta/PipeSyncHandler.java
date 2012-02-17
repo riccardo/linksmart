@@ -360,7 +360,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		 *            the data to send
 		 */
 		public void notification(String sessionId, String data) {
-			resp.setData(data);
+			//TODO: Does data also include a status? Then, resp.setStatus() must also be called
+			resp.setMessage(data);
 			// resp.setSessionID(sessionId);
 			synchronized (response) {
 				response.notify();
@@ -405,7 +406,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			int numRetries = 0;
 			OutputPipe outPipe = null;
 			resp = new NMResponse();
-			resp.setData("Error in SenderPipeSyncHandler");
+			resp.setStatus(NMResponse.STATUS_ERROR);
+			resp.setMessage("Error in SenderPipeSyncHandler");
 
 			while (numRetries < MAXNUMRETRIES) {
 				try {
@@ -443,7 +445,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					} catch (IOException e) {
 						logger.error("Error sending data to HID = "
 								+ dest.toString());
-						resp.setData("Error sending data to HID = "
+						resp.setStatus(NMResponse.STATUS_ERROR);
+						resp.setMessage("Error sending data to HID = "
 								+ dest.toString());
 					}
 
@@ -451,7 +454,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				} else {
 					logger.error("Sender: Could not find destination HID "
 							+ dest.toString() + ". Please try later...");
-					resp.setData("Could not find destination HID "
+					resp.setStatus(NMResponse.STATUS_ERROR);
+					resp.setMessage("Could not find destination HID "
 							+ dest.toString() + ". Please try later...");
 					return resp;
 				}
@@ -464,7 +468,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				} catch (IOException e) {
 					logger.error("Error sending data to HID = "
 							+ dest.toString());
-					resp.setData("Error sending data to HID = "
+					resp.setStatus(NMResponse.STATUS_ERROR);
+					resp.setMessage("Error sending data to HID = "
 							+ dest.toString());
 				}
 

@@ -299,7 +299,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			msocket.sendData(multicastSocket, new DatagramPacket(payload,
 					payload.length));
 		}
-		response.setData("Broadcast successful");
+		response.setStatus(NMResponse.STATUS_SUCCESS);
+		response.setMessage("Broadcast successful");
 
 		logger.debug("broadcastData Response: " + response.toString());
 
