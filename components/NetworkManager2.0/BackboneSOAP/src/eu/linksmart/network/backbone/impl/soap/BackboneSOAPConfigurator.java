@@ -16,7 +16,7 @@ public class BackboneSOAPConfigurator extends Configurator {
 	/* Configuration Keys. */
 	//see enum SecurityProperty in API, file SecurityProperty.java
 	//and configuration section in /resources/BBSOAP.properties
-	public static final String SECURITY_PARAMETERS = "BackboneJXTA.SecurityParameters";
+	public static final String SECURITY_PARAMETERS = "BackboneSOAP.SecurityParameters";
 
 	
 	private BackboneSOAPImpl bbSOAPImpl;
