@@ -197,7 +197,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 							+ senderHID.toString() + " "
 							+ receiverHID.toString(), e);
 			NMResponse response = new NMResponse();
-			response.setData(ERROR_PROCESSING);
+			response.setStatus(NMResponse.STATUS_ERROR); 
+			response.setMessage("Error getting connection for HIDs: "
+					+ senderHID.toString() + " "
+					+ receiverHID.toString());
 			return response;
 		}
 
@@ -210,7 +213,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 				msg = observer.processMessage(msg);
 				if (msg == null || msg.getData() == null) {
 					NMResponse nmresp = new NMResponse();
-					nmresp.setData(SUCCESSFUL_PROCESSING);
+					nmresp.setStatus(NMResponse.STATUS_SUCCESS);
 					return nmresp;
 				}
 			}
@@ -226,7 +229,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 					|| msg.getReceiverHID() == null) {
 				LOG.warn("Received a message which has not been processed");
 				NMResponse response = new NMResponse();
-				response.setData(ERROR_PROCESSING);
+				response.setStatus(NMResponse.STATUS_ERROR);
+				response.setMessage("Received a message which has not been processed");
 				return response;
 			}
 			/*
@@ -236,7 +240,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 			return sendMessage(msg, this.myHID, receiverHID);
 		} else {
 			NMResponse response = new NMResponse();
-			response.setData(SUCCESSFUL_PROCESSING);
+			response.setStatus(NMResponse.STATUS_SUCCESS);
 			return response;
 		}
 	}
@@ -300,7 +304,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 			LOG.warn("Could not create packet from message from HID: "
 					+ message.getSenderHID(), e);
 			NMResponse response = new NMResponse();
-			response.setData(ERROR_PROCESSING);
+			response.setStatus(NMResponse.STATUS_ERROR);
+			response.setMessage("Could not create packet from message from HID: "
+					+ message.getSenderHID());
 			return response;
 		}
 		NMResponse response = this.backboneRouter
@@ -339,7 +345,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 			LOG.warn("Could not create packet from message from HID: "
 					+ message.getSenderHID());
 			NMResponse response = new NMResponse();
-			response.setData(ERROR_PROCESSING);
+			response.setStatus(NMResponse.STATUS_ERROR);
+			response.setMessage("Could not create packet from message from HID: "
+					+ message.getSenderHID());
 			return response;
 		}
 		NMResponse response = this.backboneRouter.sendData(senderHID,
