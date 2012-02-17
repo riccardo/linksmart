@@ -83,7 +83,8 @@ public class BackboneSOAPImpl implements Backbone {
 
 		String soapMsg = "Error in SOAP tunneling receiveData";
 		LOG.debug(soapMsg);
-		resp.setData(generateSoapResponse(soapMsg));
+		resp.setStatus(NMResponse.STATUS_ERROR);
+		resp.setMessage(generateSoapResponse(soapMsg));
 
 		if (data.startsWith("GET")) {
 			// It is a GET request
@@ -215,17 +216,20 @@ public class BackboneSOAPImpl implements Backbone {
 			}
 
 			LOG.debug("Response:\n" + response);
-			resp.setData(response);
+			resp.setStatus(NMResponse.STATUS_SUCCESS);
+			resp.setMessage(response);
 		} catch (UnknownHostException e) {
 			String msg = "Error delivering the data to destination:\n"
 					+ e.getMessage();
 			LOG.debug(msg);
-			resp.setData(generateSoapResponse(msg));
+			resp.setStatus(NMResponse.STATUS_ERROR);
+			resp.setMessage(generateSoapResponse(msg));
 		} catch (IOException e) {
 			String msg = "Error delivering the data to destination:\n"
 					+ e.getMessage();
 			LOG.debug(msg);
-			resp.setData(generateSoapResponse(msg));
+			resp.setStatus(NMResponse.STATUS_ERROR);
+			resp.setMessage(generateSoapResponse(msg));
 		}
 	}
 
@@ -268,7 +272,8 @@ public class BackboneSOAPImpl implements Backbone {
 							+ "Data not available on service. Max Number of "
 							+ "retries reached: " + MAXNUMRETRIES;
 					LOG.debug(soapMsg);
-					resp.setData(generateSoapResponse(soapMsg));
+					resp.setStatus(NMResponse.STATUS_ERROR);
+					resp.setMessage(generateSoapResponse(soapMsg));
 					break;
 				}
 				try {
@@ -277,7 +282,8 @@ public class BackboneSOAPImpl implements Backbone {
 					soapMsg = "Error delivering the data to destination:\n"
 							+ e.getMessage();
 					LOG.debug(soapMsg);
-					resp.setData(generateSoapResponse(soapMsg));
+					resp.setStatus(NMResponse.STATUS_ERROR);
+					resp.setMessage(generateSoapResponse(soapMsg));
 				}
 				++numRetries;
 			}
