@@ -18,9 +18,6 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.SecurityProperty;
 
-/*
- * TODO #NM refactoring
- */
 public class BackboneRouterImpl implements BackboneRouter {
 
 	private Logger logger = Logger
@@ -74,13 +71,13 @@ public class BackboneRouterImpl implements BackboneRouter {
 	}
 
 	/**
-	 * Receives a message over the communication channel from which the Hid
+	 * Sends a message over the communication channel from which the Hid
 	 * came.
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
-	 * @param data
-	 * @return
+	 * @param senderHID HID of the sender
+	 * @param receiverHID HID of the receiver
+	 * @param data data to be sent
+	 * @return success status response of the network manager
 	 */
 	@Override
 	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data) {
@@ -97,10 +94,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * the sender. This will then update the list of HIDs and which backbone
 	 * they use.
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
-	 * @param data
-	 * @param originatingBackbone
+	 * @param senderHID HID of the sender
+	 * @param receiverHID HID of the receiver
+	 * @param data data to be sent
+	 * @param originatingBackbone which backbone is used
+	 * @return success status response of the network manager
 	 */
 	@Override
 	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data,
@@ -129,10 +127,10 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * the network manager. this msg will be firstly accepted by backbone, and
 	 * then propagated to the NMCore and IdManager
 	 * 
-	 * @param tempId
-	 * @param receiverHID
-	 * @param data
-	 * @param originatingBackbone
+	 * @param tempId temporary HID of the sender
+	 * @param receiverHID HID of the receiver
+	 * @param data data to be sent
+	 * @param originatingBackbone which backbone is used
 	 * @return
 	 */
 	// @Override
@@ -146,8 +144,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	// } catch (RemoteException e) {
 	// logger.error(e.getMessage(), e);
 	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
+	// logger.error(e.getMessage(), e);
 	// }
 	// return new NMResponse(NMResponse.STATUS_ERROR);
 	//
@@ -157,7 +154,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * This function is called when the configuration is updated from the web
 	 * page.
 	 * 
-	 * @param updates
+	 * @param updates updated configuration data
 	 */
 	@Override
 	public void applyConfigurations(Hashtable updates) {
@@ -170,8 +167,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 	/**
 	 * Broadcasts a message over the all communication channel.
 	 * 
-	 * @param senderHid
-	 * @param data
+	 * @param senderHid HID of the sender
+	 * @param data data to be sent
 	 * @return success if data could be delivered on at least one backbone. error if no backbone was successful
 	 */
 	@Override
@@ -193,12 +190,12 @@ public class BackboneRouterImpl implements BackboneRouter {
 	}
 
 	/**
-	 * this function return information about the backbone from which the hid
-	 * come from the format is BackboneType:BackboneAddresse e.g.:
-	 * WS;http://202.12.11.11/axis/services
+	 * This function returns information about the backbone of the HID
+	 * The return format is BackboneType;BackboneAddresse
+	 * Example: BackboneSOAP;http://202.12.11.11/axis/services
 	 * 
-	 * @param hid
-	 * @return BackboneType:BackboneAddresse
+	 * @param hid HID of the node to request the route from
+	 * @return BackboneType;BackboneAddresse
 	 */
 	@Override
 	public String getRoute(HID hid) {
@@ -206,7 +203,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		if (b == null) {
 			return null;
 		} else {
-			return b.toString() + ";" + b.getEndpoint(hid);
+			return b.getName() + ";" + b.getEndpoint(hid);
 		}
 	}
 
@@ -220,7 +217,6 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public boolean addRoute(HID hid, String backboneName) {
 		synchronized (hidBackboneMap) {
-
 			if (hidBackboneMap.containsKey(hid)) {
 				return false;
 			}
@@ -240,7 +236,6 @@ public class BackboneRouterImpl implements BackboneRouter {
 			addRoute(remoteHID, senderBackbone.getName());
 			senderBackbone.addEndpointForRemoteHID(senderHID, remoteHID);
 		}
-		
 	}
 
 	/*
