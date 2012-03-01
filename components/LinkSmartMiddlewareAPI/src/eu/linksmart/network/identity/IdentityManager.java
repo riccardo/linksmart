@@ -112,7 +112,7 @@ public interface IdentityManager {
 	 * @param maxNum
 	 * @return
 	 */
-	public Set<HIDInfo> getHIDsByAttributes(String query, int maxNum);
+	public Set<HIDInfo> getHIDsByAttributes(String query);
 
 	/**
 	 * Removes the given {@link HID} from the internal HID-store. Does nothing

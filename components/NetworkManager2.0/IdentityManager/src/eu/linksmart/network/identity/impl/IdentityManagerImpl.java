@@ -225,7 +225,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	@Override
-	public Set<HIDInfo> getHIDsByAttributes(String query, int maxNum) {
+	public Set<HIDInfo> getHIDsByAttributes(String query) {
 		LinkedList<String> parsedQuery = AttributeQueryParser.parseQuery(query);
 		/* Parse the query. */
 		HashSet<HIDInfo> results = new HashSet<HIDInfo>();
@@ -241,11 +241,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			if (attr != null) {
 				if (AttributeQueryParser.checkAttributes(attr, parsedQuery)) {
 					results.add(entry.getValue());
-					// TODO
-					// careful, maxNum=0 means return all
-					if ((results.size() == maxNum) && (maxNum > 0)) {
-						return results;
-					}
 				}
 			}
 		}
