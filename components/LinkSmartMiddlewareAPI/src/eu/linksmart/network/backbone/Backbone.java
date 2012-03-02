@@ -17,10 +17,10 @@ public interface Backbone {
 	/**
 	 * Sends a message over the specific communication channel.
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
-	 * @param data
-	 * @return
+	 * @param senderHID HID of the sender
+	 * @param receiverHID HID of the receiver
+	 * @param data data to be sent
+	 * @return Response of the receiver
 	 */
 	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data);
 
