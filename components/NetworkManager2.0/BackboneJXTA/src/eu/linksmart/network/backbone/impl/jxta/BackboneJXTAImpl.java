@@ -222,8 +222,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			receiverJxtaURI = new URI(receiverJxtaAddress);
 			receiverPeerID = (PeerID)IDFactory.fromURI(receiverJxtaURI);
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.warn("Wrong syntax in URI " + receiverJxtaAddress, e);
 		}
 		
 		response = pipeSyncHandler.sendData(senderHID.toString(), receiverHID
