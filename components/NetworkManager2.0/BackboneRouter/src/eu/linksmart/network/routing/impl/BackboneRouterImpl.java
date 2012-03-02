@@ -203,7 +203,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		if (b == null) {
 			return null;
 		} else {
-			return b.getName() + ";" + b.getEndpoint(hid);
+			return b.getName() + " " + b.getEndpoint(hid);
 		}
 	}
 
