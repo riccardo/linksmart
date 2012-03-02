@@ -24,6 +24,7 @@ import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.identity.IdentityManager;
+import eu.linksmart.network.identity.util.AttributeQueryParser;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.utils.ByteArrayCodec;
 import eu.linksmart.utils.Part;

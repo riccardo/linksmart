@@ -1,4 +1,4 @@
-package eu.linksmart.network.identity.impl;
+package eu.linksmart.network.identity.util;
 
 import java.util.Iterator;
 import java.util.LinkedList;
