@@ -257,13 +257,11 @@ public class BackboneSOAPImpl implements Backbone {
 	 */
 	private String parseResponse(NMResponse resp, Socket socket)
 			throws IOException {
-		// TODO change buffer size to available bytes
 		byte[] buffer = new byte[BUFFSIZE];
 		String response = "";
 		InputStream cis = socket.getInputStream();
 		String soapMsg;
 		int bytesRead = 0;
-		int total = 0;
 		int numRetries = 0;
 		do {
 			if (cis.available() == 0) {
@@ -291,7 +289,6 @@ public class BackboneSOAPImpl implements Backbone {
 			if (bytesRead > 0) {
 				numRetries = 0;
 				response = response.concat(new String(buffer, 0, bytesRead));
-				total += bytesRead;
 			}
 		} while (bytesRead != -1);
 		cis.close();
