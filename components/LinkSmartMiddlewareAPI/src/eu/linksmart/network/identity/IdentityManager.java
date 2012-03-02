@@ -50,15 +50,6 @@ public interface IdentityManager {
 	 */
 	public boolean updateHIDInfo(HID hid, Properties attributes);
 
-	// public Set<HID> getHIDs(Properties attributes);
-	// public HID createHID(long contextID, int level, String description,
-	// String endpoint, Properties attr);
-	// public HID createHID(long contextID, int level);
-
-	// public HID createHID();
-	// public HID createHID(String description, String endpoint, Properties
-	// attr);
-
 	/**
 	 * Returns the {@link HIDInfo} for a given {@link HID}.
 	 * 
