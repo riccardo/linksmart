@@ -30,6 +30,7 @@ import eu.linksmart.utils.ByteArrayCodec;
 import eu.linksmart.utils.Part;
 import eu.linksmart.utils.PartConverter;
 
+@SuppressWarnings("deprecation")
 public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
@@ -355,7 +356,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			} catch (IOException e) {
 				LOG.debug("IO Exception in communication, message maybe damaged? " + e);
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				LOG.error("Class not found in reconstructing message. Why? " + e);
 			}
 			//message is processed
