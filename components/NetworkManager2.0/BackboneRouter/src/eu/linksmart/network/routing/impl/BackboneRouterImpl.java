@@ -191,11 +191,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 	/**
 	 * This function returns information about the backbone of the HID
-	 * The return format is BackboneType;BackboneAddresse
-	 * Example: BackboneSOAP;http://202.12.11.11/axis/services
+	 * The return format is BackboneType:BackboneAddresse
+	 * Example: BackboneSOAP:http://202.12.11.11/axis/services
 	 * 
 	 * @param hid HID of the node to request the route from
-	 * @return BackboneType;BackboneAddresse
+	 * @return BackboneType:BackboneAddresse
 	 */
 	@Override
 	public String getRoute(HID hid) {
@@ -203,7 +203,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		if (b == null) {
 			return null;
 		} else {
-			return b.getName() + " " + b.getEndpoint(hid);
+			return b.getName().concat(":").concat(b.getEndpoint(hid));
 		}
 	}
 
