@@ -85,8 +85,19 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private static Logger logger = Logger.getLogger(PipeSyncHandler.class
 			.getName());
 
+	/**
+	 * Number of times to try to search for input pipe.
+	 */
 	private static final int MAXNUMRETRIES = 15;
-	private static final long OUTPUTPIPE_CREATION_TIMEOUT = 2000;
+	/**
+	 * Time to wait for advertisement to find pipe.
+	 */
+	private static final long OUTPUTPIPE_CREATION_TIMEOUT = 3000;
+	/**
+	 * The identifier for the LinkSmart input pipes.
+	 */
+	private static final String PIPE_ID = 
+		"urn:jxta:uuid-79B6A084D3264DF8B641867D926C48D9F3C29CB8709F4D7EB39D92335B61D4CE04";
 
 	private PipeService pipeService;
 	private PipeAdvertisement pipeAdv;
@@ -126,31 +137,21 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	}
 
 	/**
-	 * Creates a Pipe Advertisement
+	 * Creates a Pipe Advertisement.
 	 * 
 	 * @return a pipe advertisement
 	 */
-	private PipeAdvertisement createPipeAdv() {
-		// String ppidSeed =
-		// "urn:jxta:uuid-79B6A084D3264DF8B641867D926C48D9F3C29CB8709F4D7EB39D92335B61D4CE04";
-		// PipeID pipeID =
-		// IDFactory.newPipeID(bbjxta.netPeerGroup.getPeerGroupID() ,
-		// ppidSeed.getBytes());
+	private PipeAdvertisement createPipeAdv() {		
+		PipeID pipeID = IDFactory.newPipeID(bbjxta.netPeerGroup.getPeerGroupID());
+		PipeAdvertisement pipeAdv = (PipeAdvertisement)
+		AdvertisementFactory.newAdvertisement(PipeAdvertisement.getAdvertisementType());
+		String ppid = PIPE_ID;
 
-		PipeID pipeID = IDFactory.newPipeID(bbjxta.netPeerGroup
-				.getPeerGroupID());
-
-		PipeAdvertisement pipeAdv = (PipeAdvertisement) AdvertisementFactory
-				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
-
-//		try {
-//			// pipeID = (PipeID) IDFactory.fromURI(new URI(ppid));
-//			pipeID = IDFactory.newPipeID(bbjxta.netPeerGroup.getPeerGroupID(),
-//					ppidSeed.getBytes());
-//		} catch (Exception e) {
-//			logger.error(
-//					"Imposible to create PipeID for the pipe advertisement", e);
-//		}
+		try {
+			pipeID = (PipeID) IDFactory.fromURI(new URI(ppid));
+		} catch (URISyntaxException e) {
+			logger.error("Imposible to create PipeID for the pipe advertisement");
+		}
 
 		pipeAdv.setPipeID(pipeID);
 		pipeAdv.setName("Input Pipe Advertisement for Network Manager");

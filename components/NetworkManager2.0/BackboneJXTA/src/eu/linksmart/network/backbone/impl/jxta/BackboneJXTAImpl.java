@@ -18,6 +18,7 @@ import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
 import net.jxta.discovery.DiscoveryService;
 import net.jxta.document.Advertisement;
+import net.jxta.document.AdvertisementFactory;
 import net.jxta.document.MimeMediaType;
 import net.jxta.exception.PeerGroupException;
 import net.jxta.id.ID;
@@ -420,6 +421,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 */
 	private void startJXTA() {
 		clearCache(new File(jxtaHome, "cm"));
+		AdvertisementFactory.registerAdvertisementInstance(
+				NMadvertisement.getAdvertisementType(), new NMadvertisement.Instantiator());
 
 		/* JXTA platform configuration. */
 		try {
