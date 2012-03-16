@@ -1,17 +1,20 @@
 package eu.linksmart.utils;
 
 import java.util.Properties;
+import java.util.Set;
 import java.util.Map.Entry;
 
 @Deprecated public class PartConverter {
 	@Deprecated public static Part[] fromProperties(Properties attributes) {
-			@SuppressWarnings("unchecked")
-			Entry<String, String>[] entries = (Entry<String, String>[]) attributes
-					.entrySet().toArray();
-			Part[] newAttributes = new Part[entries.length];
-			for (int i = 0; i < entries.length; i++) {
-				newAttributes[i] = new Part(entries[i].getKey(),
-						entries[i].getValue());
+			Set<Entry<Object, Object>> entries = attributes.entrySet();
+			Part[] newAttributes = new Part[entries.size()];
+			int i = 0;
+			for (Entry<Object, Object> entry : entries){
+				String key = (String)entry.getKey();
+				String value = (String)entry.getValue();
+				newAttributes[i] = new Part(key,
+						value);
+				i++;
 			}
 			return newAttributes;
 		}
