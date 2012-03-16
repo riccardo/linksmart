@@ -85,7 +85,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
 				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
-		this.connectionManager.setCommunicationSecurityManager(this.commSecMgr);
 		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
 				this.myDescription) };
 		this.myHID = this.identityManager.createHIDForAttributes(attributes);
