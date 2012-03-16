@@ -59,7 +59,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger
-			.getLogger(SOAPTunnelServlet.class.getName());
+	.getLogger(SOAPTunnelServlet.class.getName());
 	private NetworkManagerCore nmCore;
 
 	/**
@@ -85,15 +85,15 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 */
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	throws IOException {
 
 		// split path - path contains HIDs and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		String parts[] = path.split("/", 5);
 		// extract HIDs from path
-		HID sHid = new HID(parts[1]);
+		HID sHid = (parts[1].contentEquals("0")) ? nmCore.getHID() : new HID(parts[1]);
 		HID rHid = new HID(parts[2]);
-		
+
 		// build parameter string
 		StringBuilder queryBuilder = new StringBuilder();
 		if (parts.length > 3 && parts[3].equals("wsdl")) {
@@ -112,10 +112,10 @@ public class SOAPTunnelServlet extends HttpServlet {
 		}
 
 		// build request
-		
+
 		StringBuilder requestBuilder = new StringBuilder();
 		HttpServletRequestWrapper hsrw = new HttpServletRequestWrapper(request);
-//		hsrw.
+		//		hsrw.
 
 		// append request line
 		requestBuilder.append(request.getMethod()).append(" /");
@@ -144,16 +144,17 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 *            servlet
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	throws IOException {
 		// split path - path contains HIDs and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		StringTokenizer token = new StringTokenizer(path, "/");
 		if (token.countTokens() > 2) {
 			StringBuilder requestBuilder = new StringBuilder();
-			HID senderHID = new HID(token.nextToken());
+			String sHID = token.nextToken();
+			HID senderHID = (sHID.contentEquals("0")) ? nmCore.getHID() : new HID(sHID);
 			HID receiverHID = new HID(token.nextToken());
 			// sessionID = new HID(token.nextToken());
-			
+
 			// append headers and blank line for end of headers
 			requestBuilder.append(buildHeaders(request));
 			requestBuilder.append("\r\n");
@@ -168,7 +169,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 					e.printStackTrace();
 				}
 			}
-			
+
 			// send request to NetworkManagerCore
 			logger.debug("Sending soap request through tunnel");
 			sendRequest(senderHID, receiverHID, requestBuilder.toString(), response);
