@@ -249,19 +249,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		// give message to BBRouter for further processing
 		try {
-			// FIXME
-			// this is temporary code until the complete move to LS 2.0; it is
-			// there just
-			// to ignore LS1.1 messages from supernodes and other 1.1 NM
-			if (receivedData[0] == 'N' && receivedData[1] == 'M') {
-				logger.debug("Received LS1.1 Message: " + receivedData[0]
-						+ ". Throwing it away.");
-				return response;
-			}
-			// end temporary code
-
 			response = bbRouter.receiveData(senderHID, receiverHID,
-					BackboneJXTAUtils.RemoveHIDFromData(receivedData),
+					receivedData,
 					(Backbone) this);
 			
 			logger.debug("receiveData Response: " + response.toString());
@@ -779,6 +768,20 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 					if (msgAsString.length() > 0) {
 						// do not process empty messages
+						
+						// FIXME
+						// this is temporary code until the complete move to LS 2.0; it is
+						// there just
+						// to ignore LS1.1 messages from supernodes and other 1.1 NM
+						if (receivedData.getData()[0] == 'N' && receivedData.getData()[1] == 'M') {
+							logger.debug("Received LS1.1 Message: " + 
+									((receivedData.getLength() > 10)?
+											new String(receivedData.getData()).substring(0, 10): new String(receivedData.getData()))
+									+ ".... Throwing it away.");
+							return;
+						}
+						// end temporary code
+						
 						String senderJXTAID = receivedData.getAddress()
 								.getHostName();
 						
@@ -801,8 +804,9 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 							listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 						}
 						
-						bbJXTA.receiveData(senderHID, null, receivedData
-								.getData());
+						bbJXTA.receiveData(senderHID,
+								null,
+								BackboneJXTAUtils.RemoveHIDFromData(receivedData.getData()));
 						
 					}
 				} catch (Exception e) {
