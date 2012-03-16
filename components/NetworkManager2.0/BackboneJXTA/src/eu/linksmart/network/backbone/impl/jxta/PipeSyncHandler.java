@@ -218,7 +218,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private Message createRequestMessage(HID source, HID dest, byte[] data) {
 
 		Message msg = new Message();
-		MessageElement elem = new StringMessageElement("Data", data.toString(),
+		MessageElement elem = new StringMessageElement("Data", new String(data),
 				null);
 		msg.addMessageElement(null, elem);
 		elem = new StringMessageElement("Dest", dest.toString(), null);
