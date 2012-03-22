@@ -110,6 +110,9 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
 
+	/**
+	 * A map of HID to JXTA Peer ID.
+	 */
 	protected Hashtable<HID, String> listOfRemoteEndpoints;
 
 	protected void activate(ComponentContext context) {
@@ -800,6 +803,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 										+ senderHID);
 
 						// add info to table of HID-Endpoints
+						//TODO Mark this check is a workaround for a parsing bug (HID String can have random text)
+						//Should be removed when parsing bug is fixed
 						if (senderHID.getContextID1() == 0){
 							listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 						}
