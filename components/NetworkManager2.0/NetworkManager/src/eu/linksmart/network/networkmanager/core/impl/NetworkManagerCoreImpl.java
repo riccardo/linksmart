@@ -66,7 +66,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 
 	/* fields */
 	private NetworkManagerCoreConfigurator configurator;
-	private CommunicationSecurityManager commSecMgr;
 	private Map<String, ArrayList<MessageProcessor>> msgObservers = new HashMap<String, ArrayList<MessageProcessor>>();
 
 	protected void activate(ComponentContext context) {
@@ -160,7 +159,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	protected void unbindCommunicationSecurityManager(
 			CommunicationSecurityManager commSecMgr) {
 		this.connectionManager.removeCommunicationSecurityManager(commSecMgr);
-		this.commSecMgr = null;
 	}
 
 	protected void bindIdentityManager(IdentityManager identityManager) {
