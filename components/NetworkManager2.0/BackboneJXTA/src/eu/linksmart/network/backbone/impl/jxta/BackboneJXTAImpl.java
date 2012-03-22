@@ -778,7 +778,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 									((receivedData.getLength() > 10)?
 											new String(receivedData.getData()).substring(0, 10): new String(receivedData.getData()))
 									+ ".... Throwing it away.");
-							return;
+							continue;
 						}
 						// end temporary code
 						
