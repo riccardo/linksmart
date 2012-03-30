@@ -157,7 +157,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 //				}
 				description = identityManager.getHIDInfo(hid).getDescription();
 
-				if (checkAttributes && description.equals("")) {
+				if (checkAttributes && (description == null || description.equals(""))) {
 					HIDInfo hidInfo = identityManager.getHIDInfo(hid);
 
 					Part[] attr = hidInfo.getAttributes();
