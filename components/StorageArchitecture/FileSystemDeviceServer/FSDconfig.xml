@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<config>
-	<NetworkManager url="http://localhost:8083/services/NetworkManagerApplication" soaptunnel="http://localhost:8083/SOAPTunneling" />
-</config>
