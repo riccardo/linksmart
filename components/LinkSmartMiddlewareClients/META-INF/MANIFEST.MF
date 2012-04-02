@@ -92,7 +92,6 @@ Export-Package: eu.linksmart.aom.client,
  eu.linksmart.network.client,
  eu.linksmart.policy.pdp.client,
  eu.linksmart.policy.pep.client,
- eu.linksmart.qos.client,
  eu.linksmart.security.trustmanager.client,
  eu.linksmart.wsprovider.test.client
 Bundle-Vendor: TID
