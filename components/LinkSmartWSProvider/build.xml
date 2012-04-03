@@ -58,7 +58,7 @@
 	<!-- set up local build environment -->
 	<target name="setup-local">
 		<echo message="Setting up local build environment" />
-		<property name="antlib.dir" value="${basedir}/../antlibs" />
+		<property name="antlib.dir" value="${basedir}/../../antlibs" />
 		<path id="antlib.path">
 			<fileset dir="${antlib.dir}" includes="*.jar" />
 		</path>
@@ -127,11 +127,6 @@
 		<echo message="Published as: ${rootDistributionDir}/${moduleName}-${revision}.jar" />
 	</target>
 
-	<!-- test -->
-	<target name="test" depends="make">
-		<echo message="Testing" />
-		<mkdir dir="${test.build.dir}" />
-	</target>
 
 	<!-- clean -->
 	<target name="clean">
@@ -141,8 +136,6 @@
 		<!-- files in distribution directory -->
 		<delete dir="${dist.dir}" includeEmptyDirs="true" failonerror="false" />
 		<delete file="${rootDistributionDir}/${moduleName}-${revision}.jar" failonerror="false" />
-		<!-- files in test directory -->
-		<delete dir="${test.build.dir}" includeEmptyDirs="true" failonerror="false" />
 	</target>
 
 </project>

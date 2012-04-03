@@ -47,7 +47,7 @@ Local build file for the LinkSmart Ontology Manager
 
 	<!-- Local versions of targets, setting properties so it may be called from this directory -->
 	<target name="local">
-		<property name="antlib.dir" value="${basedir}/../antlibs" />
+		<property name="antlib.dir" value="${basedir}/../../antlibs" />
 
 		<path id="antlib.path">
 			<fileset dir="${antlib.dir}" includes="*.jar" />
@@ -111,30 +111,30 @@ Local build file for the LinkSmart Ontology Manager
 			<doctitle>
 				<![CDATA[<h1>Ontology Manager</h1>]]>
 			</doctitle>
-		<bottom>
-			<![CDATA[<i>Copyright &#169; 2010 the LinkSmart Project.</i>]]>
-		</bottom>
-	<link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
-</javadoc>
-</target>
+			<bottom>
+				<![CDATA[<i>Copyright &#169; 2010 the LinkSmart Project.</i>]]>
+			</bottom>
+			<link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
+		</javadoc>
+	</target>
 
-<target name="test" depends="make">
-<mkdir dir="${rootBuildDir}/../test" />
-<mkdir dir="${rootBuildDir}/../test/resources" />
-<copy todir="${rootBuildDir}/../test/resources">
-	<fileset dir="${test.dir}/resources" />
-</copy>
-<junit fork="yes" haltonfailure="yes">
-	<classpath>
-		<path refid="test-classpath" />
-	</classpath>
-	<formatter type="brief" usefile="false" />
-	<batchtest fork="yes">
-		<fileset dir="${test.dir}">
-			<include name="**/*Test*.java" />
-		</fileset>
-	</batchtest>
-</junit>
-<delete dir="${rootBuildDir}/../test" includeEmptyDirs="true" failonerror="false" />
-</target>
+	<target name="test" depends="make">
+		<mkdir dir="${rootBuildDir}/../test" />
+		<mkdir dir="${rootBuildDir}/../test/resources" />
+		<copy todir="${rootBuildDir}/../test/resources">
+			<fileset dir="${test.dir}/resources" />
+		</copy>
+		<junit fork="yes" haltonfailure="yes">
+			<classpath>
+				<path refid="test-classpath" />
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<batchtest fork="yes">
+				<fileset dir="${test.dir}">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<delete dir="${rootBuildDir}/../test" includeEmptyDirs="true" failonerror="false" />
+	</target>
 </project>

@@ -62,6 +62,7 @@
 		<ant dir="TrustManager" target="make" />
 		<ant dir="NetworkManager" target="make" />
 		<ant dir="CryptoManager" target="make" />
+		<ant dir="OntologyManager" target="make" />
 	</target>
 	
 	<!--

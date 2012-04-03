@@ -22,8 +22,8 @@ Local build file for the Linksmart InsideSecurity
 			<include name="**/*.jar" />
 		</fileset>
 		<fileset dir="${targetPlatform.dir}">
-	    	<include name="**/*.jar"/>
-	   	</fileset>
+			<include name="**/*.jar" />
+		</fileset>
 		<pathelement path="${build.dir}" />
 	</path>
 
@@ -33,7 +33,7 @@ Local build file for the Linksmart InsideSecurity
 
 	<!-- Local versions of targets, setting properties so it may be called from this directory -->
 	<target name="local">
-		<property name="antlib.dir" value="${basedir}/../antlibs" />
+		<property name="antlib.dir" value="${basedir}/../../antlibs" />
 		<path id="antlib.path">
 			<fileset dir="${antlib.dir}" includes="*.jar" />
 		</path>
@@ -45,12 +45,7 @@ Local build file for the Linksmart InsideSecurity
 		<antcall target="make" />
 	</target>
 
-	<target name="test-local" depends="local">
-		<antcall target="test" />
-	</target>
 	<!-- Local versions -->
-
-
 	<target name="publish" depends="jar">
 		<ivy:publish pubrevision="${revision}" resolver="local" forcedeliver="true" overwrite="true" publishivy="false">
 			<artifacts pattern="${distribution.dir}/[artifact]-${revision}.[ext]" />
@@ -63,10 +58,6 @@ Local build file for the Linksmart InsideSecurity
 		<ivy:retrieve transitive="true" type="bundle" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
 	</target>
 
-	<target name="clean">
-		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
-	</target>
-
 	<target name="build" depends="resolve">
 		<mkdir dir="${build.dir}" />
 		<javac destdir="${build.dir}" classpathref="classpath">
@@ -76,8 +67,7 @@ Local build file for the Linksmart InsideSecurity
 
 	<target name="jar" depends="build">
 		<mkdir dir="${distribution.dir}" />
-		<jar jarfile="${distribution.dir}/${moduleName}-${revision}.jar" 
-				manifest="${basedir}/META-INF/MANIFEST.MF">
+		<jar jarfile="${distribution.dir}/${moduleName}-${revision}.jar" manifest="${basedir}/META-INF/MANIFEST.MF">
 			<fileset dir="${build.dir}">
 				<patternset>
 					<include name="**/*.class" />
@@ -94,6 +84,13 @@ Local build file for the Linksmart InsideSecurity
 		</jar>
 	</target>
 
-	<target name="test" depends="make">
+	<target name="clean">
+		<echo message="Cleaning" />
+		<!-- files in build directory -->
+		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
+		<!-- files in distribution directory -->
+		<delete dir="${dist.dir}" includeEmptyDirs="true" failonerror="false" />
+		<delete file="${rootDistributionDir}/${moduleName}-${revision}.jar" failonerror="false" />
 	</target>
+
 </project>
