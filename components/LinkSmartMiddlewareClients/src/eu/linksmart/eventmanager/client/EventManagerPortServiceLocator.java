@@ -182,23 +182,39 @@ if ("BasicHttpBinding_EventManagerPort".equals(portName)) {
 
 	@Override
 	public EventManagerPort getEventManagerPort() throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		java.net.URL endpoint;
+		try {
+			endpoint = new java.net.URL(BasicHttpBinding_EventManagerPort_address);
+		} catch (java.net.MalformedURLException e) {
+			throw new javax.xml.rpc.ServiceException(e);
+		}
+		
+		return getEventManagerPort(endpoint);
 	}
 
 
 	@Override
 	public EventManagerPort getEventManagerPort(URL portAddress)
 			throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			eu.linksmart.eventmanager.client.EventManagerPortSoapBindingStub _stub = 
+				new eu.linksmart.eventmanager.client.EventManagerPortSoapBindingStub(
+					portAddress, this);
+			_stub.setPortName(getEventManagerPortWSDDServiceName());
+			return _stub;
+		} catch (org.apache.axis.AxisFault e) {
+			return null;
+		}
 	}
 
 
 	@Override
 	public String getEventManagerPortAddress() {
-		// TODO Auto-generated method stub
-		return null;
+		return BasicHttpBinding_EventManagerPort_address;
+	}
+	
+	public java.lang.String getEventManagerPortWSDDServiceName() {
+		return BasicHttpBinding_EventManagerPortWSDDServiceName;
 	}
 
 
