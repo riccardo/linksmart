@@ -62,7 +62,7 @@ public class EventManagerPortServiceLocator
     }
 
     // Use to get a proxy class for BasicHttpBinding_EventManagerPort
-    private java.lang.String BasicHttpBinding_EventManagerPort_address = "http://192.168.104.131:8124/Service";
+    private java.lang.String BasicHttpBinding_EventManagerPort_address = "http://localhost:8124/Service";
 
     public java.lang.String getBasicHttpBinding_EventManagerPortAddress() {
         return BasicHttpBinding_EventManagerPort_address;
