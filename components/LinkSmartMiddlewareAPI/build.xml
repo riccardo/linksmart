@@ -13,7 +13,7 @@
 	<!-- properties -->
 
 	<property name="moduleName" value="LinkSmartMiddlewareAPI" />
-	<property name="revision" value="1.0.0" />
+	<property name="revision" value="1.2.0" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="test.dir" value="${basedir}/test" />
 	<property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test" />

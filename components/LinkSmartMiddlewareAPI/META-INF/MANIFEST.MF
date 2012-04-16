@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LinkSmart Middleware API
 Bundle-SymbolicName: LinkSmartMiddlewareAPI
-Bundle-Version: 1.0.0
+Bundle-Version: 1.2.0
 Bundle-Vendor: TID
 Import-Package: org.apache.log4j,
  org.osgi.framework,
