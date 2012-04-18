@@ -106,6 +106,10 @@ public class KeyManagerImpl implements KeyManager {
 			.getName());
 	private static final String PRIVATE_ENCRYPTION_KEY_PASS = "hydrademo";
 	private static int CACHE_SIZE = 10;
+	/**	 Unique random salt for LinkSmart. */
+	private static String KEY_DERIVATION_SALT = "52EA39FD2857E2C85EE291DA02BBC0708D1A3D26E83FBF1522B753A7086AA314";
+	/** Number of times to iterate the hash. */
+	private static int PASSWORD_DERIVATION_ITERATION = 1000;
 
 	private KeyStore ks;
 	private DBmanagement dbase;
@@ -866,10 +870,26 @@ public class KeyManagerImpl implements KeyManager {
 				//set keylength from bit to byte number
 				keyLength = (int)((double)keyLength / 8.0);
 				//create byte[] from provided password
+				
 				//create one-way hash function
 				MessageDigest md = MessageDigest.getInstance("SHA-256");
 				byte[] digest = null;
-				byte[] iterationValue = Base64.decode(password);
+				byte[] passBytes = Base64.decode(password);
+				byte[] saltBytes = hexStringToByteArray(KEY_DERIVATION_SALT);
+				//concat password bytes with salt bytes
+				byte[] iterationValue = new byte[passBytes.length + saltBytes.length];
+				for (int i=0; i < passBytes.length; i++) {
+					iterationValue[i] = passBytes[i];
+				}
+				for (int i=0; i < saltBytes.length; i++) {
+					iterationValue[passBytes.length + i] = saltBytes[i];
+				}
+				//iterate hash function 1000 times to generate proper key from password
+				for (int i=0; i < PASSWORD_DERIVATION_ITERATION; i++) {
+					md.update(iterationValue);
+					iterationValue = md.digest();
+				}
+				
 				//add input to digest and concatenate output at end of digest until it reaches key size
 				do{
 					md.update(iterationValue);
@@ -1289,5 +1309,15 @@ public class KeyManagerImpl implements KeyManager {
 				}
 			}
 		}	
+	}
+	
+	private static byte[] hexStringToByteArray(String s) {
+	    int len = s.length();
+	    byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+	                             + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
 	}
 }
