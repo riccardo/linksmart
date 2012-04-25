@@ -19,62 +19,36 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 
 public class PropSkip {
 	private static final String CONFIGURATION_FILE = "NetworkManagerSuperNode/config/NM.properties";
 	private HashMap properties;
 
-	/* Bloque de inicializacion
-	 */
-
+	private static Logger logger = Logger.getLogger(PropSkip.class.getName());
 
 	public PropSkip() {
-		try {		
-			FileInputStream f = null;
-			
+		FileInputStream f = null;
+		try {
 			f = new FileInputStream(CONFIGURATION_FILE);
-			
+
 			Properties tempProperties = new Properties();
 
-	    	try {
-	    		tempProperties.load(f);
-		    } catch(IOException e) {
-		    	System.out.println(e.getMessage());
-		    	System.out.println(e.getStackTrace());
-		    }			
-			
+			tempProperties.load(f);
+
 			f.close();
 			properties = new HashMap(tempProperties);
 
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println(e.getStackTrace());
+		} catch (IOException e) {
+			logger.error("Unable to load properties.", e);
 		}
-		
+
 	}
 
-	public String getProperty(String nombre) {
-
-			String valor = (String) properties.get(nombre);
-		    if (valor == null)
-		        System.err.println("ERROR. Wrong property Field: " + nombre + "\n");
-			
-			return valor;
+	public String getProperty(String name) {
+		String value = (String) properties.get(name);
+		if (value == null)
+			logger.error("Unknown property: " + name);
+		return value;
 	}
-	
-	public static void main(String[] args) {
-	    	String devuelveNull;
-	    	try {
-	    		/* Buscamos algunos valores
-	    		 */
-	    	
-	    	
-	    	
-
-
-	    	} catch (Exception e) {
-	    		System.out.println(e);
-	    		devuelveNull = "Valor por defecto";
-	    	}
-	  	}
-	}
+}

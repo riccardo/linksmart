@@ -12,7 +12,7 @@
 
 	<!-- properties -->
 	<property name="moduleName" value="NetworkManagerSupernode" />
-	<property name="revision" value="1.0.0" />
+	<property name="revision" value="1.2.0" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="test.dir" value="${basedir}/test" />
 	<property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test" />
@@ -61,7 +61,7 @@
 	<!-- set up local build environment -->
 	<target name="setup-local">
 		<echo message="Setting up local build environment" />
-		<property name="antlib.dir" value="${basedir}/../antlibs" />
+		<property name="antlib.dir" value="${basedir}/../../antlibs" />
 		<path id="antlib.path">
 			<fileset dir="${antlib.dir}" includes="*.jar" />
 		</path>
@@ -110,9 +110,7 @@
 					<include name="lib/jxta.jar" />
 				</patternset>
 			</fileset>
-			<fileset dir="${basedir}" includes="OSGi-INF/*" />
-			<fileset dir="${basedir}" includes="resources/**" />
-			<fileset dir="${basedir}" includes="crypto.properties,NM.properties,seeds.txt" />
+			<fileset dir="${basedir}" includes="config/*" />
 		</jar>
 	</target>
 

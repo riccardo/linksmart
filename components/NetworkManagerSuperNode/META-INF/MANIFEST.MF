@@ -2,12 +2,23 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: NetworkManagerSuperNode Bundle
 Bundle-SymbolicName: NetworkManagerSupernode
-Bundle-Version: 1.0.0
+Bundle-Version: 1.2.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.apache.log4j,
+Import-Package: javax.servlet;version="2.4.0",
+ javax.servlet.http;version="2.4.0",
+ org.apache.log4j;version="1.2.15",
+ org.mortbay;version="4.2.22",
+ org.mortbay.html;version="4.2.22",
+ org.mortbay.http;version="4.2.22",
+ org.mortbay.http.ajp;version="4.2.22",
+ org.mortbay.http.handler;version="4.2.22",
+ org.mortbay.jetty;version="4.2.22",
+ org.mortbay.jetty.servlet;version="4.2.22",
+ org.mortbay.jetty.win32;version="4.2.22",
+ org.mortbay.servlet;version="4.2.22",
+ org.mortbay.util;version="4.2.22",
+ org.mortbay.xml;version="4.2.22",
  org.osgi.framework
 Bundle-Activator: eu.linksmart.network.supernode.Activator
-Bundle-ClassPath: lib/jxta.jar,
- .,
- lib/org.mortbay.jetty.jar,
- lib/bcprov-jdk15-138.jar
+Bundle-ClassPath: .,
+ lib/jxta.jar

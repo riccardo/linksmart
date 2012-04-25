@@ -12,7 +12,8 @@
 	<dependencies>
 		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi"	rev="3.6.2" />
-		<dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.5.0" />
+		<dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.4.0" />
+		<dependency org="org.mortbay.jetty" name="com.springsource.org.mortbay.jetty" rev="4.2.22" />
 	</dependencies>
 
 </ivy-module>

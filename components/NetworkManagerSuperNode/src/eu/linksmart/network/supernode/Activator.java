@@ -22,10 +22,10 @@ import org.osgi.framework.BundleContext;
 
 import eu.linksmart.tools.JarUtil;
 
-
 public class Activator implements BundleActivator {
-	LinksmartSuperNode superNode;
-	
+
+	private LinksmartSuperNode superNode;
+
 	final static private String NMPROPPATH = "NetworkManagerSuperNode/config/NM.properties";
 	final static private String NMPROPJARPATH = "config/NM.properties";
 	final static private String SEEDSPATH = "NetworkManagerSuperNode/config/seeds.txt";
@@ -35,24 +35,18 @@ public class Activator implements BundleActivator {
 	static {
 		HashFilesExtract.put(NMPROPPATH, NMPROPJARPATH);
 		HashFilesExtract.put(SEEDSPATH, SEEDSJARPATH);
-		
-	}
-	
-	
-	public void start(BundleContext context) throws Exception {
-		try {
-            JarUtil.extractFilesJar(HashFilesExtract);
-        } catch (IOException e) {
-           
-        }
-		superNode = LinksmartSuperNode.getSingleton();
-		
+
 	}
 
-	
+	public void start(BundleContext context) throws Exception {
+		JarUtil.extractFilesJar(HashFilesExtract);
+		superNode = LinksmartSuperNode.getSingleton();
+
+	}
+
 	public void stop(BundleContext context) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
