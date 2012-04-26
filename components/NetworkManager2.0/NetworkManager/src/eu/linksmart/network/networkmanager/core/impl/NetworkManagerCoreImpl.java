@@ -79,8 +79,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	}
 
 	private void init(ComponentContext context) {
-		this.configurator = new NetworkManagerCoreConfigurator(this,
-				context.getBundleContext());
+		this.configurator = new NetworkManagerCoreConfigurator(this, context
+				.getBundleContext());
 		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
 				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
@@ -188,10 +188,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 				conn = connectionManager.getConnection(receiverHID, senderHID);
 			}
 		} catch (Exception e) {
-			LOG.warn(
-					"Error getting connection for HIDs: "
-							+ senderHID.toString() + " "
-							+ receiverHID.toString(), e);
+			LOG.warn("Error getting connection for HIDs: "
+					+ senderHID.toString() + " " + receiverHID.toString(), e);
 			NMResponse response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_ERROR);
 			response.setMessage("Error getting connection for HIDs: "
@@ -220,12 +218,13 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 			 * check if message is not intended for host HID, if yes and it has
 			 * not been processed drop it
 			 */
-			if (msg.getReceiverHID() == this.myHID
-					|| msg.getReceiverHID() == null) {
+			if (msg.getReceiverHID() == null
+					|| msg.getReceiverHID().equals(this.myHID)) {
 				LOG.warn("Received a message which has not been processed");
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
-				response.setMessage("Received a message which has not been processed");
+				response
+						.setMessage("Received a message which has not been processed");
 				return response;
 			}
 			/*
@@ -300,8 +299,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 					+ message.getSenderHID(), e);
 			NMResponse response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_ERROR);
-			response.setMessage("Could not create packet from message from HID: "
-					+ message.getSenderHID());
+			response
+					.setMessage("Could not create packet from message from HID: "
+							+ message.getSenderHID());
 			return response;
 		}
 		NMResponse response = this.backboneRouter
@@ -341,8 +341,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 					+ message.getSenderHID());
 			NMResponse response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_ERROR);
-			response.setMessage("Could not create packet from message from HID: "
-					+ message.getSenderHID());
+			response
+					.setMessage("Could not create packet from message from HID: "
+							+ message.getSenderHID());
 			return response;
 		}
 		NMResponse response = this.backboneRouter.sendData(senderHID,
