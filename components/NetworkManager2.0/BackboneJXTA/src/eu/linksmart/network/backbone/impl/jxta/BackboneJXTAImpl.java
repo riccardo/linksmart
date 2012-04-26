@@ -3,8 +3,6 @@ package eu.linksmart.network.backbone.impl.jxta;
 import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -12,7 +10,6 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 
 import net.jxta.discovery.DiscoveryEvent;
 import net.jxta.discovery.DiscoveryListener;
@@ -21,7 +18,6 @@ import net.jxta.document.Advertisement;
 import net.jxta.document.AdvertisementFactory;
 import net.jxta.document.MimeMediaType;
 import net.jxta.exception.PeerGroupException;
-import net.jxta.id.ID;
 import net.jxta.id.IDFactory;
 import net.jxta.impl.protocol.RdvAdv;
 import net.jxta.logging.Logging;
@@ -221,17 +217,17 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		// add senderHID to data
 		logger.debug("Sending data over pipe to HID= " + receiverHID);
-		
+
 		String receiverJxtaAddress = listOfRemoteEndpoints.get(receiverHID);
 		URI receiverJxtaURI;
 		PeerID receiverPeerID = null;
 		try {
 			receiverJxtaURI = new URI(receiverJxtaAddress);
-			receiverPeerID = (PeerID)IDFactory.fromURI(receiverJxtaURI);
+			receiverPeerID = (PeerID) IDFactory.fromURI(receiverJxtaURI);
 		} catch (URISyntaxException e) {
 			logger.warn("Wrong syntax in URI " + receiverJxtaAddress, e);
 		}
-		
+
 		response = pipeSyncHandler.sendData(senderHID.toString(), receiverHID
 				.toString(), data, receiverPeerID);
 
@@ -254,18 +250,10 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		NMResponse response = new NMResponse();
 
 		// give message to BBRouter for further processing
-		try {
-			response = bbRouter.receiveData(senderHID, receiverHID,
-					receivedData,
-					(Backbone) this);
-			
-			logger.debug("receiveData Response: " + response.toString());
-		} catch (Exception e) {
-			logger
-					.error(
-							"BBJXTA could not give received message for processing to bbRouter",
-							e);
-		}
+		response = bbRouter.receiveData(senderHID, receiverHID, receivedData,
+				(Backbone) this);
+
+		logger.debug("receiveData Response: " + response.toString());
 
 		return response;
 	}
@@ -416,8 +404,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 */
 	private void startJXTA() {
 		clearCache(new File(jxtaHome, "cm"));
-		AdvertisementFactory.registerAdvertisementInstance(
-				NMadvertisement.getAdvertisementType(), new NMadvertisement.Instantiator());
+		AdvertisementFactory.registerAdvertisementInstance(NMadvertisement
+				.getAdvertisementType(), new NMadvertisement.Instantiator());
 
 		/* JXTA platform configuration. */
 		try {
@@ -779,27 +767,33 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 					if (msgAsString.length() > 0) {
 						// do not process empty messages
-						
+
 						// FIXME
-						// this is temporary code until the complete move to LS 2.0; it is
+						// this is temporary code until the complete move to LS
+						// 2.0; it is
 						// there just
-						// to ignore LS1.1 messages from supernodes and other 1.1 NM
-						if (receivedData.getData()[0] == 'N' && receivedData.getData()[1] == 'M') {
-							logger.debug("Received LS1.1 Message: " + 
-									((receivedData.getLength() > 10)?
-											new String(receivedData.getData()).substring(0, 10): new String(receivedData.getData()))
-									+ ".... Throwing it away.");
+						// to ignore LS1.1 messages from supernodes and other
+						// 1.1 NM
+						if (receivedData.getData()[0] == 'N'
+								&& receivedData.getData()[1] == 'M') {
+							logger
+									.debug("Received LS1.1 Message: "
+											+ ((receivedData.getLength() > 10) ? new String(
+													receivedData.getData())
+													.substring(0, 10)
+													: new String(receivedData
+															.getData()))
+											+ ".... Throwing it away.");
 							continue;
 						}
 						// end temporary code
-						
+
 						String senderJXTAID = receivedData.getAddress()
 								.getHostName();
-						
+
 						HID senderHID = BackboneJXTAUtils
 								.GetHIDFromData(receivedData.getData());
-						
-						
+
 						logger.debug("BBJXTA receive multicast message: "
 								+ BackboneJXTAUtils
 										.ConvertByteArrayToString(receivedData
@@ -811,16 +805,16 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 										+ senderHID);
 
 						// add info to table of HID-Endpoints
-						//TODO Mark this check is a workaround for a parsing bug (HID String can have random text)
-						//Should be removed when parsing bug is fixed
-						if (senderHID.getContextID1() == 0){
+						// TODO Mark this check is a workaround for a parsing
+						// bug (HID String can have random text)
+						// Should be removed when parsing bug is fixed
+						if (senderHID.getContextID1() == 0) {
 							listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 						}
-						
-						bbJXTA.receiveData(senderHID,
-								null,
-								BackboneJXTAUtils.RemoveHIDFromData(receivedData.getData()));
-						
+
+						bbJXTA.receiveData(senderHID, null, BackboneJXTAUtils
+								.RemoveHIDFromData(receivedData.getData()));
+
 					}
 				} catch (Exception e) {
 					logger
@@ -898,15 +892,16 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	@Override
 	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID) {
-		
+
 		String endpoint = listOfRemoteEndpoints.get(senderHID);
-		
-		if(endpoint != null){			
+
+		if (endpoint != null) {
 			listOfRemoteEndpoints.put(remoteHID, endpoint);
-		}else{			
-			logger.error("Network Manager endpoint of HID " + senderHID + " cannot be found");
+		} else {
+			logger.error("Network Manager endpoint of HID " + senderHID
+					+ " cannot be found");
 		}
-		
+
 	}
 
 }
