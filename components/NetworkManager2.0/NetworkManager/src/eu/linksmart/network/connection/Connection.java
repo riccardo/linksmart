@@ -111,25 +111,36 @@ public class Connection {
 		} else if (securityProtocol != null
 				&& !securityProtocol.isInitialized()) {
 			// if protocol not initialized then pass it for processing
+			// in this case the data is a serialized properties object
+			
+			Properties properties = new Properties();
 			try {
-				// in this case the data is a serialized properties object
-				Properties properties = new Properties();
 				properties.loadFromXML(new ByteArrayInputStream(data));
-				tempMsg = new Message((String) properties.remove(TOPIC),
-						senderHID, receiverHID, ((String) properties
-								.remove(APPLICATION_DATA)).getBytes());
+			} catch (InvalidPropertiesFormatException e) {
+				logger.error("Cannot parse message from HID: "
+						+ senderHID.toString() + ":\n" + new String(data), e);
+			} catch (IOException e) {
+				logger.error("Cannot parse message from HID: "
+						+ senderHID.toString() + ":\n" + new String(data), e);
+			}
+			
+			// Create the Message
+			tempMsg = new Message((String) properties.remove(TOPIC), senderHID,
+					receiverHID, ((String) properties.remove(APPLICATION_DATA))
+							.getBytes());
+			
+			// Process message by Security Protocol
+			try {
 				tempMsg = securityProtocol.processMessage(tempMsg);
-				return tempMsg;
 			} catch (CryptoException e) {
 				logger.error("Error during cryptographic operation", e);
 			} catch (VerificationFailureException e) {
-				logger.error("Signature is not valid from HID: "
-						+ senderHID.toString(), e);
+				logger.error("Error during cryptographic operation", e);
 			} catch (IOException e) {
-				logger.error("Cannot parse message from HID: "
-						+ senderHID.toString() + ":\n " + new String(data), e);
+				logger.error("Error during cryptographic operation", e);
 			}
-			return null;
+			
+			return tempMsg;
 		}
 
 		// open data and divide it into properties of the message and
