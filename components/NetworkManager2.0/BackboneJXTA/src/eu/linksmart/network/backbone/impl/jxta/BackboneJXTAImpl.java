@@ -220,7 +220,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		NMResponse response = new NMResponse();
 
 		// add senderHID to data
-		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
 		logger.debug("Sending data over pipe to HID= " + receiverHID);
 		
 		String receiverJxtaAddress = listOfRemoteEndpoints.get(receiverHID);
@@ -234,7 +233,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		}
 		
 		response = pipeSyncHandler.sendData(senderHID.toString(), receiverHID
-				.toString(), payload, receiverPeerID);
+				.toString(), data, receiverPeerID);
 
 		logger.debug("sendData Response: " + response.toString());
 
