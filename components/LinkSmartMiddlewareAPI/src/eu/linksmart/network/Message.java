@@ -22,6 +22,8 @@ public class Message {
 	private HID senderHID = null;
 	private HID receiverHID = null;
 	
+	public final static String TOPIC_APPLICATION = "eu.linksmart.application";
+	
 	/**
 	 * 
 	 * @param topic the topic of this message
