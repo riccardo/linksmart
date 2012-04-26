@@ -653,8 +653,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 					rdvAdv.getPeerID();
 					logger.info("LinkSmart Super Node discovered "
 							+ rdvAdv.getPeerID());
-					// FIXME
-					logger.info("Cannot connect to it yet (Implement me!)");
 				}
 
 				if (adv1.getAdvType().equals(
