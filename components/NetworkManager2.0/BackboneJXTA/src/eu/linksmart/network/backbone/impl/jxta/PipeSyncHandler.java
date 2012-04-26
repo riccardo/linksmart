@@ -58,6 +58,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.jxta.document.AdvertisementFactory;
+import net.jxta.endpoint.ByteArrayMessageElement;
 import net.jxta.endpoint.Message;
 import net.jxta.endpoint.MessageElement;
 import net.jxta.endpoint.StringMessageElement;
@@ -96,9 +97,14 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	/**
 	 * The identifier for the LinkSmart input pipes.
 	 */
-	private static final String PIPE_ID = 
-		"urn:jxta:uuid-79B6A084D3264DF8B641867D926C48D9F3C29CB8709F4D7EB39D92335B61D4CE04";
+	private static final String PIPE_ID = "urn:jxta:uuid-79B6A084D3264DF8B641867D926C48D9F3C29CB8709F4D7EB39D92335B61D4CE04";
 
+	private static final String MESSAGE_ELEMENT_NAME_DATA = "Data";
+	private static final String MESSAGE_ELEMENT_NAME_SOURCE = "Source";
+	private static final String MESSAGE_ELEMENT_NAME_DESTINATION = "Dest";
+	private static final String MESSAGE_ELEMENT_NAME_TYPE = "Type";
+	private static final String MESSAGE_ELEMENT_TYPE_REQUEST = "REQUEST2";	
+	
 	private PipeService pipeService;
 	private PipeAdvertisement pipeAdv;
 	private InputPipe inputPipe;
@@ -141,10 +147,11 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 * 
 	 * @return a pipe advertisement
 	 */
-	private PipeAdvertisement createPipeAdv() {		
-		PipeID pipeID = IDFactory.newPipeID(bbjxta.netPeerGroup.getPeerGroupID());
-		PipeAdvertisement pipeAdv = (PipeAdvertisement)
-		AdvertisementFactory.newAdvertisement(PipeAdvertisement.getAdvertisementType());
+	private PipeAdvertisement createPipeAdv() {
+		PipeID pipeID = IDFactory.newPipeID(bbjxta.netPeerGroup
+				.getPeerGroupID());
+		PipeAdvertisement pipeAdv = (PipeAdvertisement) AdvertisementFactory
+				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
 		String ppid = PIPE_ID;
 
 		try {
@@ -218,15 +225,14 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private Message createRequestMessage(HID source, HID dest, byte[] data) {
 
 		Message msg = new Message();
-		MessageElement elem = new StringMessageElement("Data", new String(data),
-				null);
-		msg.addMessageElement(null, elem);
-		elem = new StringMessageElement("Dest", dest.toString(), null);
-		msg.addMessageElement(null, elem);
-		elem = new StringMessageElement("Source", source.toString(), null);
-		msg.addMessageElement(null, elem);
-		elem = new StringMessageElement("Type", "REQUEST", null);
-		msg.addMessageElement(null, elem);
+		msg.addMessageElement(new ByteArrayMessageElement(
+				MESSAGE_ELEMENT_NAME_DATA, null, data, null));
+		msg.addMessageElement(new ByteArrayMessageElement(
+				MESSAGE_ELEMENT_NAME_DESTINATION, null, dest.getBytes(), null));
+		msg.addMessageElement(new ByteArrayMessageElement(
+				MESSAGE_ELEMENT_NAME_SOURCE, null, source.getBytes(), null));
+		msg.addMessageElement(new StringMessageElement(
+				MESSAGE_ELEMENT_NAME_TYPE, MESSAGE_ELEMENT_TYPE_REQUEST, null));
 		return msg;
 	}
 
@@ -361,7 +367,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		 *            the data to send
 		 */
 		public void notification(String sessionId, String data) {
-			//TODO: Does data also include a status? Then, resp.setStatus() must also be called
+			// TODO: Does data also include a status? Then, resp.setStatus()
+			// must also be called
 			resp.setMessage(data);
 			// resp.setSessionID(sessionId);
 			synchronized (response) {
@@ -541,7 +548,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 * @return the NMResponse
 	 * @throws java.rmi.RemoteException
 	 */
-	private NMResponse receiveData(String senderHID, String receiverHID,
+	private NMResponse receiveData(byte[] senderHID, byte[] receiverHID,
 			byte[] data) throws java.rmi.RemoteException {
 		return bbjxta.receiveData(new HID(senderHID), new HID(receiverHID),
 				data);
@@ -580,9 +587,13 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		 */
 		public void run() {
 			Message msg = event.getMessage();
-			MessageElement data = msg.getMessageElement("Data");
-			MessageElement dest = msg.getMessageElement("Dest");
-			MessageElement source = msg.getMessageElement("Source");
+			StringMessageElement type = (StringMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_TYPE);
+			if(!type.equals(MESSAGE_ELEMENT_TYPE_REQUEST)) {
+				logger.debug("Received incompatible JXTA message with type " + type);
+			}
+			ByteArrayMessageElement data = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DATA);
+			ByteArrayMessageElement dest = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DESTINATION);
+			ByteArrayMessageElement source = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SOURCE);
 
 			/*
 			 * MESSAGE request arrived. Call the NMSoapImp.receiveData(). Once
@@ -592,9 +603,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			logger.info("PipeSyncHandler - Receiving message.");
 
 			try {
-				receiveData(source.toString(), dest.toString(),
-						BackboneJXTAUtils.ConvertStringToByteArray(data
-								.toString()));
+				receiveData(source.getBytes(), dest.getBytes(),
+						data.getBytes());
 			} catch (RemoteException e) {
 				logger.error("Error calling receiveData " + e.getMessage());
 			}
