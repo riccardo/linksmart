@@ -588,7 +588,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		public void run() {
 			Message msg = event.getMessage();
 			StringMessageElement type = (StringMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_TYPE);
-			if(!type.equals(MESSAGE_ELEMENT_TYPE_REQUEST)) {
+			if(!type.toString().equals(MESSAGE_ELEMENT_TYPE_REQUEST)) {
 				logger.debug("Received incompatible JXTA message with type " + type);
 			}
 			ByteArrayMessageElement data = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DATA);
