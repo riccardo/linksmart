@@ -124,7 +124,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		}
 
 		HID newHID = this.identityManager.createHIDForAttributes(attributes);
-		List<SecurityProperty> properties = this.backboneRouter.getBackboneSecurityProperties(backboneName);
+		List<SecurityProperty> properties = this.backboneRouter
+				.getBackboneSecurityProperties(backboneName);
 		// register HID with backbone policies in connection manager
 		this.connectionManager.registerHIDPolicy(newHID, properties);
 		// add route to selected backbone
@@ -134,10 +135,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 
 	public NMResponse sendData(HID sender, HID receiver, byte[] data)
 			throws RemoteException {
-
-		NMResponse response = this.backboneRouter.sendData(sender, receiver,
-				data);
-		return response;
+		return this.sendMessage(new Message(Message.TOPIC_APPLICATION, sender,
+				receiver, data));
 	}
 
 	public boolean removeHID(HID hid) throws RemoteException {
@@ -194,10 +193,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 							+ senderHID.toString() + " "
 							+ receiverHID.toString(), e);
 			NMResponse response = new NMResponse();
-			response.setStatus(NMResponse.STATUS_ERROR); 
+			response.setStatus(NMResponse.STATUS_ERROR);
 			response.setMessage("Error getting connection for HIDs: "
-					+ senderHID.toString() + " "
-					+ receiverHID.toString());
+					+ senderHID.toString() + " " + receiverHID.toString());
 			return response;
 		}
 
@@ -389,7 +387,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		 * appropriate implementation class is referenced
 		 */
 
-		if(!identityManager.getIdentifier().contentEquals(CRYPTO_HID_IMPLEMENTATION)){
+		if (!identityManager.getIdentifier().contentEquals(
+				CRYPTO_HID_IMPLEMENTATION)) {
 			return null;
 		}
 		HID hid = null;
@@ -405,8 +404,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		hid = identityManager.createHIDForAttributes(newAttributes);
 		return identityManager.getHIDInfo(hid);
 	}
-
-
 
 	/**
 	 * Operation to create an crypto HID providing a certificate reference (from
@@ -426,7 +423,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 		 * as the method is implementation specific we have to check whether the
 		 * appropriate implementation class is referenced
 		 */
-		if(!identityManager.getIdentifier().contentEquals(CRYPTO_HID_IMPLEMENTATION)){
+		if (!identityManager.getIdentifier().contentEquals(
+				CRYPTO_HID_IMPLEMENTATION)) {
 			return null;
 		}
 		Part[] attributes = { new Part(HIDAttribute.CERT_REF.name(), certRef) };
@@ -442,6 +440,5 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	public void addRemoteHID(HID senderHID, HID remoteHID) {
 		this.backboneRouter.addRouteForRemoteHID(senderHID, remoteHID);
 	}
-
 
 }
