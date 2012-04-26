@@ -124,10 +124,10 @@ public class Connection {
 				logger.error("Error during cryptographic operation", e);
 			} catch (VerificationFailureException e) {
 				logger.error("Signature is not valid from HID: "
-						+ senderHID.toString());
+						+ senderHID.toString(), e);
 			} catch (IOException e) {
 				logger.error("Cannot parse message from HID: "
-						+ senderHID.toString() + ":\n " + new String(data));
+						+ senderHID.toString() + ":\n " + new String(data), e);
 			}
 			return null;
 		}
