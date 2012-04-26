@@ -415,7 +415,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			OutputPipe outPipe = null;
 			resp = new NMResponse();
 			resp.setStatus(NMResponse.STATUS_ERROR);
-			resp.setMessage("Error in SenderPipeSyncHandler");
+			resp.setMessage("<Response>Error in SenderPipeSyncHandler</Response>");
 
 			while (numRetries < MAXNUMRETRIES) {
 				try {
@@ -448,11 +448,14 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					Message message = createRequestMessage(source, dest, data);
 
 					try {
-						outPipe.send(message);
-						// resp.setSessionID("0");
+						if(outPipe.send(message)){
+							resp.setStatus(NMResponse.STATUS_SUCCESS);
+							resp.setMessage("<Response>Success sending data to HID = "
+									+ dest.toString() + "</Response>");
+						}
 					} catch (IOException e) {
-						logger.error("Error sending data to HID = "
-								+ dest.toString());
+						logger.error("<Response>Error sending data to HID = "
+								+ dest.toString()+ "</Response>");
 						resp.setStatus(NMResponse.STATUS_ERROR);
 						resp.setMessage("Error sending data to HID = "
 								+ dest.toString());
@@ -463,22 +466,26 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					logger.error("Sender: Could not find destination HID "
 							+ dest.toString() + ". Please try later...");
 					resp.setStatus(NMResponse.STATUS_ERROR);
-					resp.setMessage("Could not find destination HID "
-							+ dest.toString() + ". Please try later...");
+					resp.setMessage("<Response>Could not find destination HID "
+							+ dest.toString() + ". Please try later...</Response>");
 					return resp;
 				}
 			} else {
 				Message message = createRequestMessage(source, dest, data);
 
 				try {
-					outPipe.send(message);
-					// resp.setSessionID("0");
+					
+					if(outPipe.send(message)){
+						resp.setStatus(NMResponse.STATUS_SUCCESS);
+						resp.setMessage("<Response>Success sending data to HID = "
+								+ dest.toString()+"</Response>");
+					}
 				} catch (IOException e) {
 					logger.error("Error sending data to HID = "
 							+ dest.toString());
 					resp.setStatus(NMResponse.STATUS_ERROR);
-					resp.setMessage("Error sending data to HID = "
-							+ dest.toString());
+					resp.setMessage("<Response>Error sending data to HID = "
+							+ dest.toString() + "</Response>");
 				}
 
 				pipeTable.get(pID).setTime(System.currentTimeMillis());
