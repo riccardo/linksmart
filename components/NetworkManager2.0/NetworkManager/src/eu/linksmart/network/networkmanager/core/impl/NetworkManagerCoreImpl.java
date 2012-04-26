@@ -311,8 +311,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	}
 
 	public NMResponse sendMessage(Message message) {
-		HID senderHID = message.getReceiverHID();
-		HID receiverHID = message.getSenderHID();
+		HID senderHID = message.getSenderHID();
+		HID receiverHID = message.getReceiverHID();
 		return sendMessage(message, senderHID, receiverHID);
 	}
 
