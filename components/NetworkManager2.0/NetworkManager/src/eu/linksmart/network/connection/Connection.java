@@ -119,7 +119,7 @@ public class Connection {
 			} catch (VerificationFailureException e) {
 				logger.debug("Signature is not valid from HID: " + senderHID.toString());
 			} catch (IOException e) {
-				logger.debug("Cannot parse message from HID: " + senderHID.toString());
+				logger.warn("Cannot parse message from HID: " + senderHID.toString() + ": " + new String(data));
 			}
 			return null;
 		}	
