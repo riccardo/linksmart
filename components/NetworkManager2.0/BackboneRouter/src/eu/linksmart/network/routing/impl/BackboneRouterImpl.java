@@ -24,8 +24,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 			.getLogger(BackboneRouterImpl.class.getName());
 	protected ComponentContext context;
 
-	private Map<HID, Backbone> hidBackboneMap;
-	private Map<String, Backbone> availableBackbones;
+	private Map<HID, Backbone> hidBackboneMap = new HashMap<HID, Backbone>();
+	private Map<String, Backbone> availableBackbones = new HashMap<String, Backbone>();
 	private NetworkManagerCore nmCore;
 	private String defaultRoute;
 
@@ -41,9 +41,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 		bindNMCore((NetworkManagerCore) context
 				.locateService(NetworkManagerCore.class.getSimpleName()));
-
-		hidBackboneMap = new HashMap<HID, Backbone>();
-		availableBackbones = new HashMap<String, Backbone>();
+		
 		configurator = new BackboneRouterConfigurator(this,
 				context.getBundleContext());
 		configurator.registerConfiguration();
