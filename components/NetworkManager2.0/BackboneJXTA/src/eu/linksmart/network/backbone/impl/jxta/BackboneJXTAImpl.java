@@ -424,11 +424,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			e.printStackTrace();
 		}
 
-		// URI uri = new File(JXTA_HOME_DIR + "config/seeds.txt").toURI();
-		// logger.debug(uri.toString());
-		//
-		// jxtaNetworkConfigurator.addRdvSeedingURI(uri);
-
 		URI superNodeTCPURI = null;
 		try {
 			String uriString = (String) configurator.getConfiguration().get(
