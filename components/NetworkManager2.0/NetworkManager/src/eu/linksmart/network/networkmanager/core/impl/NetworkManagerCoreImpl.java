@@ -47,7 +47,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	protected HID myHID;
 
 	protected String myDescription;
-
+	
 	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class
 			.getSimpleName();
@@ -58,6 +58,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 	public static String ERROR_PROCESSING = "ERROR";
 	/** The name of the class implementing CryptoHID **/
 	private static String CRYPTO_HID_IMPLEMENTATION = "IdentityManagerCryptoImpl";
+	
+	private static String NETWORK_MGR_ENDPOINT = "http://localhost:8082/axis/services/NetworkManager";
 
 	/*
 	 * logger
@@ -86,7 +88,14 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
 				this.myDescription) };
-		this.myHID = this.identityManager.createHIDForAttributes(attributes);
+		
+		//Create a local HID with SOAP Backbone for NetworkManager
+		// TODO Make the Backbone a constant or enum somewhere.
+		try {
+			this.myHID = createHID(attributes, NETWORK_MGR_ENDPOINT,  "eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl");
+		} catch (RemoteException e) {
+			LOG.error("Should never happen.", e);
+		}
 
 		// Init Servlets
 		HttpService http = (HttpService) context.locateService("HttpService");
