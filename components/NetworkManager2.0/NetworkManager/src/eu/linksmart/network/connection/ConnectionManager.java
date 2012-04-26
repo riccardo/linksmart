@@ -107,8 +107,6 @@ public class ConnectionManager {
 		}
 
 		//there was no connection found so create new connection
-		//if there was no connection that means that the sender is the client and the receiver is the server
-		Connection conn = new Connection(senderHID, receiverHID);
 		//check if there are policies for one of the HIDs
 		ArrayList<SecurityProperty> allRequirements = new ArrayList<SecurityProperty>();
 		if(this.hidPolicies.containsKey(senderHID) || this.hidPolicies.containsKey(receiverHID)){
@@ -129,7 +127,26 @@ public class ConnectionManager {
 					}
 				}
 			}
+			
+			//check if requirements are not colliding
+			boolean noEncoding = allRequirements.contains(SecurityProperty.NoEncoding);
+			boolean noSecurity = allRequirements.contains(SecurityProperty.NoSecurity);
+			boolean justNoEncNoSec = allRequirements.size() == 2 && noEncoding && noSecurity;
+			//if there are more requirements and noEnc or noSec is included it must be colliding
+			if (!justNoEncNoSec && (allRequirements.size() > 1 && (noEncoding || noSecurity))) {
+						throw new Exception("Colliding policies for HIDs");
+					}
 		}
+		
+		//if there was no connection that means that the sender is the client and the receiver is the server
+		//check if an active connection or a dummy connectin is needed
+		Connection conn = null;
+		if(allRequirements.contains(SecurityProperty.NoEncoding)) {
+			conn = new NOPConnection(senderHID, receiverHID);
+		} else {
+			conn = new Connection(senderHID, receiverHID);
+		}
+		
 		boolean foundComSecMgr = false;
 		if (!this.communicationSecurityManagers.isEmpty()) {
 			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
@@ -142,8 +159,7 @@ public class ConnectionManager {
 		}
 		if (!foundComSecMgr 
 				&& allRequirements.size() != 0 
-				&& !(allRequirements.size() == 1 
-						&& allRequirements.contains(SecurityProperty.NoSecurity))) {
+				&& !allRequirements.contains(SecurityProperty.NoSecurity)) {
 			//no available communication security manager although required
 			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
 		}
