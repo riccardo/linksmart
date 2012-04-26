@@ -58,6 +58,7 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 	public static final String COMMUNICATION_TYPE = "Network.CommunicationType";
 	public static final String CONNECTION_TIMEOUT = "NetworkManager.ConnectionTimeout";
 	
+	// TODO SECURITY_PROTOCOL is not applied anywhere! MJ
 	public static final String SECURITY_PROTOCOL = "Security.Protocol";
 	//TODO Currently this functionality is not provided
 //	public static final String USE_CORE_SECURITY = "Security.UseCoreSecurity";
