@@ -89,7 +89,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	private static String BACKBONE_JXTA = BackboneJXTAImpl.class
 			.getSimpleName();
-
+	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
+	
 	private Logger logger = Logger.getLogger(BackboneJXTAImpl.class.getName());
 	protected ComponentContext context;
 	private BackboneJXTAConfigurator configurator;
@@ -97,8 +98,13 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	protected static String JXTA_HOME_DIR = "Backbone/.jxta/";
 
 	private String jxtaHome;
-
 	private BackboneRouter bbRouter;
+	/** Length of multicast buffer.	 */
+	private int bufferLength = 64000;
+	/** Maximum length until multicast buffer is increased.	 */
+	private int maxBufferLength = 128000;
+	/** Only report maximum size reached once. */
+	private boolean bufferReported = false;
 
 	private HttpService http;
 	private String httpPort;
@@ -107,8 +113,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	public ConfigMode jxtaMode;
 	private String synched;
 	private MulticastSocket msocket;
-
-	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
 
 	/**
 	 * A map of HID to JXTA Peer ID.
@@ -749,15 +753,22 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			byte[] buffer;
 			DatagramPacket receivedData;
 			while (running) {
-				buffer = new byte[64000];
+				buffer = new byte[bufferLength];
 				receivedData = new DatagramPacket(buffer, buffer.length);
 
 				try {
 					m.receive(receivedData);
 				} catch (IOException e2) {
-					logger.error(getName() + ": Unable to receive data in "
+					logger.warn(getName() + ": Unable to receive data in "
 							+ m.toString(), e2);
-					e2.printStackTrace();
+					//increase buffer length until maximum is reached
+					if (bufferLength >= maxBufferLength) {
+						bufferLength += 16000;
+						logger.info("Increasing multicast buffer length.");
+					} else if(!bufferReported){
+						bufferReported = true;
+						logger.error("Multicast buffer reached maximum length!");
+					}
 				}
 
 				// give message to BBRouter for further processing
