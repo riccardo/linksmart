@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
@@ -132,12 +133,15 @@ public class GetNetworkManagerStatus extends HttpServlet {
 			}
 
 			// Get the Route for this HID
-			String route = backboneRouter.getRoute(hidInfo.getHID());
-
+			HID hid = hidInfo.getHID();
+			String route = backboneRouter.getRoute(hid);
+			String hidString = hid.toString();
+			String path = "/SOAPTunneling/0/" + hidString;
+			
 			// Here we print one row
 			try {
 				response.getWriter().write(
-						hidInfo.getHID().toString() + "|" + description + "|"
+						"<a href=\"" + path + "\">" + hidString + "</a> <a href=\"" + path + "?wsdl\">(wsdl)</a>|" + description + "|"
 								+ "TODO: Host" + "|" + route);
 				if (it.hasNext()) {
 					response.getWriter().write("<br>");
