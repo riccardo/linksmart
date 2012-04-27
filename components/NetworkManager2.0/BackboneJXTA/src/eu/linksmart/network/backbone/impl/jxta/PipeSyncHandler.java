@@ -740,6 +740,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				MESSAGE_ELEMENT_NAME_SOURCE, null, source.getBytes(), null));
 		msg.addMessageElement(new StringMessageElement(
 				MESSAGE_ELEMENT_NAME_TYPE, MESSAGE_ELEMENT_TYPE_RESPONSE, null));
+		msg.addMessageElement(new StringMessageElement(
+				MESSAGE_ELEMENT_NAME_REQUESTID, i , null));
 		return msg;
 	}
 	

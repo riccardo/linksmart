@@ -81,7 +81,7 @@ public class BackboneSOAPImpl implements Backbone {
 		String soapMsg = "Error in SOAP tunneling receiveData";
 		resp.setStatus(NMResponse.STATUS_ERROR);
 		resp.setMessage(generateSoapResponse(soapMsg));
-
+//decode properties & Decode64
 		if (data.startsWith("GET")) {
 			// It is a GET request
 			resp = processGetMessage(urlEndpoint, data, resp);
