@@ -20,7 +20,6 @@ import org.osgi.service.component.ComponentContext;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
-import eu.linksmart.network.backbone.impl.soap.BackboneSOAPConfigurator;
 import eu.linksmart.security.communication.SecurityProperty;
 
 /*
@@ -31,15 +30,13 @@ public class BackboneSOAPImpl implements Backbone {
 	private static String BACKBONE_SOAP = BackboneSOAPImpl.class
 			.getSimpleName();
 	private Map<HID, URL> hidUrlMap;
-	private Logger LOG = Logger.getLogger(BackboneSOAPImpl.class
-			.getName());
+	private Logger LOG = Logger.getLogger(BackboneSOAPImpl.class.getName());
 	private static final int MAXNUMRETRIES = 15;
 	private static final long SLEEPTIME = 20;
 	private static final int BUFFSIZE = 16384;
 
 	private BackboneSOAPConfigurator configurator;
 
-	
 	protected void activate(ComponentContext context) {
 		hidUrlMap = new HashMap<HID, URL>();
 
@@ -48,10 +45,9 @@ public class BackboneSOAPImpl implements Backbone {
 					.getBundleContext());
 			configurator.registerConfiguration();
 		} catch (NullPointerException e) {
-			LOG.fatal("Configurator could not be initialized "
-					+ e.toString());
+			LOG.fatal("Configurator could not be initialized " + e.toString());
 		}
-		
+
 		LOG.info(BACKBONE_SOAP + " started");
 	}
 
@@ -81,16 +77,17 @@ public class BackboneSOAPImpl implements Backbone {
 		LOG.debug("SOAPTunnel received this message " + data);
 		NMResponse resp = new NMResponse();
 
+		// Set error as default status
 		String soapMsg = "Error in SOAP tunneling receiveData";
-		LOG.debug(soapMsg);
 		resp.setStatus(NMResponse.STATUS_ERROR);
 		resp.setMessage(generateSoapResponse(soapMsg));
 
 		if (data.startsWith("GET")) {
 			// It is a GET request
-			processGetMessage(urlEndpoint, data, resp);
+			resp = processGetMessage(urlEndpoint, data, resp);
 		} else {
 			// It is a POST request.
+			// TODO make the same as GET
 			processPostMessage(urlEndpoint, data, resp);
 		}
 		return resp;
@@ -98,18 +95,24 @@ public class BackboneSOAPImpl implements Backbone {
 
 	/**
 	 * Processes POST message
-	 * @param urlEndpoint URL of endpoint
-	 * @param data header data as String
-	 * @param resp response from SOAP service
+	 * 
+	 * @param urlEndpoint
+	 *            URL of endpoint
+	 * @param data
+	 *            header data as String
+	 * @param resp
+	 *            response from SOAP service
 	 */
 	private void processPostMessage(URL urlEndpoint, String data,
 			NMResponse resp) {
 		StringBuilder dataproc;
 		if (urlEndpoint.getQuery() != null) {
-			dataproc = new StringBuilder("POST ").append(urlEndpoint.getPath()).append("?")
-					.append(urlEndpoint.getQuery()).append(" HTTP/1.0\r\n");
+			dataproc = new StringBuilder("POST ").append(urlEndpoint.getPath())
+					.append("?").append(urlEndpoint.getQuery()).append(
+							" HTTP/1.0\r\n");
 		} else {
-			dataproc = new StringBuilder("POST ").append(urlEndpoint.getPath()).append(" HTTP/1.0\r\n");
+			dataproc = new StringBuilder("POST ").append(urlEndpoint.getPath())
+					.append(" HTTP/1.0\r\n");
 		}
 
 		if (data.contains("<ns1:SetAVTransportURI>")) {
@@ -136,12 +139,15 @@ public class BackboneSOAPImpl implements Backbone {
 		while (token.hasMoreElements()) {
 			aux = token.nextToken();
 			if (aux.contains("Content-Length")) {
-				header = new StringBuilder("Content-Length: ").append(headers[1].length()).append("\r\n").toString();
+				header = new StringBuilder("Content-Length: ").append(
+						headers[1].length()).append("\r\n").toString();
 			} else if (aux.contains("content-length")) {
-				header = new StringBuilder("content-length: ").append(headers[1].length()).append("\r\n").toString();
+				header = new StringBuilder("content-length: ").append(
+						headers[1].length()).append("\r\n").toString();
 			} else if (aux.toLowerCase().contains("host")) {
-				header = new StringBuilder("Host: ").append(urlEndpoint.getHost()).append(":")
-						.append(urlEndpoint.getPort()).append("\r\n").toString();
+				header = new StringBuilder("Host: ").append(
+						urlEndpoint.getHost()).append(":").append(
+						urlEndpoint.getPort()).append("\r\n").toString();
 			} else {
 				header = aux + "\r\n";
 			}
@@ -156,20 +162,24 @@ public class BackboneSOAPImpl implements Backbone {
 		LOG.debug("Received SOAP message at the end of the tunnel:\n"
 				+ SOAPMessage);
 
-		sendResponse(urlEndpoint, resp, dataproc.toString());
+		getResponse(urlEndpoint, resp, dataproc.toString());
 	}
 
 	/**
 	 * Processes GET message
-	 * @param urlEndpoint URL of endpoint
-	 * @param data header data as String
-	 * @param resp response from SOAP service
+	 * 
+	 * @param urlEndpoint
+	 *            URL of endpoint
+	 * @param data
+	 *            header data as String
+	 * @param resp
+	 *            response from SOAP service
 	 */
-	private void processGetMessage(URL urlEndpoint, String data, NMResponse resp) {
+	private NMResponse processGetMessage(URL urlEndpoint, String data, NMResponse resp) {
 		StringTokenizer token = new StringTokenizer(data, "\r\n");
 		String header = "", aux = "";
 		StringBuilder dataproc = new StringBuilder();
-		
+
 		while (token.hasMoreElements()) {
 			aux = token.nextToken();
 			if (aux.toLowerCase().contains("get")) {
@@ -190,19 +200,25 @@ public class BackboneSOAPImpl implements Backbone {
 				header = "Connection: close\r\n";
 			} else if (aux.toLowerCase().startsWith("keep-alive")) {
 				header = "";
-			} 
+			}
 			dataproc.append(header);
 		}
 		dataproc.append("\r\n");
 		LOG.debug("Received GET request at the end of the tunnel:\n" + data);
 
-		sendResponse(urlEndpoint, resp, dataproc.toString());
+		return getResponse(urlEndpoint, resp, dataproc.toString());
 	}
 
-	private void sendResponse(URL urlEndpoint, NMResponse resp, String dataproc) {
+	/*
+	 * Creates a socket connection to local axis service located at urlEndpoint. Returns 
+	 * response from this call.
+	 * Can be a call to a Web Service or just to an WSDL.
+	 */
+	private NMResponse getResponse(URL urlEndpoint, NMResponse resp, String dataproc) {
 		try {
-			Socket clientSocket = new Socket(urlEndpoint.getHost(),
-					urlEndpoint.getPort());
+			// Create Socket to local axis service
+			Socket clientSocket = new Socket(urlEndpoint.getHost(), urlEndpoint
+					.getPort());
 
 			flushMessage(dataproc, clientSocket);
 			String response = parseResponse(resp, clientSocket);
@@ -218,18 +234,22 @@ public class BackboneSOAPImpl implements Backbone {
 			LOG.debug("Response:\n" + response);
 			resp.setStatus(NMResponse.STATUS_SUCCESS);
 			resp.setMessage(response);
+			return resp;
+			
 		} catch (UnknownHostException e) {
 			String msg = "Error delivering the data to destination:\n"
 					+ e.getMessage();
 			LOG.debug(msg);
 			resp.setStatus(NMResponse.STATUS_ERROR);
 			resp.setMessage(generateSoapResponse(msg));
+			return resp;
 		} catch (IOException e) {
 			String msg = "Error delivering the data to destination:\n"
 					+ e.getMessage();
 			LOG.debug(msg);
 			resp.setStatus(NMResponse.STATUS_ERROR);
 			resp.setMessage(generateSoapResponse(msg));
+			return resp;
 		}
 	}
 
@@ -350,8 +370,9 @@ public class BackboneSOAPImpl implements Backbone {
 
 	@Override
 	public void applyConfigurations(Hashtable updates) {
-		//at this point there is nothing that is saved in the configurations that needs to be updated when they change
-		
+		// at this point there is nothing that is saved in the configurations
+		// that needs to be updated when they change
+
 	}
 
 	@Override
@@ -364,9 +385,8 @@ public class BackboneSOAPImpl implements Backbone {
 			this.hidUrlMap.put(hid, url);
 			return true;
 		} catch (MalformedURLException e) {
-			LOG.debug(
-					"Unable to add endpoint " + endpoint + " for HID "
-							+ hid.toString(), e);
+			LOG.debug("Unable to add endpoint " + endpoint + " for HID "
+					+ hid.toString(), e);
 		}
 		return false;
 	}
@@ -380,7 +400,7 @@ public class BackboneSOAPImpl implements Backbone {
 	public String getName() {
 		return BackboneSOAPImpl.class.getName();
 	}
-	
+
 	@Override
 	/**
 	 * returns security types available by using this backbone implementation. 
@@ -399,29 +419,26 @@ public class BackboneSOAPImpl implements Backbone {
 				oneProperty = SecurityProperty.valueOf(s);
 				answer.add(oneProperty);
 			} catch (Exception e) {
-				LOG.error("Security property value from configuration is not recognized: "
+				LOG
+						.error("Security property value from configuration is not recognized: "
 								+ s + ": " + e);
 			}
 		}
 		return answer;
 	}
 
-	
-	
-	
-	
 	@Override
 	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID) {
-		
-		URL endpoint = hidUrlMap.get(senderHID);
-	
-		if(endpoint!=null){			
-			hidUrlMap.put(remoteHID, endpoint);
-		}else{			
-			LOG.error("Network Manager endpoint of HID " + senderHID + " cannot be found");
-		}
-		
-	}
 
+		URL endpoint = hidUrlMap.get(senderHID);
+
+		if (endpoint != null) {
+			hidUrlMap.put(remoteHID, endpoint);
+		} else {
+			LOG.error("Network Manager endpoint of HID " + senderHID
+					+ " cannot be found");
+		}
+
+	}
 
 }
