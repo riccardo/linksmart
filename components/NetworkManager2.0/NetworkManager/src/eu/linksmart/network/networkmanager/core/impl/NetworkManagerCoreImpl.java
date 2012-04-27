@@ -90,7 +90,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 				this.myDescription) };
 		
 		//Create a local HID with SOAP Backbone for NetworkManager
-		// TODO Make the Backbone a constant or enum somewhere.
+		// TODO Make the Backbone a constant or enum somewhere. find another way to tell the BackboneRouter that my local network manager's HID has BackboneSOAPImpl. 
 		try {
 			this.myHID = createHID(attributes, NETWORK_MGR_ENDPOINT,  "eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl");
 		} catch (RemoteException e) {
@@ -227,8 +227,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore,
 			 * check if message is not intended for host HID, if yes and it has
 			 * not been processed drop it
 			 */
-			if (msg.getReceiverHID() == null
-					|| msg.getReceiverHID().equals(this.myHID)) {
+			if (msg.getReceiverHID() == null){
+//					|| msg.getReceiverHID().equals(this.myHID)) {
 				LOG.warn("Received a message which has not been processed");
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);

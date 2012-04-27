@@ -141,7 +141,7 @@ public class ConnectionManager {
 		//if there was no connection that means that the sender is the client and the receiver is the server
 		//check if an active connection or a dummy connectin is needed
 		Connection conn = null;
-		if(allRequirements.contains(SecurityProperty.NoEncoding)) {
+		if(true || allRequirements.contains(SecurityProperty.NoEncoding)) {
 			conn = new NOPConnection(senderHID, receiverHID);
 		} else {
 			conn = new Connection(senderHID, receiverHID);
