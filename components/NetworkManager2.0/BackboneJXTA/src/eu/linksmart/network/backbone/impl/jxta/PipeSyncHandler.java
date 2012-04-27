@@ -336,7 +336,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		NMResponse res = pipeSender.sendDataOverPipe(s, d, data, pID);
 
 		h.remove(i);
-		logger.info("Closing " + i + " the size is " + h.size() + " Time: "
+		logger.debug("Closing " + i + " the size is " + h.size() + " Time: "
 				+ (System.currentTimeMillis() - time));
 		return res;
 	}
