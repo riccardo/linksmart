@@ -35,8 +35,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
 			.getSimpleName();
-	protected final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
-	protected final static String IDMANAGER_NMADVERTISMENT_TOPIC = "NMAdvertisement";
 
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
@@ -290,7 +288,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		BroadcastMessage updateMsg = null;
 		try {
 			updateMsg = new BroadcastMessage(
-					IDMANAGER_UPDATE_HID_LIST_TOPIC, networkManagerCore.getHID(),
+					Message.IDMANAGER_UPDATE_HID_LIST_TOPIC, networkManagerCore.getHID(),
 					update.getBytes());
 		} catch (RemoteException e) {
 			// local invocation
@@ -300,7 +298,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	@Override
 	public Message processMessage(Message msg) {
-		if (msg.getTopic().contentEquals(IDMANAGER_UPDATE_HID_LIST_TOPIC)) {
+		if (msg.getTopic().contentEquals(Message.IDMANAGER_UPDATE_HID_LIST_TOPIC)) {
 			try {
 				if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
 					// this is not an echo of our own broadcast
@@ -332,7 +330,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				// local invocation
 			}
 			return null; // the complete message has been processed
-		} else if (msg.getTopic().contentEquals(IDMANAGER_NMADVERTISMENT_TOPIC)){
+		} else if (msg.getTopic().contentEquals(Message.IDMANAGER_NMADVERTISMENT_TOPIC)){
 			try {
 				if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
 					//check if we already know this network manager
@@ -502,7 +500,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 					try {
 						m = new BroadcastMessage(
-								IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
+								Message.IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
 									.getHID(), localHIDbytes);
 					} catch (RemoteException e) {
 						// local invocation
@@ -534,9 +532,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		//subscribe to messages sent by other identity managers
 		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_NMADVERTISMENT_TOPIC, this);
+				Message.IDMANAGER_NMADVERTISMENT_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
+				Message.IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
 	}
 
 	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
@@ -546,9 +544,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		
 		//unsubscribe to messages sent by other identity managers
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
-				IDMANAGER_NMADVERTISMENT_TOPIC, this);
+				Message.IDMANAGER_NMADVERTISMENT_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
-				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
+				Message.IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
 	}
 
 	public String getIdentifier() {
