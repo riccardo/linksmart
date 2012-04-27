@@ -105,6 +105,13 @@ public class ConnectionManager {
 				return c;
 			}
 		}
+		
+		if(receiverHID.equals(senderHID)){
+			//add nopconnection to list as this is a reflection message
+			Connection conn = new NOPConnection(senderHID, receiverHID);
+			connections.add(conn);
+			timeouts.put(conn, cal.getTime());
+		}
 
 		//there was no connection found so create new connection
 		//check if there are policies for one of the HIDs
