@@ -173,7 +173,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	public NMResponse broadcastData(HID senderHid, byte[] data) {
 		boolean success = false;
 		for (Backbone bb : availableBackbones.values()) {
-			logger.debug("BBRouter broadcastData over Backbone: "
+			logger.debug("BBRouter broadcastData (from " + senderHid + ") over Backbone: "
 					+ bb.getClass().getName());
 			NMResponse response = bb.broadcastData(senderHid, data);
 			if (response != null && response.getStatus() == NMResponse.STATUS_SUCCESS) {
