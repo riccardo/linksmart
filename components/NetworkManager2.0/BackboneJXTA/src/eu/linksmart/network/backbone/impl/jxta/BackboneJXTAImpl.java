@@ -899,4 +899,17 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	}
 
+	public PeerID getPeerID(HID hid) {
+		String jxtaAddress = listOfRemoteEndpoints.get(hid);
+		URI jxtaURI;
+		PeerID peerID = null;
+		try {
+			jxtaURI = new URI(jxtaAddress);
+			peerID = (PeerID) IDFactory.fromURI(jxtaURI);
+		} catch (URISyntaxException e) {
+			logger.warn("Wrong syntax in URI " + jxtaAddress, e);
+		}
+		return peerID;
+	}
+
 }
