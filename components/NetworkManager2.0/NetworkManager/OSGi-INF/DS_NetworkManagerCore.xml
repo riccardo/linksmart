@@ -9,4 +9,5 @@
  <reference bind="bindCommunicationSecurityManager" cardinality="0..n" interface="eu.linksmart.security.communication.CommunicationSecurityManager" name="CommunicationSecurityManager" policy="dynamic" unbind="unbindCommunicationSecurityManager"/>
  <reference bind="bindBackboneRouter" cardinality="1..1" interface="eu.linksmart.network.routing.BackboneRouter" name="BackboneRouter" policy="dynamic" unbind="unbindBackboneRouter"/>
  <reference bind="bindIdentityManager" cardinality="1..1" interface="eu.linksmart.network.identity.IdentityManager" name="IdentityManager" policy="dynamic" unbind="unbindIdentityManager"/>
+ <reference cardinality="1..1" interface="eu.linksmart.network.backbone.Backbone" name="Backbone" policy="static"/>
 </scr:component>
