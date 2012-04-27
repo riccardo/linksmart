@@ -103,7 +103,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private static final String MESSAGE_ELEMENT_NAME_SOURCE = "Source";
 	private static final String MESSAGE_ELEMENT_NAME_DESTINATION = "Dest";
 	private static final String MESSAGE_ELEMENT_NAME_TYPE = "Type";
-	private static final String MESSAGE_ELEMENT_TYPE_REQUEST = "REQUEST2";	
+	private static final String MESSAGE_ELEMENT_TYPE_REQUEST = "REQUEST2";
+	private static final String MESSAGE_ELEMENT_TYPE_RESPONSE = "RESPONSE2";	
 	
 	private PipeService pipeService;
 	private PipeAdvertisement pipeAdv;
@@ -555,9 +556,9 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 * @return the NMResponse
 	 * @throws java.rmi.RemoteException
 	 */
-	private NMResponse receiveData(byte[] senderHID, byte[] receiverHID,
+	private NMResponse receiveData(HID senderHID, HID receiverHID,
 			byte[] data) throws java.rmi.RemoteException {
-		return bbjxta.receiveData(new HID(senderHID), new HID(receiverHID),
+		return bbjxta.receiveData(senderHID, receiverHID,
 				data);
 	}
 
@@ -608,17 +609,125 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			 * sendMessageResponse(sessionID,source, dest, data)
 			 */
 			logger.info("PipeSyncHandler - Receiving message.");
+			NMResponse r = new NMResponse();
 
+			HID sourceHID = new HID(source.getBytes());
+			HID destHID = new HID(dest.getBytes());
+			
 			try {
-				receiveData(source.getBytes(), dest.getBytes(),
-						data.getBytes());
+				r = receiveData(sourceHID, 
+						destHID, data.getBytes());
 			} catch (RemoteException e) {
 				logger.error("Error calling receiveData " + e.getMessage());
 			}
+
+			logger.debug("Received data : " + data.toString() + " from HID="
+					+ sourceHID.toString() + " to HID=" + destHID.toString());
+			// reverse source and destination because we (dest) send response back to source
+			sendMessageResponse(destHID, sourceHID, r.getMessage().getBytes(), i);
+
+		}
+		
+		/**
+		 * Sends a response message
+		 * @param sessionID the session ID
+		 * @param source the source HID
+		 * @param destination the destination HID
+		 * @param data the data
+		 * @param i the index
+		 * @return boolean depending on the result
+		 */
+		private boolean sendMessageResponse(/* String sessionID, */ HID source, HID destination, 
+				byte[] data, int i) {
+			return false;
+
+//			HID dest = new HID(destination);
+//			HID source = new HID(sourceHID);
+//			PeerID pID = null;
+//			int numRetries = 0;
+//			OutputPipe outPipe = null;
+//
+//			while (numRetries < MAXNUMRETRIES) {
+//				try {
+//					pID = hidMgr.getIDfromHID(destination);
+//					if (pID != null) {
+//						if (pipeTable.containsKey(pID)) outPipe = 
+//							pipeTable.get(pID).getOutputPipe();
+//						break;
+//					}
+//					numRetries++;
+//				} catch (NullPointerException e) {
+//					logger.debug("Could not find destination HID. Backing off");
+//					numRetries++;
+//				}
+//				try {
+//					Thread.sleep(100);
+//				} catch (InterruptedException e) {
+//					logger.error(e.getMessage(), e);
+//				}
+//			}
+//
+//			if ((outPipe == null)) {
+//				if ((pID != null)) {
+//					outPipe = createOutputPipe(pID);
+//					logger.debug("The pipe to " + pID.toString()
+//							+ " was closed or never created before");
+//					Message message = createResponseMessage(source, dest, data, i);
+//
+//					try {
+//						outPipe.send(message);
+//					} catch (IOException e) {
+//						logger.error("Error sending data to HID = " + dest.toString());
+//					}
+//
+//					return true;
+//				}
+//				else {
+//					logger.error("Resp. Could not find destination HID "
+//							+ dest.toString() + ". Please try later...");
+//					return false;
+//				}
+//			}
+//			else {
+//				Message message = createResponseMessage(sessionID, source, dest, data, i);
+//
+//				try {
+//					outPipe.send(message);
+//				} catch (IOException e) {
+//					logger.error("Error sending data to HID = " + dest.toString());
+//				}
+//
+//				pipeTable.get(pID).setTime(System.currentTimeMillis());
+//				return true;	
+//			}
 		}
 
 	}
 
+	/**
+	 * Creates a response message
+	 * @param sessionID the session ID
+	 * @param source the source HID
+	 * @param dest the destination HID
+	 * @param data the data
+	 * @param i the index
+	 * @return the response message
+	 */
+	private Message createResponseMessage(HID source, HID dest, 
+			byte[] data, String i) {
+
+		Message msg = new Message();
+				msg.addMessageElement(new ByteArrayMessageElement(
+				MESSAGE_ELEMENT_NAME_DATA, null, data, null));
+		msg.addMessageElement(new ByteArrayMessageElement(
+				MESSAGE_ELEMENT_NAME_DESTINATION, null, dest.getBytes(), null));
+		msg.addMessageElement(new ByteArrayMessageElement(
+				MESSAGE_ELEMENT_NAME_SOURCE, null, source.getBytes(), null));
+		msg.addMessageElement(new StringMessageElement(
+				MESSAGE_ELEMENT_NAME_TYPE, MESSAGE_ELEMENT_TYPE_RESPONSE, null));
+		return msg;
+	}
+	
 	/**
 	 * PipeTableUpdater class
 	 */
