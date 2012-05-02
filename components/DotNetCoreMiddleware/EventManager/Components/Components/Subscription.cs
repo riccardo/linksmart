@@ -83,6 +83,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Components
 {
@@ -229,6 +230,25 @@ namespace Components
             get { return dateTime; }
             set { dateTime = value; }
         }
+
+        /// <summary>
+        /// Determines whether the specified published topic is a match to the subscription.
+        /// This match uses RegEx.IsMatch(), with the start and end of sting anchors added: 
+        /// "^"+subscriptionTopic+"$". A published event "topic12" matches subscriptions to:
+        /// "topic12", "topic1.*", but not subscriptions to "topic123" or "opic12".
+        /// </summary>
+        /// <param name="publishedTopic">The published topic.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified published topic is match; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsMatch(string publishedTopic)
+        {
+            bool isMatch = false;
+            Regex regex = new Regex("^"+this.topic + "$", RegexOptions.None);
+            isMatch = regex.IsMatch(publishedTopic);
+            return isMatch;
+        }
+
         /// <summary>
         /// Method to create an object. Can be used as an element in a list
         /// </summary>

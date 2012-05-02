@@ -111,7 +111,8 @@ namespace EventManager
         public readonly object m_Lock = new object();
 
         /// <summary>
-        /// Start subscribing to a topic from an endpoint
+        /// Start subscribing to a topic from an endpoint. The topic is a regular expression that is 
+        /// matched to published events using RegEx.IsMatch(topic+"$",RegexOptions.None).
         /// </summary>
         public bool subscribe(string topic, string endpoint, int priority)
         {
@@ -133,7 +134,8 @@ namespace EventManager
         }
 
         /// <summary>
-        /// Unsubscribe to a topic from an endpoint
+        /// Start subscribing to a topic from an HID. The topic is a regular expression that is 
+        /// matched to published events using RegEx.IsMatch(topic+"$",RegexOptions.None).
         /// </summary>
         public bool unsubscribe(string topic, string endpoint)
         {
@@ -258,12 +260,14 @@ namespace EventManager
         }
 
         /// <summary>
-        /// Send the published event to all subscribers to the specified topic
+        /// Send the published event to all subscribers to the specified topic.
+        /// The matching of published topic to subscriptions is done with Subscription.IsMatch(string topic),
+        /// which uses RexEx to match the subscription topic to published events. 
         /// </summary>
         /// <param name="request">Request that contains topic and values regarding the event</param>
         public publishResponse publish(publishRequest request)
         {   //Make a copy of the list in order to avoid it being changed during the forea.ch loop. As long as copy is used, foreach can stay here. Otherwise -> Notification.cs
-            foreach (Components.Subscription subscription in Program.subscriptionList.Where(f => f.Topic.Equals(request.topic) == true).ToList())
+            foreach (Components.Subscription subscription in Program.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList())
             {
                 subscription.NumberOfRetries = 0;
                 if (subscription.DateTime != null) { }

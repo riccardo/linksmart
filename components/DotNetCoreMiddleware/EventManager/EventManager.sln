@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventStorage", "EventStorag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Components", "Components\Components\Components.csproj", "{2D6C8F0E-B2FB-4327-B157-98FC2A17B9DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventManagerTests", "EventManagerTests\EventManagerTests.csproj", "{D8195699-CF88-4C85-A9E3-B243CAB458CF}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -63,6 +65,16 @@ Global
 		{2D6C8F0E-B2FB-4327-B157-98FC2A17B9DA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2D6C8F0E-B2FB-4327-B157-98FC2A17B9DA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2D6C8F0E-B2FB-4327-B157-98FC2A17B9DA}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D8195699-CF88-4C85-A9E3-B243CAB458CF}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
