@@ -9,6 +9,7 @@ import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.identity.impl.IdentityManagerImpl;
 import eu.linksmart.security.cryptomanager.CryptoManager;
+import eu.linksmart.utils.Part;
 import eu.linksmart.utils.PartConverter;
 
 /**
@@ -36,7 +37,8 @@ public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
 	 * in the CryptoManager and if a certificate is found it is used.
 	 * @return null if there was error creating the HID TODO add appropriate exceptions
 	 */
-	public HID createHIDForAttributes(Properties attributes) {
+	public HID createHIDForAttributes(Part[] parts) {
+		Properties attributes = PartConverter.toProperties(parts);
 		HID hid = createUniqueHID();
 		try{
 			//create XML to be placed into certificate of CryptoHID
