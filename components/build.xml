@@ -59,10 +59,16 @@
 		<ant dir="LinkSmartWSProvider" target="make" />
 		<ant dir="LinkSmartMiddlewareClients" target="make" />
 		<ant dir="LinkSmartManagerConfigurator" target="make" />
+		<ant dir="LinkSmartRemoteServiceStore" target="make" />
 		<ant dir="TrustManager" target="make" />
 		<ant dir="NetworkManager" target="make" />
 		<ant dir="CryptoManager" target="make" />
 		<ant dir="OntologyManager" target="make" />
+	</target>
+	
+	<target name="make-supernode" depends="make-dirs" description="Build components">
+		<ant dir="Log4j" target="make" />
+		<ant dir="NetworkManagerSupernode" target="make" />
 	</target>
 	
 	<!--
