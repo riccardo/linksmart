@@ -15,7 +15,7 @@
 	<!-- properties -->
 
 	<property name="moduleName" value="Log4j" />
-	<property name="revision" value="1.0.0" />
+	<property name="revision" value="1.2.0" />
 	<property name="rootBuildDir" value="${basedir}/../build" />
 	<property name="rootDistributionDir" value="${basedir}/../distribution" />
 	<property name="src.dir" value="${basedir}/src" />

@@ -85,7 +85,7 @@ Import-Package: eu.linksmart.aom,
  org.osgi.service.component
 Service-Component: OSGI-INF/component.xml
 Export-Package: eu.linksmart.aom.client,
- eu.linksmart.clients.impl,
+ eu.linksmart.clients.impl;version="1.2.0",
  eu.linksmart.dac.client,
  eu.linksmart.eventmanager.client;version="1.2.0",
  eu.linksmart.network.client,

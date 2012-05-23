@@ -8,7 +8,7 @@
 		<artifact name="CryptoManager" type="jar" />
 	</publications>
 	<dependencies>
-		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
+		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.16" />
 		<dependency org="org.apache.servicemix" name="org.apache.servicemix.bundles.xmlsec" rev="1.4.4_2" />
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.lang" rev="2.4.0" />
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" transitive="false"/>

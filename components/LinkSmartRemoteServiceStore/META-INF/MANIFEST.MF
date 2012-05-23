@@ -11,4 +11,4 @@ Import-Package: eu.linksmart.clients,
  org.osgi.framework;version="1.5.0",
  org.osgi.service.component;version="1.1.0"
 Service-Component: OSGI-INF/component.xml
-Export-Package: eu.linksmart.remote.service.store
+Export-Package: eu.linksmart.remote.service.store;version="1.2.0"
