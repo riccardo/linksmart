@@ -7,8 +7,8 @@
 	<property name="SOAP.service.name" type="String" value="NetworkManagerApplication"/>
 	<property name="service.remote.registration" type="String" value="true"/>
  <reference bind="cryptoBind" cardinality="1..1" interface="eu.linksmart.security.cryptomanager.CryptoManager" name="CryptoManager" policy="static" unbind="cryptoUnbind"/>
- <reference bind="bindTrustManager" cardinality="0..1" interface="eu.linksmart.security.trustmanager.TrustManager" name="TrustManager" policy="dynamic" unbind="unbindTrustManager"/>
- <reference bind="bindInsideSecurity" cardinality="0..1" interface="eu.linksmart.security.communication.inside.InsideHydra" name="InsideHydra" policy="dynamic" unbind="unbindInsideSecurity"/>
+ <reference bind="bindTrustManager" cardinality="1..1" interface="eu.linksmart.security.trustmanager.TrustManager" name="TrustManager" policy="static" unbind="unbindTrustManager"/>
+ <reference bind="bindInsideSecurity" cardinality="1..1" interface="eu.linksmart.security.communication.inside.InsideHydra" name="InsideHydra" policy="static" unbind="unbindInsideSecurity"/>
  <reference cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static"/>
  <reference cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="static"/>
 </scr:component>
