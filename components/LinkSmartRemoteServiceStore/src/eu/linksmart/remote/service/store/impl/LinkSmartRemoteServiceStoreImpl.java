@@ -42,7 +42,7 @@ public class LinkSmartRemoteServiceStoreImpl implements
 
 			while (notFound && counter < 2) {
 
-				String serviceHID = getServiceHID(myHID);
+				String serviceHID = getServiceHID(serviceDescription);
 				LOG.debug("Service HID: " + serviceHID);
 
 				if (StringUtils.isNotEmpty(serviceHID)) {
@@ -86,14 +86,13 @@ public class LinkSmartRemoteServiceStoreImpl implements
 			@SuppressWarnings("rawtypes")
 			Vector results = null;
 
-			String query = "((PID==" + serviceDescription + "))";
 			try {
 				results = networkManager.getHIDsbyDescription(description);
 				LOG.debug("Number of available " + serviceDescription
 						+ " HIDs: " + results.size());
 			} catch (IOException e) {
 				LOG.error("Cannot find HID for " + serviceDescription
-						+ " for query: " + query, e);
+						+ " for query: " + description, e);
 			}
 			if (results == null || (results != null && results.size() == 0)) {
 				return null;
