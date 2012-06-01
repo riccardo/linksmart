@@ -54,11 +54,11 @@ import eu.linksmart.network.routing.RouteManagerApplication;
  * SOAP Tunnel servlet
  */
 public class SOAPTunnelServlet extends HttpServlet {
-	
+
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SOAPTunnelServlet.class.getName());
 	private NetworkManagerApplication nm;
-	
+
 	/**
 	 * Constructor with parameters
 	 * 
@@ -67,7 +67,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 	public SOAPTunnelServlet(NetworkManagerApplication nm) {
 		this.nm = nm;
 	}
-	
+
 	/**
 	 * Performs the HTTP GET operation
 	 * 
@@ -76,35 +76,64 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 */
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
-			throws IOException {
-		
+	throws IOException {
+
 		String path = request.getPathInfo();
 		String parts[] = path.split("/",5);
 		if (parts.length != 4) {
 			return;
 		}
-		
+
 		String senderHID = parts[1];
 		String receiverHID = parts[2];
 		String url = parts[3].equals("wsdl")?"?"+parts[3]:parts[3];
 		String req = request.getMethod() + " /" + url + " " + request.getProtocol() + "\r\n";
 		Enumeration headerNames = request.getHeaderNames();
-		
+
 		while(headerNames.hasMoreElements()) {
-			 String header = (String) headerNames.nextElement();
-			 String value = request.getHeader(header);
-			 req = req.concat(header + ": " + value + "\r\n");
+			String header = (String) headerNames.nextElement();
+			String value = request.getHeader(header);
+			req = req.concat(header + ": " + value + "\r\n");
 		}
-		
+
 		NMResponse r = nm.sendData("0", senderHID, receiverHID, req);
 		String sResp = r.getData();
-		
+
 		if (r.getSessionID().equals(RouteManagerApplication.ACCESS_DENIED_SESSIONID))
 			throw new AccessException("Access Denied by Security Policies");
-		
-		response.setContentLength(sResp.getBytes().length);
-		response.setContentType("text/xml");
-		response.getWriter().write(sResp);
+
+		String body = new String();
+		//check response status and if error response BAD_GATEWAY else parse response for client
+		if (!sResp.startsWith("HTTP/1.1 200 OK")) {
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			//set whole response data as body
+			body = sResp;
+		} else {		
+			//take headers from data and add them to response
+			String[] headers = sResp.split("\r\n");
+			//use it to get index of data element
+			int i = 0;
+			//go through headers and put them to response until empty line is reached
+			for (String header : headers) {	
+				if(header.contentEquals("")) {
+					break;
+				}
+				if(!header.toLowerCase().startsWith("http")) {
+					String[] headerParts = header.split(":");
+					if(headerParts.length == 2) {
+						response.setHeader(headerParts[0], headerParts[1]);
+					}
+				}
+				i++;
+			}
+			//concat remaining elements of 'headers' array (the real data) into response body
+			for(i++;i < headers.length;i++) {
+				body = body.concat(headers[i]);
+			}
+		}
+		//write body data
+		response.setContentLength(body.getBytes().length);
+		response.getWriter().write(body);
 	}
 
 	/**
@@ -114,13 +143,13 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 * @param response HttpServletResponse that encapsulates the response from the servlet
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response) 
-			throws IOException {
+	throws IOException {
 
 		String header;
 		String value;
 		String theSOAPAction = "";
 		String senderHID, receiverHID, sessionID;
-		
+
 		String path = request.getPathInfo();
 		StringTokenizer token = new StringTokenizer(path, "/");
 		String SOAPRequest = "";
@@ -128,7 +157,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 			senderHID = token.nextToken();
 			receiverHID = token.nextToken();
 			sessionID = token.nextToken();
-			
+
 			Enumeration headerNames = request.getHeaderNames();
 			while(headerNames.hasMoreElements()) {
 				header = (String) headerNames.nextElement();
@@ -139,10 +168,10 @@ public class SOAPTunnelServlet extends HttpServlet {
 				}
 			}
 			SOAPRequest = SOAPRequest + "\r\n";
-		   
+
 			String sResp = "";
 			boolean accessDenied = false;
-			
+
 			if((request.getContentLength() > 0)) {
 				try {
 					BufferedReader reader = request.getReader();
@@ -151,22 +180,22 @@ public class SOAPTunnelServlet extends HttpServlet {
 					logger.debug("Sending soap request through tunnel: " + SOAPRequest);
 					NMResponse r = nm.sendData(sessionID, senderHID, receiverHID, SOAPRequest);
 					sResp = r.getData();
-					
+
 					if (r.getSessionID().equals(RouteManagerApplication.ACCESS_DENIED_SESSIONID))
 						accessDenied = true;
-					
+
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
-			
+
 			/** 
 			 * If access has been denied, we throw an AccessException to
 			 * report to the caller correctly
 			 */
 			if (accessDenied)
 				throw new AccessException("Access Denied by Security Policies");
-			
+
 			response.setContentLength(sResp.getBytes().length);
 			response.setContentType("text/xml");
 			response.getWriter().write(sResp);
