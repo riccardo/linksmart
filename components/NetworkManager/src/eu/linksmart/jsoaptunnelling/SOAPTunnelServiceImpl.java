@@ -57,7 +57,7 @@ import eu.linksmart.network.NMResponse;
 public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 
 	private static Logger logger = Logger.getLogger(SOAPTunnelServiceImpl.class.getName());
-	
+
 	private static final int MAXNUMRETRIES = 15;
 	private static final long SLEEPTIME = 20;
 	private static final int BUFFSIZE = 16384;
@@ -73,14 +73,14 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 		logger.debug("SOAPTunnel received this message " + data);
 		NMResponse resp = new NMResponse();
 		resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
-			+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-			+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-			+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-			+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-			+ "<SendDataResult>" + "Error in SOAP tunneling receiveData"
-			+ "</SendDataResult></SendDataResponse></soap:Body></soap:Envelope>");
+				+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+				+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+				+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+				+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+				+ "<SendDataResult>" + "Error in SOAP tunneling receiveData"
+				+ "</SendDataResult></SendDataResponse></soap:Body></soap:Envelope>");
 		resp.setSessionID("");
-		
+
 		if (data.startsWith("GET")) {
 			// It is a GET request
 			try {
@@ -88,31 +88,48 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 				StringTokenizer token = new StringTokenizer(data, "\r\n");
 				String header = "", aux = "";
 				String dataproc = "";
-				String url = "";
 				while (token.hasMoreElements()) {
 					aux = token.nextToken();
-					if (aux.toLowerCase().contains("get")) {
-							String parts[] = aux.toLowerCase().split(" ");
-						urlEndpoint = new URL(urlEndpoint.toString() + parts[1].replace("/", ""));
-						header = aux.replace(parts[1], urlEndpoint.getFile()) + "\r\n";
-					}else if (aux.toLowerCase().contains("host")) {
+					//remove network manager host to real host
+					if (aux.toLowerCase().contains("host")) {
 						header = "Host: " + urlEndpoint.getHost() + ":"
-							+ urlEndpoint.getPort() + "\r\n";
-					}					
+						+ urlEndpoint.getPort() + "\r\n";
+					}	
+					//do not leave connections open
 					else if (aux.toLowerCase().startsWith("connection")) {
 						header = "Connection: close\r\n";
 					}
 					else if (aux.toLowerCase().startsWith("keep-alive")) {
 						header = "";
-					}						
-					else {
-						header =  "\r\n";
+					}		
+					//remove gzip encoding
+					else if (aux.startsWith("Accept-Encoding")
+							&& aux.contains("gzip")) {
+						String encodingsStr = aux.substring(15);
+						String[] encodings = encodingsStr.split(",");
+						String newEncodingStr = new String("Accept-Encoding: ");
+
+						//if the only encoding is not gzip than recreate encodings header but remove gzip
+						if(encodings.length != 1) {
+							int i = 0;
+							for (String encoding : encodings) {
+								if(!encoding.contains("gzip")) {
+									//last encoding does not need comma at the end
+									newEncodingStr = newEncodingStr.concat(encoding.trim()
+											+ ((i+1 == encodings.length)? "" : ","));
+								}
+								i++;
+							}
+							header = newEncodingStr + "\r\n";
+						}
 					}
-					
+					else {
+						header = aux + "\r\n";
+					}
 					dataproc = dataproc + header;
 				}
 				dataproc = dataproc + "\r\n";
-				
+
 				logger.debug("Received GET request at the end of the tunnel:\n" + data);   
 				Socket clientSocket = new Socket(urlEndpoint.getHost(), urlEndpoint.getPort());
 				OutputStream cos = clientSocket.getOutputStream();
@@ -121,7 +138,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 				InputStream cis = clientSocket.getInputStream();
 				String response = "";
 				byte[] buffer = new byte[BUFFSIZE];
-				
+
 				int bytesRead = 0;
 				int total = 0;
 				int numRetries = 0;
@@ -129,34 +146,34 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 					if (cis.available() == 0) {
 						if (numRetries >= MAXNUMRETRIES) {
 							logger.debug("Error delivering the data to destination:\n"
-								+ "Data not available on service. Max Number of "
-								+ "retries reached: " + MAXNUMRETRIES); 
+									+ "Data not available on service. Max Number of "
+									+ "retries reached: " + MAXNUMRETRIES); 
 							resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-								+ "<soap:Envelope "
-								+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-								+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-								+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-								+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-								+ "<SendDataResult>" + "Data not available on service. Max Number "
-								+ "of retries reached: " + MAXNUMRETRIES + "</SendDataResult>"
-								+ "</SendDataResponse></soap:Body></soap:Envelope>");
+									+ "<soap:Envelope "
+									+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+									+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+									+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+									+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+									+ "<SendDataResult>" + "Data not available on service. Max Number "
+									+ "of retries reached: " + MAXNUMRETRIES + "</SendDataResult>"
+									+ "</SendDataResponse></soap:Body></soap:Envelope>");
 							break;
 						}
-						
+
 						try {
 							Thread.currentThread().sleep(SLEEPTIME, 0);
 						} catch (InterruptedException e) {
 							logger.debug("Error delivering the data to destination:\n" 
-								+ e.getMessage()); 
-			  				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-			  					+ "<soap:Envelope "
-			  					+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-			  					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-			  					+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-			  					+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-			  					+ "<SendDataResult>" + e.getMessage()
-			  					+ "</SendDataResult></SendDataResponse>"
-			  					+ "</soap:Body></soap:Envelope>");
+									+ e.getMessage()); 
+							resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+									+ "<soap:Envelope "
+									+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+									+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+									+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+									+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+									+ "<SendDataResult>" + e.getMessage()
+									+ "</SendDataResult></SendDataResponse>"
+									+ "</soap:Body></soap:Envelope>");
 						}
 						++numRetries;
 					}
@@ -167,12 +184,9 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 						total += bytesRead;
 					}
 				} while (bytesRead != -1);
-				
-				String[] s = response.split("\r\n\r\n");
-				if (s.length > 0) {
-					response = s[1];	
-				}
-				else {
+
+
+				if (response.length() == 0) {
 					// In case the SOAP response from the service is empty.
 					response = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
 						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
@@ -182,41 +196,41 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 						+ "<SendDataResult>" + "No SOAP response from the service"
 						+ "</SendDataResult></SendDataResponse></soap:Body></soap:Envelope>";
 				}
-				
+
 				logger.debug("Response:\n" + response);									
 				resp.setData(response);
 				cos.close();
 				cis.close();
 			} catch (MalformedURLException e) {
 				logger.debug("Error delivering the data to destination:\n"
-					+ e.getMessage()); 
+						+ e.getMessage()); 
 				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
-					+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-					+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-					+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-					+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-					+ "</SendDataResponse></soap:Body></soap:Envelope>");
+						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
+						+ "</SendDataResponse></soap:Body></soap:Envelope>");
 			} catch (UnknownHostException e) {
 				logger.debug("Error delivering the data to destination:\n"
-					+ e.getMessage()); 
+						+ e.getMessage()); 
 				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
-					+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-					+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-					+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-					+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-					+"</SendDataResponse></soap:Body></soap:Envelope>");
+						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
+						+"</SendDataResponse></soap:Body></soap:Envelope>");
 			} catch (IOException e) {
 				logger.debug("Error delivering the data to destination:\n" 
-					+ e.getMessage()); 
+						+ e.getMessage()); 
 				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
-					+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-					+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-					+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-					+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-					+ "</SendDataResponse></soap:Body></soap:Envelope>");
+						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
+						+ "</SendDataResponse></soap:Body></soap:Envelope>");
 			}
 		}
 		else { 
@@ -226,17 +240,17 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 				String post;
 				if (urlEndpoint.getQuery() != null) { 
 					post = "POST " + urlEndpoint.getPath() + "?" 
-						+ urlEndpoint.getQuery() + " HTTP/1.0\r\n"; 
-					}
+					+ urlEndpoint.getQuery() + " HTTP/1.0\r\n"; 
+				}
 				else {
 					post = "POST " + urlEndpoint.getPath() + " HTTP/1.0\r\n";
 				}
-				
+
 				if (data.contains("<ns1:SetAVTransportURI>")) {
 					data = data.replace("<ns1:SetAVTransportURI>", "<ns1:SetAVTransportURI "
-						+ "xmlns:ns1=\"urn:schemas-upnp-org:service:AVTransport:1\">");
+							+ "xmlns:ns1=\"urn:schemas-upnp-org:service:AVTransport:1\">");
 				}
-				
+
 				String[] headers = null;
 				if (data.contains("\r\n\r\n")) {
 					headers = data.split("\r\n\r\n");
@@ -250,10 +264,10 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 				logger.debug("Length of headers: " + headers.length);
 				StringTokenizer token = new StringTokenizer(headers[0], "\r\n");
 				String header = "", aux = "";
-				
+
 				while (token.hasMoreElements()) {
 					aux = token.nextToken();
-					
+
 					if (aux.contains("Content-Length")) {
 						header = "Content-Length: " + headers[1].length() + "\r\n";
 					}
@@ -262,18 +276,18 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 					}						
 					else if (aux.toLowerCase().contains("host")) {
 						header = "Host: " + urlEndpoint.getHost() + ":"
-							+ urlEndpoint.getPort() + "\r\n";
+						+ urlEndpoint.getPort() + "\r\n";
 					}
 					else {
 						header = aux + "\r\n";
 					}
-					
+
 					if ((aux.contains("Connection:")) || (aux.contains("connection:"))) {
 						header = "";
 					}
 					post = post + header;
 				}
-				
+
 				String SOAPMessage = post + "\r\n"+ headers[1];
 				logger.debug("Received SOAP message at the end of the tunnel:\n" + SOAPMessage);   
 				Socket clientSocket = new Socket(urlEndpoint.getHost(), urlEndpoint.getPort());
@@ -282,7 +296,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 				InputStream cis = clientSocket.getInputStream();
 				String response = "";
 				byte[] buffer = new byte[BUFFSIZE];
-				
+
 				int bytesRead = 0;
 				int total = 0;
 				int numRetries = 0;
@@ -290,33 +304,33 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 					if (cis.available() == 0) {
 						if (numRetries >= MAXNUMRETRIES) {
 							logger.debug("Error delivering the data to destination:\n"
-								+ "Data not available on service. Max Number of retries "
-								+ "reached: " + MAXNUMRETRIES); 
+									+ "Data not available on service. Max Number of retries "
+									+ "reached: " + MAXNUMRETRIES); 
 							resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-								+ "<soap:Envelope "
-								+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-								+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-								+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-								+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-								+ "<SendDataResult>" + "Data not available on service. Max Number "
-								+ "of retries reached: " + MAXNUMRETRIES + "</SendDataResult>"
-								+ "</SendDataResponse></soap:Body></soap:Envelope>");
+									+ "<soap:Envelope "
+									+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+									+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+									+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+									+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+									+ "<SendDataResult>" + "Data not available on service. Max Number "
+									+ "of retries reached: " + MAXNUMRETRIES + "</SendDataResult>"
+									+ "</SendDataResponse></soap:Body></soap:Envelope>");
 							break;
 						}
-						
+
 						try {
 							Thread.currentThread().sleep(SLEEPTIME, 0);
 						} catch (InterruptedException e) {
 							logger.debug("Error delivering the data to destination:\n"
-								+ e.getMessage()); 
-			  				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-			  					+ "<soap:Envelope "
-			  					+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-			  					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-			  					+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-			  					+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-			  					+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-			  					+ "</SendDataResponse></soap:Body></soap:Envelope>");
+									+ e.getMessage()); 
+							resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+									+ "<soap:Envelope "
+									+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+									+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+									+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+									+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+									+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
+									+ "</SendDataResponse></soap:Body></soap:Envelope>");
 						}
 						++numRetries;
 					}
@@ -328,7 +342,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 						total += bytesRead;
 					}
 				} while (bytesRead != -1);
-				
+
 				String[] s = response.split("\r\n\r\n");
 				if (s.length > 1) {
 					response = s[1];	
@@ -343,41 +357,41 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 						+ "<SendDataResult>" + "No SOAP response from the service"
 						+ "</SendDataResult></SendDataResponse></soap:Body></soap:Envelope>";
 				}
-				
+
 				logger.debug("Response:\n" + response);									
 				resp.setData(response);
 				cos.close();
 				cis.close();
 			} catch (MalformedURLException e) {
 				logger.debug("Error delivering the data to destination:\n"
-					+ e.getMessage()); 
+						+ e.getMessage()); 
 				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-					+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-					+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-					+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-					+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-					+ "</SendDataResponse></soap:Body></soap:Envelope>");
+						+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
+						+ "</SendDataResponse></soap:Body></soap:Envelope>");
 			} catch (UnknownHostException e) {
 				logger.debug("Error delivering the data to destination:\n"
-					+ e.getMessage()); 
+						+ e.getMessage()); 
 				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-					+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-					+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-					+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-					+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-					+ "</SendDataResponse></soap:Body></soap:Envelope>");
+						+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
+						+ "</SendDataResponse></soap:Body></soap:Envelope>");
 			} catch (IOException e) {
 				logger.debug("Error delivering the data to destination:\n"
-					+ e.getMessage()); 
+						+ e.getMessage()); 
 				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-					+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-					+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-					+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-					+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-					+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-					+ "</SendDataResponse></soap:Body></soap:Envelope>");
+						+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
+						+ "</SendDataResponse></soap:Body></soap:Envelope>");
 			}
 		}
 		return resp;
@@ -391,13 +405,13 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) 
-			throws IOException, InterruptedException {
+	throws IOException, InterruptedException {
 
 		URL urlEndpoint = new URL("http://192.168.1.34:4004/gen-desc.xml");
-		
+
 		String t = "GET /gen-desc.xml HTTP/1.1\r\n"
 			+ "Host: 192.168.1.34:4004\r\n\r\n";
-			
+
 		System.out.println(t.length());
 		Socket clientSocket = new Socket(urlEndpoint.getHost(), urlEndpoint.getPort());
 		OutputStream cos = clientSocket.getOutputStream();
@@ -405,7 +419,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 		cos.flush();
 		InputStream cis = clientSocket.getInputStream();
 		BufferedInputStream bais = new BufferedInputStream(cis);
-		
+
 		String response = "";
 		byte[] buffer = new byte[BUFFSIZE];
 		int bytesRead = 0;
@@ -416,12 +430,12 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 		do {
 			System.out.println("Entro");
 			if (cis.available() == 0) {
-				
+
 				System.err.println("not available " + numRetries);
 				if (numRetries >= MAXNUMRETRIES) {
 					logger.debug("Error delivering the data to destination:\n" 
-						+ "Data not available on service. Max Number of retries "
-						+ "reached: " + MAXNUMRETRIES); 
+							+ "Data not available on service. Max Number of retries "
+							+ "reached: " + MAXNUMRETRIES); 
 					response = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
 						+ "<soap:Envelope "
 						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
@@ -433,18 +447,18 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 						+ "</SendDataResponse></soap:Body></soap:Envelope>";
 					break;
 				}
-				
+
 				try {
 					Thread.currentThread().sleep(SLEEPTIME, 0);
 				} catch (InterruptedException e) {
 					logger.debug("Error delivering the data to destination:\n"
-						+ e.getMessage()); 
+							+ e.getMessage()); 
 				}
 				++numRetries;
 			}
-			
+
 			bytesRead = cis.read(buffer);
-			
+
 			System.err.println("Leo =" + bytesRead);
 			if (bytesRead > 0) {
 				numRetries = 0;
