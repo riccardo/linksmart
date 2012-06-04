@@ -411,7 +411,7 @@ public class BackboneSOAPImpl implements Backbone {
 	public List<SecurityProperty> getSecurityTypesAvailable() {
 		String configuredSecurity = this.configurator
 				.get(BackboneSOAPConfigurator.SECURITY_PARAMETERS);
-		String[] securityTypes = configuredSecurity.split("|");
+		String[] securityTypes = configuredSecurity.split("\\|");
 		SecurityProperty oneProperty;
 		List<SecurityProperty> answer = new ArrayList<SecurityProperty>();
 		for (String s : securityTypes) {

@@ -864,7 +864,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	public List<SecurityProperty> getSecurityTypesAvailable() {
 		String configuredSecurity = this.configurator
 				.get(BackboneJXTAConfigurator.SECURITY_PARAMETERS);
-		String[] securityTypes = configuredSecurity.split("|");
+		String[] securityTypes = configuredSecurity.split("\\|");
 		SecurityProperty oneProperty;
 		List<SecurityProperty> answer = new ArrayList<SecurityProperty>();
 		for (String s : securityTypes) {
