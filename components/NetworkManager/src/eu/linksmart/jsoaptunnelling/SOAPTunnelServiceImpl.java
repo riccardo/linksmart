@@ -81,7 +81,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 				+ "</SendDataResult></SendDataResponse></soap:Body></soap:Envelope>");
 		resp.setSessionID("");
 
-		if (data.startsWith("GET")) {
+		if (data.startsWith("GET") || data.startsWith("DELETE")) {
 			// It is a GET request
 			try {
 				URL urlEndpoint = new URL(endpoint);
@@ -148,15 +148,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 							logger.debug("Error delivering the data to destination:\n"
 									+ "Data not available on service. Max Number of "
 									+ "retries reached: " + MAXNUMRETRIES); 
-							resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-									+ "<soap:Envelope "
-									+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-									+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-									+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-									+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-									+ "<SendDataResult>" + "Data not available on service. Max Number "
-									+ "of retries reached: " + MAXNUMRETRIES + "</SendDataResult>"
-									+ "</SendDataResponse></soap:Body></soap:Envelope>");
+							resp.setData("HTTP/1.1 503 Service Unavailable\r\n");
 							break;
 						}
 
@@ -165,15 +157,6 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 						} catch (InterruptedException e) {
 							logger.debug("Error delivering the data to destination:\n" 
 									+ e.getMessage()); 
-							resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-									+ "<soap:Envelope "
-									+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-									+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-									+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-									+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-									+ "<SendDataResult>" + e.getMessage()
-									+ "</SendDataResult></SendDataResponse>"
-									+ "</soap:Body></soap:Envelope>");
 						}
 						++numRetries;
 					}
@@ -188,7 +171,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 
 				if (response.length() == 0) {
 					// In case the SOAP response from the service is empty.
-					response = "HTTP/1.1 204 No Content\n\n";
+					response = "HTTP/1.1 204 No Content\r\n";
 				}
 
 				logger.debug("Response:\n" + response);									
@@ -198,15 +181,15 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 			} catch (MalformedURLException e) {
 				logger.debug("Error delivering the data to destination:\n"
 						+ e.getMessage()); 
-				resp.setData("HTTP/1.1 400 Bad Request\n\n" + e.getMessage());
+				resp.setData("HTTP/1.1 400 Bad Request\r\n" + e.getMessage());
 			} catch (UnknownHostException e) {
 				logger.debug("Error delivering the data to destination:\n"
 						+ e.getMessage()); 
-				resp.setData("HTTP/1.1 418 I'm a teapot\n\n" + e.getMessage());
+				resp.setData("HTTP/1.1 418 I'm a teapot\r\n" + e.getMessage());
 			} catch (IOException e) {
 				logger.debug("Error delivering the data to destination:\n" 
 						+ e.getMessage()); 
-				resp.setData("HTTP/1.1 500 Internal Server Error\n\n" + e.getMessage());
+				resp.setData("HTTP/1.1 500 Internal Server Error\r\n" + e.getMessage());
 			}
 		}
 		else { 
