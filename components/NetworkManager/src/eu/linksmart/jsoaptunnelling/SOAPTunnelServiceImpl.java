@@ -188,13 +188,7 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 
 				if (response.length() == 0) {
 					// In case the SOAP response from the service is empty.
-					response = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
-						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-						+ "<SendDataResult>" + "No SOAP response from the service"
-						+ "</SendDataResult></SendDataResponse></soap:Body></soap:Envelope>";
+					response = "HTTP/1.1 204 No Content\n\n";
 				}
 
 				logger.debug("Response:\n" + response);									
@@ -204,33 +198,15 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 			} catch (MalformedURLException e) {
 				logger.debug("Error delivering the data to destination:\n"
 						+ e.getMessage()); 
-				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
-						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-						+ "</SendDataResponse></soap:Body></soap:Envelope>");
+				resp.setData("HTTP/1.1 400 Bad Request\n\n" + e.getMessage());
 			} catch (UnknownHostException e) {
 				logger.debug("Error delivering the data to destination:\n"
 						+ e.getMessage()); 
-				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
-						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-						+"</SendDataResponse></soap:Body></soap:Envelope>");
+				resp.setData("HTTP/1.1 418 I'm a teapot\n\n" + e.getMessage());
 			} catch (IOException e) {
 				logger.debug("Error delivering the data to destination:\n" 
 						+ e.getMessage()); 
-				resp.setData("<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope "
-						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-						+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-						+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-						+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
-						+ "<SendDataResult>" + e.getMessage() + "</SendDataResult>"
-						+ "</SendDataResponse></soap:Body></soap:Envelope>");
+				resp.setData("HTTP/1.1 500 Internal Server Error\n\n" + e.getMessage());
 			}
 		}
 		else { 
