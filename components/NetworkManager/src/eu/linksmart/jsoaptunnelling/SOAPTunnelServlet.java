@@ -80,7 +80,11 @@ public class SOAPTunnelServlet extends HttpServlet {
 		String senderHID = parts[1];
 		String receiverHID = parts[2];
 		String url = parts[3];
+		if(request.getQueryString() != null && request.getQueryString().length() != 0) {
+			url = url.concat("?"+request.getQueryString());
+		}
 		String req = request.getMethod() + " /" + url + " " + request.getProtocol() + "\r\n";
+		
 		Enumeration headerNames = request.getHeaderNames();
 
 		while(headerNames.hasMoreElements()) {
