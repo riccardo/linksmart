@@ -36,6 +36,7 @@ package eu.linksmart.jsoaptunnelling;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.rmi.AccessException;
+import java.rmi.RemoteException;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 
@@ -67,17 +68,9 @@ public class SOAPTunnelServlet extends HttpServlet {
 	public SOAPTunnelServlet(NetworkManagerApplication nm) {
 		this.nm = nm;
 	}
-
-	/**
-	 * Performs the HTTP GET operation
-	 * 
-	 * @param request HttpServletRequest that encapsulates the request to the servlet 
-	 * @param response HttpServletResponse that encapsulates the response from the servlet
-	 */
-
-	public void doGet(HttpServletRequest request, HttpServletResponse response) 
-	throws IOException {
-
+	
+	private void processDatalessRequest(HttpServletRequest request, HttpServletResponse response)
+	throws IOException, RemoteException, AccessException {		
 		String path = request.getPathInfo();
 		String parts[] = path.split("/",5);
 		if (parts.length != 4) {
@@ -86,8 +79,12 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 		String senderHID = parts[1];
 		String receiverHID = parts[2];
-		String url = parts[3].equals("wsdl")?"?"+parts[3]:parts[3];
+		String url = parts[3];
+		if(request.getQueryString() != null && request.getQueryString().length() != 0) {
+			url = url.concat("?"+request.getQueryString());
+		}
 		String req = request.getMethod() + " /" + url + " " + request.getProtocol() + "\r\n";
+		
 		Enumeration headerNames = request.getHeaderNames();
 
 		while(headerNames.hasMoreElements()) {
@@ -135,7 +132,96 @@ public class SOAPTunnelServlet extends HttpServlet {
 		response.setContentLength(body.getBytes().length);
 		response.getWriter().write(body);
 	}
+	
+	/**
+	 * Performs the HTTP DELETE operation
+	 * Is identical to GET
+	 * @param request HttpServletRequest that encapsulates the request to the servlet 
+	 * @param response HttpServletResponse that encapsulates the response from the servlet
+	 */
+	public void doDelete(HttpServletRequest request, HttpServletResponse response) 
+	throws IOException {
+		processDatalessRequest(request, response);
+	}
 
+	/**
+	 * Performs the HTTP GET operation
+	 * 
+	 * @param request HttpServletRequest that encapsulates the request to the servlet 
+	 * @param response HttpServletResponse that encapsulates the response from the servlet
+	 */
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+	throws IOException {
+		processDatalessRequest(request, response);
+	}
+
+	/**
+	 * Performs the HTTP POST operation
+	 * 
+	 * @param request HttpServletRequest that encapsulates the request to the servlet
+	 * @param response HttpServletResponse that encapsulates the response from the servlet
+	 */
+	public void doPut(HttpServletRequest request, HttpServletResponse response) 
+	throws IOException {
+
+		String header;
+		String value;
+		String theSOAPAction = "";
+		String senderHID, receiverHID, sessionID;
+
+		String path = request.getPathInfo();
+		StringTokenizer token = new StringTokenizer(path, "/");
+		String SOAPRequest = "";
+		if (token.countTokens() > 2) {
+			senderHID = token.nextToken();
+			receiverHID = token.nextToken();
+			sessionID = token.nextToken();
+
+			Enumeration headerNames = request.getHeaderNames();
+			while(headerNames.hasMoreElements()) {
+				header = (String) headerNames.nextElement();
+				value = request.getHeader(header);
+				SOAPRequest = SOAPRequest.concat(header + ": " + value + "\r\n");				
+				if(header.equalsIgnoreCase("SOAPAction")) {
+					theSOAPAction = value.replaceAll("\"", "");
+				}
+			}
+			SOAPRequest = SOAPRequest + "\r\n";
+
+			String sResp = "";
+			boolean accessDenied = false;
+
+			if((request.getContentLength() > 0)) {
+				try {
+					BufferedReader reader = request.getReader();
+					for(String line = null; (line = reader.readLine()) != null;)
+						SOAPRequest = SOAPRequest.concat(line);
+					logger.debug("Sending soap request through tunnel: " + SOAPRequest);
+					NMResponse r = nm.sendData(sessionID, senderHID, receiverHID, SOAPRequest);
+					sResp = r.getData();
+
+					if (r.getSessionID().equals(RouteManagerApplication.ACCESS_DENIED_SESSIONID))
+						accessDenied = true;
+
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			/** 
+			 * If access has been denied, we throw an AccessException to
+			 * report to the caller correctly
+			 */
+			if (accessDenied)
+				throw new AccessException("Access Denied by Security Policies");
+
+			response.setContentLength(sResp.getBytes().length);
+			response.setContentType("text/xml");
+			response.getWriter().write(sResp);
+		}
+	}
+	
 	/**
 	 * Performs the HTTP POST operation
 	 * 
