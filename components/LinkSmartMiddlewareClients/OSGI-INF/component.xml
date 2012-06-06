@@ -4,5 +4,4 @@
  <service>
     <provide interface="eu.linksmart.clients.RemoteWSClientProvider"/>
  </service>
- <reference cardinality="1..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="static"/>
 </scr:component>
