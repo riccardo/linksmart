@@ -20,6 +20,8 @@ import eu.linksmart.remote.service.store.LinkSmartRemoteServiceStore;
 public class LinkSmartRemoteServiceStoreImpl implements
 		LinkSmartRemoteServiceStore {
 
+	private Thread registerAtNetworkManagerThread;
+
 	private class GetRemoteServiceByDescriptionHelper {
 
 		private String serviceDescription;
@@ -267,31 +269,31 @@ public class LinkSmartRemoteServiceStoreImpl implements
 
 	}
 
-	@SuppressWarnings("deprecation")
-	private void initHydra() {
+	private class RegisterAtNetworkManagerThread implements Runnable {
 
-		// get NetworkManager
-		remoteWSClientProvider = (RemoteWSClientProvider) bundleContext
-				.getService(bundleContext
-						.getServiceReference(RemoteWSClientProvider.class
-								.getName()));
+		@Override
+		public void run() {
+			while (myHID == null) {
+				try {
+					myHID = networkManager.createHIDwDesc(
+							HYDRA_REMOTE_SERVICE_STORE_PATH, AXIS_SERVICES_PATH
+									+ HYDRA_REMOTE_SERVICE_STORE_PATH);
+				} catch (RemoteException e) {
+					LOG
+							.warn("Unable to regster at Network Manager. Trying again.");
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					LOG.error("Error while waiting.", e);
+				}
+			}
 
-		try {
-			networkManager = (NetworkManagerApplication) remoteWSClientProvider
-					.getRemoteWSClient(
-							NetworkManagerApplication.class.getName(),
-							"http://localhost:8082/axis/services/NetworkManagerApplication",
-							false);
-			myHID = networkManager.createHIDwDesc(
-					HYDRA_REMOTE_SERVICE_STORE_PATH, AXIS_SERVICES_PATH
-							+ HYDRA_REMOTE_SERVICE_STORE_PATH);
-		} catch (RemoteException e) {
-			LOG.error("Cannot create HID for "
-					+ HYDRA_REMOTE_SERVICE_STORE_PATH, e);
-		} catch (Exception e) {
-			LOG.error("Unable to register at NetworkManager.", e);
 		}
+
 	}
+
+	
 
 	protected void activate(ComponentContext context) {
 
@@ -299,7 +301,24 @@ public class LinkSmartRemoteServiceStoreImpl implements
 
 		remoteHydraServices = new HashMap<String, Object>();
 
-		initHydra();
+		// get RemoteClientProvider
+		remoteWSClientProvider = (RemoteWSClientProvider) bundleContext
+				.getService(bundleContext
+						.getServiceReference(RemoteWSClientProvider.class
+								.getName()));
+		try {
+			networkManager = (NetworkManagerApplication) remoteWSClientProvider
+					.getRemoteWSClient(
+							NetworkManagerApplication.class.getName(),
+							"http://localhost:8082/axis/services/NetworkManagerApplication",
+							false);
+		} catch (Exception e) {
+			LOG.error("Unable to get NetworkManager through RemoteWSClientProvider", e);
+		}
+		
+		Thread thread1 = new Thread(new RegisterAtNetworkManagerThread());
+		thread1.start();
+		
 
 		LOG.debug("Started " + bundleContext.getBundle().getSymbolicName());
 
