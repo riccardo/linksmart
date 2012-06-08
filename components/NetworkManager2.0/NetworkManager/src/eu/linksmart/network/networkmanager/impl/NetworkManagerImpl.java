@@ -54,13 +54,13 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public HIDInfo createCryptoHID(String xmlAttributes) throws RemoteException {
-			return this.core.createCryptoHID(xmlAttributes);
+		public HIDInfo createCryptoHID(String xmlAttributes, String endpoint) throws RemoteException {
+			return this.core.createCryptoHID(xmlAttributes, endpoint);
 		}
 
 		@Override
-		public HIDInfo createCryptoHIDFromReference(String certRef) throws RemoteException {
-			return this.core.createCryptoHIDFromReference(certRef);
+		public HIDInfo createCryptoHIDFromReference(String certRef, String endpoint) throws RemoteException {
+			return this.core.createCryptoHIDFromReference(certRef, endpoint);
 		}
 
 		@Override
