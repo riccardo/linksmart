@@ -105,7 +105,7 @@ public class ConnectionManager {
 				return c;
 			}
 		}
-		
+
 		if(receiverHID.equals(senderHID)){
 			//add nopconnection to list as this is a reflection message
 			Connection conn = new NOPConnection(senderHID, receiverHID);
@@ -134,17 +134,17 @@ public class ConnectionManager {
 					}
 				}
 			}
-			
+
 			//check if requirements are not colliding
 			boolean noEncoding = allRequirements.contains(SecurityProperty.NoEncoding);
 			boolean noSecurity = allRequirements.contains(SecurityProperty.NoSecurity);
 			boolean justNoEncNoSec = allRequirements.size() == 2 && noEncoding && noSecurity;
 			//if there are more requirements and noEnc or noSec is included it must be colliding
 			if (!justNoEncNoSec && (allRequirements.size() > 1 && (noEncoding || noSecurity))) {
-						throw new Exception("Colliding policies for HIDs");
-					}
+				throw new Exception("Colliding policies for HIDs");
+			}
 		}
-		
+
 		//if there was no connection that means that the sender is the client and the receiver is the server
 		//check if an active connection or a dummy connectin is needed
 		Connection conn = null;
@@ -153,7 +153,7 @@ public class ConnectionManager {
 		} else {
 			conn = new Connection(senderHID, receiverHID);
 		}
-		
+
 		boolean foundComSecMgr = false;
 		if (!this.communicationSecurityManagers.isEmpty()) {
 			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
@@ -195,24 +195,34 @@ public class ConnectionManager {
 			}
 		}
 
-		//there was no connection found so create new connection
+		//there was no connection found so create new connection		
 		List<SecurityProperty> policies = this.hidPolicies.get(senderHID);
-		BroadcastConnection conn = new BroadcastConnection(senderHID);
+
+		//check if an active connection or a dummy connectin is needed
+		BroadcastConnection conn = null;
+		if(policies.contains(SecurityProperty.NoEncoding)) {
+			conn = new NOPBroadcastConnection(senderHID);
+		} else {
+			conn = new BroadcastConnection(senderHID);
+		}
+
 		boolean foundComSecMgr = false;
 		if(!this.communicationSecurityManagers.isEmpty()) {
 			if(policies != null){
 				for(CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
 					if(matchingPolicies(policies, comSecMgr.getProperties())
-							&& comSecMgr.getProperties().contains(SecurityProperty.Broadcast))
+							&& comSecMgr.getProperties().contains(SecurityProperty.Broadcast)) {
 						conn.setSecurityProtocol(
 								comSecMgr.getBroadcastSecurityProtocol(senderHID));
+						foundComSecMgr = true;
+					}
 				}
 			}
 		}
 		if(!foundComSecMgr
 				&& policies != null 
 				&& policies.size() != 0
-				&& !(policies.size() == 1 && policies.contains(SecurityProperty.NoSecurity))) {
+				&& !policies.contains(SecurityProperty.NoSecurity)) {
 			//no available communication security manager although required
 			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
 		}
@@ -231,17 +241,17 @@ public class ConnectionManager {
 	 * @return Properties object unserialized from data
 	 * @throws IOException 
 	 */
-//	public Part[] getHIDAttributes(byte[] data) throws IOException {
-//		Properties properties = new Properties();
-//		try {
-//			properties.loadFromXML(new ByteArrayInputStream(data));
-//		} catch (Exception e) {
-//			IOException ioe = new IOException("Cannot parse received data!");
-//			ioe.initCause(e);
-//			throw ioe;
-//		}
-//		return properties;
-//	}
+	//	public Part[] getHIDAttributes(byte[] data) throws IOException {
+	//		Properties properties = new Properties();
+	//		try {
+	//			properties.loadFromXML(new ByteArrayInputStream(data));
+	//		} catch (Exception e) {
+	//			IOException ioe = new IOException("Cannot parse received data!");
+	//			ioe.initCause(e);
+	//			throw ioe;
+	//		}
+	//		return properties;
+	//	}
 
 	/**
 	 * Sets the number of minutes before a connection is closed

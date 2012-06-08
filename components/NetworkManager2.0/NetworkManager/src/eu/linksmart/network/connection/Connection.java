@@ -96,59 +96,11 @@ public class Connection {
 	 * @return Message object for further processing
 	 */
 	public Message processData(HID senderHID, HID receiverHID, byte[] data) {
-		Message tempMsg = null;
-		if (securityProtocol != null && securityProtocol.isInitialized()) {
-			// if protocol is initialized than open message with it
-			try {
-				tempMsg = new Message("CIPHERTEXT", senderHID, receiverHID,
-						data);
-				tempMsg = securityProtocol.unprotectMessage(tempMsg);
-			} catch (Exception e) {
-				logger.debug("Cannot unprotect message from HID: "
-						+ senderHID.toString());
-				return null;
-			}
-		} else if (securityProtocol != null
-				&& !securityProtocol.isInitialized()) {
-			// if protocol not initialized then pass it for processing
-			// in this case the data is a serialized properties object
-			
-			Properties properties = new Properties();
-			try {
-				properties.loadFromXML(new ByteArrayInputStream(data));
-			} catch (InvalidPropertiesFormatException e) {
-				logger.error("Cannot parse message from HID: "
-						+ senderHID.toString() + ":\n" + new String(data), e);
-			} catch (IOException e) {
-				logger.error("Cannot parse message from HID: "
-						+ senderHID.toString() + ":\n" + new String(data), e);
-			}
-			
-			// Create the Message
-			tempMsg = new Message((String) properties.remove(TOPIC), senderHID,
-					receiverHID, ((String) properties.remove(APPLICATION_DATA))
-							.getBytes());
-			
-			// Process message by Security Protocol
-			try {
-				tempMsg = securityProtocol.processMessage(tempMsg);
-			} catch (CryptoException e) {
-				logger.error("Error during cryptographic operation", e);
-			} catch (VerificationFailureException e) {
-				logger.error("Error during cryptographic operation", e);
-			} catch (IOException e) {
-				logger.error("Error during cryptographic operation", e);
-			}
-			
-			return tempMsg;
-		}
-
 		// open data and divide it into properties of the message and
 		// application data
 		Properties properties = new Properties();
 		try {
-			properties.loadFromXML(new ByteArrayInputStream(
-					(tempMsg == null) ? data : tempMsg.getData()));
+			properties.loadFromXML(new ByteArrayInputStream(data));
 		} catch (InvalidPropertiesFormatException e) {
 			logger.error(
 					"Unable to load properties from XML data. Data is not valid XML: "
@@ -167,6 +119,31 @@ public class Connection {
 		while (i.hasNext()) {
 			String key = (String) i.next();
 			message.setProperty(key, properties.getProperty(key));
+		}
+		
+		//check if application data has to be unprotected
+		if (securityProtocol != null && securityProtocol.isInitialized()) {
+			// if protocol is initialized than open message with it
+			try {
+				message = securityProtocol.unprotectMessage(message);
+			} catch (Exception e) {
+				logger.debug("Cannot unprotect message from HID: "
+						+ senderHID.toString());
+				return null;
+			}
+		} else if (securityProtocol != null
+				&& !securityProtocol.isInitialized()) {
+			// if protocol not initialized then pass it for processing			
+			// Process message by Security Protocol
+			try {
+				message = securityProtocol.processMessage(message);
+			} catch (CryptoException e) {
+				logger.error("Error during cryptographic operation", e);
+			} catch (VerificationFailureException e) {
+				logger.error("Error during cryptographic operation", e);
+			} catch (IOException e) {
+				logger.error("Error during cryptographic operation", e);
+			}
 		}
 		return message;
 	}
