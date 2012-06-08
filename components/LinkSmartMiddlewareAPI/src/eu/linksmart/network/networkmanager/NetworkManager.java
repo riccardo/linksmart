@@ -31,7 +31,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * @return HID instance.
 	 * @throws RemoteException
 	 */
-	public HID createHID(Part[] attributes, String endpoint, String backboneName)
+	public HIDInfo createHID(Part[] attributes, String endpoint, String backboneName)
 	throws RemoteException;
 	
 	/**
@@ -62,7 +62,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	 *         reference (UUID)
 	 */
 	@Deprecated
-	public HIDInfo createCryptoHID(String xmlAttributes) throws RemoteException;
+	public HIDInfo createCryptoHID(String xmlAttributes, String endpoint) throws RemoteException;
 	
 	/**
 	 * Operation to create an CryptoHID providing a certificate reference (from
@@ -77,7 +77,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * @return The {@link String} representation of the HID.
 	 */
 	@Deprecated
-	public HIDInfo createCryptoHIDFromReference(String certRef) throws RemoteException;
+	public HIDInfo createCryptoHIDFromReference(String certRef, String endpoint) throws RemoteException;
 	
 	/**
 	 * To control what communication channels or backbones the

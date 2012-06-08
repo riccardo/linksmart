@@ -24,7 +24,7 @@ public interface IdentityManager {
 	 *            Attributes describing the HID. E.g. description.
 	 * @return the {@link HID} that has been created.
 	 */
-	public HID createHIDForAttributes(Part[] attributes);
+	public HIDInfo createHIDForAttributes(Part[] attributes);
 
 	/**
 	 * Creates a local {@link HID} without any context and stores. It creates a
@@ -37,7 +37,7 @@ public interface IdentityManager {
 	 * @return the HID created
 	 */
 	@Deprecated
-	public HID createHIDForDescription(String description);
+	public HIDInfo createHIDForDescription(String description);
 
 	/**
 	 * Updates the attributes of the given {@link HID}.

@@ -48,7 +48,7 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public HID createHID(Part[] attributes, String endpoint, String backboneName)
+		public HIDInfo createHID(Part[] attributes, String endpoint, String backboneName)
 				throws RemoteException {
 			return this.core.createHID(attributes, endpoint, backboneName);
 		}

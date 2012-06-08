@@ -92,7 +92,7 @@ MessageDistributor {
 		//Create a local HID with SOAP Backbone for NetworkManager
 		// TODO Make the Backbone a constant or enum somewhere. find another way to tell the BackboneRouter that my local network manager's HID has BackboneSOAPImpl. 
 		try {
-			this.myHID = createHID(attributes, NETWORK_MGR_ENDPOINT,  "eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl");
+			this.myHID = createHID(attributes, NETWORK_MGR_ENDPOINT,  "eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl").getHID();
 		} catch (RemoteException e) {
 			LOG.error("Should never happen.", e);
 		}
@@ -117,7 +117,7 @@ MessageDistributor {
 	}
 
 	@Override
-	public HID createHID(Part[] attributes, String endpoint, String backboneName)
+	public HIDInfo createHID(Part[] attributes, String endpoint, String backboneName)
 	throws RemoteException {
 		// check if backbone exist before creating the HID
 		boolean backboneFound = false;
@@ -132,13 +132,13 @@ MessageDistributor {
 			"Required backbone not available");
 		}
 
-		HID newHID = this.identityManager.createHIDForAttributes(attributes);
+		HIDInfo newHID = this.identityManager.createHIDForAttributes(attributes);
 		List<SecurityProperty> properties = this.backboneRouter
 		.getBackboneSecurityProperties(backboneName);
 		// register HID with backbone policies in connection manager
-		this.connectionManager.registerHIDPolicy(newHID, properties);
+		this.connectionManager.registerHIDPolicy(newHID.getHID(), properties);
 		// add route to selected backbone
-		this.backboneRouter.addRouteToBackbone(newHID, backboneName, endpoint);
+		this.backboneRouter.addRouteToBackbone(newHID.getHID(), backboneName, endpoint);
 		return newHID;
 	}
 
@@ -411,7 +411,7 @@ MessageDistributor {
 			return null;
 		}
 		Part[] newAttributes = PartConverter.fromProperties(attributes);
-		hid = identityManager.createHIDForAttributes(newAttributes);
+		hid = identityManager.createHIDForAttributes(newAttributes).getHID();
 
 		//add it to backbonesoap as this method is deprecated anyway
 		List<SecurityProperty> properties = this.backboneRouter
@@ -447,7 +447,7 @@ MessageDistributor {
 			return null;
 		}
 		Part[] attributes = { new Part(HIDAttribute.CERT_REF.name(), certRef) };
-		HID hid = identityManager.createHIDForAttributes(attributes);
+		HID hid = identityManager.createHIDForAttributes(attributes).getHID();
 		
 		//add it to backbonesoap as this method is deprecated anyway
 		List<SecurityProperty> properties = this.backboneRouter
