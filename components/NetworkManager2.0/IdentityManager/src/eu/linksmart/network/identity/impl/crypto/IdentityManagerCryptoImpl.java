@@ -37,7 +37,7 @@ public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
 	 * in the CryptoManager and if a certificate is found it is used.
 	 * @return null if there was error creating the HID TODO add appropriate exceptions
 	 */
-	public HID createHIDForAttributes(Part[] parts) {
+	public HIDInfo createHIDForAttributes(Part[] parts) {
 		Properties attributes = PartConverter.toProperties(parts);
 		HID hid = createUniqueHID();
 		try{
@@ -81,7 +81,7 @@ public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
 			HIDInfo info = new HIDInfo(hid, PartConverter.fromProperties(attributes));
 			addLocalHID(hid, info);
 			LOG.debug("Created HID: " + info.toString());
-			return hid;
+			return info;
 		}catch(Exception e){
 			LOG.error("Cannot create CryptoHID!",e);
 			return null;

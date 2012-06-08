@@ -68,16 +68,16 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	@Override
-	public HID createHIDForAttributes(Part[] attributes) {
+	public HIDInfo createHIDForAttributes(Part[] attributes) {
 		HID hid = createUniqueHID();
 		HIDInfo info = new HIDInfo(hid, attributes);
 		addLocalHID(hid, info);
 		LOG.debug("Created HID: " + info.toString());
-		return hid;
+		return info;
 	}
 
 	@Override
-	public HID createHIDForDescription(String description) {
+	public HIDInfo createHIDForDescription(String description) {
 		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(), description)};
 		return createHIDForAttributes(attributes);
 	}
