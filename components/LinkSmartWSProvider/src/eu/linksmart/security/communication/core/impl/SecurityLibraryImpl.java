@@ -115,9 +115,9 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 	private void init(short config) throws FileNotFoundException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
 		logger.debug("Loading settings for SecurityLibrary");
 		settings = new Properties();
-		logger.debug("Loading file " + "settings.properties");
+		logger.debug("Loading file settings.properties from JAR");
 		try {
-			settings.load(this.getClass().getResourceAsStream("/settings.properties"));
+			settings.load(this.getClass().getResourceAsStream("/resources/settings.properties"));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
