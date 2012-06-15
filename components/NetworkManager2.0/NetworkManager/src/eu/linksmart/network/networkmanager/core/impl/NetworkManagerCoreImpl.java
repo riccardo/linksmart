@@ -96,7 +96,8 @@ MessageDistributor {
 		} catch (RemoteException e) {
 			LOG.error("Should never happen.", e);
 		}
-
+		connectionManager.setOwnerHID(myHID);
+		
 		// Init Servlets
 		HttpService http = (HttpService) context.locateService("HttpService");
 		try {
