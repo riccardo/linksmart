@@ -99,8 +99,9 @@ public class ConnectionManager {
 		Calendar cal = Calendar.getInstance();
 		//find connection belonging to these HIDs
 		for(Connection c : connections){
-			if((c.getClientHID().equals(receiverHID) && c.getServerHID().equals(senderHID))
-					|| (c.getClientHID().equals(senderHID) && c.getServerHID().equals(receiverHID))){
+			if(!(c instanceof BroadcastConnection) &&
+					((c.getClientHID().equals(receiverHID) && c.getServerHID().equals(senderHID))
+					|| (c.getClientHID().equals(senderHID) && c.getServerHID().equals(receiverHID)))){
 				//set last use date of connection
 				timeouts.put(c, cal.getTime());
 				return c;
