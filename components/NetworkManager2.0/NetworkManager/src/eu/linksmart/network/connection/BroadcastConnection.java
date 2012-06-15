@@ -5,8 +5,8 @@ import eu.linksmart.security.communication.SecurityProtocol;
 
 public class BroadcastConnection extends Connection {
 
-	public BroadcastConnection(HID clientHID) {
-		super(clientHID);
+	public BroadcastConnection(HID serverHID) {
+		super(serverHID);
 	}
 	
 	protected void setSecurityProtocol(SecurityProtocol secProtocol){

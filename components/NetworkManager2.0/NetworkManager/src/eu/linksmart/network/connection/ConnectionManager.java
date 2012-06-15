@@ -52,6 +52,7 @@ public class ConnectionManager {
 	 */
 	private ArrayList<CommunicationSecurityManager> communicationSecurityManagers = 
 		new ArrayList<CommunicationSecurityManager>();
+	private HID nmHID = null;;
 
 
 	public ConnectionManager(){
@@ -98,8 +99,8 @@ public class ConnectionManager {
 		Calendar cal = Calendar.getInstance();
 		//find connection belonging to these HIDs
 		for(Connection c : connections){
-			if((c.getClientHID() == receiverHID && c.getServerHID() == senderHID)
-					|| (c.getClientHID() == senderHID && c.getServerHID() == receiverHID)){
+			if((c.getClientHID().equals(receiverHID) && c.getServerHID().equals(senderHID))
+					|| (c.getClientHID().equals(senderHID) && c.getServerHID().equals(receiverHID))){
 				//set last use date of connection
 				timeouts.put(c, cal.getTime());
 				return c;
@@ -117,20 +118,24 @@ public class ConnectionManager {
 		//check if there are policies for one of the HIDs
 		ArrayList<SecurityProperty> allRequirements = new ArrayList<SecurityProperty>();
 		if(this.hidPolicies.containsKey(senderHID) || this.hidPolicies.containsKey(receiverHID)){
-			//add both policies to requirement list		
-			List<SecurityProperty> senderPolicies = hidPolicies.get(senderHID);
-			if(senderPolicies != null){
-				//add all properties from this HID
-				for(SecurityProperty prop : senderPolicies){
-					allRequirements.add(prop);
+			//add both policies to requirement list
+			if(!senderHID.equals(nmHID)){
+				List<SecurityProperty> senderPolicies = hidPolicies.get(senderHID);
+				if(senderPolicies != null){
+					//add all properties from this HID
+					for(SecurityProperty prop : senderPolicies){
+						allRequirements.add(prop);
+					}
 				}
 			}
-			List<SecurityProperty> receiverPolicies = hidPolicies.get(receiverHID);
-			if(receiverPolicies != null){
-				//add only not already needed properties
-				for(SecurityProperty prop : receiverPolicies){
-					if(!allRequirements.contains(prop)){
-						allRequirements.add(prop);
+			if(!receiverHID.equals(nmHID)){
+				List<SecurityProperty> receiverPolicies = hidPolicies.get(receiverHID);
+				if(receiverPolicies != null){
+					//add only not already needed properties
+					for(SecurityProperty prop : receiverPolicies){
+						if(!allRequirements.contains(prop)){
+							allRequirements.add(prop);
+						}
 					}
 				}
 			}
@@ -148,7 +153,7 @@ public class ConnectionManager {
 		//if there was no connection that means that the sender is the client and the receiver is the server
 		//check if an active connection or a dummy connectin is needed
 		Connection conn = null;
-		if(true || allRequirements.contains(SecurityProperty.NoEncoding)) {
+		if(allRequirements.contains(SecurityProperty.NoEncoding)) {
 			conn = new NOPConnection(senderHID, receiverHID);
 		} else {
 			conn = new Connection(senderHID, receiverHID);
@@ -188,19 +193,21 @@ public class ConnectionManager {
 		Calendar cal = Calendar.getInstance();
 		//find connection belonging to this HID
 		for(Connection c : connections){
-			if(c.getClientHID() == senderHID && c.getClass() == BroadcastConnection.class) {
+			if(c.getServerHID().equals(senderHID) && c instanceof BroadcastConnection) {
 				//set last use date of connection
 				timeouts.put(c, cal.getTime());
 				return c;
 			}
 		}
 
-		//there was no connection found so create new connection		
-		List<SecurityProperty> policies = this.hidPolicies.get(senderHID);
-
+		//there was no connection found so create new connection	
+		List<SecurityProperty> policies = null;
+		if(!senderHID.equals(nmHID)) {
+			policies = this.hidPolicies.get(senderHID);
+		}
 		//check if an active connection or a dummy connectin is needed
 		BroadcastConnection conn = null;
-		if(policies.contains(SecurityProperty.NoEncoding)) {
+		if(policies != null && policies.contains(SecurityProperty.NoEncoding)) {
 			conn = new NOPBroadcastConnection(senderHID);
 		} else {
 			conn = new BroadcastConnection(senderHID);
@@ -261,6 +268,10 @@ public class ConnectionManager {
 		this.timeoutMinutes = minutes;
 		timer.cancel();
 		timer.schedule(new ConnectionClearer(), 0, timeoutMinutes * 60 * 1000 / 2);
+	}
+
+	public void setOwnerHID(HID hid) {
+		nmHID  = hid;
 	}
 
 	/**

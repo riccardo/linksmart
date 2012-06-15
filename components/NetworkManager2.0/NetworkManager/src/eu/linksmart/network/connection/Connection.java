@@ -51,12 +51,12 @@ public class Connection {
 	 */
 	private HID serverHID = null;
 
-	protected Connection(HID clientHID) {
-		if (clientHID == null) {
+	protected Connection(HID serverHID) {
+		if (serverHID == null) {
 			throw new IllegalArgumentException(
 					"Cannot set null for required fields.");
 		}
-		this.clientHID = clientHID;
+		this.serverHID = serverHID;
 	}
 
 	public Connection(HID clientHID, HID serverHID) {

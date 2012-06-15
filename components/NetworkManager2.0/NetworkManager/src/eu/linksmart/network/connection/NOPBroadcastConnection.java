@@ -9,8 +9,8 @@ import eu.linksmart.network.Message;
  *
  */
 public class NOPBroadcastConnection extends BroadcastConnection {
-	public NOPBroadcastConnection(HID clientHID) {
-		super(clientHID);
+	public NOPBroadcastConnection(HID serverHID) {
+		super(serverHID);
 	}
 
 	public byte[] processMessage(Message msg) throws Exception{
