@@ -204,7 +204,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 */
 	private void sendRequest(HID senderHid, HID receiverHid, String requestString,
 			HttpServletResponse response) throws IOException {
-		NMResponse r = this.nmCore.sendData(senderHid, receiverHid, requestString.getBytes());
+		NMResponse r = this.nmCore.sendData(senderHid, receiverHid, requestString.getBytes(), true);
 		String sResp = r.getMessage();
 
 		// /**

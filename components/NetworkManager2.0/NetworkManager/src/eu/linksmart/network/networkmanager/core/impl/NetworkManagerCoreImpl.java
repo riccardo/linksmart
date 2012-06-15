@@ -47,7 +47,7 @@ MessageDistributor {
 	protected HID myHID;
 
 	protected String myDescription;
-	
+
 	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class
 	.getSimpleName();
@@ -88,7 +88,7 @@ MessageDistributor {
 		.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
 				this.myDescription) };
-		
+
 		//Create a local HID with SOAP Backbone for NetworkManager
 		// TODO Make the Backbone a constant or enum somewhere. find another way to tell the BackboneRouter that my local network manager's HID has BackboneSOAPImpl. 
 		try {
@@ -142,10 +142,10 @@ MessageDistributor {
 		return newHID;
 	}
 
-	public NMResponse sendData(HID sender, HID receiver, byte[] data)
+	public NMResponse sendData(HID sender, HID receiver, byte[] data, boolean synch)
 	throws RemoteException {
 		return this.sendMessage(new Message(Message.TOPIC_APPLICATION, sender,
-				receiver, data));
+				receiver, data), synch);
 	}
 
 	public boolean removeHID(HID hid) throws RemoteException {
@@ -228,7 +228,7 @@ MessageDistributor {
 			 * not been processed drop it
 			 */
 			if (msg.getReceiverHID() == null){
-//					|| msg.getReceiverHID().equals(this.myHID)) {
+				//					|| msg.getReceiverHID().equals(this.myHID)) {
 				LOG.warn("Received a message which has not been processed");
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
@@ -240,7 +240,8 @@ MessageDistributor {
 			 * send message over sendMessage method of this and return response
 			 * of it
 			 */
-			return sendMessage(msg, this.myHID, receiverHID);
+			//TODO check if should be always synch
+			return sendMessageSynch(msg, this.myHID, receiverHID);
 		} else {
 			NMResponse response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_SUCCESS);
@@ -319,10 +320,13 @@ MessageDistributor {
 		return response;
 	}
 
-	public NMResponse sendMessage(Message message) {
+	public NMResponse sendMessage(Message message, boolean synch) {
 		HID senderHID = message.getSenderHID();
 		HID receiverHID = message.getReceiverHID();
-		return sendMessage(message, senderHID, receiverHID);
+		if(synch)
+			return sendMessageSynch(message, senderHID, receiverHID);
+		else
+			return sendMessageAsynch(message, senderHID, receiverHID);
 	}
 
 	/**
@@ -338,7 +342,7 @@ MessageDistributor {
 	 *            Receiver endpoint of connection to open
 	 * @return
 	 */
-	private NMResponse sendMessage(Message message, HID senderHID,
+	private NMResponse sendMessageAsynch(Message message, HID senderHID,
 			HID receiverHID) {
 		byte[] data = null;
 		try {
@@ -356,7 +360,61 @@ MessageDistributor {
 			return response;
 		}
 		NMResponse response = this.backboneRouter.sendData(senderHID,
-				receiverHID, data);
+				receiverHID, data, false);
+
+		return response;
+	}
+
+	/**
+	 * Internal method for sending messages with more possible parameters. The
+	 * message contains the original sender and the final receiver but the
+	 * parameters determine which connection to use for sending.
+	 * 
+	 * @param message
+	 *            Message to send
+	 * @param senderHID
+	 *            Sender endpoint of connection to open
+	 * @param receiverHID
+	 *            Receiver endpoint of connection to open
+	 * @return
+	 */
+	private NMResponse sendMessageSynch(Message message, HID senderHID,
+			HID receiverHID) {
+		byte[] data = null;
+		NMResponse response = new NMResponse();
+		Message tempMessage = message;
+
+		try {
+			Connection connection = this.connectionManager.getConnection(
+					receiverHID, senderHID);
+
+			//process outgoing message
+			data = connection.processMessage(tempMessage);
+			response = this.backboneRouter.sendData(senderHID,
+					receiverHID, data, true);
+			//process response message
+			tempMessage = connection.processData(receiverHID, senderHID, response.getMessage().getBytes());
+			//repeat sending and receiving until security protocol is over
+			while (tempMessage != null &&
+					tempMessage.getTopic().
+					contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
+				response = this.backboneRouter.sendData(senderHID, 
+						receiverHID, tempMessage.getData(), true);
+				tempMessage = connection.processData(receiverHID, senderHID,
+						response.getMessage().getBytes());
+			}
+		} catch (Exception e) {
+			LOG.warn("Could not create packet from message from HID: "
+					+ message.getSenderHID());
+			response = new NMResponse();
+			response.setStatus(NMResponse.STATUS_ERROR);
+			response
+			.setMessage("Could not create packet from message from HID: "
+					+ message.getSenderHID());
+			return response;
+		}		
+		response.setStatus(NMResponse.STATUS_SUCCESS);
+		response.setMessage(new String(tempMessage.getData()));
 
 		return response;
 	}
@@ -448,7 +506,7 @@ MessageDistributor {
 		}
 		Part[] attributes = { new Part(HIDAttribute.CERT_REF.name(), certRef) };
 		HID hid = identityManager.createHIDForAttributes(attributes).getHID();
-		
+
 		//add it to backbonesoap as this method is deprecated anyway
 		List<SecurityProperty> properties = this.backboneRouter
 		.getBackboneSecurityProperties(BACKBONE_SOAP);
@@ -456,7 +514,7 @@ MessageDistributor {
 		this.connectionManager.registerHIDPolicy(hid, properties);
 		// add route to selected backbone
 		this.backboneRouter.addRouteToBackbone(hid, BACKBONE_SOAP, endpoint);
-		
+
 		return identityManager.getHIDInfo(hid);
 	}
 

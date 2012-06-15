@@ -32,9 +32,9 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public NMResponse sendData(HID sender, HID receiver, byte[] data)
+		public NMResponse sendData(HID sender, HID receiver, byte[] data, boolean synch)
 				throws RemoteException {
-			return this.core.sendData(sender, receiver, data);
+			return this.core.sendData(sender, receiver, data, synch);
 		}
 
 		@Override

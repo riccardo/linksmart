@@ -66,7 +66,7 @@ public class BackboneSOAPImpl implements Backbone {
 	 *            header data as String
 	 * @return SOAP response
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] rawData) {
+	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] rawData) {
 		URL urlEndpoint = hidUrlMap.get(receiverHID);
 		if (urlEndpoint == null) {
 			throw new IllegalArgumentException("Cannot send data to HID "
@@ -91,6 +91,10 @@ public class BackboneSOAPImpl implements Backbone {
 			processPostMessage(urlEndpoint, data, resp);
 		}
 		return resp;
+	}
+	
+	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID, byte[] rawData) {
+		throw new RuntimeException("Asynchronous sending not supported by HTTP!");
 	}
 
 	/**

@@ -199,11 +199,15 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		logger.info("JXTA Backbone stopped succesfully");
 	}
-
-	/*
-	 * Now follow the methods from the interface
-	 */
-
+	
+	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] data) {
+		return sendData(senderHID, receiverHID, data, true);
+	}
+	
+	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
+		return sendData(senderHID, receiverHID, data, false);
+	}
+	
 	/**
 	 * Sends a message for one specific recipient over the JXTA communication
 	 * channel.
@@ -212,7 +216,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param receiverHID
 	 * @param message
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data) {
+	private NMResponse sendData(HID senderHID, HID receiverHID, byte[] data, boolean synch) {
 		NMResponse response = new NMResponse();
 
 		// add senderHID to data
@@ -229,12 +233,13 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		}
 
 		response = pipeSyncHandler.sendData(senderHID.toString(), receiverHID
-				.toString(), data, receiverPeerID);
+				.toString(), data, receiverPeerID, synch);
 
 		logger.debug("sendData Response: " + response.toString());
 
 		return response;
 	}
+
 
 	/**
 	 * Receives a message over the JXTA communication channel. In case of a

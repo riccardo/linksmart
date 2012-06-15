@@ -23,10 +23,11 @@ public interface NetworkManagerCore extends NetworkManager {
 	/**
 	 * Send message from one LinkSmart node to another node.
 	 * @param message
+	 * @param synch
 	 * @return
 	 * @throws RemoteException
 	 */
-	public NMResponse sendMessage(Message message);
+	public NMResponse sendMessage(Message message, boolean synch);
 
 	
 	/**

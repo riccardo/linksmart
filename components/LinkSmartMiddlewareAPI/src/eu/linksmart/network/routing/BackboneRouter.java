@@ -27,9 +27,10 @@ public interface BackboneRouter {
 	 * @param senderHID
 	 * @param receiverHID
 	 * @param message
+	 * @param synchronous sending
 	 */
 	public NMResponse sendData(HID senderHID, HID receiverHID,
-			byte[] protectedData);
+			byte[] protectedData, boolean synch);
 
 	/**
 	 * Receives a message which also specifies the communication channel used by

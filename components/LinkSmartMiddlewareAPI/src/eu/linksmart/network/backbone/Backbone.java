@@ -15,15 +15,25 @@ import eu.linksmart.security.communication.SecurityProperty;
 public interface Backbone {
 
 	/**
-	 * Sends a message over the specific communication channel.
+	 * Sends a message over the specific communication channel and blocks until response comes.
 	 * 
 	 * @param senderHID HID of the sender
 	 * @param receiverHID HID of the receiver
 	 * @param data data to be sent
 	 * @return Response of the receiver
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data);
+	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] data);
 
+	/**
+	 * Sends a message over the specific communication channel and immediately returns.
+	 * 
+	 * @param senderHID HID of the sender
+	 * @param receiverHID HID of the receiver
+	 * @param data data to be sent
+	 * @return Response of the receiver
+	 */
+	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID, byte[] data);
+	
 	/**
 	 * Receives a message over the specific communication channel.
 	 * 

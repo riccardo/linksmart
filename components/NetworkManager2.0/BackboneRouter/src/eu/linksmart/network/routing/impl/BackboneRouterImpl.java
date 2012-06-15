@@ -21,7 +21,7 @@ import eu.linksmart.security.communication.SecurityProperty;
 public class BackboneRouterImpl implements BackboneRouter {
 
 	private Logger logger = Logger
-			.getLogger(BackboneRouterImpl.class.getName());
+	.getLogger(BackboneRouterImpl.class.getName());
 	protected ComponentContext context;
 
 	private Map<HID, Backbone> hidBackboneMap = new HashMap<HID, Backbone>();
@@ -30,7 +30,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	private String defaultRoute;
 
 	private static String BACKBONE_ROUTER = BackboneRouterImpl.class
-			.getSimpleName();
+	.getSimpleName();
 	private static String ROUTING_JXTA = "JXTA";
 	BackboneRouterConfigurator configurator;
 
@@ -41,7 +41,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 		bindNMCore((NetworkManagerCore) context
 				.locateService(NetworkManagerCore.class.getSimpleName()));
-		
+
 		configurator = new BackboneRouterConfigurator(this,
 				context.getBundleContext());
 		configurator.registerConfiguration();
@@ -78,13 +78,16 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * @return success status response of the network manager
 	 */
 	@Override
-	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data) {
+	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data, boolean synch) {
 		Backbone b = (Backbone) hidBackboneMap.get(receiverHID);
 		if (b == null) {
 			throw new IllegalArgumentException(
 					"No Backbone found to reach HID " + receiverHID);
 		}
-		return b.sendData(senderHID, receiverHID, data);
+		if (synch)
+			return b.sendDataSynch(senderHID, receiverHID, data);
+		else
+			return b.sendDataAsynch(senderHID, receiverHID, data);
 	}
 
 	/**
@@ -104,12 +107,12 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 		// TODO: check why backbone for receiverHID would be needed - and if it
 		// is needed one has to check if receiverHID is NULL (in case of
-//		 broadcast messagereceiverHID is NULL)
+		//		 broadcast messagereceiverHID is NULL)
 		Backbone b = (Backbone)hidBackboneMap.get(senderHID);
 		if (b == null) {
 			hidBackboneMap.put(senderHID, originatingBackbone);
 		}
-		
+
 		// TODO #NM refactoring check case when there is no core what to do
 		// Has to be considered as future feature for relay nodes
 		if (nmCore != null) {
@@ -158,7 +161,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(BackboneRouterConfigurator.COMMUNICATION_TYPE)) {
 			this.defaultRoute = (String) configurator
-					.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
+			.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
 		}
 	}
 
@@ -226,7 +229,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		}
 		return true;
 	}
-	
+
 	@Override 
 	public void addRouteForRemoteHID(HID senderHID, HID remoteHID) {
 		Backbone senderBackbone = hidBackboneMap.get(senderHID);
@@ -320,7 +323,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 		}
 		return availableBackbones.values().remove(backbone);
 	}
-	
+
 	/**
 	 * returns list of security properties available via a given backbone
 	 * necessary because we do not know what backbones we have, and there is no point in creating backbones on the fly to ask them

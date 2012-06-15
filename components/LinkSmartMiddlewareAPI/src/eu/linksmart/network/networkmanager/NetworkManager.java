@@ -15,7 +15,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	/**
 	 * Send data from one LinkSmart node to another node.
 	 */
-	public NMResponse sendData(HID sender, HID receiver, byte [] data)	throws RemoteException;
+	public NMResponse sendData(HID sender, HID receiver, byte [] data, boolean synch)	throws RemoteException;
 		
 	/**
 	 * Retrieves HID of NetworkManagerCore.
