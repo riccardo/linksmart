@@ -221,6 +221,8 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	}
 
 	public Message processMessage(Message msg) throws CryptoException, VerificationFailureException, IOException{
+		if(lastSent == msg)
+			return msg;
 		if(!isInitialized){
 			if(!isStarted()){
 				//check if protocol is started or this message has to be stored
