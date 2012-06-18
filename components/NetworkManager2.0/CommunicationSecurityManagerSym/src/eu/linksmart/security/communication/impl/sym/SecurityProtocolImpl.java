@@ -50,115 +50,119 @@ import eu.linksmart.utils.Base64;
 public class SecurityProtocolImpl implements SecurityProtocol {
 
 	/**
-	 * JCE Encryption algorithm used
+	 * JCE Encryption algorithm used.
 	 */
 	public static final String SYMMETRIC_ENCRYPTION_ALGORITHM = "AES";
 	/**
-	 * JCE MAC algorithm used
+	 * JCE MAC algorithm used.
 	 */
 	public static final String MAC_ALGORITHM = "HmacSHA256";
 	/**
-	 * XMLCipher name of encryption algorithm
+	 * XMLCipher name of encryption algorithm.
 	 */
 	public static final String XMLCIPHER_ENCRYPTION_ALGORITHM = XMLCipher.AES_128;
 	/**
-	 * XMLSignature name of signature algorithm
+	 * XMLSignature name of signature algorithm.
 	 */
 	public static final String XMLSIGNATURE_MAC_ALGORITHM = XMLSignature.ALGO_ID_MAC_HMAC_SHA256;
 	/**
-	 * The Log4j logger of this class
+	 * The Log4j logger of this class.
 	 */
 	private static Logger logger = Logger.getLogger(SecurityProtocolImpl.class);
 
 	/**
-	 * {@CryptoManager} used to store certificates and keys
+	 * {@CryptoManager} used to store certificates and keys.
 	 */
 	private CryptoManager cryptoMgr = null;
 	/**
-	 * {@TrustManager} used to check validity of certificates
+	 * {@TrustManager} used to check validity of certificates.
 	 */
 	private TrustManager trustMgr = null;
 	/**
-	 * The client of this protocol run meaning who started the communication
+	 * The client of this protocol run meaning who started the communication.
 	 */
 	private HID clientHID = null;
 	/**
-	 * The server of this protocol run meaning who received the request
+	 * The server of this protocol run meaning who received the request.
 	 */
 	private HID serverHID = null;
 	/**
-	 * The threshold between 0 and 1 needed for a certificate to be accepted
+	 * The threshold between 0 and 1 needed for a certificate to be accepted.
 	 */
 	private double trustThreshold;
 
 	/**
-	 * NonceGenerator used for creating nonces in this protocol
+	 * NonceGenerator used for creating nonces in this protocol.
 	 */
 	private NonceGenerator nonceGenerator = null;
 	/**
-	 * Indicates whether the handshake has already been completed successfully
+	 * Indicates whether the handshake has already been completed successfully.
 	 */
 	private boolean isInitialized = false;
 	/**
-	 * Implements the handshake for the asymmetric part of the protocol
+	 * Implements the handshake for the asymmetric part of the protocol.
 	 */
 	private AsymHandshake asymHandshake = null;
 	/**
-	 * Implements the handshake for the symmetric part of the protocol 
+	 * Implements the handshake for the symmetric part of the protocol .
 	 */
 	private SymHandshake symHandshake = null;
 	/**
-	 * Indicates whether asymmetric handshake or symmetric handshake is running
+	 * Indicates whether asymmetric handshake or symmetric handshake is running.
 	 */
 	private boolean isAsymRunning = false;
 	/**
-	 * The MAC sym key used by the client
+	 * The MAC sym key used by the client.
 	 */
 	private Key localMacKey = null;
 	/**
-	 * The MAC sym key used by the server
+	 * The MAC sym key used by the server.
 	 */
 	private Key remoteMacKey = null;
 	/**
-	 * The sym encryption key used by the client
+	 * The sym encryption key used by the client.
 	 */
 	private Key localEncKey = null;
 	/**
-	 * The sym encryption key used by the server
+	 * The sym encryption key used by the server.
 	 */
 	private Key remoteEncKey = null;
 	/**
-	 * The IV for the next client message
+	 * The IV for the next client message.
 	 */
 	private byte[] localIV = null;
 	/**
-	 * The IV for the next server message
+	 * The IV for the next server message.
 	 */
 	private byte[] remoteIV = null;
 	/**
-	 * Tells whether handshake protocol is started
+	 * Tells whether handshake protocol is started.
 	 */
 	private boolean isStarted;
 	/**
-	 * Tells whether this is the client in the handshake
+	 * Tells whether this is the client in the handshake.
 	 */
 	private boolean isClient;
 	/**
-	 * Stores the message with wich the handshake has been started to send it later
+	 * Stores the message with wich the handshake has been started to send it later.
 	 */
 	private Message storedMessage;
 	/**
-	 * The master key id for this two entities
+	 * The master key id for this two entities.
 	 */
 	private String masterKeyId;
 	/**
-	 * Increasing counter of the client messages for reorder protection
+	 * Increasing counter of the client messages for reorder protection.
 	 */
 	private int localCounter = 0;
 	/**
-	 * Increasing counter of the server messages for reorder protection
+	 * Increasing counter of the server messages for reorder protection.
 	 */
 	private int remoteCounter = 0;
+	/**
+	 * Last sent message to avoid double processing.
+	 */
+	private Message lastSent = null;
 
 	public SecurityProtocolImpl(HID clientHID,
 			HID serverHID,
@@ -225,7 +229,8 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 					isClient = true;
 					isStarted = true;
 					storedMessage = msg;
-					return startProtocol();
+					lastSent = startProtocol();
+					return lastSent;
 				} else if(msg.getTopic().contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)){
 					//this is the server side of a handshake but decide which handshake the message belongs to
 					Command cmd = getCommand(msg);
@@ -251,7 +256,8 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 			//check whether asymmetric or symmetric handshake is running based on message type and certificates
 			if(this.isAsymRunning){
 				try {
-					return asymHandshake.processMessage(msg);
+					lastSent = asymHandshake.processMessage(msg);
+					return lastSent;
 				} catch (CryptoException ce) {
 					throw ce;
 				} catch (VerificationFailureException ve){
@@ -266,7 +272,8 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 				}
 			}else{
 				try {
-					return symHandshake.processMessage(msg);
+					lastSent = symHandshake.processMessage(msg);
+					return lastSent;
 				} catch (Exception e){
 					//make cryptoexception from exception 
 					CryptoException ce = new CryptoException("Error processing protocol message");
