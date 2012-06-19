@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
+import eu.linksmart.security.communication.SecurityProtocol;
 import eu.linksmart.security.communication.VerificationFailureException;
 import eu.linksmart.security.communication.util.impl.BytesUtil;
 import eu.linksmart.security.communication.util.impl.Command;
@@ -218,7 +219,7 @@ public class SymHandshake {
 					//read application data out of acknowledgment
 					if(command.containsKey(Command.APPLICATION_MESSAGE)){
 						String data = command.getProperty(Command.APPLICATION_MESSAGE);
-						Message message = new Message("CIPHERTEXT", secProtocol.getClientHID(), secProtocol.getServerHID(), data.getBytes());
+						Message message = new Message(SecurityProtocol.CIPHER_TEXT, secProtocol.getClientHID(), secProtocol.getServerHID(), data.getBytes());
 						message = secProtocol.unprotectMessage(message);
 						return message;
 					}

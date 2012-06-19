@@ -242,7 +242,7 @@ MessageDistributor {
 			 * of it
 			 */
 			//TODO check if should be always synch
-			return sendMessageSynch(msg, this.myHID, receiverHID);
+			return sendMessageAsynch(msg, this.myHID, msg.getReceiverHID());
 		} else {
 			NMResponse response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_SUCCESS);

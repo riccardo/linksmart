@@ -28,11 +28,11 @@ public class Connection {
 	/**
 	 * Name of the property holding the applicaton data
 	 */
-	private static final String APPLICATION_DATA = "applicationData";
+	public static final String APPLICATION_DATA = "applicationData";
 	/**
 	 * Name of the property holding the topic of the message
 	 */
-	private static final String TOPIC = "topic";
+	public static final String TOPIC = "topic";
 
 	/**
 	 * Logger from log4j
@@ -54,7 +54,7 @@ public class Connection {
 	protected Connection(HID serverHID) {
 		if (serverHID == null) {
 			throw new IllegalArgumentException(
-					"Cannot set null for required fields.");
+			"Cannot set null for required fields.");
 		}
 		this.serverHID = serverHID;
 	}
@@ -62,7 +62,7 @@ public class Connection {
 	public Connection(HID clientHID, HID serverHID) {
 		if (clientHID == null || serverHID == null) {
 			throw new IllegalArgumentException(
-					"Cannot set null for required fields.");
+			"Cannot set null for required fields.");
 		}
 		this.clientHID = clientHID;
 		this.serverHID = serverHID;
@@ -96,53 +96,38 @@ public class Connection {
 	 * @return Message object for further processing
 	 */
 	public Message processData(HID senderHID, HID receiverHID, byte[] data) {
-		// open data and divide it into properties of the message and
-		// application data
-		Properties properties = new Properties();
-		try {
-			properties.loadFromXML(new ByteArrayInputStream(data));
-		} catch (InvalidPropertiesFormatException e) {
-			logger.error(
-					"Unable to load properties from XML data. Data is not valid XML: "
-							+ new String(data), e);
-		} catch (IOException e) {
-			logger.error("Unable to load properties from XML data: "
-					+ new String(data), e);
-		}
-
-		// create real message
-		Message message = new Message((String) properties.remove(TOPIC),
-				senderHID, receiverHID, (Base64.decode((String) properties
-						.remove(APPLICATION_DATA))));
-		// go through the properties and add them to the message
-		Iterator<Object> i = properties.keySet().iterator();
-		while (i.hasNext()) {
-			String key = (String) i.next();
-			message.setProperty(key, properties.getProperty(key));
-		}
-		
+		Message message = null;
 		//check if application data has to be unprotected
 		if (securityProtocol != null && securityProtocol.isInitialized()) {
 			// if protocol is initialized than open message with it
 			try {
+				message = unserializeMessage(data, false, senderHID, receiverHID);
 				message = securityProtocol.unprotectMessage(message);
+				//use data field of message to reconstruct original message
+				message = unserializeMessage(message.getData(), true, senderHID, receiverHID);
 			} catch (Exception e) {
 				logger.debug("Cannot unprotect message from HID: "
 						+ senderHID.toString());
 				return null;
 			}
-		} else if (securityProtocol != null
-				&& !securityProtocol.isInitialized()) {
-			// if protocol not initialized then pass it for processing			
-			// Process message by Security Protocol
-			try {
-				message = securityProtocol.processMessage(message);
-			} catch (CryptoException e) {
-				logger.error("Error during cryptographic operation", e);
-			} catch (VerificationFailureException e) {
-				logger.error("Error during cryptographic operation", e);
-			} catch (IOException e) {
-				logger.error("Error during cryptographic operation", e);
+		} else { 
+			message = unserializeMessage(data, true, senderHID, receiverHID);
+			if (securityProtocol != null
+					&& !securityProtocol.isInitialized()) {
+				// if protocol not initialized then pass it for processing			
+				// Process message by Security Protocol
+				try {
+					message = securityProtocol.processMessage(message);
+					/*possible that last handshake message held a message which got unprotected
+					but not reconstructed yet*/
+					message = unserializeMessage(message.getData(), true, senderHID, receiverHID);
+				} catch (CryptoException e) {
+					logger.error("Error during cryptographic operation", e);
+				} catch (VerificationFailureException e) {
+					logger.error("Error during cryptographic operation", e);
+				} catch (IOException e) {
+					logger.error("Error during cryptographic operation", e);
+				}
 			}
 		}
 		return message;
@@ -165,18 +150,48 @@ public class Connection {
 			// the message has to be processed for sending now by the regular
 			// code
 		}
-		// read the properties of the message and put them into one properties
-		// object
+
+		//serialize the message into one stream to protect it
+		byte[] serializedCommand = serializeMessage(msg, true);
+		//protect the stream if should be
+		if (securityProtocol != null
+				&& securityProtocol.isInitialized()
+				&& !msg.getTopic().contentEquals(
+						CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
+			/*
+			 * this could also be a message which has been stored by the
+			 * security protocol until now and is becoming sent at last
+			 */
+			// set all data of the message as data part and protect it
+			msg.setData(serializedCommand);
+			msg = securityProtocol.protectMessage(msg);
+			//serialize the propertyless created protected dummy message
+			return serializeMessage(msg, false);
+		} else {
+			return serializedCommand;
+		}
+	}
+
+	/**
+	 * Creates a stream from the provided message
+	 * @param msg to be serialized
+	 * @param includeProperties
+	 * @return
+	 */
+	private byte[] serializeMessage(Message msg, boolean includeProperties) {
 		Properties props = new Properties();
-		Iterator<String> i = msg.getKeySet().iterator();
-		while (i.hasNext()) {
-			String key = i.next();
-			props.put(key, msg.getProperty(key));
+		if(includeProperties) {
+			// read the properties of the message and put it into the properties
+			Iterator<String> i = msg.getKeySet().iterator();
+			while (i.hasNext()) {
+				String key = i.next();
+				props.put(key, msg.getProperty(key));
+			}
 		}
 		// put application data into properties
 		props.put(APPLICATION_DATA, Base64.encodeBytes(msg.getData()));
 		props.put(TOPIC, msg.getTopic());
-		// convert props into xml and encode it
+		//convert properties to xml and put it into stream
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		byte[] serializedCommand = null;
 		try {
@@ -191,20 +206,44 @@ public class Connection {
 				logger.error("Error closing stream", e);
 			}
 		}
-		if (securityProtocol != null
-				&& securityProtocol.isInitialized()
-				&& props.getProperty(TOPIC).equals(
-						CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
-			/*
-			 * this could also be a message which has been stored by the
-			 * security protocol until now and is becoming sent at last
-			 */
-			// set all data of the message as data part and protect it
-			msg.setData(serializedCommand);
-			msg = securityProtocol.protectMessage(msg);
-			return msg.getData();
-		} else {
-			return serializedCommand;
+		return serializedCommand;
+	}
+
+	/**
+	 * Creates message from received byte stream.
+	 * @param serializedMsg Stream to read from
+	 * @param includeProps Fill properties fields of msg
+	 * @param senderHID
+	 * @param receiverHID
+	 * @return
+	 */
+	private Message unserializeMessage(byte[] serializedMsg, boolean includeProps, HID senderHID, HID receiverHID) {
+		// open data and divide it into properties of the message and
+		// application data
+		Properties properties = new Properties();
+		try {
+			properties.loadFromXML(new ByteArrayInputStream(serializedMsg));
+		} catch (InvalidPropertiesFormatException e) {
+			logger.error(
+					"Unable to load properties from XML data. Data is not valid XML: "
+					+ new String(serializedMsg), e);
+		} catch (IOException e) {
+			logger.error("Unable to load properties from XML data: "
+					+ new String(serializedMsg), e);
 		}
+
+		// create real message
+		Message message = new Message((String) properties.remove(TOPIC),
+				senderHID, receiverHID, (Base64.decode((String) properties
+						.remove(APPLICATION_DATA))));
+		if(includeProps) {
+			// go through the properties and add them to the message
+			Iterator<Object> i = properties.keySet().iterator();
+			while (i.hasNext()) {
+				String key = (String) i.next();
+				message.setProperty(key, properties.getProperty(key));
+			}
+		}
+		return message;
 	}
 }

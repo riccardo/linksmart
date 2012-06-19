@@ -23,6 +23,7 @@ public interface SecurityProtocol {
 	public static final String INSIDE_COUNTER_ELEMENT = "linksmart:InsideCounter";
 	public static final String INSIDE_CONTENT_ELEMENT = "linksmart:InsideContent";
 	public static final String INSIDE_PROTECTED_ELEMENT = "linksmart:InsideProtected";
+	public static final String CIPHER_TEXT = "CIPHERTEXT";
 	
 	/**
 	 * Starts the initialization of the security

@@ -17,6 +17,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.InvalidPropertiesFormatException;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.crypto.KeyGenerator;
@@ -288,7 +289,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 						if(command.containsKey(Command.APPLICATION_MESSAGE)){
 							try{
 								String data = command.getProperty(Command.APPLICATION_MESSAGE);
-								Message message = new Message("CIPHERTEXT", clientHID, serverHID, data.getBytes());
+								Message message = new Message(SecurityProtocol.CIPHER_TEXT, clientHID, serverHID, data.getBytes());
 								message = unprotectMessage(message);
 								return message;
 							}catch(Exception e){

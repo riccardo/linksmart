@@ -267,7 +267,7 @@ public class AsymHandshake {
 				//read application data out of acknowledgment
 				if(command.containsKey(Command.APPLICATION_MESSAGE)){
 					String data = command.getProperty(Command.APPLICATION_MESSAGE);
-					Message message = new Message("CIPHERTEXT", secProtocol.getClientHID(), secProtocol.getServerHID(), data.getBytes());
+					Message message = new Message(SecurityProtocol.CIPHER_TEXT, secProtocol.getClientHID(), secProtocol.getServerHID(), data.getBytes());
 					message = secProtocol.unprotectMessage(message);
 					return message;
 				}
