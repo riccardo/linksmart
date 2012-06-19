@@ -8,6 +8,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.sql.SQLException;
 import java.util.InvalidPropertiesFormatException;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.crypto.KeyGenerator;
@@ -189,6 +190,33 @@ public class AsymHandshake {
 					//also add protected stored message to acknowledgment
 					Message storedMessage = null;
 					if((storedMessage = secProtocol.getStoredMessage()) != null){
+						//put whole message into data field - is independent from connection
+						Properties props = new Properties();
+						// read the properties of the message and put it into the properties
+						Iterator<String> i = storedMessage.getKeySet().iterator();
+						while (i.hasNext()) {
+							String key = i.next();
+							props.put(key, storedMessage.getProperty(key));
+						}
+						// put application data into properties
+						props.put(Command.APPLICATION_MESSAGE, Base64.encodeBytes(storedMessage.getData()));
+						props.put(Command.TOPIC, storedMessage.getTopic());
+						//convert properties to xml and put it into stream
+						ByteArrayOutputStream bos = new ByteArrayOutputStream();
+						byte[] serializedCommand = null;
+						try {
+							props.storeToXML(bos, null);
+							serializedCommand = bos.toByteArray();
+						} catch (IOException e) {
+							logger.warn("Message to be sent cannot be parsed!");
+						} finally {
+							try {
+								bos.close();
+							} catch (IOException e) {
+								logger.error("Error closing stream", e);
+							}
+						}
+						storedMessage.setData(serializedCommand);
 						Message protectedMessage = secProtocol.protectMessage(storedMessage);
 						cmd.setProperty(Command.APPLICATION_MESSAGE, new String(protectedMessage.getData()));
 						secProtocol.setStoredMessage(null);
@@ -265,10 +293,35 @@ public class AsymHandshake {
 			}else if(sentKeyToClient && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_ACK){
 				setInitialized();
 				//read application data out of acknowledgment
-				if(command.containsKey(Command.APPLICATION_MESSAGE)){
+				if(command.containsKey(Command.APPLICATION_MESSAGE)) {
 					String data = command.getProperty(Command.APPLICATION_MESSAGE);
 					Message message = new Message(SecurityProtocol.CIPHER_TEXT, secProtocol.getClientHID(), secProtocol.getServerHID(), data.getBytes());
 					message = secProtocol.unprotectMessage(message);
+					// open data and divide it into properties of the message and
+					// application data
+					byte[] serializedMsg = message.getData();
+					Properties properties = new Properties();
+					try {
+						properties.loadFromXML(new ByteArrayInputStream(serializedMsg));
+					} catch (InvalidPropertiesFormatException e) {
+						logger.error(
+								"Unable to load properties from XML data. Data is not valid XML: "
+								+ new String(serializedMsg), e);
+					} catch (IOException e) {
+						logger.error("Unable to load properties from XML data: "
+								+ new String(serializedMsg), e);
+					}
+
+					// create real message
+					message = new Message((String) properties.remove(Command.TOPIC),
+							message.getSenderHID(), message.getReceiverHID(), (Base64.decode((String) properties
+									.remove(Command.APPLICATION_MESSAGE))));
+					// go through the properties and add them to the message
+					Iterator<Object> i = properties.keySet().iterator();
+					while (i.hasNext()) {
+						String key = (String) i.next();
+						message.setProperty(key, properties.getProperty(key));
+					}
 					return message;
 				}
 			}

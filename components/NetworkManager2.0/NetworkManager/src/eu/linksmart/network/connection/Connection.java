@@ -118,9 +118,6 @@ public class Connection {
 				// Process message by Security Protocol
 				try {
 					message = securityProtocol.processMessage(message);
-					/*possible that last handshake message held a message which got unprotected
-					but not reconstructed yet*/
-					message = unserializeMessage(message.getData(), true, senderHID, receiverHID);
 				} catch (CryptoException e) {
 					logger.error("Error during cryptographic operation", e);
 				} catch (VerificationFailureException e) {

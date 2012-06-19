@@ -83,6 +83,7 @@ public class Command extends Properties {
 	public static final String CLIENT = "client";
 	public static final String SYMMETRIC_KEY = "symmetrickey";
 	public static final String APPLICATION_MESSAGE= "applicationData";
+	public static final String TOPIC = "topic";
 	public static final String CLIENT_NONCE = "clientNonce";
 	public static final String SERVER_NONCE = "serverNonce";
 	public static final String SERVER_AUTH_TOKEN = "serverAuthToken";
