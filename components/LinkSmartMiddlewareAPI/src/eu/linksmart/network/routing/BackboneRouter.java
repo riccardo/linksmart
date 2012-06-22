@@ -27,7 +27,7 @@ public interface BackboneRouter {
 	 * @param senderHID
 	 * @param receiverHID
 	 * @param message
-	 * @param synchronous sending
+	 * @param synchrounous = true will block until a reply from the peer is accepted or a timeout is reached. 
 	 */
 	public NMResponse sendData(HID senderHID, HID receiverHID,
 			byte[] protectedData, boolean synch);
@@ -99,7 +99,7 @@ public interface BackboneRouter {
 	 * Removes a route from the BackboneRouter, if the HID was reached through
 	 * the given backbone
 	 * 
-	 * @param hid
+	 * @param hid 
 	 *            The HID of which the route should be removed
 	 * @param backbone
 	 *            The name of the backbone through which the HID was reached
@@ -124,8 +124,8 @@ public interface BackboneRouter {
 	public NMResponse broadcastData(HID sender, byte[] data);
 
 	/**
-	 * 
-	 * @param updates
+	 * update the backbone configuration
+	 * @param backbone configuration from the status page.
 	 */
 	public void applyConfigurations(Hashtable updates);
 	
@@ -139,11 +139,17 @@ public interface BackboneRouter {
 	public List<SecurityProperty> getBackboneSecurityProperties(String backbone);
 
 	/**
+	 * this method is needed by the network manager status page 
 	 * @param hid
 	 * @return "BackboneType:BackboneAddresse"
 	 */
 	public String getRoute(HID hid);
 	
+	/**
+	 * this method is needed by the network manager status page
+	 * @param hid
+	 * @return Backbone class name
+	 */
 	public String getBackboneType(HID hid);
 	
 
