@@ -92,11 +92,15 @@ public interface Backbone {
 	public boolean removeEndpoint(HID hid);
 	
 	/**
-	 * 
+	 * used to apply configurations from the web page 
 	 * @param updates
 	 */
 	public void applyConfigurations(Hashtable updates);
 	
+	/**
+	 * 
+	 * @return Backbone implementation's class name
+	 */
 	public String getName();
 	
 	
