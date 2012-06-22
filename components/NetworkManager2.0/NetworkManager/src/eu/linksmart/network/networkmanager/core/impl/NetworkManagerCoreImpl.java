@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 
+import eu.linksmart.network.ErrorMessage;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
@@ -235,12 +236,15 @@ MessageDistributor {
 				.setMessage("Received a message which has not been processed");
 				return response;
 			} else {
-				NMResponse nmresp = null;
 				if(!msg.getReceiverHID().equals(senderHID)) {
 					// forward over sendMessage method of this and return response
-					nmresp = sendMessageSynch(msg, this.myHID, msg.getReceiverHID());
+					//here sendmessage should include a message object
+					msg = sendMessageSynch(msg, this.myHID, msg.getReceiverHID())
+					.getMessageObject();
 				}
-				if(nmresp.getMessageObject().getReceiverHID().equals(senderHID)) {
+				NMResponse nmresp = new NMResponse();
+				if(msg != null &&
+						msg.getReceiverHID().equals(senderHID)) {
 					//create response with connection and etc
 					nmresp.setStatus(NMResponse.STATUS_SUCCESS);
 					try {
@@ -250,6 +254,7 @@ MessageDistributor {
 						nmresp.setStatus(NMResponse.STATUS_ERROR);
 					}
 				} else {
+
 					nmresp.setStatus(NMResponse.STATUS_ERROR);
 					nmresp.setMessage("Error in processing request");
 				}
@@ -466,7 +471,7 @@ MessageDistributor {
 					tempMessage.getTopic().
 					contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
 				response = this.backboneRouter.sendDataSynch(senderHID, 
-						receiverHID, tempMessage.getData());
+						receiverHID, connection.processMessage(tempMessage));
 				tempMessage = connection.processData(receiverHID, senderHID,
 						response.getMessage().getBytes());
 			}
@@ -479,8 +484,13 @@ MessageDistributor {
 			.setMessage("Could not create packet from message from HID: "
 					+ message.getSenderHID());
 			return response;
-		}		
-		response.setStatus(NMResponse.STATUS_SUCCESS);
+		}	
+
+		if(tempMessage.getClass().equals(ErrorMessage.class)) {
+			response.setStatus(NMResponse.STATUS_ERROR);
+		} else {
+			response.setStatus(NMResponse.STATUS_SUCCESS);
+		}
 		response.setMessageObject(tempMessage);
 		response.setMessage(new String(tempMessage.getData()));
 		return response;

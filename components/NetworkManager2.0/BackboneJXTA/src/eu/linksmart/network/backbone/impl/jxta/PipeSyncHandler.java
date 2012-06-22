@@ -509,8 +509,6 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			Message msg = event.getMessage();
 			String type = msg.getMessageElement(MESSAGE_ELEMENT_NAME_TYPE).toString();
 
-			ByteArrayMessageElement synchBytes = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SYNCH);
-			boolean synch = new String(synchBytes.getBytes()).contentEquals(TRUE);
 			ByteArrayMessageElement data = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DATA);
 			ByteArrayMessageElement dest = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DESTINATION);
 			ByteArrayMessageElement source = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SOURCE);			
@@ -527,7 +525,9 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 
 				HID sourceHID = new HID(source.getBytes());
 				HID destHID = new HID(dest.getBytes());
-
+				
+				ByteArrayMessageElement synchBytes = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SYNCH);
+				boolean synch = new String(synchBytes.getBytes()).contentEquals(TRUE);
 				try {
 					r = receiveData(sourceHID, 
 							destHID, data.getBytes(), synch);

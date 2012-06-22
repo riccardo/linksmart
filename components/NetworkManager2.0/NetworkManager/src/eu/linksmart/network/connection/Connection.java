@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import eu.linksmart.network.ErrorMessage;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
@@ -224,9 +225,13 @@ public class Connection {
 			logger.error(
 					"Unable to load properties from XML data. Data is not valid XML: "
 					+ new String(serializedMsg), e);
+			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
+					senderHID, receiverHID, e.getMessage().getBytes());
 		} catch (IOException e) {
 			logger.error("Unable to load properties from XML data: "
 					+ new String(serializedMsg), e);
+			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
+					senderHID, receiverHID, e.getMessage().getBytes());
 		}
 
 		// create real message

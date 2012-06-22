@@ -277,7 +277,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		NMResponse response = new NMResponse();
 
 		// give message to BBRouter for further processing
-		response = bbRouter.receiveDataSynch(senderHID, receiverHID, receivedData,
+		response = bbRouter.receiveDataAsynch(senderHID, receiverHID, receivedData,
 				(Backbone) this);
 
 		logger.debug("receiveData Response: " + response.toString());
