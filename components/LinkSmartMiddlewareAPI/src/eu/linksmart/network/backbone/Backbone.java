@@ -40,9 +40,19 @@ public interface Backbone {
 	 * @param senderHID
 	 * @param receiverHID
 	 * @param data
-	 * @return
+	 * @return includes response to message
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data);
+	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data);
+	
+	/**
+	 * Receives a message over the specific communication channel.
+	 * 
+	 * @param senderHID
+	 * @param receiverHID
+	 * @param data
+	 * @return includes status of sending attempt
+	 */
+	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data);
 
 	/**
 	 * Broadcasts a message over the specific communication channel.

@@ -13,6 +13,7 @@ public class NMResponse  implements java.io.Serializable {
 	public static final int STATUS_TIMEOUT = 2;
 	
     private java.lang.String message;
+    private Message messageObject;
     private int status;
 
     public NMResponse() {
@@ -21,12 +22,19 @@ public class NMResponse  implements java.io.Serializable {
     public NMResponse(int status) {
            this.status = status;
     }
-
+    
+    public Message getMessageObject() {
+    	return messageObject;
+    }
+    
+    public void setMessageObject(Message msg) {
+    	messageObject = msg;
+    }
 
     /**
      * Gets the message value for this NMResponse.
      * 
-     * @return message
+     * @return message if no msg object else null
      */
     public java.lang.String getMessage() {
         return message;

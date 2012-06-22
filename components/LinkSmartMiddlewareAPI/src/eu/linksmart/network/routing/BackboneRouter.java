@@ -27,10 +27,20 @@ public interface BackboneRouter {
 	 * @param senderHID
 	 * @param receiverHID
 	 * @param message
-	 * @param synchrounous = true will block until a reply from the peer is accepted or a timeout is reached. 
 	 */
-	public NMResponse sendData(HID senderHID, HID receiverHID,
-			byte[] protectedData, boolean synch);
+	public NMResponse sendDataSynch(HID senderHID, HID receiverHID,
+			byte[] protectedData);
+	
+	/**
+	 * This method checks by which channel the receiver is reachable and sends
+	 * the message.
+	 * 
+	 * @param senderHID
+	 * @param receiverHID
+	 * @param message
+	 */
+	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID,
+			byte[] protectedData);
 
 	/**
 	 * Receives a message which also specifies the communication channel used by
@@ -42,9 +52,22 @@ public interface BackboneRouter {
 	 * @param data
 	 * @param originatingBackbone
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data,
+	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data,
 			Backbone originatingBackbone);
 
+	/**
+	 * Receives a message which also specifies the communication channel used by
+	 * the sender. This will then update the list of HIDs and which backbone
+	 * they use.
+	 * 
+	 * @param senderHID
+	 * @param receiverHID
+	 * @param data
+	 * @param originatingBackbone
+	 */
+	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data,
+			Backbone originatingBackbone);
+	
 	/**
 	 * this method is invoked by backbone when a service requests a new HID to
 	 * the network manager. this msg will be firstly accepted by backbone, and

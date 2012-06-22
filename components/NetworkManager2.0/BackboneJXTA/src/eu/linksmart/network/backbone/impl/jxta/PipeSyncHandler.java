@@ -106,6 +106,9 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private static final String MESSAGE_ELEMENT_TYPE_REQUEST = "REQUEST2";
 	private static final String MESSAGE_ELEMENT_TYPE_RESPONSE = "RESPONSE2";	
 	private static final String MESSAGE_ELEMENT_NAME_REQUESTID = "RequestId";
+	private static final String MESSAGE_ELEMENT_NAME_SYNCH = "Synch";
+	private static final String TRUE = "true";
+	private static final String FALSE = "false";
 
 	private PipeService pipeService;
 	private PipeAdvertisement pipeAdv;
@@ -195,9 +198,11 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 *            the index
 	 * @return the request message
 	 */
-	private Message createRequestMessage(HID source, HID dest, byte[] data, String requestID) {
+	private Message createRequestMessage(HID source, HID dest, byte[] data, String requestID, boolean synch) {
 
 		Message msg = new Message();
+		msg.addMessageElement(new ByteArrayMessageElement(
+		MESSAGE_ELEMENT_NAME_SYNCH, null, (synch)?TRUE.getBytes():FALSE.getBytes(), null));
 		msg.addMessageElement(new ByteArrayMessageElement(
 				MESSAGE_ELEMENT_NAME_DATA, null, data, null));
 		msg.addMessageElement(new ByteArrayMessageElement(
@@ -231,7 +236,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		if(synch) {
 			requestIdPipeSenderTable.put(i, pipeSender);
 		}
-		NMResponse res = pipeSender.sendDataOverPipe(s, d, data, pID);
+		NMResponse res = pipeSender.sendDataOverPipe(s, d, data, pID, synch);
 
 		//block until response comes and then remove id
 		if(synch) {
@@ -306,10 +311,12 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		 *            the destine LinkSmart ID
 		 * @param data
 		 *            the data to send
+		 * @param synch
+		 * 			  send message synchronously
 		 * @return the response
 		 */
 		public NMResponse sendDataOverPipe(String s, String d, byte[] data,
-				PeerID pID) {
+				PeerID pID, boolean synch) {
 
 			HID dest = new HID(d);
 			HID source = new HID(s);
@@ -346,7 +353,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					outPipe = createOutputPipe(pID);
 					logger.debug("The pipe to " + pID.toString()
 							+ " was closed or never created before");
-					Message message = createRequestMessage(source, dest, data, i.toString());
+					Message message = createRequestMessage(source, dest, data, i.toString(), synch);
 
 					try {
 						if(outPipe.send(message)){
@@ -372,7 +379,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					return resp;
 				}
 			} else {
-				Message message = createRequestMessage(source, dest, data, i.toString());
+				Message message = createRequestMessage(source, dest, data, i.toString(), true);
 
 				try {
 
@@ -457,9 +464,14 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 * @throws java.rmi.RemoteException
 	 */
 	private NMResponse receiveData(HID senderHID, HID receiverHID,
-			byte[] data) throws java.rmi.RemoteException {
-		return bbjxta.receiveData(senderHID, receiverHID,
-				data);
+			byte[] data, boolean synch) throws java.rmi.RemoteException {
+		if(synch) {
+			return bbjxta.receiveDataSynch(senderHID, receiverHID,
+					data);
+		} else {
+			return bbjxta.receiveDataAsynch(senderHID, receiverHID,
+					data);
+		}
 	}
 
 	/**
@@ -497,6 +509,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			Message msg = event.getMessage();
 			String type = msg.getMessageElement(MESSAGE_ELEMENT_NAME_TYPE).toString();
 
+			ByteArrayMessageElement synchBytes = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SYNCH);
+			boolean synch = new String(synchBytes.getBytes()).contentEquals(TRUE);
 			ByteArrayMessageElement data = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DATA);
 			ByteArrayMessageElement dest = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DESTINATION);
 			ByteArrayMessageElement source = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SOURCE);			
@@ -516,15 +530,17 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 
 				try {
 					r = receiveData(sourceHID, 
-							destHID, data.getBytes());
+							destHID, data.getBytes(), synch);
 				} catch (RemoteException e) {
 					logger.error("Error calling receiveData " + e.getMessage());
 				}
 
 				logger.debug("Received data : " + data.toString() + " from HID="
 						+ sourceHID.toString() + " to HID=" + destHID.toString());
+				if(synch) {
 				// reverse source and destination because we (dest) send response back to source
 				sendMessageResponse(destHID, sourceHID, r.getMessage().getBytes(), requestId);
+				}
 
 			}else if (type.toString().equalsIgnoreCase(MESSAGE_ELEMENT_TYPE_RESPONSE)) {
 				/*

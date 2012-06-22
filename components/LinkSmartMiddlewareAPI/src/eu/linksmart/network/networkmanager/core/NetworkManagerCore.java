@@ -31,14 +31,17 @@ public interface NetworkManagerCore extends NetworkManager {
 
 	
 	/**
-	 * Receive data from one LinkSmart node to another node.
+	 * Receive data from one LinkSmart node to another node synchronously.
+	 * @return Includes the response to the message
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte [] data);
+	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte [] data);
+	
+	/**
+	 * Receive data from one LinkSmart node to another node asynchronously.
+	 * @return Includes only status of delivery attempt
+	 */
+	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte [] data);
 
-//	/**
-//	 * Creates an HID based on byte array data
-//	 */
-//	public HID createHID(byte [] data) throws IOException;
 	
 	/**
 	 * Adds an HID of a remote service.  

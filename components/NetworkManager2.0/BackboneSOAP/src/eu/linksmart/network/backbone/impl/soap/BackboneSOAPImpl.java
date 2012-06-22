@@ -341,7 +341,19 @@ public class BackboneSOAPImpl implements Backbone {
 	 * @param data
 	 * @return
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data) {
+	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data) {
+		return null;
+	}
+	
+	/**
+	 * Receives a message over the specific communication channel.
+	 * 
+	 * @param senderHID
+	 * @param receiverHID
+	 * @param data
+	 * @return
+	 */
+	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
 		return null;
 	}
 

@@ -97,7 +97,7 @@ MessageDistributor {
 			LOG.error("Should never happen.", e);
 		}
 		connectionManager.setOwnerHID(myHID);
-		
+
 		// Init Servlets
 		HttpService http = (HttpService) context.locateService("HttpService");
 		try {
@@ -187,7 +187,83 @@ MessageDistributor {
 		this.backboneRouter = null;
 	}
 
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data) {
+	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data) {
+		// get connection belonging to HIDs
+		Connection conn;
+		try {
+			if (receiverHID == null) {
+				// broadcast message
+				conn = connectionManager.getBroadcastConnection(senderHID);
+			} else {
+				conn = connectionManager.getConnection(receiverHID, senderHID);
+			}
+		} catch (Exception e) {
+			LOG.warn("Error getting connection for HIDs: "
+					+ senderHID.toString() + " " + receiverHID.toString(), e);
+			NMResponse response = new NMResponse();
+			response.setStatus(NMResponse.STATUS_ERROR);
+			response.setMessage("Error getting connection for HIDs: "
+					+ senderHID.toString() + " " + receiverHID.toString());
+			return response;
+		}
+
+		Message msg = conn.processData(senderHID, receiverHID, data);
+		String topic = msg.getTopic();
+		// go through MsgObservers for additional processing
+		List<MessageProcessor> observers = msgObservers.get(topic);
+		if (observers != null) {
+			for (MessageProcessor observer : observers) {
+				msg = observer.processMessage(msg);
+				if (msg == null || msg.getData() == null) {
+					NMResponse nmresp = new NMResponse();
+					nmresp.setStatus(NMResponse.STATUS_SUCCESS);
+					return nmresp;
+				}
+			}
+		}
+
+		if (msg != null && msg.getData() != null && msg.getData().length != 0) {
+			/*
+			 * check if message is not intended for host HID, if yes and it has
+			 * not been processed drop it
+			 */
+			if (msg.getReceiverHID() == null){
+				LOG.warn("Received a message which has not been processed");
+				NMResponse response = new NMResponse();
+				response.setStatus(NMResponse.STATUS_ERROR);
+				response
+				.setMessage("Received a message which has not been processed");
+				return response;
+			} else {
+				NMResponse nmresp = null;
+				if(!msg.getReceiverHID().equals(senderHID)) {
+					// forward over sendMessage method of this and return response
+					nmresp = sendMessageSynch(msg, this.myHID, msg.getReceiverHID());
+				}
+				if(nmresp.getMessageObject().getReceiverHID().equals(senderHID)) {
+					//create response with connection and etc
+					nmresp.setStatus(NMResponse.STATUS_SUCCESS);
+					try {
+						nmresp.setMessage(new String(
+								conn.processMessage(msg)));
+					} catch (Exception e) {
+						nmresp.setStatus(NMResponse.STATUS_ERROR);
+					}
+				} else {
+					nmresp.setStatus(NMResponse.STATUS_ERROR);
+					nmresp.setMessage("Error in processing request");
+				}
+				return nmresp;
+			}
+
+		} else {
+			NMResponse response = new NMResponse();
+			response.setStatus(NMResponse.STATUS_SUCCESS);
+			return response;
+		}
+	}
+
+	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
 		// get connection belonging to HIDs
 		Connection conn;
 		try {
@@ -241,7 +317,6 @@ MessageDistributor {
 			 * send message over sendMessage method of this and return response
 			 * of it
 			 */
-			//TODO check if should be always synch
 			return sendMessageAsynch(msg, this.myHID, msg.getReceiverHID());
 		} else {
 			NMResponse response = new NMResponse();
@@ -289,15 +364,6 @@ MessageDistributor {
 			msgObservers.get(topic).remove(observer);
 		}
 	}
-
-	// public HID createHID(byte[] data) throws IOException {
-	//
-	// Properties attributes = this.connectionManager.getHIDAttributes(data);
-	//
-	// HID newHID = this.identityManager.createHIDForAttributes(attributes);
-	//
-	// return newHID;
-	// }
 
 	public NMResponse broadcastMessage(Message message) {
 		HID senderHID = message.getSenderHID();
@@ -360,8 +426,8 @@ MessageDistributor {
 					+ message.getSenderHID());
 			return response;
 		}
-		NMResponse response = this.backboneRouter.sendData(senderHID,
-				receiverHID, data, false);
+		NMResponse response = this.backboneRouter.sendDataAsynch(senderHID,
+				receiverHID, data);
 
 		return response;
 	}
@@ -391,16 +457,16 @@ MessageDistributor {
 
 			//process outgoing message
 			data = connection.processMessage(tempMessage);
-			response = this.backboneRouter.sendData(senderHID,
-					receiverHID, data, true);
+			response = this.backboneRouter.sendDataSynch(senderHID,
+					receiverHID, data);
 			//process response message
 			tempMessage = connection.processData(receiverHID, senderHID, response.getMessage().getBytes());
 			//repeat sending and receiving until security protocol is over
 			while (tempMessage != null &&
 					tempMessage.getTopic().
 					contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
-				response = this.backboneRouter.sendData(senderHID, 
-						receiverHID, tempMessage.getData(), true);
+				response = this.backboneRouter.sendDataSynch(senderHID, 
+						receiverHID, tempMessage.getData());
 				tempMessage = connection.processData(receiverHID, senderHID,
 						response.getMessage().getBytes());
 			}
@@ -415,8 +481,8 @@ MessageDistributor {
 			return response;
 		}		
 		response.setStatus(NMResponse.STATUS_SUCCESS);
+		response.setMessageObject(tempMessage);
 		response.setMessage(new String(tempMessage.getData()));
-
 		return response;
 	}
 

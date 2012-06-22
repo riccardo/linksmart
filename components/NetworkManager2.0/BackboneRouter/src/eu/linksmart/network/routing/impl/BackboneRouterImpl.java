@@ -78,16 +78,32 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * @return success status response of the network manager
 	 */
 	@Override
-	public NMResponse sendData(HID senderHID, HID receiverHID, byte[] data, boolean synch) {
+	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] data) {
 		Backbone b = (Backbone) hidBackboneMap.get(receiverHID);
 		if (b == null) {
 			throw new IllegalArgumentException(
 					"No Backbone found to reach HID " + receiverHID);
 		}
-		if (synch)
-			return b.sendDataSynch(senderHID, receiverHID, data);
-		else
-			return b.sendDataAsynch(senderHID, receiverHID, data);
+		return b.sendDataSynch(senderHID, receiverHID, data);
+	}
+	
+	/**
+	 * Sends a message over the communication channel from which the Hid
+	 * came.
+	 * 
+	 * @param senderHID HID of the sender
+	 * @param receiverHID HID of the receiver
+	 * @param data data to be sent
+	 * @return success status response of the network manager
+	 */
+	@Override
+	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
+		Backbone b = (Backbone) hidBackboneMap.get(receiverHID);
+		if (b == null) {
+			throw new IllegalArgumentException(
+					"No Backbone found to reach HID " + receiverHID);
+		}
+		return b.sendDataAsynch(senderHID, receiverHID, data);
 	}
 
 	/**
@@ -99,11 +115,46 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * @param receiverHID HID of the receiver
 	 * @param data data to be sent
 	 * @param originatingBackbone which backbone is used
+	 * @param true to process request synchronously
 	 * @return success status response of the network manager
 	 */
 	@Override
-	public NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data,
+	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data,
 			Backbone originatingBackbone) {
+
+		return receiveData(senderHID, receiverHID, data, originatingBackbone, true);
+	}
+	
+	/**
+	 * Receives a message which also specifies the communication channel used by
+	 * the sender. This will then update the list of HIDs and which backbone
+	 * they use.
+	 * 
+	 * @param senderHID HID of the sender
+	 * @param receiverHID HID of the receiver
+	 * @param data data to be sent
+	 * @param originatingBackbone which backbone is used
+	 * @param true to process request synchronously
+	 * @return success status response of the network manager
+	 */
+	@Override
+	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data,
+			Backbone originatingBackbone) {
+
+		return receiveData(senderHID, receiverHID, data, originatingBackbone, false);
+	}
+
+	/**
+	 * Method to receive data as synchronous and asynchronous are handled the same way
+	 * @param senderHID
+	 * @param receiverHID
+	 * @param data
+	 * @param originatingBackbone
+	 * @param synch
+	 * @return
+	 */
+	private NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data,
+			Backbone originatingBackbone, boolean synch) {
 
 		// TODO: check why backbone for receiverHID would be needed - and if it
 		// is needed one has to check if receiverHID is NULL (in case of
@@ -116,11 +167,14 @@ public class BackboneRouterImpl implements BackboneRouter {
 		// TODO #NM refactoring check case when there is no core what to do
 		// Has to be considered as future feature for relay nodes
 		if (nmCore != null) {
-			return nmCore.receiveData(senderHID, receiverHID, data);
+			if(synch) {
+				return nmCore.receiveDataSynch(senderHID, receiverHID, data);
+			} else {
+				return	nmCore.receiveDataAsynch(senderHID, receiverHID, data);
+			}
 		} else {
 			return new NMResponse(NMResponse.STATUS_ERROR);
 		}
-
 	}
 
 	/**

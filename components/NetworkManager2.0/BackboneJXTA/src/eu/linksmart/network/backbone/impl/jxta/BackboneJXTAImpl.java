@@ -250,12 +250,34 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param receiverHID
 	 * @param message
 	 */
-	public NMResponse receiveData(HID senderHID, HID receiverHID,
+	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID,
 			byte[] receivedData) {
 		NMResponse response = new NMResponse();
 
 		// give message to BBRouter for further processing
-		response = bbRouter.receiveData(senderHID, receiverHID, receivedData,
+		response = bbRouter.receiveDataSynch(senderHID, receiverHID, receivedData,
+				(Backbone) this);
+
+		logger.debug("receiveData Response: " + response.toString());
+
+		return response;
+	}
+	
+	/**
+	 * Receives a message over the JXTA communication channel. In case of a
+	 * broadcast message the receiverHID is null (since the sender does not
+	 * specify who should receive this message).
+	 * 
+	 * @param senderHID
+	 * @param receiverHID
+	 * @param message
+	 */
+	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID,
+			byte[] receivedData) {
+		NMResponse response = new NMResponse();
+
+		// give message to BBRouter for further processing
+		response = bbRouter.receiveDataSynch(senderHID, receiverHID, receivedData,
 				(Backbone) this);
 
 		logger.debug("receiveData Response: " + response.toString());
@@ -812,7 +834,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 							listOfRemoteEndpoints.put(senderHID, senderJXTAID);
 						}
 
-						bbJXTA.receiveData(senderHID, null, BackboneJXTAUtils
+						bbJXTA.receiveDataAsynch(senderHID, null, BackboneJXTAUtils
 								.RemoveHIDFromData(receivedData.getData()));
 
 					}
