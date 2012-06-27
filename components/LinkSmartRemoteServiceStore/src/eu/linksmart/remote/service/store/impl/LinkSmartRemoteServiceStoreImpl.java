@@ -20,8 +20,6 @@ import eu.linksmart.remote.service.store.LinkSmartRemoteServiceStore;
 public class LinkSmartRemoteServiceStoreImpl implements
 		LinkSmartRemoteServiceStore {
 
-	private Thread registerAtNetworkManagerThread;
-
 	private class GetRemoteServiceByDescriptionHelper {
 
 		private String serviceDescription;
@@ -279,8 +277,7 @@ public class LinkSmartRemoteServiceStoreImpl implements
 							HYDRA_REMOTE_SERVICE_STORE_PATH, AXIS_SERVICES_PATH
 									+ HYDRA_REMOTE_SERVICE_STORE_PATH);
 				} catch (RemoteException e) {
-					LOG
-							.warn("Unable to regster at Network Manager. Trying again.");
+					LOG.warn("Unable to regster at Network Manager. Trying again.");
 				}
 				try {
 					Thread.sleep(1000);
@@ -292,8 +289,6 @@ public class LinkSmartRemoteServiceStoreImpl implements
 		}
 
 	}
-
-	
 
 	protected void activate(ComponentContext context) {
 
@@ -313,12 +308,13 @@ public class LinkSmartRemoteServiceStoreImpl implements
 							"http://localhost:8082/axis/services/NetworkManagerApplication",
 							false);
 		} catch (Exception e) {
-			LOG.error("Unable to get NetworkManager through RemoteWSClientProvider", e);
+			LOG.error(
+					"Unable to get NetworkManager through RemoteWSClientProvider",
+					e);
 		}
-		
+
 		Thread thread1 = new Thread(new RegisterAtNetworkManagerThread());
 		thread1.start();
-		
 
 		LOG.debug("Started " + bundleContext.getBundle().getSymbolicName());
 
@@ -329,16 +325,9 @@ public class LinkSmartRemoteServiceStoreImpl implements
 		try {
 			networkManager.removeHID(myHID);
 		} catch (RemoteException e) {
-			LOG.error(e.getMessage(), e.getCause());
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e.getCause());
+			LOG.error("Unable to deregister from NetworkManager: " + myHID
+					+ " Network Manager might already have shut down.");
 		}
-
-		remoteHydraServices = null;
-		networkManager = null;
-		remoteWSClientProvider = null;
-
-		bundleContext = null;
 
 		LOG.debug("Stopped " + bundleContext.getBundle().getSymbolicName());
 	}
