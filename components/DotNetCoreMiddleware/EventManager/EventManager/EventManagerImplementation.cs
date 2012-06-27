@@ -86,6 +86,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Services;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace EventManager
 {
@@ -267,6 +268,7 @@ namespace EventManager
         /// <param name="request">Request that contains topic and values regarding the event</param>
         public publishResponse publish(publishRequest request)
         {   //Make a copy of the list in order to avoid it being changed during the forea.ch loop. As long as copy is used, foreach can stay here. Otherwise -> Notification.cs
+            //Parallel.ForEach(Components.Subscription subscription in Program.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList(), 
             foreach (Components.Subscription subscription in Program.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList())
             {
                 subscription.NumberOfRetries = 0;
@@ -275,7 +277,6 @@ namespace EventManager
                 Notification notification = new Notification(subscription, request);
                 Thread notificationThread = new Thread(new ThreadStart(notification.notify));
                 notificationThread.Start();
-                notificationThread.Join();
             }
 
             publishResponse p = new publishResponse();
