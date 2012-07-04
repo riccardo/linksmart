@@ -596,7 +596,9 @@ MessageDistributor {
 	}
 
 	public String[] getAvailableBackbones() {
-		return (String[]) this.backboneRouter.getAvailableBackbones().toArray();
+		List<String> backbones = this.backboneRouter.getAvailableBackbones();
+		String[] backboneNames = new String[backbones.size()];
+		return backbones.toArray(backboneNames);
 	}
 
 	@Override
