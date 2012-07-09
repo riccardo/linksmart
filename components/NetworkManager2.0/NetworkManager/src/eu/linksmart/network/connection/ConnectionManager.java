@@ -90,8 +90,8 @@ public class ConnectionManager {
 	/**
 	 * Returns {@link Connection} object associated to two entities.
 	 * Creates new if there exists none yet.
-	 * @param receiverHID
-	 * @param senderHID
+	 * @param receiverHID physical endpoint of connection
+	 * @param senderHID physical endpoint of connection
 	 * @return Connection to use for processing of communication
 	 * @throws Exception If there are policies for an HID but no CommunicationSecurityManager
 	 */
@@ -101,7 +101,7 @@ public class ConnectionManager {
 		for(Connection c : connections){
 			if(!(c instanceof BroadcastConnection) &&
 					((c.getClientHID().equals(receiverHID) && c.getServerHID().equals(senderHID))
-					|| (c.getClientHID().equals(senderHID) && c.getServerHID().equals(receiverHID)))){
+							|| (c.getClientHID().equals(senderHID) && c.getServerHID().equals(receiverHID)))){
 				//set last use date of connection
 				timeouts.put(c, cal.getTime());
 				return c;
@@ -116,37 +116,23 @@ public class ConnectionManager {
 		}
 
 		//there was no connection found so create new connection
-		//check if there are policies for one of the HIDs
-		ArrayList<SecurityProperty> allRequirements = new ArrayList<SecurityProperty>();
-		if(this.hidPolicies.containsKey(senderHID) || this.hidPolicies.containsKey(receiverHID)){
-			//add both policies to requirement list
-			if(!senderHID.equals(nmHID)){
-				List<SecurityProperty> senderPolicies = hidPolicies.get(senderHID);
-				if(senderPolicies != null){
-					//add all properties from this HID
-					for(SecurityProperty prop : senderPolicies){
-						allRequirements.add(prop);
-					}
-				}
-			}
-			if(!receiverHID.equals(nmHID)){
-				List<SecurityProperty> receiverPolicies = hidPolicies.get(receiverHID);
-				if(receiverPolicies != null){
-					//add only not already needed properties
-					for(SecurityProperty prop : receiverPolicies){
-						if(!allRequirements.contains(prop)){
-							allRequirements.add(prop);
-						}
-					}
-				}
+		//policies only apply for connections between this NM and other entity
+		List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
+		if(receiverHID.equals(nmHID) || senderHID.equals(nmHID)) {
+			//get hid of remote entity
+			HID remoteHID = nmHID.equals(receiverHID)? senderHID : receiverHID;
+			//check if there are policies for the HID
+			if(this.hidPolicies.containsKey(remoteHID)){
+				//add policies to requirement list
+				policies = hidPolicies.get(remoteHID);
 			}
 
 			//check if requirements are not colliding
-			boolean noEncoding = allRequirements.contains(SecurityProperty.NoEncoding);
-			boolean noSecurity = allRequirements.contains(SecurityProperty.NoSecurity);
-			boolean justNoEncNoSec = allRequirements.size() == 2 && noEncoding && noSecurity;
+			boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
+			boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
+			boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
 			//if there are more requirements and noEnc or noSec is included it must be colliding
-			if (!justNoEncNoSec && (allRequirements.size() > 1 && (noEncoding || noSecurity))) {
+			if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
 				throw new Exception("Colliding policies for HIDs");
 			}
 		}
@@ -154,7 +140,7 @@ public class ConnectionManager {
 		//if there was no connection that means that the sender is the client and the receiver is the server
 		//check if an active connection or a dummy connectin is needed
 		Connection conn = null;
-		if(allRequirements.contains(SecurityProperty.NoEncoding)) {
+		if(policies.contains(SecurityProperty.NoEncoding)) {
 			conn = new NOPConnection(senderHID, receiverHID);
 		} else {
 			conn = new Connection(senderHID, receiverHID);
@@ -163,16 +149,16 @@ public class ConnectionManager {
 		boolean foundComSecMgr = false;
 		if (!this.communicationSecurityManagers.isEmpty()) {
 			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
-				if (matchingPolicies(allRequirements, comSecMgr.getProperties())){
-					conn.setSecurityProtocol(comSecMgr.getSecurityProtocol(senderHID, receiverHID));
+				if (matchingPolicies(policies, comSecMgr.getProperties())){
+					conn.setCommunicationSecMgr(comSecMgr);
 					foundComSecMgr = true;
 					break;
 				}
 			}
 		}
 		if (!foundComSecMgr 
-				&& allRequirements.size() != 0 
-				&& !allRequirements.contains(SecurityProperty.NoSecurity)) {
+				&& policies.size() != 0 
+				&& !policies.contains(SecurityProperty.NoSecurity)) {
 			//no available communication security manager although required
 			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
 		}
@@ -201,12 +187,14 @@ public class ConnectionManager {
 			}
 		}
 
+		//FIXME broadcast messages and policies have to be re-thought
+		
 		//there was no connection found so create new connection	
 		List<SecurityProperty> policies = null;
 		if(!senderHID.equals(nmHID)) {
 			policies = this.hidPolicies.get(senderHID);
 		}
-		//check if an active connection or a dummy connectin is needed
+		//check if an active connection or a dummy connection is needed
 		BroadcastConnection conn = null;
 		if(policies != null && policies.contains(SecurityProperty.NoEncoding)) {
 			conn = new NOPBroadcastConnection(senderHID);
@@ -220,8 +208,7 @@ public class ConnectionManager {
 				for(CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
 					if(matchingPolicies(policies, comSecMgr.getProperties())
 							&& comSecMgr.getProperties().contains(SecurityProperty.Broadcast)) {
-						conn.setSecurityProtocol(
-								comSecMgr.getBroadcastSecurityProtocol(senderHID));
+						conn.setCommunicationSecMgr(comSecMgr);
 						foundComSecMgr = true;
 					}
 				}

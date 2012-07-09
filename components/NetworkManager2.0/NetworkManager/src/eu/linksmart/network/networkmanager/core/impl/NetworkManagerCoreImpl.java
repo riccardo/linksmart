@@ -189,144 +189,157 @@ MessageDistributor {
 	}
 
 	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data) {
-		// get connection belonging to HIDs
-		Connection conn;
-		try {
-			if (receiverHID == null) {
-				// broadcast message
-				conn = connectionManager.getBroadcastConnection(senderHID);
-			} else {
-				conn = connectionManager.getConnection(receiverHID, senderHID);
-			}
-		} catch (Exception e) {
-			LOG.warn("Error getting connection for HIDs: "
-					+ senderHID.toString() + " " + receiverHID.toString(), e);
-			NMResponse response = new NMResponse();
-			response.setStatus(NMResponse.STATUS_ERROR);
-			response.setMessage("Error getting connection for HIDs: "
-					+ senderHID.toString() + " " + receiverHID.toString());
-			return response;
-		}
-
-		Message msg = conn.processData(senderHID, receiverHID, data);
-		String topic = msg.getTopic();
-		// go through MsgObservers for additional processing
-		List<MessageProcessor> observers = msgObservers.get(topic);
-		if (observers != null) {
-			for (MessageProcessor observer : observers) {
-				msg = observer.processMessage(msg);
-				if (msg == null || msg.getData() == null) {
-					NMResponse nmresp = new NMResponse();
-					nmresp.setStatus(NMResponse.STATUS_SUCCESS);
-					return nmresp;
+		//open message only if it is for local entity
+		HIDInfo receiverHIDInfo = identityManager.getHIDInfo(receiverHID);
+		if(identityManager.getLocalHIDs().contains(receiverHIDInfo)) {
+			// get connection belonging to HIDs
+			Connection conn;
+			try {
+				if (receiverHID == null) {
+					// broadcast message
+					conn = connectionManager.getBroadcastConnection(senderHID);
+				} else {
+					//to get proper connection use my HID
+					conn = connectionManager.getConnection(myHID, senderHID);
 				}
-			}
-		}
-
-		if (msg != null && msg.getData() != null && msg.getData().length != 0) {
-			/*
-			 * check if message is not intended for host HID, if yes and it has
-			 * not been processed drop it
-			 */
-			if (msg.getReceiverHID() == null){
-				LOG.warn("Received a message which has not been processed");
+			} catch (Exception e) {
+				LOG.warn("Error getting connection for HIDs: "
+						+ senderHID.toString() + " " + myHID.toString(), e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
-				response
-				.setMessage("Received a message which has not been processed");
+				response.setMessage("Error getting connection for HIDs: "
+						+ senderHID.toString() + " " + myHID.toString());
 				return response;
-			} else {
-				if(!msg.getReceiverHID().equals(senderHID)) {
-					// forward over sendMessage method of this and return response
-					//here sendmessage should include a message object
-					msg = sendMessageSynch(msg, this.myHID, msg.getReceiverHID())
-					.getMessageObject();
-				}
-				NMResponse nmresp = new NMResponse();
-				if(msg != null &&
-						msg.getReceiverHID().equals(senderHID)) {
-					//create response with connection and etc
-					nmresp.setStatus(NMResponse.STATUS_SUCCESS);
-					try {
-						nmresp.setMessage(new String(
-								conn.processMessage(msg)));
-					} catch (Exception e) {
-						nmresp.setStatus(NMResponse.STATUS_ERROR);
-					}
-				} else {
-
-					nmresp.setStatus(NMResponse.STATUS_ERROR);
-					nmresp.setMessage("Error in processing request");
-				}
-				return nmresp;
 			}
 
+			Message msg = conn.processData(senderHID, receiverHID, data);
+			String topic = msg.getTopic();
+			// go through MsgObservers for additional processing
+			List<MessageProcessor> observers = msgObservers.get(topic);
+			if (observers != null) {
+				for (MessageProcessor observer : observers) {
+					msg = observer.processMessage(msg);
+					if (msg == null || msg.getData() == null) {
+						NMResponse nmresp = new NMResponse();
+						nmresp.setStatus(NMResponse.STATUS_SUCCESS);
+						return nmresp;
+					}
+				}
+			}
+
+			if (msg != null && msg.getData() != null && msg.getData().length != 0) {
+				/*
+				 * check if message is not intended for host HID, if yes and it has
+				 * not been processed drop it
+				 */
+				if (msg.getReceiverHID() == null){
+					LOG.warn("Received a message which has not been processed");
+					NMResponse response = new NMResponse();
+					response.setStatus(NMResponse.STATUS_ERROR);
+					response
+					.setMessage("Received a message which has not been processed");
+					return response;
+				} else {
+					//if this is not the response first forward it
+					if(!msg.getReceiverHID().equals(senderHID)) {
+						// forward over sendMessage method of this and return response
+						//here the response message should include a message object
+						msg = sendMessageSynch(msg, this.myHID, msg.getReceiverHID())
+						.getMessageObject();
+					}
+					NMResponse nmresp = new NMResponse();
+					if(msg != null &&
+							msg.getReceiverHID().equals(senderHID)) {
+						//create response with connection and etc
+						nmresp.setStatus(NMResponse.STATUS_SUCCESS);
+						try {
+							nmresp.setMessage(new String(
+									conn.processMessage(msg)));
+						} catch (Exception e) {
+							nmresp.setStatus(NMResponse.STATUS_ERROR);
+						}
+					} else {
+
+						nmresp.setStatus(NMResponse.STATUS_ERROR);
+						nmresp.setMessage("Error in processing request");
+					}
+					return nmresp;
+				}
+
+			} else {
+				NMResponse response = new NMResponse();
+				response.setStatus(NMResponse.STATUS_SUCCESS);
+				return response;
+			}
 		} else {
-			NMResponse response = new NMResponse();
-			response.setStatus(NMResponse.STATUS_SUCCESS);
-			return response;
+			return backboneRouter.sendDataSynch(senderHID, receiverHID, data);
 		}
 	}
 
 	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
-		// get connection belonging to HIDs
-		Connection conn;
-		try {
-			if (receiverHID == null) {
-				// broadcast message
-				conn = connectionManager.getBroadcastConnection(senderHID);
-			} else {
-				conn = connectionManager.getConnection(receiverHID, senderHID);
-			}
-		} catch (Exception e) {
-			LOG.warn("Error getting connection for HIDs: "
-					+ senderHID.toString() + " " + receiverHID.toString(), e);
-			NMResponse response = new NMResponse();
-			response.setStatus(NMResponse.STATUS_ERROR);
-			response.setMessage("Error getting connection for HIDs: "
-					+ senderHID.toString() + " " + receiverHID.toString());
-			return response;
-		}
-
-		Message msg = conn.processData(senderHID, receiverHID, data);
-		String topic = msg.getTopic();
-		// go through MsgObservers for additional processing
-		List<MessageProcessor> observers = msgObservers.get(topic);
-		if (observers != null) {
-			for (MessageProcessor observer : observers) {
-				msg = observer.processMessage(msg);
-				if (msg == null || msg.getData() == null) {
-					NMResponse nmresp = new NMResponse();
-					nmresp.setStatus(NMResponse.STATUS_SUCCESS);
-					return nmresp;
+		//open message only if it is for local entity
+		HIDInfo receiverHIDInfo = identityManager.getHIDInfo(receiverHID);
+		if(identityManager.getLocalHIDs().contains(receiverHIDInfo)) {
+			// get connection belonging to HIDs
+			Connection conn;
+			try {
+				if (receiverHID == null) {
+					// broadcast message
+					conn = connectionManager.getBroadcastConnection(senderHID);
+				} else {
+					conn = connectionManager.getConnection(receiverHID, senderHID);
 				}
-			}
-		}
-
-		// if message is still existing it has to be forwarded
-		if (msg != null && msg.getData() != null && msg.getData().length != 0) {
-			/*
-			 * check if message is not intended for host HID, if yes and it has
-			 * not been processed drop it
-			 */
-			if (msg.getReceiverHID() == null){
-				//					|| msg.getReceiverHID().equals(this.myHID)) {
-				LOG.warn("Received a message which has not been processed");
+			} catch (Exception e) {
+				LOG.warn("Error getting connection for HIDs: "
+						+ senderHID.toString() + " " + receiverHID.toString(), e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
-				response
-				.setMessage("Received a message which has not been processed");
+				response.setMessage("Error getting connection for HIDs: "
+						+ senderHID.toString() + " " + receiverHID.toString());
 				return response;
 			}
-			/*
-			 * send message over sendMessage method of this and return response
-			 * of it
-			 */
-			return sendMessageAsynch(msg, this.myHID, msg.getReceiverHID());
+
+			Message msg = conn.processData(senderHID, receiverHID, data);
+			String topic = msg.getTopic();
+			// go through MsgObservers for additional processing
+			List<MessageProcessor> observers = msgObservers.get(topic);
+			if (observers != null) {
+				for (MessageProcessor observer : observers) {
+					msg = observer.processMessage(msg);
+					if (msg == null || msg.getData() == null) {
+						NMResponse nmresp = new NMResponse();
+						nmresp.setStatus(NMResponse.STATUS_SUCCESS);
+						return nmresp;
+					}
+				}
+			}
+			// if message is still existing it has to be forwarded
+			if (msg != null && msg.getData() != null && msg.getData().length != 0) {
+				/*
+				 * check if message is not intended for host HID, if yes and it has
+				 * not been processed drop it
+				 */
+				if (msg.getReceiverHID() == null){
+					//					|| msg.getReceiverHID().equals(this.myHID)) {
+					LOG.warn("Received a message which has not been processed");
+					NMResponse response = new NMResponse();
+					response.setStatus(NMResponse.STATUS_ERROR);
+					response
+					.setMessage("Received a message which has not been processed");
+					return response;
+				}
+				/*
+				 * send message over sendMessage method of this and return response
+				 * of it
+				 */
+				return sendMessageAsynch(msg, this.myHID, msg.getReceiverHID());
+			} else {
+				NMResponse response = new NMResponse();
+				response.setStatus(NMResponse.STATUS_SUCCESS);
+				return response;
+			}
 		} else {
-			NMResponse response = new NMResponse();
-			response.setStatus(NMResponse.STATUS_SUCCESS);
-			return response;
+			return backboneRouter.sendDataAsynch(senderHID, receiverHID, data);
 		}
 	}
 

@@ -3,6 +3,7 @@ package eu.linksmart.network.connection;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.Properties;
@@ -42,7 +43,7 @@ public class Connection {
 	/**
 	 * {@link SecurityProtocol} used to protect and unprotect messages
 	 */
-	protected SecurityProtocol securityProtocol = null;
+	protected HashMap<HIDTuple, SecurityProtocol> securityProtocols = new HashMap<Connection.HIDTuple, SecurityProtocol>();
 	/**
 	 * The initiator of this communication
 	 */
@@ -51,6 +52,7 @@ public class Connection {
 	 * The called entity of this communication
 	 */
 	private HID serverHID = null;
+	protected CommunicationSecurityManager comSecMgr;
 
 	protected Connection(HID serverHID) {
 		if (serverHID == null) {
@@ -78,25 +80,27 @@ public class Connection {
 	}
 
 	/**
-	 * Set {@link SecurityProtocol} for this connection. It has to be ensured
-	 * that no message is processed until no security protocol is set for
+	 * Set {@link CommunicationSecurityManager} for this connection. It has to be ensured
+	 * that no message is processed until no CommunicationSecurityManager is set for
 	 * connection.
 	 * 
-	 * @param secProt
-	 *            Connection specific object
-	 */
-	protected void setSecurityProtocol(SecurityProtocol secProt) {
-		securityProtocol = secProt;
+	 * @param comSecMgr
+	 *            Reference for creator of {@link SecurityProtocol}
+	 */	
+	protected void setCommunicationSecMgr(CommunicationSecurityManager comSecMgr) {
+		this.comSecMgr = comSecMgr;
 	}
 
 	/**
-	 * Creates a Message object for received data
-	 * 
+	 * Creates a Message object for received data.
+	 * @param senderHID logical endpoint of message
+	 * @param receiverHID logical endpoint of message
 	 * @param data
 	 *            Data received over network
 	 * @return Message object for further processing
 	 */
 	public Message processData(HID senderHID, HID receiverHID, byte[] data) {
+		SecurityProtocol securityProtocol = getSecurityProtocol(senderHID, receiverHID);
 		Message message = null;
 		//check if application data has to be unprotected
 		if (securityProtocol != null && securityProtocol.isInitialized()) {
@@ -131,10 +135,20 @@ public class Connection {
 		return message;
 	}
 
+	protected SecurityProtocol getSecurityProtocol(HID senderHID, HID receiverHID) {
+		HIDTuple hidTuple = new HIDTuple(senderHID, receiverHID);
+		if(securityProtocols.containsKey(hidTuple)) {
+			return securityProtocols.get(hidTuple);
+		} else {
+			SecurityProtocol secProt = comSecMgr.getSecurityProtocol(senderHID, receiverHID);
+			securityProtocols.put(hidTuple, secProt);
+			return secProt;
+		}
+	}
+
 	/**
 	 * Creates a serialized representation of the Message object which can be
 	 * sent over network
-	 * 
 	 * @param msg
 	 *            Message to convert
 	 * @return Serialized version of the message including all properties
@@ -142,6 +156,7 @@ public class Connection {
 	 *             When message cannot be processed for sending
 	 */
 	public byte[] processMessage(Message msg) throws Exception {
+		SecurityProtocol securityProtocol = getSecurityProtocol(msg.getReceiverHID(), msg.getSenderHID());
 		if (securityProtocol != null && !securityProtocol.isInitialized()) {
 			// set the message to be sent by security protocol
 			msg = securityProtocol.processMessage(msg);
@@ -247,5 +262,42 @@ public class Connection {
 			}
 		}
 		return message;
+	}
+	
+	class HIDTuple {
+		private HID hid1 = null;
+		private HID hid2 = null;
+		
+		public HIDTuple(HID one, HID two) {
+			hid1 = one;
+			hid2 = two;
+		}
+		
+		public HID getHID1() {
+			return hid1;
+		}
+		
+		public HID getHID2() {
+			return hid2;
+		}
+		
+		@Override
+		public boolean equals(Object o)  {
+			HIDTuple tuple = (HIDTuple)o;
+			if((tuple.getHID1().equals(hid1) && tuple.getHID2().equals(hid2))
+					|| (tuple.getHID1().equals(hid2) && tuple.getHID2().equals(hid1))) {
+				return true;
+			} else {
+			return false;
+			}
+		}
+		
+		@Override
+		public int hashCode() {
+			int hid1Hash = hid1.hashCode();
+			int hid2Hash = hid2.hashCode();
+			//returned hash must be indifferent for tuples with same two HIDs
+			return hid1Hash & hid2Hash;
+		}
 	}
 }
