@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -43,7 +45,7 @@ public class Connection {
 	/**
 	 * {@link SecurityProtocol} used to protect and unprotect messages
 	 */
-	protected HashMap<HIDTuple, SecurityProtocol> securityProtocols = new HashMap<Connection.HIDTuple, SecurityProtocol>();
+	protected Map<HIDTuple, SecurityProtocol> securityProtocols = new ConcurrentHashMap<Connection.HIDTuple, SecurityProtocol>();
 	/**
 	 * The initiator of this communication
 	 */
@@ -160,7 +162,7 @@ public class Connection {
 	 *             When message cannot be processed for sending
 	 */
 	public byte[] processMessage(Message msg) throws Exception {
-		SecurityProtocol securityProtocol = getSecurityProtocol(msg.getReceiverHID(), msg.getSenderHID());
+		SecurityProtocol securityProtocol = getSecurityProtocol(msg.getSenderHID(), msg.getReceiverHID());
 		if (securityProtocol != null && !securityProtocol.isInitialized()) {
 			// set the message to be sent by security protocol
 			msg = securityProtocol.processMessage(msg);

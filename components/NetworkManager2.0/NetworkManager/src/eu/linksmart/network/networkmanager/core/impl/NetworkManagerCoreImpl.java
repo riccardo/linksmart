@@ -189,9 +189,13 @@ MessageDistributor {
 	}
 
 	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data) {
-		//open message only if it is for local entity
-		HIDInfo receiverHIDInfo = identityManager.getHIDInfo(receiverHID);
-		if(identityManager.getLocalHIDs().contains(receiverHIDInfo)) {
+		//open message only if it is for local entity or is broadcast
+		HIDInfo receiverHIDInfo = null;
+		if (receiverHID != null) {
+			receiverHIDInfo = identityManager.getHIDInfo(receiverHID);
+		}
+		if(receiverHID == null || 
+				(receiverHIDInfo != null && identityManager.getLocalHIDs().contains(receiverHIDInfo))) {
 			// get connection belonging to HIDs
 			Connection conn;
 			try {
@@ -277,9 +281,13 @@ MessageDistributor {
 	}
 
 	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
-		//open message only if it is for local entity
-		HIDInfo receiverHIDInfo = identityManager.getHIDInfo(receiverHID);
-		if(identityManager.getLocalHIDs().contains(receiverHIDInfo)) {
+		//open message only if it is for local entity or is broadcast
+		HIDInfo receiverHIDInfo = null;
+		if (receiverHID != null) {
+			receiverHIDInfo = identityManager.getHIDInfo(receiverHID);
+		}
+		if(receiverHID == null || 
+				(receiverHIDInfo != null && identityManager.getLocalHIDs().contains(receiverHIDInfo))) {
 			// get connection belonging to HIDs
 			Connection conn;
 			try {

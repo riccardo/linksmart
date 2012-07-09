@@ -1,6 +1,8 @@
 package eu.linksmart.network.connection;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
@@ -8,7 +10,7 @@ import eu.linksmart.security.communication.SecurityProtocol;
 
 public class BroadcastConnection extends Connection {
 
-	private HashMap<HID, SecurityProtocol> broadcastSecProtocols = new HashMap<HID, SecurityProtocol>();
+	private Map<HID, SecurityProtocol> broadcastSecProtocols = new ConcurrentHashMap<HID, SecurityProtocol>();
 
 	public BroadcastConnection(HID serverHID) {
 		super(serverHID);
