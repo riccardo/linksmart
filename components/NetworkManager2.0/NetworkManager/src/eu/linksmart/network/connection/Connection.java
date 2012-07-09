@@ -136,13 +136,17 @@ public class Connection {
 	}
 
 	protected SecurityProtocol getSecurityProtocol(HID senderHID, HID receiverHID) {
-		HIDTuple hidTuple = new HIDTuple(senderHID, receiverHID);
-		if(securityProtocols.containsKey(hidTuple)) {
-			return securityProtocols.get(hidTuple);
+		if(comSecMgr != null) {
+			HIDTuple hidTuple = new HIDTuple(senderHID, receiverHID);
+			if(securityProtocols.containsKey(hidTuple)) {
+				return securityProtocols.get(hidTuple);
+			} else {
+				SecurityProtocol secProt = comSecMgr.getSecurityProtocol(senderHID, receiverHID);
+				securityProtocols.put(hidTuple, secProt);
+				return secProt;
+			}
 		} else {
-			SecurityProtocol secProt = comSecMgr.getSecurityProtocol(senderHID, receiverHID);
-			securityProtocols.put(hidTuple, secProt);
-			return secProt;
+			return null;
 		}
 	}
 
@@ -263,24 +267,24 @@ public class Connection {
 		}
 		return message;
 	}
-	
+
 	class HIDTuple {
 		private HID hid1 = null;
 		private HID hid2 = null;
-		
+
 		public HIDTuple(HID one, HID two) {
 			hid1 = one;
 			hid2 = two;
 		}
-		
+
 		public HID getHID1() {
 			return hid1;
 		}
-		
+
 		public HID getHID2() {
 			return hid2;
 		}
-		
+
 		@Override
 		public boolean equals(Object o)  {
 			HIDTuple tuple = (HIDTuple)o;
@@ -288,10 +292,10 @@ public class Connection {
 					|| (tuple.getHID1().equals(hid2) && tuple.getHID2().equals(hid1))) {
 				return true;
 			} else {
-			return false;
+				return false;
 			}
 		}
-		
+
 		@Override
 		public int hashCode() {
 			int hid1Hash = hid1.hashCode();
