@@ -119,12 +119,12 @@ public class AsymHandshake {
 		Command command = SecurityProtocolImpl.getCommand(msg);
 		//check whether this is the correct party
 		if(!command.get(Command.CLIENT).equals(clientHID.toString()) 
-				|| !command.get(Command.SERVER).equals(serverHID.toString())){
+				|| !command.get(Command.SERVER).equals(serverHID.toString())) {
 			throw new VerificationFailureException("Not appropriate sender or receiver of handshake");
 		}
 
-		if(secProtocol.isClient()){
-			if(!sentAcknowledgement){
+		if(secProtocol.isClient()) {
+			if(!sentAcknowledgement) {
 				//response from the server which should contain a certificate
 				if(Integer.parseInt(command.getProperty("command")) == Command.SERVER_SEND_KEY){
 					String signedAndEncryptedPayload = command.getProperty(Command.SIGNED_AND_ENCRYPTED_PAYLOAD);
@@ -238,9 +238,9 @@ public class AsymHandshake {
 					logger.debug("Not appropriate message received from HID: " + serverHID.toString());
 				}
 			}
-		}else{
+		} else {
 			//this is server and client sent request or acknowledgment
-			if(Integer.parseInt(command.getProperty(Command.COMMAND)) == Command.CLIENT_REQUESTS_KEY){
+			if(Integer.parseInt(command.getProperty(Command.COMMAND)) == Command.CLIENT_REQUESTS_KEY) {
 				//if signature on message and certificate are valid go to next state	
 				if(verifySignature(command) && verifyCertificate(command)){
 					//get client nonce from message
@@ -290,7 +290,7 @@ public class AsymHandshake {
 							clientHID,
 							cmd);
 				}
-			}else if(sentKeyToClient && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_ACK){
+			} else if (sentKeyToClient && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_ACK) {
 				setInitialized();
 				//read application data out of acknowledgment
 				if(command.containsKey(Command.APPLICATION_MESSAGE)) {
@@ -364,6 +364,14 @@ public class AsymHandshake {
 		String master_identifier = secProtocol.getMasterKeyId();
 		boolean storedSymKey = false;
 		try {
+			if (secProtocol.getCryptoMgr().identifierExists(master_identifier)) {
+				boolean deleted = secProtocol.getCryptoMgr()
+										.deleteEntry(master_identifier);
+				if(!deleted) {
+					throw new CryptoException("Cannot delete previously existing key with identifier: " 
+							+ master_identifier);
+				}
+			}
 			storedSymKey = secProtocol.getCryptoMgr().storeSymmetricKeyWithFriendlyName(
 					master_identifier,
 					SecurityProtocolImpl.MAC_ALGORITHM,

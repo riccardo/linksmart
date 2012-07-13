@@ -115,7 +115,10 @@ public class Connection {
 			} catch (Exception e) {
 				logger.debug("Cannot unprotect message from HID: "
 						+ senderHID.toString());
-				return null;
+				message = new ErrorMessage(ErrorMessage.ERROR,
+						message.getSenderHID(), 
+						message.getReceiverHID(), 
+						e.getMessage().getBytes());
 			}
 		} else { 
 			message = unserializeMessage(data, true, senderHID, receiverHID);
@@ -127,10 +130,22 @@ public class Connection {
 					message = securityProtocol.processMessage(message);
 				} catch (CryptoException e) {
 					logger.error("Error during cryptographic operation", e);
+					message = new ErrorMessage(ErrorMessage.ERROR,
+							message.getSenderHID(), 
+							message.getReceiverHID(), 
+							e.getMessage().getBytes());
 				} catch (VerificationFailureException e) {
 					logger.error("Error during cryptographic operation", e);
+					message = new ErrorMessage(ErrorMessage.ERROR,
+							message.getSenderHID(), 
+							message.getReceiverHID(), 
+							e.getMessage().getBytes());
 				} catch (IOException e) {
 					logger.error("Error during cryptographic operation", e);
+					message = new ErrorMessage(ErrorMessage.ERROR,
+							message.getSenderHID(), 
+							message.getReceiverHID(), 
+							e.getMessage().getBytes());
 				}
 			}
 		}

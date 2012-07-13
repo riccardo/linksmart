@@ -254,9 +254,7 @@ public class KeyManagerImpl implements KeyManager {
 
 		try {
 			if (dbase.identifierExists(identifier)) {
-
 				logger.debug("identifier exists");
-
 				// delete from Hashmaps
 				if (privateKeyRefCache.containsValue(identifier)) {
 					logger.debug("identifier is in privateKeyRefCache");
@@ -264,14 +262,12 @@ public class KeyManagerImpl implements KeyManager {
 							+ privateKeyRefCache.values().remove(identifier));
 					this.privateKeyCacheUse.remove(identifier);
 				}
-
 				if (certificateRefCache.containsValue(identifier)) {
 					logger.debug("identifier is in certificateRefCache");
 					logger.debug("deletion successful: "
 							+ certificateRefCache.values().remove(identifier));
 					this.certificateCacheUse.remove(identifier);
 				}
-
 				// delete from KS
 				String alias = dbase.getIdentifierAlias(identifier);
 				logger.debug("keystore alias for " + identifier + ": " + alias);
@@ -282,7 +278,6 @@ public class KeyManagerImpl implements KeyManager {
 						logger.debug("deletion successful: "
 								+ !ks.containsAlias(alias));
 					}
-
 				} catch (KeyStoreException e) {
 					logger.error(e.getMessage(), e);
 				}
@@ -290,8 +285,7 @@ public class KeyManagerImpl implements KeyManager {
 				// delete from DB
 				logger.debug("delete from DB");
 				dbase.removeTableEntry(identifier);
-
-			} else {
+				return true;
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);

@@ -244,6 +244,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 						if(cryptoMgr.identifierExists(this.masterKeyId)){
 							symHandshake.setMasterKeyIdentifier(this.masterKeyId);
 						}else{
+							resetProtocol();
 							throw new CryptoException(
 									"Entity is trying to agree on session keys but there is no master key for HIDs: "
 									+ clientHID.toString() + " " + serverHID.toString());

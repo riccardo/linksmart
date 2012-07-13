@@ -312,4 +312,12 @@ public interface CryptoManager {
 	 * @return True if identifier is available
 	 */
 	public boolean identifierExists(String identifier);
+	
+	/**
+	 * Deletes an entry in the keystore as overwrites
+	 * should not be possible.
+	 * @param identifier
+	 * @return True if identifier was found and deleted.
+	 */
+	public boolean deleteEntry(String identifier);
 }

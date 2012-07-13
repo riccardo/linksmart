@@ -487,4 +487,8 @@ public class CryptoManagerImpl implements CryptoManager{
 			return false;
 		}
 	}
+
+	public boolean deleteEntry(String identifier) {
+		return keyManager.deleteEntry(identifier);
+	}
 }
