@@ -67,4 +67,9 @@ import eu.linksmart.utils.Part;
 		public String[] getAvailableBackbones() throws RemoteException {
 			return this.core.getAvailableBackbones();
 		}
+
+		@Override
+		public String[] getHIDByAttributes(Part[] attributes) {
+			return this.core.getHIDByAttributes(attributes);
+		}
 }

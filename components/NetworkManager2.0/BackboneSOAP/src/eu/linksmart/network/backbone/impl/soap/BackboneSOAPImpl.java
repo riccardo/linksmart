@@ -166,7 +166,7 @@ public class BackboneSOAPImpl implements Backbone {
 		LOG.debug("Received SOAP message at the end of the tunnel:\n"
 				+ SOAPMessage);
 
-		getResponse(urlEndpoint, resp, dataproc.toString());
+		getResponse(urlEndpoint, resp, SOAPMessage);
 	}
 
 	/**

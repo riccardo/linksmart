@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
@@ -485,15 +486,20 @@ MessageDistributor {
 			data = connection.processMessage(tempMessage);
 			response = this.backboneRouter.sendDataSynch(senderHID,
 					receiverHID, data);
-			//process response message
-			tempMessage = connection.processData(receiverHID, senderHID, response.getMessage().getBytes());
+			//process response message with logical endpoints in connection with physical endpoints
+			tempMessage = connection.processData(
+					message.getReceiverHID(), 
+					message.getSenderHID(), 
+					response.getMessage().getBytes());
 			//repeat sending and receiving until security protocol is over
 			while (tempMessage != null &&
 					tempMessage.getTopic().
 					contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
 				response = this.backboneRouter.sendDataSynch(senderHID, 
 						receiverHID, connection.processMessage(tempMessage));
-				tempMessage = connection.processData(receiverHID, senderHID,
+				tempMessage = connection.processData(
+						message.getReceiverHID(), 
+						message.getSenderHID(), 
 						response.getMessage().getBytes());
 			}
 		} catch (Exception e) {
@@ -625,6 +631,24 @@ MessageDistributor {
 	@Override
 	public void addRemoteHID(HID senderHID, HID remoteHID) {
 		this.backboneRouter.addRouteForRemoteHID(senderHID, remoteHID);
+	}
+
+	@Override
+	public String[] getHIDByAttributes(Part[] attributes) {
+		StringBuilder query = new StringBuilder();
+		for (Part attribute : attributes) {
+			query.append("(" + attribute.getKey() + "==" + attribute.getValue() + ")" + "&&");
+		}
+		query.delete(query.length() - 2, query.length());
+		Set<HIDInfo> hids = identityManager.getHIDsByAttributes(query.toString());
+		String[] hidsAsString = new String[hids.size()];
+		
+		int i = 0;
+		for (HIDInfo hidInfo : hids) {
+			hidsAsString[i] = hidInfo.getHID().toString();
+			i++;
+		}
+		return hidsAsString;
 	}
 
 }
