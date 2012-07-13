@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -230,9 +231,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		/* Parse the query. */
 		HashSet<HIDInfo> results = new HashSet<HIDInfo>();
 
-		Set<Map.Entry<HID, HIDInfo>> allHIDs = localHIDs.entrySet();
-		allHIDs.addAll(remoteHIDs.entrySet()); // because we are checking ALL
-		// hids
+		
+		HashSet<Map.Entry<HID, HIDInfo>> allHIDs = new HashSet<Map.Entry<HID,HIDInfo>>();
+		//search in local and remote HIDs
+		allHIDs.addAll(localHIDs.entrySet());
+		allHIDs.addAll(remoteHIDs.entrySet());
 		Iterator<Map.Entry<HID, HIDInfo>> it = allHIDs.iterator();
 
 		while (it.hasNext()) {

@@ -87,4 +87,6 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * @return Class names of the connected Backbones
 	 */
 	public String[] getAvailableBackbones() throws RemoteException;
+	
+	public String[] getHIDByAttributes(Part[] attributes);
 }
