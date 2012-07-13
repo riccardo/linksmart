@@ -146,6 +146,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		try {
 			return createMessage(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, clientHID, serverHID, cmd);
 		} catch (Exception e){
+			resetProtocol();
 			//this exception cannot happen{
 			CryptoException ce = new CryptoException("Error creating initial message");
 			ce.initCause(e);
@@ -180,6 +181,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 			//check whether this is the correct party
 			if(!command.get(Command.CLIENT).equals(clientHID.toString()) 
 					|| !command.get(Command.SERVER).equals(serverHID.toString())){
+				resetProtocol();
 				throw new VerificationFailureException("Not appropriate sender or receiver of handshake");
 			}
 
@@ -205,6 +207,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 							try {
 								serverKeyidentifier = cryptoMgr.storePublicKey(Base64.encodeBytes(cert.getEncoded()), "RSA");
 							} catch (CertificateEncodingException e) {
+								resetProtocol();
 								IOException ioe = new IOException("Cannot parse received message!");
 								ioe.initCause(e);
 								throw ioe;
@@ -213,6 +216,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 						} else {
 							logger.debug("Signature or nonce not valid, aborting");
+							resetProtocol();
 							throw new VerificationFailureException(
 									"Signature or nonce from HID: " + serverHID + " not valid!");
 						} 
@@ -237,6 +241,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 									cmd.setProperty(Command.APPLICATION_MESSAGE, new String(protectedMessage.getData()));
 									storedMessage = null;
 								}catch(Exception e){
+									resetProtocol();
 									CryptoException ce = new CryptoException("Excaption protecting original message");
 									ce.initCause(e);
 									throw ce;
@@ -248,6 +253,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 									cmd);
 							return lastSent;
 						} catch (IOException e) {
+							resetProtocol();
 							logger.error("Error creating acknowledgment for server",e);
 							return null;
 						}						
@@ -293,6 +299,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 								message = unprotectMessage(message);
 								return message;
 							}catch(Exception e){
+								resetProtocol();
 								CryptoException ce = new CryptoException("Error opening application data sent in handshake");
 								ce.initCause(e);
 								throw ce;
@@ -304,6 +311,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 						}
 					}else{
 						logger.debug("Signature or nonce not valid, aborting!");
+						resetProtocol();
 						throw new VerificationFailureException("Received not valid signature from HID: " + clientHID);
 					}
 				}
@@ -676,5 +684,19 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 	public Message unprotectBroadcastMessage(Message msg) throws Exception{
 		throw new Exception("Broadcasting not supported by security protocol!");
+	}
+	
+	/**
+	 * Should be called when exception occurs thus this
+	 * method resets all variables to default.
+	 */
+	protected void resetProtocol() {
+		this.isInitialized = false;
+		this.isStarted = false;
+		this.generatedNonce = null;
+		this.lastSent = null;
+		this.sentAcknowledgement = false;
+		this.sentKeyToClient = false;
+		this.storedMessage = null;
 	}
 }

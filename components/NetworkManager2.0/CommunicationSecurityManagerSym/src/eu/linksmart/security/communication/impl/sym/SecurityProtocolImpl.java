@@ -212,6 +212,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 			CryptoException ce = new CryptoException("Error during agreement of session keys");
 			ce.initCause(e);
 			logger.error("Error during exchange of certificates with HID: " + serverHID.toString());
+			resetProtocol();
 			throw ce;
 		}
 	}
@@ -261,12 +262,16 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 					lastSent = asymHandshake.processMessage(msg);
 					return lastSent;
 				} catch (CryptoException ce) {
+					resetProtocol();
 					throw ce;
 				} catch (VerificationFailureException ve){
+					resetProtocol();
 					throw ve;
 				} catch (IOException ioe){
+					resetProtocol();
 					throw ioe;
 				} catch (Exception e){
+					resetProtocol();
 					//make cryptoexception from exception 
 					CryptoException ce = new CryptoException("Error processing protocol message");
 					ce.initCause(e);
@@ -277,6 +282,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 					lastSent = symHandshake.processMessage(msg);
 					return lastSent;
 				} catch (Exception e){
+					resetProtocol();
 					//make cryptoexception from exception 
 					CryptoException ce = new CryptoException("Error processing protocol message");
 					ce.initCause(e);
@@ -692,5 +698,23 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 			this.masterKeyId = Base64.encodeBytes(mkIdentifier);
 		}
 		return masterKeyId;
+	}
+	
+	/**
+	 * Should be called when exception occurs thus this
+	 * method resets all variables to default.
+	 */
+	protected void resetProtocol() {
+		this.isStarted = false;
+		this.isInitialized = false;
+		this.isAsymRunning = false;
+		this.lastSent = null;
+		this.masterKeyId = null;
+		this.localEncKey = null;
+		this.localMacKey = null;
+		this.remoteEncKey = null;
+		this.remoteMacKey = null;
+		this.symHandshake = new SymHandshake(this);
+		this.asymHandshake = new AsymHandshake(this);
 	}
 }
