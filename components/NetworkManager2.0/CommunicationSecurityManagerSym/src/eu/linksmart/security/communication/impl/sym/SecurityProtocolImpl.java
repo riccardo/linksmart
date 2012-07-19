@@ -227,19 +227,19 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		if(!isInitialized){
 			if(!isStarted()){
 				//check if protocol is started or this message has to be stored
-				if(!msg.getTopic().contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)){
+				if(!msg.getTopic().contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
 					//this is the client side of a handshake
 					isClient = true;
 					isStarted = true;
 					storedMessage = msg;
 					lastSent = startProtocol();
 					return lastSent;
-				} else if(msg.getTopic().contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)){
+				} else if(msg.getTopic().contentEquals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
 					//this is the server side of a handshake but decide which handshake the message belongs to
 					Command cmd = getCommand(msg);
 					if(Integer.parseInt(cmd.getProperty(Command.COMMAND)) == Command.CLIENT_HELLO){
 						isAsymRunning = false;
-						//try to set master key id else drop exception
+						//try to set master key id else throw exception
 						getMasterKeyId();
 						if(cryptoMgr.identifierExists(this.masterKeyId)){
 							symHandshake.setMasterKeyIdentifier(this.masterKeyId);
