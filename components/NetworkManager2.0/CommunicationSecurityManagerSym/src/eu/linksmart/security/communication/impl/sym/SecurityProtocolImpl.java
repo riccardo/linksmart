@@ -375,6 +375,18 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	}
 
 	public Message unprotectMessage(Message msg) throws Exception {
+		//check if this is a handshake message because then the protocol should restart
+		if(msg.getTopic().equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
+			Command cmd = getCommand(msg);
+			if(Integer.parseInt(cmd.getProperty(Command.COMMAND)) == Command.CLIENT_HELLO){
+				//other party requests new keys
+				resetProtocol();
+				return this.processMessage(msg);
+			} else {
+				throw new Exception("Not expected message!");
+			}
+		}
+		
 		// string to doc conversion
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
@@ -706,6 +718,8 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 * method resets all variables to default.
 	 */
 	protected void resetProtocol() {
+		this.localCounter = 0;
+		this.remoteCounter = 0;
 		this.isStarted = false;
 		this.isInitialized = false;
 		this.isAsymRunning = false;

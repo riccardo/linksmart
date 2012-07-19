@@ -111,7 +111,10 @@ public class Connection {
 				message = unserializeMessage(data, false, senderHID, receiverHID);
 				message = securityProtocol.unprotectMessage(message);
 				//use data field of message to reconstruct original message
-				message = unserializeMessage(message.getData(), true, senderHID, receiverHID);
+				if(!message.getTopic().
+						equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
+					message = unserializeMessage(message.getData(), true, senderHID, receiverHID);
+				}
 			} catch (Exception e) {
 				logger.debug("Cannot unprotect message from HID: "
 						+ senderHID.toString());
