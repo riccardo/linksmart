@@ -350,7 +350,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 			bos.close();
 		}
 
-		return new Message(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, clientHID, serverHID, serializedCommand);
+		return new Message(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, senderHID, receiverHID, serializedCommand);
 	}
 
 	/**
