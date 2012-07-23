@@ -3,7 +3,6 @@ package eu.linksmart.network.connection;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.Map;
@@ -82,9 +81,9 @@ public class Connection {
 	}
 
 	/**
-	 * Set {@link CommunicationSecurityManager} for this connection. It has to be ensured
-	 * that no message is processed until no CommunicationSecurityManager is set for
-	 * connection.
+	 * Set {@link CommunicationSecurityManager} for this connection. It has to 
+	 * be ensured that no message is processed until CommunicationSecurityManager
+	 * is set for connection.
 	 * 
 	 * @param comSecMgr
 	 *            Reference for creator of {@link SecurityProtocol}
@@ -155,6 +154,13 @@ public class Connection {
 		return message;
 	}
 
+	/**
+	 * Gets the {@link SecurityProtocol} object assigned to provided HIDs from
+	 * the HashMap. If no object is stored a new one is created.
+	 * @param senderHID
+	 * @param receiverHID
+	 * @return Object assigned to this HIDs
+	 */
 	protected SecurityProtocol getSecurityProtocol(HID senderHID, HID receiverHID) {
 		if(comSecMgr != null) {
 			HIDTuple hidTuple = new HIDTuple(senderHID, receiverHID);

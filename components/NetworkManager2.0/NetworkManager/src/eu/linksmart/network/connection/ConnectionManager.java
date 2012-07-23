@@ -1,14 +1,11 @@
 package eu.linksmart.network.connection;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,7 +41,8 @@ public class ConnectionManager {
 	 */
 	private Timer timer = null;
 	/**
-	 * HIDs stored with a fix set of properties needed to be fulfilled by a connection to it.
+	 * Required properties stored by HID. These {@link SecurityProperty} have to
+	 * be provided by {@link Connection} between these HIDs.
 	 */
 	private HashMap<HID, List<SecurityProperty>> hidPolicies = new HashMap<HID, List<SecurityProperty>>();
 	/**
@@ -227,26 +225,6 @@ public class ConnectionManager {
 
 		return conn;
 	}
-
-	/**
-	 * Creates a {@Properties} object form the received data.
-	 * It is assumed that every message which does not have
-	 * a sender HID is a request for an HID as such sends attributes
-	 * @param data Received data from an entity without HID
-	 * @return Properties object unserialized from data
-	 * @throws IOException 
-	 */
-	//	public Part[] getHIDAttributes(byte[] data) throws IOException {
-	//		Properties properties = new Properties();
-	//		try {
-	//			properties.loadFromXML(new ByteArrayInputStream(data));
-	//		} catch (Exception e) {
-	//			IOException ioe = new IOException("Cannot parse received data!");
-	//			ioe.initCause(e);
-	//			throw ioe;
-	//		}
-	//		return properties;
-	//	}
 
 	/**
 	 * Sets the number of minutes before a connection is closed

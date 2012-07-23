@@ -79,15 +79,18 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 */
 	private TrustManager trustMgr = null;
 	/**
-	 * The client of this protocol run meaning who started the communication.
+	 * The client of this protocol. Client is the party 
+	 * who started the communication.
 	 */
 	private HID clientHID = null;
 	/**
-	 * The server of this protocol run meaning who received the request.
+	 * The server of this protocol. Server is the party 
+	 * who received the request.
 	 */
 	private HID serverHID = null;
 	/**
-	 * The threshold between 0 and 1 needed for a certificate to be accepted.
+	 * The margin over which the calculated trust value
+	 * of the certificate has to be to be accepted (between 0 and 1).
 	 */
 	private double trustThreshold;
 
@@ -144,7 +147,8 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 */
 	private boolean isClient;
 	/**
-	 * Stores the message with wich the handshake has been started to send it later.
+	 * Stores the message with which the handshake
+	 *  has been started to send it later.
 	 */
 	private Message storedMessage;
 	/**
@@ -152,11 +156,11 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 */
 	private String masterKeyId;
 	/**
-	 * Increasing counter of the client messages for reorder protection.
+	 * Increasing counter which protects order integrity of messages sent.
 	 */
 	private int localCounter = 0;
 	/**
-	 * Increasing counter of the server messages for reorder protection.
+	 * Increasing counter which protects order integrity of messages received.
 	 */
 	private int remoteCounter = 0;
 	/**
@@ -478,7 +482,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	}
 
 	/**
-	 * Parses the incoming message's data field into a Command object
+	 * Parses the incoming message's data field into a Command object.
 	 * @param msg
 	 * @return The command included in the data field
 	 * @throws IOException If the data is not a command or cannot be parsed
@@ -497,7 +501,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 
 	/**
 	 * 
-	 * @return The CryptoManager
+	 * @return The CryptoManager.
 	 */
 	protected CryptoManager getCryptoMgr() {
 		return cryptoMgr;
@@ -505,7 +509,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 
 	/**
 	 * 
-	 * @return The TrustManager
+	 * @return The TrustManager.
 	 */
 	protected TrustManager getTrustMgr() {
 		return trustMgr;
@@ -513,7 +517,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 
 	/**
 	 * 
-	 * @return The client of the protocol run
+	 * @return The client of security session.
 	 */
 	protected HID getClientHID() {
 		return clientHID;
@@ -521,7 +525,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 
 	/**
 	 * 
-	 * @return The server of the protocol run
+	 * @return The server of security session.
 	 */
 	protected HID getServerHID() {
 		return serverHID;
@@ -529,7 +533,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 
 	/**
 	 * 
-	 * @return Trust threshold to accept certificates
+	 * @return Trust threshold to accept certificates.
 	 */
 	protected double getTrustThreshold() {
 		return trustThreshold;
@@ -537,21 +541,21 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 
 	/**
 	 * 
-	 * @return The nonce generator used
+	 * @return The nonce generator used.
 	 */
 	protected NonceGenerator getNonceGenerator() {
 		return nonceGenerator;
 	}
 
 	/**
-	 * Sets the handshake as finished
+	 * Sets the handshake as finished.
 	 */
-	protected void setInitialized(){
+	protected void setInitialized() {
 		isInitialized = true;
 	}
 
 	/**
-	 * @return the localMacKey
+	 * @return the localMacKey.
 	 */
 	protected Key getLocalMacKey() {
 		return localMacKey;
@@ -637,14 +641,14 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	/**
 	 * Sets this protocol run to started
 	 */
-	protected void setStarted(){
+	protected void setStarted() {
 		this.isStarted = true;
 	}
 
 	/**
 	 * @return Returns whether this protocol run is started
 	 */
-	protected boolean isStarted(){
+	protected boolean isStarted() {
 		return this.isStarted;
 	}
 
@@ -688,7 +692,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 * @return
 	 * @throws CryptoException If one of the certificates is missing
 	 */
-	protected String getMasterKeyId() throws CryptoException{
+	protected String getMasterKeyId() throws CryptoException {
 		if(this.masterKeyId == null){
 			//generate master key id which is certificate references XORed
 			String clientIdentifier = cryptoMgr.getCertificateReference(
@@ -700,12 +704,15 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 				throw new CryptoException("Does not have own certificate");
 			}
 			if(serverIdentifier == null){
-				throw new CryptoException("Does not have certificate for HID:" + serverHID.toString());
+				throw new CryptoException("Does not have certificate for HID:"
+						+ serverHID.toString());
 			}
 			byte[] serverId = serverIdentifier.getBytes();
 			byte[] clientId = clientIdentifier.getBytes();
-			byte[] mkIdentifier = new byte[(clientId.length >= serverId.length)? clientId.length : serverId.length];
-			for(int i=0; i < clientId.length && i < serverId.length;i++){
+			byte[] mkIdentifier = new byte[(clientId.length >= serverId.length)?
+					clientId.length 
+					: serverId.length];
+			for(int i=0; i < clientId.length && i < serverId.length;i++) {
 				mkIdentifier[i] = (byte) (clientId[i] ^ serverId[i]);
 			}
 			this.masterKeyId = Base64.encodeBytes(mkIdentifier);

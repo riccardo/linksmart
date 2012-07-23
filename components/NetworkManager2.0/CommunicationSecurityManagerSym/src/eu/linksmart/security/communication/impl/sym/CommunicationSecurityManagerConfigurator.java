@@ -2,7 +2,6 @@ package eu.linksmart.security.communication.impl.sym;
 
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
@@ -73,6 +72,11 @@ public class CommunicationSecurityManagerConfigurator extends Configurator {
 		this.setConfiguration(SECURITY_PROVIDED, sb.toString());
 	}
 
+	/**
+	 * Apply the configuration changes
+	 * 
+	 * @param updates the configuration changes
+	 */
 	public void applyConfigurations(Hashtable updates) {
 		comSecMgr.applyConfigurations(updates);
 	}

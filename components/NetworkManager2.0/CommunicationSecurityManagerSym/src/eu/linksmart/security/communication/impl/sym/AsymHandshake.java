@@ -37,41 +37,41 @@ import eu.linksmart.utils.Base64;
 public class AsymHandshake {
 
 	/**
-	 * The Log4j logger of this class
+	 * The Log4j logger of this class.
 	 */
 	private static Logger logger = Logger.getLogger(SecurityProtocolImpl.class);
 	/**
-	 * The owner of this handshake class
+	 * The owner of this handshake class.
 	 */
 	SecurityProtocolImpl secProtocol = null;
 	/**
-	 * Indicates for a server state machine that it has already sent keys to the client
+	 * Indicates for a server state machine that it has already sent keys to the client.
 	 */
 	private boolean sentKeyToClient = false;
 	/**
-	 * Indicates for a client state machine that the acknowledgment has been sent
+	 * Indicates for a client state machine that the acknowledgment has been sent.
 	 */
 	private boolean sentAcknowledgement = false;
 	/**
-	 * The symmetric handshake integrated into this one to get tokens
+	 * The symmetric handshake, which can generate the authentication tokens.
 	 */
 	SymHandshake symHandshake = null;
 	/**
-	 * The master symmetric key
+	 * The master symmetric key.
 	 */
 	private String masterKeyId;
 
-	protected AsymHandshake(SecurityProtocolImpl secProtocol){
+	protected AsymHandshake(SecurityProtocolImpl secProtocol) {
 		this.secProtocol = secProtocol;
 		symHandshake = new SymHandshake(secProtocol);
 	}
 
 	/**
-	 * Behaves as it were the startProtocol method of {@SecurityProtocol}
+	 * Behaves as it were the startProtocol method of {@link SecurityProtocol}.
 	 * @return First Message to send
 	 * @throws Exception
 	 */
-	protected Message startProtocol() throws Exception{
+	protected Message startProtocol() throws Exception {
 		HID clientHID = secProtocol.getClientHID();
 		HID serverHID = secProtocol.getServerHID();
 
@@ -104,7 +104,7 @@ public class AsymHandshake {
 	/**
 	 * Behaves exactly as the processMessage method of {@link SecurityProtocol}
 	 * @param msg
-	 * @return
+	 * @return next message to come in handshake
 	 * @throws IOException
 	 * @throws CryptoException
 	 * @throws Exception

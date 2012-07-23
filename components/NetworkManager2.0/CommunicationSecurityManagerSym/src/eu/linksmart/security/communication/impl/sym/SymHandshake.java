@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
+import eu.linksmart.security.communication.CryptoException;
 import eu.linksmart.security.communication.SecurityProtocol;
 import eu.linksmart.security.communication.VerificationFailureException;
 import eu.linksmart.security.communication.util.impl.BytesUtil;
@@ -83,6 +84,12 @@ public class SymHandshake {
 		return message;
 	}
 
+	/**
+	 * Behaves exactly as the processMessage method of {@link SecurityProtocol}
+	 * @param msg
+	 * @return next message to come in handshake
+	 * @throws Exception
+	 */
 	public Message processMessage(Message msg) throws Exception {
 		HID clientHID = secProtocol.getClientHID();
 		HID serverHID = secProtocol.getServerHID();

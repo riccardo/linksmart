@@ -3,6 +3,11 @@ package eu.linksmart.network.connection;
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 
+/**
+ * {@link Connection} which does not encode provided messages or data.
+ * @author Vinkovits
+ *
+ */
 public class NOPConnection extends Connection {
 
 	public NOPConnection(HID clientHID, HID serverHID) {
