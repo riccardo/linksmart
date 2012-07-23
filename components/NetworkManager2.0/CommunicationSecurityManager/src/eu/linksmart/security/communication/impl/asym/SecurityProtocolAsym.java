@@ -232,7 +232,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 						ByteArrayOutputStream bos = new ByteArrayOutputStream();
 						try {
 							cmd.storeToXML(bos, null);
-							String signedCommand = cryptoMgr.sign(bos.toString(),null, serverHID.toString());
+							String signedCommand = cryptoMgr.sign(bos.toString(),null, clientHID.toString());
 							cmd.setProperty(Command.SIGNED_PAYLOAD, signedCommand);
 							//add stored message if there is one
 							if(storedMessage != null){
