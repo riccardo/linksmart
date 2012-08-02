@@ -679,4 +679,11 @@ MessageDistributor {
 		return (HIDInfo[]) hids.toArray();
 	}
 
+	@Override
+	public HIDInfo[] getHIDByQuery(String query) {
+		
+		Set<HIDInfo> hids = identityManager.getHIDsByAttributes(query);
+		return (HIDInfo[]) hids.toArray();
+	}
+
 }
