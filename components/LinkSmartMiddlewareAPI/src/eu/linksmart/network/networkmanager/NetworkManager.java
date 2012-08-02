@@ -115,7 +115,15 @@ public interface NetworkManager extends java.rmi.Remote {
 	/**
 	 * Gets the HIDInfo for the available service(s) with the description.
 	 * @param description The relevant service description.
-	 * @return The HIDInfo object.
+	 * @return The HIDInfo objects.
 	 */
 	public HIDInfo [] getHIDByDescription(String description);
+	
+	/**
+	 * Gets the HID for the available services for the passed query. 
+	 * This method should only be used by advanced developers.
+	 * @param query The formulated query.
+	 * @return The HIDInfo objects.
+	 */
+	public HIDInfo [] getHIDByQuery(String query);
 }
