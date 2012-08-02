@@ -633,10 +633,33 @@ MessageDistributor {
 		this.backboneRouter.addRouteForRemoteHID(senderHID, remoteHID);
 	}
 
+	public HIDInfo[] getHIDByDescription(String description){
+		
+		Part part_description = new Part(HIDAttribute.DESCRIPTION.name(), description);
+		
+		return getHIDByAttributes(new Part[]{part_description});
+	}
+	
+	public HIDInfo getHIDByPID(String PID) throws IllegalArgumentException{
+		
+		if(PID==null || PID.length()>0)
+			throw new IllegalArgumentException("PID not specificed");
+		
+		Part part_description = new Part(HIDAttribute.PID.name(), PID);
+		
+		HIDInfo[] hids = getHIDByAttributes(new Part[]{part_description});
+		
+		if(hids.length>0)
+			throw new RuntimeException("More than one hid found to passed PID");
+		else 
+			return hids[0];
+	}
+
 	@Override
 	public HIDInfo[] getHIDByAttributes(Part[] attributes) {
 		return getHIDByAttributes(attributes, true);
 	}
+	
 	
 	@Override
 	public HIDInfo[] getHIDByAttributes(Part[] attributes, boolean isConjunction) {
