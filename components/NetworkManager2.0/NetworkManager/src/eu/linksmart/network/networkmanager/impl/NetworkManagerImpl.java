@@ -69,7 +69,29 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public String[] getHIDByAttributes(Part[] attributes) {
+		public HIDInfo[] getHIDByAttributes(Part[] attributes) {
 			return this.core.getHIDByAttributes(attributes);
+		}
+
+		@Override
+		public HIDInfo[] getHIDByAttributes(Part[] attributes,
+				boolean isConjunction) {
+			
+			return this.core.getHIDByAttributes(attributes, isConjunction);
+		}
+
+		@Override
+		public HIDInfo getHIDByPID(String PID) throws IllegalArgumentException {
+			return this.core.getHIDByPID(PID);
+		}
+
+		@Override
+		public HIDInfo[] getHIDByDescription(String description) {
+			return this.core.getHIDByDescription(description);
+		}
+
+		@Override
+		public HIDInfo[] getHIDByQuery(String query) {
+			return this.core.getHIDByQuery(query);
 		}
 }
