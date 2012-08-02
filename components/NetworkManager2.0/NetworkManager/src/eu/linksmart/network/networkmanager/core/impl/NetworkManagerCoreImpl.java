@@ -634,21 +634,26 @@ MessageDistributor {
 	}
 
 	@Override
-	public String[] getHIDByAttributes(Part[] attributes) {
+	public HIDInfo[] getHIDByAttributes(Part[] attributes) {
+		return getHIDByAttributes(attributes, true);
+	}
+	
+	@Override
+	public HIDInfo[] getHIDByAttributes(Part[] attributes, boolean isConjunction) {
+		String relation = null;
+		if (isConjunction) {
+			relation = "&&";
+		} else {
+			relation = "||";
+		}
+		
 		StringBuilder query = new StringBuilder();
 		for (Part attribute : attributes) {
-			query.append("(" + attribute.getKey() + "==" + attribute.getValue() + ")" + "&&");
+			query.append("(" + attribute.getKey() + "==" + attribute.getValue() + ")" + relation);
 		}
 		query.delete(query.length() - 2, query.length());
 		Set<HIDInfo> hids = identityManager.getHIDsByAttributes(query.toString());
-		String[] hidsAsString = new String[hids.size()];
-		
-		int i = 0;
-		for (HIDInfo hidInfo : hids) {
-			hidsAsString[i] = hidInfo.getHID().toString();
-			i++;
-		}
-		return hidsAsString;
+		return (HIDInfo[]) hids.toArray();
 	}
 
 }
