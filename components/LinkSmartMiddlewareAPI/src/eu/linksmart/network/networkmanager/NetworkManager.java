@@ -104,4 +104,18 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * @return The HIDs in HIDInfo objects
 	 */
 	public HIDInfo[] getHIDByAttributes(Part[] attributes, boolean isConjunction);
+	
+	/**
+	 * Gets the HID for the available service with the passed PID.
+	 * @param PID The persistent identifier of the service.
+	 * @return The HIDInfo obect.
+	 */
+	public HIDInfo getHIDByPID(String PID);
+	
+	/**
+	 * Gets the HIDInfo for the available service(s) with the description.
+	 * @param description The relevant service description.
+	 * @return The HIDInfo object.
+	 */
+	public HIDInfo [] getHIDByDescription(String description);
 }
