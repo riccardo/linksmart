@@ -88,5 +88,20 @@ public interface NetworkManager extends java.rmi.Remote {
 	 */
 	public String[] getAvailableBackbones() throws RemoteException;
 	
-	public String[] getHIDByAttributes(Part[] attributes);
+	/**
+	 * Gets the HID for the available services with the given attributes. 
+	 * Attributes are connected via conjunction.
+	 * @param attributes The attributes the service is supposed to have
+	 * @return The HIDs in HIDInfo objects
+	 */
+	public HIDInfo[] getHIDByAttributes(Part[] attributes);
+	
+	/**
+	 * Gets the HID for the available services with the given attributes. 
+	 * @param attributes The attributes the service is supposed to have
+	 * @param isConjunction if true the attributes are connected with a logical "AND", 
+	 * 			if false attributes are connected with a logical "OR"
+	 * @return The HIDs in HIDInfo objects
+	 */
+	public HIDInfo[] getHIDByAttributes(Part[] attributes, boolean isConjunction);
 }
