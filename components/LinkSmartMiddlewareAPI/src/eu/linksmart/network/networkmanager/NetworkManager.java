@@ -110,7 +110,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * @param PID The persistent identifier of the service.
 	 * @return The HIDInfo obect.
 	 */
-	public HIDInfo getHIDByPID(String PID);
+	public HIDInfo getHIDByPID (String PID) throws IllegalArgumentException;
 	
 	/**
 	 * Gets the HIDInfo for the available service(s) with the description.
