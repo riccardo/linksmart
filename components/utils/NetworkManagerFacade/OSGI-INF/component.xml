@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="eu.linksmart.network.facade">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="eu.linksmart.network.facade">
    <implementation class="eu.linksmart.network.facade.impl.NetworkManagerFacaceImpl"/>
    <reference cardinality="1..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="static"/>
    <service>
