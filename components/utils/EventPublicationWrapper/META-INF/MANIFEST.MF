@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: EventPublicationWrapper
+Bundle-SymbolicName: EventPublicationWrapper
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: eu.linksmart.eventmanager,
+ eu.linksmart.network;version="1.0.0",
+ eu.linksmart.remote.service.store;version="1.2.0",
+ org.apache.log4j,
+ org.osgi.service.component
+Service-Component: OSGI-INF/DS_EventPublicationWrapper.xml
+Export-Package: eu.linksmart.event.publication
