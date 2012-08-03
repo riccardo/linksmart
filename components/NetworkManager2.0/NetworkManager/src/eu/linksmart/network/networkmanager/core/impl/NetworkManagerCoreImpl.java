@@ -651,7 +651,7 @@ MessageDistributor {
 	}
 	
 	public HIDInfo getHIDByPID(String PID) throws IllegalArgumentException{
-		if (PID == null || PID.length() > 0) {
+		if (PID == null || PID.length() == 0) {
 			throw new IllegalArgumentException("PID not specificed");
 		}
 		
