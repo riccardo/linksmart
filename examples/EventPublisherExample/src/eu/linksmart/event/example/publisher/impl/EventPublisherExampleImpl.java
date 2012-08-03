@@ -19,7 +19,7 @@ public class EventPublisherExampleImpl implements
 		EventPublisherExample {
 
 		/* Description of the EventManager */
-	private static final String EVENT_MANAGER_PID = "EventManager:Marc";
+	private static final String EVENT_MANAGER_PID = "EventManager:FIT:zfs15";
 	/* Topic of the events */
 	private static final String SENSOR_EVENT_TOPIC = "EVENT/POST_PROCESSED/WEATHER_FORECAST/PASSEIG_DE_GRACIA/LINE_3/2_HOUR_AHEAD";
 

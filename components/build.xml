@@ -64,6 +64,8 @@
 		<ant dir="NetworkManager" target="make" />
 		<ant dir="CryptoManager" target="make" />
 		<ant dir="OntologyManager" target="make" />
+		<ant dir="utils/EventPublicationWrapper" target="make" />
+		<ant dir="utils/EventSubscriptionWrapper" target="make" />
 	</target>
 	
 	<target name="make-supernode" depends="make-dirs" description="Build components">

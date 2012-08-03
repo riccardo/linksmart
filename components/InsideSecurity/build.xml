@@ -68,6 +68,7 @@ Local build file for the Linksmart InsideSecurity
 	<target name="jar" depends="build">
 		<mkdir dir="${distribution.dir}" />
 		<jar jarfile="${distribution.dir}/${moduleName}-${revision}.jar" manifest="${basedir}/META-INF/MANIFEST.MF">
+			<fileset dir="${src.dir}" />
 			<fileset dir="${build.dir}">
 				<patternset>
 					<include name="**/*.class" />

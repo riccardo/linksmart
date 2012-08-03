@@ -18,7 +18,7 @@ public class EventSubscriberExampleImpl implements EventSubscriberExample,
 	private static final String SERVICE_ID = EventSubscriberExampleImpl.class
 			.getSimpleName();
 
-	private static final String EVENT_MANAGER_PID = "EventManager:Marc";
+	private static final String EVENT_MANAGER_PID = "EventManager:FIT:zfs15";
 	private final String EVENTTOPIC_SENSOR = "EVENT/.*";
 	// private final String EVENTTOPIC_SENSOR = "MEASUREMENT/SENSOR/w1";
 

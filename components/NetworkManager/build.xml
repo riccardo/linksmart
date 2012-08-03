@@ -99,6 +99,7 @@
 		<echo message="Packaging" />
 		<mkdir dir="${dist.dir}" />
 		<jar jarfile="${dist.dir}/${moduleName}-${revision}.jar" manifest="${basedir}/META-INF/MANIFEST.MF">
+			<fileset dir="${src.dir}" />
 			<fileset dir="${build.dir}" />
 			<fileset dir="${basedir}">
 				<patternset>
