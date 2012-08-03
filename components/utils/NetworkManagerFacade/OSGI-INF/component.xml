@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="eu.linksmart.network.facade">
+   <implementation class="eu.linksmart.network.facade.impl.NetworkManagerFacaceImpl"/>
+   <reference cardinality="1..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="static"/>
+   <service>
+      <provide interface="eu.linksmart.network.facade.NetworkManagerFacade"/>
+   </service>
+</scr:component>
