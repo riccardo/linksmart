@@ -43,6 +43,8 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 	private List<String> subscribedTopics = new ArrayList<String>();
 
 	protected void activate(ComponentContext context) {
+		LOG.info("Starting "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 		this.context = context;
 		subscriberHIDs = new HashMap<String, String>();
 		eventManagers = new HashMap<String, EventManagerPort>();
