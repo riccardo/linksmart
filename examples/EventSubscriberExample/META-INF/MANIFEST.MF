@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: EventSubscriberExample
+Bundle-SymbolicName: EventSubscriberExample
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: eu.linksmart.clients,
+ eu.linksmart.eventmanager,
+ eu.linksmart.network;version="1.0.0",
+ eu.linksmart.utils,
+ org.apache.log4j,
+ org.osgi.framework;version="1.5.0",
+ org.osgi.service.component
+Service-Component: OSGI-INF/DS_EventSubscriberExample.xml
+Export-Package: eu.linksmart.event.example.subscriber
+Require-Bundle: EventSubscriptionWrapper;bundle-version="1.0.0"

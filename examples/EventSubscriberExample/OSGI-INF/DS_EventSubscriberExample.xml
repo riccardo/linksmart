@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="EventSubscriberExample" immediate="true">
+	<implementation class="eu.linksmart.event.example.subscriber.impl.EventSubscriberExampleImpl"/>
+ <service>
+    <provide interface="eu.linksmart.event.example.subscriber.EventSubscriberExample"/>
+ </service>
+ <reference cardinality="1..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="static"/>
+ <reference cardinality="1..1" interface="eu.linksmart.event.subscription.EventSubscriptionWrapper" name="EventSubscriptionWrapper" policy="static"/>
+</scr:component>
