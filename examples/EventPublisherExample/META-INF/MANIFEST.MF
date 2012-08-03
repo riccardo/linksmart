@@ -12,4 +12,3 @@ Import-Package: eu.linksmart.event.publication,
  org.osgi.service.component
 Service-Component: OSGI-INF/DS_EventPublisherExample.xml
 Export-Package: eu.linksmart.event.example.publisher
-Require-Bundle: EventPublicationWrapper;bundle-version="1.0.0"

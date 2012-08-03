@@ -5,6 +5,7 @@ Bundle-SymbolicName: EventSubscriberExample
 Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: eu.linksmart.clients,
+ eu.linksmart.event.subscription,
  eu.linksmart.eventmanager,
  eu.linksmart.network;version="1.0.0",
  eu.linksmart.utils,
@@ -13,4 +14,3 @@ Import-Package: eu.linksmart.clients,
  org.osgi.service.component
 Service-Component: OSGI-INF/DS_EventSubscriberExample.xml
 Export-Package: eu.linksmart.event.example.subscriber
-Require-Bundle: EventSubscriptionWrapper;bundle-version="1.0.0"
