@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="EventPublisherExample" immediate="true">
+	<implementation class="eu.linksmart.event.example.publisher.impl.EventPublisherExampleImpl"/>
+ <service>
+    <provide interface="eu.linksmart.event.example.publisher.EventPublisherExample"/>
+ </service>
+ <reference cardinality="1..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="static"/>
+ <reference cardinality="1..1" interface="eu.linksmart.event.publication.EventPublicationWrapper" name="EventPublicationWrapper" policy="static"/>
+</scr:component>
