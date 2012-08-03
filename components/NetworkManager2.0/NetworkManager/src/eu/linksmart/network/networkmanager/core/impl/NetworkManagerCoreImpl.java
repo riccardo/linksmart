@@ -132,12 +132,23 @@ MessageDistributor {
 		}
 		if (!backboneFound) {
 			throw new IllegalArgumentException(
-			"Required backbone not available");
+					"Required backbone not available");
 		}
 
+		// PID should be unique, if the PID is already used, throw exception
+		for (Part attribute: attributes) {
+			if (attribute.getKey().equalsIgnoreCase("PID")) {
+				HIDInfo hidInfo = getHIDByPID(attribute.getValue());
+				if (hidInfo != null) {
+					throw new IllegalArgumentException(
+							"PID already in use. Please choose a different one.");
+				}
+			}
+		}
+		
 		HIDInfo newHID = this.identityManager.createHIDForAttributes(attributes);
 		List<SecurityProperty> properties = this.backboneRouter
-		.getBackboneSecurityProperties(backboneName);
+				.getBackboneSecurityProperties(backboneName);
 		// register HID with backbone policies in connection manager
 		this.connectionManager.registerHIDPolicy(newHID.getHID(), properties);
 		// add route to selected backbone
@@ -628,7 +639,6 @@ MessageDistributor {
 		return backbones.toArray(backboneNames);
 	}
 
-	@Override
 	public void addRemoteHID(HID senderHID, HID remoteHID) {
 		this.backboneRouter.addRouteForRemoteHID(senderHID, remoteHID);
 	}
@@ -641,34 +651,27 @@ MessageDistributor {
 	}
 	
 	public HIDInfo getHIDByPID(String PID) throws IllegalArgumentException{
-		
-		if(PID==null || PID.length()>0)
+		if (PID == null || PID.length() > 0) {
 			throw new IllegalArgumentException("PID not specificed");
+		}
 		
 		Part part_description = new Part(HIDAttribute.PID.name(), PID);
 		
 		HIDInfo[] hids = getHIDByAttributes(new Part[]{part_description});
 		
-		if(hids.length>0)
+		if (hids.length > 1) {
 			throw new RuntimeException("More than one hid found to passed PID");
-		else 
+		} else if (hids.length == 1) { 
 			return hids[0];
+		} else return null;
 	}
 
-	@Override
 	public HIDInfo[] getHIDByAttributes(Part[] attributes) {
 		return getHIDByAttributes(attributes, true);
 	}
 	
-	
-	@Override
 	public HIDInfo[] getHIDByAttributes(Part[] attributes, boolean isConjunction) {
-		String relation = null;
-		if (isConjunction) {
-			relation = "&&";
-		} else {
-			relation = "||";
-		}
+		String relation = (isConjunction) ? "&&" : "||";
 		
 		StringBuilder query = new StringBuilder();
 		for (Part attribute : attributes) {
@@ -676,14 +679,14 @@ MessageDistributor {
 		}
 		query.delete(query.length() - 2, query.length());
 		Set<HIDInfo> hids = identityManager.getHIDsByAttributes(query.toString());
-		return (HIDInfo[]) hids.toArray();
+		
+		return  hids.toArray(new HIDInfo[hids.size()]);
 	}
 
-	@Override
 	public HIDInfo[] getHIDByQuery(String query) {
 		
 		Set<HIDInfo> hids = identityManager.getHIDsByAttributes(query);
-		return (HIDInfo[]) hids.toArray();
+		return  hids.toArray(new HIDInfo[hids.size()]);
 	}
 
 }
