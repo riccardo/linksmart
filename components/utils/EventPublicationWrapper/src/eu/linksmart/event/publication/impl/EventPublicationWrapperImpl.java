@@ -25,6 +25,8 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 	private Map<String, EventManagerPort> eventManagers;
 	
 	protected void activate(ComponentContext context) {
+		LOG.info("Starting "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 		// Get the LinkSmartRemoteServiceStore
 		remoteServiceStore = (LinkSmartRemoteServiceStore) context
 				.locateService(LinkSmartRemoteServiceStore.class
