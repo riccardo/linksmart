@@ -1,2 +1,0 @@
-Private-Package=eu.linksmart.limbo.protocol.udp
-Service-Component=eu.linksmart.limbo.protocol.udp.*

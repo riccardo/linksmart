@@ -1,6 +1,0 @@
-package $package;
-
-public interface $interface {
-
-	public String communicateWithServer(String request, String host, int port); 
-}

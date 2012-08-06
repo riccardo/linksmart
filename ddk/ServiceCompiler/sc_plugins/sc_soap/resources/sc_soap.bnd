@@ -1,5 +1,0 @@
-Private-Package: eu.linksmart.limbo.soap.impl.*
-Export-Package: eu.linksmart.limbo.soap
-Service-Component=eu.linksmart.limbo.soap.impl.*
-Include-Resource: \
-	resources=templates
