@@ -32,4 +32,22 @@ public interface EventSubscriptionWrapper {
 	 * @param topic topic to subscribe to
 	 */
 	public void subscribeWithTopic(String serviceID, String topic);
+	
+	/**
+	 * Un-Subscribe a certain topic at the EventManager which was subscribed  
+	 * by a former call ofsubscribeWithTopic(String serviceID, String topic)
+	 * The EventManager will delete the subscription and will not notify the serviceID
+	 * @param serviceID service ID of subscriber
+	 * @param topic topic to un-subscribe to
+	 */
+	public void unsubscribeTopic(String serviceID, String topic);
+	
+	/**
+	 * Un-Subscribe all topics at the EventManager which was subscribed 
+	 * by a former call ofsubscribeWithTopic(String serviceID, String topic) with the same serviceID
+	 * The EventManager will delete all subscriptions and will not notify the serviceID	 
+	 * @param serviceID service ID of calling component	
+	 */
+	public void unsubscribeAllTopics(String serviceID);
+	
 }

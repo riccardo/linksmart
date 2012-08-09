@@ -137,6 +137,30 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 			LOG.debug("Added topic to subscription queue: " + topic);
 		}
 	}
+	
+	@Override
+	public void unsubscribeAllTopics(String serviceID) {
+		// TODO Auto-generated method stub
+		EventManagerPort eventManager = eventManagers.get(serviceID);
+		String subscriberHID = subscriberHIDs.get(serviceID);
+		try {
+			eventManager.clearSubscriptionsWithHID(subscriberHID);
+		} catch (RemoteException e) {
+			LOG.error("Unable to unsubscribeAllTopics from HID: " + subscriberHID, e);
+		}
+	}
+
+	@Override
+	public void unsubscribeTopic(String serviceID, String topic) {
+		// TODO Auto-generated method stub
+		EventManagerPort eventManager = eventManagers.get(serviceID);
+		String subscriberHID = subscriberHIDs.get(serviceID);
+		try {
+			eventManager.unsubscribe(topic, subscriberHID);
+		} catch (RemoteException e) {
+			LOG.error("Unable to unsubscribe topic(" + topic + ") from HID: " + subscriberHID, e);
+		}
+	}
 
 	/**
 	 * Continuously subscribed queued topics to Event Managers
