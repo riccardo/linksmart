@@ -160,6 +160,10 @@ public class HIDInfo implements Serializable {
 	public HID getHID() {
 		return hid;
 	}
+	
+	public String getHIDAsString(){
+		return hid.toString();
+	}
 
 	public void setHID(HID hid) {
 		this.hid = hid;
