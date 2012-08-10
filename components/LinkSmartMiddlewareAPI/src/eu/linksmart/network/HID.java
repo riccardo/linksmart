@@ -49,10 +49,6 @@ public class HID implements Serializable {
 	private long contextID2 = 0;
 	private long contextID3 = 0;
 	private int level;
-	/**
-	 * String representation of the HID.
-	 */
-	private String hid;
 
 	/**
 	 * The length of a HID in binary format, as number of bytes
@@ -92,7 +88,6 @@ public class HID implements Serializable {
 			this.contextID3 = 0;
 			this.level = 0;
 		}
-		updateHID();
 	}
 
 	/**
@@ -103,7 +98,6 @@ public class HID implements Serializable {
 	 */
 	public HID() {
 		this.deviceID = Math.abs(rnd.nextLong());
-		updateHID();
 	}
 
 	/**
@@ -118,7 +112,6 @@ public class HID implements Serializable {
 		this.contextID2 = oldHID.contextID2;
 		this.contextID3 = oldHID.contextID3;
 		this.level = oldHID.level;
-		updateHID();
 	}
 
 	/**
@@ -138,7 +131,6 @@ public class HID implements Serializable {
 		this.contextID2 = buffer.getLong();
 		this.contextID1 = buffer.getLong();
 		this.deviceID = buffer.getLong();
-		updateHID();
 	}
 
 	/**
@@ -149,7 +141,6 @@ public class HID implements Serializable {
 	 */
 	public void setDeviceID(long deviceID) {
 		this.deviceID = Math.abs(deviceID);
-		updateHID();
 	}
 
 	/**
@@ -224,40 +215,44 @@ public class HID implements Serializable {
 	 * @return The string representation of the HID
 	 */
 	public String toString() {
-		return hid;
+		return String.valueOf(contextID3) + "." + String.valueOf(contextID2)
+				+ "." + String.valueOf(contextID1) + "."
+				+ String.valueOf(deviceID);
 	}
 
-	private boolean __hashCodeCalc = false;
-
-	/**
+    private boolean __hashCodeCalc = false;
+    /**
 	 * Returns a hash code value for the object
 	 * 
 	 * @return a hash code value for the object
 	 */
-	public synchronized int hashCode() {
-		if (__hashCodeCalc) {
-			return 0;
-		}
-		__hashCodeCalc = true;
-		int _hashCode = 1;
-		if (getBytes() != null) {
-			for (int i = 0; i < java.lang.reflect.Array.getLength(getBytes()); i++) {
-				java.lang.Object obj = java.lang.reflect.Array.get(getBytes(),
-						i);
-				if (obj != null && !obj.getClass().isArray()) {
-					_hashCode += obj.hashCode();
-				}
-			}
-		}
-		_hashCode += new Long(getContextID1()).hashCode();
-		_hashCode += new Long(getContextID2()).hashCode();
-		_hashCode += new Long(getContextID3()).hashCode();
-		_hashCode += new Long(getDeviceID()).hashCode();
-		_hashCode += getLevel();
-		__hashCodeCalc = false;
-		return _hashCode;
-	}
-
+    public synchronized int hashCode() {
+        if (__hashCodeCalc) {
+            return 0;
+        }
+        __hashCodeCalc = true;
+        int _hashCode = 1;
+        if (getBytes() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getBytes());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getBytes(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
+        }
+        _hashCode += new Long(getContextID1()).hashCode();
+        _hashCode += new Long(getContextID2()).hashCode();
+        _hashCode += new Long(getContextID3()).hashCode();
+        _hashCode += new Long(getDeviceID()).hashCode();
+        _hashCode += getLevel();
+        __hashCodeCalc = false;
+        return _hashCode;
+    }
+	
+	
 	/**
 	 * Returns true if the object "obj" is "equal to" this one.
 	 * 
@@ -303,7 +298,6 @@ public class HID implements Serializable {
 		default:
 			break;
 		}
-		updateHID();
 	}
 
 	/**
@@ -321,12 +315,4 @@ public class HID implements Serializable {
 		return buffer.array();
 	}
 
-	/**
-	 * Updates the value of the hid String representation.
-	 */
-	private void updateHID() {
-		hid = String.valueOf(contextID3) + "." + String.valueOf(contextID2)
-				+ "." + String.valueOf(contextID1) + "."
-				+ String.valueOf(deviceID);
-	}
 }
