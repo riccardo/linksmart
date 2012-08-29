@@ -27,16 +27,28 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting "
 				+ context.getBundleContext().getBundle().getSymbolicName());
+		
 		// Get the LinkSmartRemoteServiceStore
 		remoteServiceStore = (LinkSmartRemoteServiceStore) context
 				.locateService(LinkSmartRemoteServiceStore.class
 						.getSimpleName());
 				
 		eventManagers = new HashMap<String, EventManagerPort>();
+		
+		LOG.info("Started "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 	}
 	
 	protected void deactivate(ComponentContext context) {
-		locatorThread.end();
+		LOG.info("Stopping "
+				+ context.getBundleContext().getBundle().getSymbolicName());
+		
+		if (locatorThread != null){
+			locatorThread.end();
+		}
+		
+		LOG.info("Stopped "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 	}
 
 	@Override

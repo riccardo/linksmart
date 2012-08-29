@@ -61,7 +61,7 @@ import eu.linksmart.network.NetworkManagerApplication;
  * Activator class
  */
 public class ConfiguratorActivator  {
-
+	
 	private static String xmlAttributes;
 	
 	private ComponentContext context;
@@ -69,11 +69,11 @@ public class ConfiguratorActivator  {
 	private ServiceRegistration configuratorReg;
 	private HttpService http;
 	private GetConfigurationServlet getConfigurationServlet;
-	private Logger logger = Logger.getLogger(ConfiguratorActivator.class.getName());
+	private Logger logger = Logger.getLogger(ConfiguratorActivator.class.getSimpleName());
 	private NetworkManagerApplication nm;
 	private CryptoHIDResult cryptoHID;
 	
-	private final static String WEB_SERVLET_ALIAS = "/LinkSmartConfigurator";
+//	private final static String WEB_SERVLET_ALIAS = "/LinkSmartConfigurator";
 	private final static String GETCONFIGURATION_SERVLET_ALIAS =
 		"/LinkSmartConfigurator/GetConfiguration";
 	
@@ -117,6 +117,7 @@ public class ConfiguratorActivator  {
 		} catch (Exception e) {
 			logger.error(e);
 		}
+		logger.info("Started " + ConfiguratorActivator.class.getSimpleName());
 	}
 	
 	/**
@@ -126,9 +127,7 @@ public class ConfiguratorActivator  {
 	 */
 	protected void deactivate(ComponentContext context) {
 		this.configuratorReg.unregister();
-		if (http != null) {
-			unregisterServlets(http);
-		}
+		logger.info("Stopped" + ConfiguratorActivator.class.getSimpleName());
 	}
 		
 	/**
@@ -158,9 +157,9 @@ public class ConfiguratorActivator  {
 	 * @param http the Http Service to unregister servlets
 	 */
 	protected void unregisterServlets(HttpService http) {
-		http.unregister(WEB_SERVLET_ALIAS);
-		http.unregister(GETCONFIGURATION_SERVLET_ALIAS);
+//		http.unregister(WEB_SERVLET_ALIAS);
 		http.unregister("/LinkSmartStatus");
+		http.unregister(GETCONFIGURATION_SERVLET_ALIAS);
 		
 		if ((nm != null) && (cryptoHID != null)) {
 			try {

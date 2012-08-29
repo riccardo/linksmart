@@ -86,15 +86,13 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 		return axisServer;
 	}
 	
-	/**
-	 * Activate method
-	 * 
-	 * @param context the bundle's execution context
-	 */
-	protected void activate(ComponentContext context) {
-		this.context = context.getBundleContext();
+	protected void activate(ComponentContext componentContext) {
+		log.info("Starting "
+				+ componentContext.getBundleContext().getBundle().getSymbolicName());
 		
-		configurator = new WSProviderConfigurator(context.getBundleContext());
+		this.context = componentContext.getBundleContext();
+		
+		configurator = new WSProviderConfigurator(componentContext.getBundleContext());
 		
 		try {
 			init();
@@ -108,6 +106,9 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 		configurator.registerConfiguration();
 		
 		activated  = true;
+		
+		log.info("Started "
+				+ componentContext.getBundleContext().getBundle().getSymbolicName());
 	}
 	
 	/**
@@ -144,21 +145,26 @@ public class Activator implements ServiceTrackerCustomizer, AxisAdmin {
 	 * 
 	 * @param context the bundle's execution context
 	 */
-	protected void deactivate(ComponentContext context) {
+	protected void deactivate(ComponentContext componentContext) {
+		log.info("Stopping "
+				+ componentContext.getBundleContext().getBundle().getSymbolicName());
+		
 		try {
 			registrationTracker.close();
-			webApp.stop(context.getBundleContext());
+			webApp.stop(componentContext.getBundleContext());
 			webApp = null;
 			this.context = null;
 			axisServer = null;
 
 			configurator.stop();
 			
-			log = null;
 		} catch (Exception e) {
 			log.error("Exception when stopping bundle", e);
 		}
 		activated = false;
+		
+		log.info("Stopped "
+				+ componentContext.getBundleContext().getBundle().getSymbolicName());
 	}
 
 	/**

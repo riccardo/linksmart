@@ -45,6 +45,7 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting "
 				+ context.getBundleContext().getBundle().getSymbolicName());
+		
 		this.context = context;
 		subscriberHIDs = new HashMap<String, String>();
 		eventManagers = new HashMap<String, EventManagerPort>();
@@ -63,28 +64,43 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 		subscriberThread = new EventManagerQueuedSubscriberThread();
 		Thread subscriberQueueThread = new Thread(subscriberThread);
 		subscriberQueueThread.start();
+		
+		LOG.info("Started "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 	}
 
 	protected void deactivate(ComponentContext context) {
+		LOG.info("Stopping "
+				+ context.getBundleContext().getBundle().getSymbolicName());
+		
 		// Stop running threads
-		subscriberThread.end();
-		locatorThread.end();
+		if (subscriberThread != null){
+			subscriberThread.end();
+		}
+		if (locatorThread != null){
+			locatorThread.end();
+		}
 
 		// Unsubscribe from EventManagers
-		Iterator<EventManagerPort> it = eventManagers.values().iterator();
-		while (it.hasNext()) {
-			EventManagerPort eventManager = it.next();
-			for (String topic : subscribedTopics) {
-				try {
-					String subscriberHID = subscriberHIDs.get(topicIDs.get(topic));
-					boolean success = eventManager.unsubscribeWithHID(topic, subscriberHID);
-					LOG.info("Successfully deregistered topic from EventManager. "
-							+ success);
-				} catch (RemoteException e) {
-					LOG.error("Unable to unsubscribe from EventManager!", e);
+		if (eventManagers != null) { 
+			Iterator<EventManagerPort> it = eventManagers.values().iterator();
+			while (it.hasNext()) {
+				EventManagerPort eventManager = it.next();
+				for (String topic : subscribedTopics) {
+					try {
+						String subscriberHID = subscriberHIDs.get(topicIDs.get(topic));
+						boolean success = eventManager.unsubscribeWithHID(topic, subscriberHID);
+						LOG.info("Successfully deregistered topic from EventManager. "
+								+ success);
+					} catch (RemoteException e) {
+						LOG.error("Unable to unsubscribe from EventManager!", e);
+					}
 				}
 			}
 		}
+		
+		LOG.info("Stopped "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 	}
 
 	@Override

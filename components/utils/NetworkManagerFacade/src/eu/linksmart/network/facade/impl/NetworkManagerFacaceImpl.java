@@ -22,12 +22,19 @@ public class NetworkManagerFacaceImpl implements NetworkManagerFacade {
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting "
 				+ context.getBundleContext().getBundle().getSymbolicName());
+		
 		networkManager = (NetworkManagerApplication) context
 				.locateService(NetworkManagerApplication.class.getSimpleName());
+		
+		LOG.info("Started "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 	}
 
 	protected void deactivate(ComponentContext context) {
 		LOG.info("Stopping "
+				+ context.getBundleContext().getBundle().getSymbolicName());
+		
+		LOG.info("Stopped "
 				+ context.getBundleContext().getBundle().getSymbolicName());
 	}
 

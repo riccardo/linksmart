@@ -195,6 +195,9 @@ implements eu.linksmart.network.NetworkManagerApplication {
 	 * @param context the bundle's execution context
 	 */
 	protected void activate(ComponentContext context) {
+		logger.info("Starting "
+				+ context.getBundleContext().getBundle().getSymbolicName());
+		
 		this.context = context;
 
 		try {
@@ -207,6 +210,9 @@ implements eu.linksmart.network.NetworkManagerApplication {
 
 		init();
 		activated  = true;
+		
+		logger.info("Stopping "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 	}
 
 	/**
@@ -214,7 +220,10 @@ implements eu.linksmart.network.NetworkManagerApplication {
 	 * 
 	 * @param context the bundle's context
 	 */
-	protected void deactivate(ComponentContext context) {		
+	protected void deactivate(ComponentContext context) {
+		logger.info("Stopping "
+				+ context.getBundleContext().getBundle().getSymbolicName());
+		
 		// Unregister servlets
 		http.unregister("/SOAPTunneling");
 		http.unregister("/NetworkManagerStatus");
@@ -226,6 +235,9 @@ implements eu.linksmart.network.NetworkManagerApplication {
 		System.runFinalization();
 		logger.debug("Network Manager Deactivated");
 		activated = false;
+		
+		logger.info("Stopped "
+				+ context.getBundleContext().getBundle().getSymbolicName());
 	}
 
 	/**
