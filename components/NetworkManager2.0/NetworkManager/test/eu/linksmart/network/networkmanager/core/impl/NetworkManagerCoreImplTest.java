@@ -10,7 +10,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -20,12 +23,12 @@ import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.connection.NOPConnection;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.utils.Part;
-import eu.linksmart.network.connection.Connection;
 
 /**
  * Test class for NetworkManagerCoreImpl 
@@ -289,6 +292,42 @@ public class NetworkManagerCoreImplTest {
 		assertEquals("The response was not successful.",  
 				NMResponse.STATUS_SUCCESS, response.getStatus());
 	}
+	
+	/**
+	 * Tests receiveDataAsync with broadcasting message, but without processing it
+	 * Because it is not processed, an exception should occur.
+	 */
+	@Test
+	public void  testReceiveDataAsyncBroadcastUnsucessful() {
+		
+		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
+		Connection connection = mock(Connection.class);
+		try {
+			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderHID))).
+				thenReturn(connection);
+			when(connection.processData(eq(senderHID), any(HID.class), any(byte[].class))).
+				thenReturn(new Message(topic, senderHID, null, data));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception occured " +e);
+		}
+		
+		byte rawData[] = null;
+		try {
+			rawData = getData();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception occurred: " + e);
+		}
+		
+		// Call the method in test
+		NMResponse response = nmCoreImpl.receiveDataSynch(senderHID, null, rawData);
+		
+		// Check if the response is as expected
+		assertEquals("The request was not successful.",  
+				NMResponse.STATUS_ERROR, response.getStatus());
+		assertEquals("Received a message which has not been processed", response.getMessage());
+	}
 
 	/**
 	 * Tests that if addRemoteHID. the right backboneRouter-method is called
@@ -306,7 +345,7 @@ public class NetworkManagerCoreImplTest {
 	 * Tests getHIDByAttribute with a conjunction 
 	 */
 	@Test
-	public void testgetHIDByAttributesConjunction() {
+	public void testGetHIDByAttributesConjunction() {
 		Part[] attributes = new Part[]{
 				new Part("description", "description"), 
 				new Part("PID", "Unique PID")};
@@ -417,6 +456,74 @@ public class NetworkManagerCoreImplTest {
 		verify(nmCoreImpl.identityManager).getHIDsByAttributes(query);
 		assertNotNull(foundHIDInfo);
 	}
+	
+	/**
+	 * Tests createHID and checks if a HIDInfo object is returned.
+	 */
+	@Test
+	public void testCreateHID() {
+		String endpoint = "for test not important";
+		Part[] attributes = new Part[] { 
+				new Part("DESCRIPTION", "description"), 
+				new Part("PID", "Unique PID")};
+		String backboneName = "backbone1";
+		List<String> availableBackbones = new ArrayList<String>();
+		availableBackbones.add(backboneName);
+		when(nmCoreImpl.backboneRouter.getAvailableBackbones()).
+			thenReturn(availableBackbones);
+		when(nmCoreImpl.identityManager.createHIDForAttributes(attributes)).
+			thenReturn(new HIDInfo(new HID(), attributes));
+		
+		try {
+			// call the method in test
+			HIDInfo hid = nmCoreImpl.createHID(attributes, endpoint, backboneName);
+			// check that something was returned
+			assertNotNull(hid);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			fail("Exception occured " + e);
+		}
+	}
+	
+	/**
+	 * Tests createHID, throws exception because PID already exists for another HID
+	 */
+	@Test
+	public void testCreateHIDWithException() {
+		String endpoint = "for test not important";
+		Part[] attributes = new Part[] { 
+				new Part("DESCRIPTION", "description"), 
+				new Part("PID", "Unique PID")};
+		String backboneName = "backbone1";
+		
+		HIDInfo hidInfo = new HIDInfo(new HID(), attributes);
+		Set<HIDInfo> returnedHIDInfos = new HashSet<HIDInfo>();
+		returnedHIDInfos.add(hidInfo);
+		
+		List<String> availableBackbones = new ArrayList<String>();
+		availableBackbones.add(backboneName);
+		
+		when(nmCoreImpl.backboneRouter.getAvailableBackbones()).
+			thenReturn(availableBackbones);
+		// "returning" that PID already exists
+		when(nmCoreImpl.identityManager.getHIDsByAttributes("(PID==Unique PID)")).
+			thenReturn(returnedHIDInfos);
+		
+		try {
+			// call the method under test
+			nmCoreImpl.createHID(attributes, endpoint, backboneName);
+			// Should not reach this point
+			fail("An exception should have occured saying that the PID is already in use.");
+		} catch (RemoteException e) {
+			// This exception should not be thrown
+			e.printStackTrace();
+			fail("Wrong exception occured " + e);
+		} catch (IllegalArgumentException e) {
+			assertEquals("PID already in use. Please choose a different one.", 
+					e.getMessage());
+		}
+	}
+	
 	
 	/**
 	 * Gets test data needed in tests
