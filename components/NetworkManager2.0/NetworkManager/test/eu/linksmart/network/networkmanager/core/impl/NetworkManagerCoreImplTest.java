@@ -64,9 +64,10 @@ public class NetworkManagerCoreImplTest {
 			thenReturn(new HIDInfo(receiverHID, new Part[]{}));
 		when(nmCoreImpl.backboneRouter.sendDataSynch(eq(senderHID), eq(receiverHID), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
-		when(nmCoreImpl.backboneRouter.sendDataAsynch(eq(senderHID), eq(receiverHID), any(byte[].class))).
+		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(HID.class), eq(receiverHID), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
-		
+		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(HID.class), eq(senderHID), any(byte[].class))).
+			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 	}
 
 	/**
@@ -163,7 +164,7 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests receiveDatanSync with broadcasting message, but without processing it
+	 * Tests receiveDataSync with broadcasting message, but without processing it
 	 * Because it is not processed, an exception should occur.
 	 */
 	@Test
@@ -199,23 +200,11 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests receiveDatanSync with broadcasting message as there is no receiver HID
+	 * Tests receiveDataSync with broadcasting message as there is no receiver HID
 	 */
 	@Test
 	public void  testReceiveDataSyncBroadcast() {
-		
-		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
-		Connection connection = mock(Connection.class);
-		try {
-			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderHID))).
-				thenReturn(connection);
-			when(connection.processData(eq(senderHID), any(HID.class), any(byte[].class))).
-				thenReturn(new Message(topic, senderHID, senderHID, data));
-			when(connection.processMessage(any(Message.class))).thenReturn(data);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Exception occured " +e);
-		}
+		mockForSucessfulReceiveData();
 		
 		byte rawData[] = null;
 		try {
@@ -227,6 +216,53 @@ public class NetworkManagerCoreImplTest {
 		
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataSynch(senderHID, null, rawData);
+		
+		// Check if the response is as expected
+		assertEquals("The request was not successful.",  
+				NMResponse.STATUS_SUCCESS, response.getStatus());
+	}
+	
+	/**
+	 * Tests receiveData with broadcasting message as there is no receiver HID
+	 */
+	@Test
+	public void  testReceiveDataAsyncBroadcast() {
+		mockForSucessfulReceiveData();
+		
+		byte rawData[] = null;
+		try {
+			rawData = getData();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception occurred: " + e);
+		}
+		
+		// Call the method in test
+		NMResponse response = nmCoreImpl.receiveDataAsynch(senderHID, null, rawData);
+		
+		// Check if the response is as expected
+		assertEquals("The request was not successful.",  
+				NMResponse.STATUS_SUCCESS, response.getStatus());
+	}
+	
+	/**
+	 * Tests receiveData with broadcasting message as there is no receiver HID
+	 * and with an empty return message
+	 */
+	@Test
+	public void  testReceiveDataAsyncBroadcastEmtpyMessage() {
+		mockForSucessfulReceiveData();
+		
+		byte rawData[] = null;
+		try {
+			rawData = getData();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception occurred: " + e);
+		}
+		
+		// Call the method in test
+		NMResponse response = nmCoreImpl.receiveDataAsynch(senderHID, null, rawData);
 		
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
@@ -392,4 +428,21 @@ public class NetworkManagerCoreImplTest {
 		return new NOPConnection(senderHID, receiverHID).processMessage(message);
 	}
 
+	private void mockForSucessfulReceiveData() {
+		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
+		Connection connection = mock(Connection.class);
+		try {
+			when(nmCoreImpl.connectionManager.getConnection(any(HID.class), any(HID.class))).
+				thenReturn(connection);
+			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderHID))).
+				thenReturn(connection);
+			when(connection.processData(eq(senderHID), any(HID.class), any(byte[].class))).
+				thenReturn(new Message(topic, senderHID, senderHID, data));
+			when(connection.processMessage(any(Message.class))).
+				thenReturn(data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception occured " +e);
+		}
+	}
 }
