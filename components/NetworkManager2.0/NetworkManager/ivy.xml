@@ -27,6 +27,7 @@
 		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.registry" rev="3.5.0.v20100503" />
 		<dependency org="org.mortbay.jetty" name="org.mortbay.jetty.server" rev="6.1.23.v201004211559" />
 		<dependency org="org.mortbay.jetty" name="org.mortbay.jetty.util" rev="6.1.23.v201004211559" />	
+		<dependency org="org.mockito" name="mockito-all" rev="1.9.0-rc1" />
 	</dependencies>
 
 </ivy-module>
