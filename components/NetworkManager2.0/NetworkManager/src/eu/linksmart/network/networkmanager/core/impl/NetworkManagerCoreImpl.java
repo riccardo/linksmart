@@ -85,6 +85,37 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 	}
 
+	protected void deactivate(ComponentContext context) {
+		System.out.println(NETWORK_MGR_CORE + "stopped");
+	}
+
+	protected void bindCommunicationSecurityManager(
+			CommunicationSecurityManager commSecMgr) {
+		this.connectionManager.setCommunicationSecurityManager(commSecMgr);
+	}
+
+	protected void unbindCommunicationSecurityManager(
+			CommunicationSecurityManager commSecMgr) {
+		this.connectionManager.removeCommunicationSecurityManager(commSecMgr);
+	}
+
+	protected void bindIdentityManager(IdentityManager identityManager) {
+		this.identityManager = identityManager;
+	}
+
+	protected void unbindIdentityManager(IdentityManager identityMgr) {
+		this.identityManager = null;
+
+	}
+
+	protected void bindBackboneRouter(BackboneRouter backboneRouter) {
+		this.backboneRouter = backboneRouter;
+	}
+
+	protected void unbindBackboneRouter(BackboneRouter backboneRouter) {
+		this.backboneRouter = null;
+	}
+
 	/**
 	 * Initializes the component, i.e. creates own HID, and registers the NM
 	 * status servlets.
@@ -137,13 +168,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		return this.myHID;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.linksmart.network.networkmanager.NetworkManager#createHID(eu.linksmart
-	 * .utils.Part[], java.lang.String, java.lang.String)
-	 */
 	@Override
 	public HIDInfo createHID(Part[] attributes, String endpoint,
 			String backboneName) throws RemoteException {
@@ -183,48 +207,19 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		return newHID;
 	}
 
+	@Override
 	public NMResponse sendData(HID sender, HID receiver, byte[] data,
 			boolean synch) throws RemoteException {
 		return this.sendMessage(new Message(Message.TOPIC_APPLICATION, sender,
 				receiver, data), synch);
 	}
 
+	@Override
 	public boolean removeHID(HID hid) throws RemoteException {
 		Boolean hidRemoved = this.identityManager.removeHID(hid);
 		this.connectionManager.deleteHIDPolicy(hid);
 
 		return hidRemoved;
-	}
-
-	protected void deactivate(ComponentContext context) {
-		System.out.println(NETWORK_MGR_CORE + "stopped");
-	}
-
-	protected void bindCommunicationSecurityManager(
-			CommunicationSecurityManager commSecMgr) {
-		this.connectionManager.setCommunicationSecurityManager(commSecMgr);
-	}
-
-	protected void unbindCommunicationSecurityManager(
-			CommunicationSecurityManager commSecMgr) {
-		this.connectionManager.removeCommunicationSecurityManager(commSecMgr);
-	}
-
-	protected void bindIdentityManager(IdentityManager identityManager) {
-		this.identityManager = identityManager;
-	}
-
-	protected void unbindIdentityManager(IdentityManager identityMgr) {
-		this.identityManager = null;
-
-	}
-
-	protected void bindBackboneRouter(BackboneRouter backboneRouter) {
-		this.backboneRouter = backboneRouter;
-	}
-
-	protected void unbindBackboneRouter(BackboneRouter backboneRouter) {
-		this.backboneRouter = null;
 	}
 
 	@Override
