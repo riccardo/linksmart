@@ -13,6 +13,11 @@
 	<property name="targetPlatform.dir" value="${basedir}/../../target_platform" />
 	<property name="antlib.dir" value="${basedir}/../../../antlibs" />
 
+	<!-- Properties used for JUnit testing -->
+		<property name="test.report.dir" location="test/testreport" />
+		<property name="test.dir" value="${basedir}/test" />
+		<property name="test.build.dir" value="${basedir}/test/bin" />
+	
 	<!-- paths -->
 
 	<path id="classpath">
@@ -25,8 +30,41 @@
 		<pathelement path="${build.dir}" />
 	</path>
 
+	<!-- Define the classpath for testing-->
+	<path id="classpath.test">
+	    <pathelement location="${test.dir}" />
+	    <pathelement location="${test.build.dir}" />
+	    <path refid="classpath" />
+	</path>
+
 	<!-- targets -->
 
+	<!-- Compiles the java code of the tests-->
+	<target name="buildTest" depends="resolve">
+	    <echo message="Compiling Tests"/>
+	    <delete dir="${test.build.dir}"/>
+	    <mkdir dir="${test.build.dir}"/>
+	    <javac srcdir="${test.dir}" destdir="${test.build.dir}">
+	        <classpath refid="classpath" />
+	    </javac>
+	</target>
+
+	<!-- Executes the Unit-Tests -->
+	<target name="junit" depends="buildTest">
+	    <echo message="Testing"/>
+	    <delete dir="${test.report.dir}"/>
+	    <mkdir dir="${test.report.dir}"/>
+	    <junit printsummary="on" haltonfailure="yes">
+	        <classpath refid="classpath.test" />
+	        <formatter type="xml" />
+	        <batchtest todir="${test.report.dir}">
+	            <fileset dir="${test.dir}">
+	            <include name="**/*Test*.java" />
+	            </fileset>
+	    </batchtest>
+	    </junit>
+	</target>
+	
 	<!-- default target fails -->
 	<target name="fail">
 		<fail message="please use the root ant build file" />
@@ -91,7 +129,7 @@
 	</target>
 
 	<!-- make -->
-	<target name="make" depends="jar,publish">
+	<target name="make" depends="jar,publish, junit">
 		<echo message="Compiled from: ${basedir}" />
 		<echo message="Compiled to: ${build.dir}" />
 		<echo message="Published as: ${rootDistributionDir}/${moduleName}-${revision}.jar" />

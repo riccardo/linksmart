@@ -108,12 +108,12 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	public SocketHandler socketHandler;
 	public ConfigMode jxtaMode;
 	private String synched;
-	private MulticastSocket msocket;
+	protected MulticastSocket msocket;
 
 	/**
 	 * A map of HID to JXTA Peer ID.
 	 */
-	protected Hashtable<HID, String> listOfRemoteEndpoints;
+	protected Hashtable<HID, String> listOfRemoteEndpoints = new Hashtable<HID, String>();
 
 	protected void activate(ComponentContext context) {
 		logger.info("**** Activating JXTA backbone!");
@@ -173,8 +173,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			this.jxtaMode = NetworkManager.ConfigMode.EDGE;
 			logger.info("LinkSmart Network Manager configured as Node");
 		}
-
-		listOfRemoteEndpoints = new Hashtable<HID, String>();
 
 		startJXTA();
 
@@ -421,7 +419,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	public long announcementValidityTime, factor;
 
-	private JxtaMulticastSocket multicastSocket;
+	protected JxtaMulticastSocket multicastSocket;
 	private MulticastSocketListener listener;
 
 	/**
