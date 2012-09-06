@@ -140,6 +140,9 @@ public class NetworkManagerCoreImplTest {
 				NMResponse.STATUS_SUCCESS, response.getStatus());
 	}
 	
+	/**
+	 * Tests receiveDataSync where processing is not successful.
+	 */
 	@Test
 	public void  testReceiveDataSyncUnsuccessful() {
 		HIDInfo receiverHIDInfo = new HIDInfo(receiverHID, new Part[]{});
