@@ -29,9 +29,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 	private NetworkManagerCore nmCore;
 	private String defaultRoute;
 
-	private static String BACKBONE_ROUTER = BackboneRouterImpl.class
-	.getSimpleName();
-	private static String ROUTING_JXTA = "JXTA";
+	private static String BACKBONE_ROUTER = BackboneRouterImpl.class.getSimpleName();
+//	private static String ROUTING_JXTA = "JXTA";
 	BackboneRouterConfigurator configurator;
 
 	protected void activate(ComponentContext context) {
@@ -39,11 +38,9 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 		this.context = context;
 
-		bindNMCore((NetworkManagerCore) context
-				.locateService(NetworkManagerCore.class.getSimpleName()));
+		bindNMCore((NetworkManagerCore) context.locateService(NetworkManagerCore.class.getSimpleName()));
 
-		configurator = new BackboneRouterConfigurator(this,
-				context.getBundleContext());
+		configurator = new BackboneRouterConfigurator(this,	context.getBundleContext());
 		configurator.registerConfiguration();
 		logger.info(BACKBONE_ROUTER + " started");
 	}
@@ -156,9 +153,6 @@ public class BackboneRouterImpl implements BackboneRouter {
 	private NMResponse receiveData(HID senderHID, HID receiverHID, byte[] data,
 			Backbone originatingBackbone, boolean synch) {
 
-		// TODO: check why backbone for receiverHID would be needed - and if it
-		// is needed one has to check if receiverHID is NULL (in case of
-		//		 broadcast messagereceiverHID is NULL)
 		Backbone b = (Backbone)hidBackboneMap.get(senderHID);
 		if (b == null) {
 			hidBackboneMap.put(senderHID, originatingBackbone);
@@ -205,6 +199,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	//
 	// }
 
+	
 	/**
 	 * This function is called when the configuration is updated from the web
 	 * page.
@@ -212,13 +207,14 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * @param updates updated configuration data
 	 */
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(BackboneRouterConfigurator.COMMUNICATION_TYPE)) {
-			this.defaultRoute = (String) configurator
-			.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
+			this.defaultRoute = (String) configurator.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
 		}
 	}
 
+	// Ruft jeden Backbone auf, der gefunden wird, um Nachricht zu broadcasten
 	/**
 	 * Broadcasts a message over the all communication channel.
 	 * 
@@ -287,7 +283,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override 
 	public void addRouteForRemoteHID(HID senderHID, HID remoteHID) {
 		Backbone senderBackbone = hidBackboneMap.get(senderHID);
-		if (senderBackbone != null){
+		if (senderBackbone != null) {
 			addRoute(remoteHID, senderBackbone.getName());
 			senderBackbone.addEndpointForRemoteHID(senderHID, remoteHID);
 		}
@@ -322,8 +318,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public boolean removeRoute(HID hid, String backbone) {
 		synchronized (hidBackboneMap) {
-
-			if (!hidBackboneMap.get(hid).getClass().getName().equals(backbone)) {
+			if (hidBackboneMap.get(hid) == null || 
+					!hidBackboneMap.get(hid).getClass().getName().equals(backbone)) {
 				return false;
 			}
 			hidBackboneMap.remove(hid);
@@ -396,13 +392,4 @@ public class BackboneRouterImpl implements BackboneRouter {
 		}
 	}
 
-	@Override
-	public String getBackboneType(HID hid) {
-		Backbone backbone = hidBackboneMap.get(hid);
-		if (backbone != null) {
-			return backbone.getName();
-		} else {
-			return null;
-		}
-	}
 }

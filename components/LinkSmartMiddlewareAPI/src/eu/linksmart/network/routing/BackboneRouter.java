@@ -10,7 +10,7 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.security.communication.SecurityProperty;
 
-/*
+/**
  * The BackboneRouter is responsible for selecting the correct channel to send the message according to the receiverHID.
  * 
  * A list of HIDs is maintained that stores the communication channel. This list will always be updated which communication 
@@ -157,23 +157,15 @@ public interface BackboneRouter {
 	 * necessary because we do not know what backbones we have, and there is no point in creating backbones on the fly to ask them
 	 * about the security types they provide
 	 * @param backbone A string with the (class)name of the backbone we are interested in. This must be loaded already
-	 * @return a list of security parameters configured for that backbone. See the backbone's parameters file and/or the configuraton interface for more details
+	 * @return a list of security parameters configured for that backbone. See the backbone's parameters file and/or the configuration interface for more details
 	 */
 	public List<SecurityProperty> getBackboneSecurityProperties(String backbone);
 
 	/**
 	 * this method is needed by the network manager status page 
 	 * @param hid
-	 * @return "BackboneType:BackboneAddresse"
+	 * @return "BackboneType:BackboneAddress"
 	 */
 	public String getRoute(HID hid);
 	
-	/**
-	 * this method is needed by the network manager status page
-	 * @param hid
-	 * @return Backbone class name
-	 */
-	public String getBackboneType(HID hid);
-	
-
 }
