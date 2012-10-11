@@ -133,7 +133,7 @@ public class GetNetworkManagerStatus extends HttpServlet {
 			}
 
 			// Get the Route for this HID
-			HID hid = hidInfo.getHID();
+			HID hid = hidInfo.getHid();
 			String route = backboneRouter.getRoute(hid);
 			String hidString = hid.toString();
 			String path = "/SOAPTunneling/0/" + hidString;

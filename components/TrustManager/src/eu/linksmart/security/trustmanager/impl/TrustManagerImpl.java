@@ -384,7 +384,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 						TrustManagerConfigurator.CERTIFICATE_REF, attr.getValue());
 			}
 		}		
-		return hidInfo.getHID().toString();
+		return hidInfo.getHid().toString();
 	}
 
 	public Class getTrustModelConfigurator(){

@@ -147,7 +147,7 @@ public class NetworkManagerApplicationStatus extends HttpServlet {
 		String description;
 		String route;
 		while (it.hasNext()) {
-			HID hid = new HID(it.next().getHID());
+			HID hid = new HID(it.next().getHid());
 
 			try {
 //				TODO Check the ServiceRegistry

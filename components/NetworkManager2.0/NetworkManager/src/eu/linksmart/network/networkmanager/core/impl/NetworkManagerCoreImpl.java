@@ -138,7 +138,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		try {
 			this.myHID = createHID(attributes, NETWORK_MGR_ENDPOINT,
 					"eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl")
-					.getHID();
+					.getHid();
 		} catch (RemoteException e) {
 			LOG.error(
 					"PANIC - RemoteException thrown on local access of own method",
@@ -200,9 +200,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		List<SecurityProperty> properties = this.backboneRouter
 				.getBackboneSecurityProperties(backboneName);
 		// register HID with backbone policies in connection manager
-		this.connectionManager.registerHIDPolicy(newHID.getHID(), properties);
+		this.connectionManager.registerHIDPolicy(newHID.getHid(), properties);
 		// add route to selected backbone
-		this.backboneRouter.addRouteToBackbone(newHID.getHID(), backboneName,
+		this.backboneRouter.addRouteToBackbone(newHID.getHid(), backboneName,
 				endpoint);
 		return newHID;
 	}
@@ -620,7 +620,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			return null;
 		}
 		Part[] newAttributes = PartConverter.fromProperties(attributes);
-		hid = identityManager.createHIDForAttributes(newAttributes).getHID();
+		hid = identityManager.createHIDForAttributes(newAttributes).getHid();
 
 		// add it to backbonesoap as this method is deprecated anyway
 		List<SecurityProperty> properties = this.backboneRouter
@@ -657,7 +657,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			return null;
 		}
 		Part[] attributes = { new Part(HIDAttribute.CERT_REF.name(), certRef) };
-		HID hid = identityManager.createHIDForAttributes(attributes).getHID();
+		HID hid = identityManager.createHIDForAttributes(attributes).getHid();
 
 		// add it to backbonesoap as this method is deprecated anyway
 		List<SecurityProperty> properties = this.backboneRouter

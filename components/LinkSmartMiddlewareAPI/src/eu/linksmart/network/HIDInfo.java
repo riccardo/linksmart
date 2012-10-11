@@ -157,7 +157,7 @@ public class HIDInfo implements Serializable {
 //		}
 	}
 
-	public HID getHID() {
+	public HID getHid() {
 		return hid;
 	}
 	
@@ -165,7 +165,7 @@ public class HIDInfo implements Serializable {
 		return hid.toString();
 	}
 
-	public void setHID(HID hid) {
+	public void setHid(HID hid) {
 		this.hid = hid;
 	}
 
@@ -182,9 +182,9 @@ public class HIDInfo implements Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.hid==null && other.getHID()==null) || 
+            ((this.hid==null && other.getHid()==null) || 
              (this.hid!=null &&
-              this.hid.equals(other.getHID()))) &&
+              this.hid.equals(other.getHid()))) &&
             ((this.attributes==null && other.getAttributes()==null) || 
              (this.attributes!=null &&
               java.util.Arrays.equals(this.attributes, other.getAttributes())));
@@ -199,8 +199,8 @@ public class HIDInfo implements Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getHID() != null) {
-            _hashCode += getHID().hashCode();
+        if (getHid() != null) {
+            _hashCode += getHid().hashCode();
         }
         if (getAttributes() != null) {
             for (int i=0;

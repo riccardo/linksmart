@@ -345,9 +345,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 							Iterator<HIDInfo> i = hidInfos.iterator();
 							while (i.hasNext()) {
 								HIDInfo oneHIDInfo = i.next();
-								addRemoteHID(oneHIDInfo.getHID(), oneHIDInfo);
+								addRemoteHID(oneHIDInfo.getHid(), oneHIDInfo);
 								// Add the backbone route for this remote HID
-								networkManagerCore.addRemoteHID(msg.getSenderHID(), oneHIDInfo.getHID());
+								networkManagerCore.addRemoteHID(msg.getSenderHID(), oneHIDInfo.getHid());
 							}
 						}
 					}
