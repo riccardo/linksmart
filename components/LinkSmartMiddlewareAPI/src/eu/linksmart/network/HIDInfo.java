@@ -37,7 +37,6 @@
 
 package eu.linksmart.network;
 
-import java.util.Properties;
 import java.io.Serializable;
 
 import eu.linksmart.utils.Part;
@@ -46,8 +45,11 @@ import eu.linksmart.utils.Part;
  * Class to store information about HIDs
  */
 public class HIDInfo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private HID hid;
 	private Part[] attributes;
+	private String hidAsString;
 
 	/**
 	 * Create an HIDInfo object with the given HID and Description.
@@ -57,6 +59,7 @@ public class HIDInfo implements Serializable {
 	 */
 	public HIDInfo(HID hid, String description) {
 		this.hid = hid;
+		this.hidAsString = hid.toString();
 		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
 				description) };
 		this.attributes = attributes;
@@ -71,6 +74,7 @@ public class HIDInfo implements Serializable {
 	 */
 	public HIDInfo(HID hid, Part[] attributes) {
 		this.hid = hid;
+		this.hidAsString = hid.toString();
 		this.attributes = attributes;
 	}
 
@@ -161,12 +165,17 @@ public class HIDInfo implements Serializable {
 		return hid;
 	}
 	
-	public String getHIDAsString(){
-		return hid.toString();
-	}
-
 	public void setHid(HID hid) {
 		this.hid = hid;
+		setHidAsString();
+	}
+	
+	public String getHidAsString() {
+		return hidAsString;
+	}
+	
+	public void setHidAsString() {
+		hidAsString = hid.toString();
 	}
 
     private java.lang.Object __equalsCalc = null;
