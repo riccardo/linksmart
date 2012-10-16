@@ -1,6 +1,0 @@
-Private-Package: eu.linksmart.selfstarmanager.gm.planner
-Service-Component=eu.linksmart.selfstarmanager.gm.planner.Planner;immediate:=true;  \
-	log=org.osgi.service.log.LogService?; \
-	eventAdmin=org.osgi.service.event.EventAdmin; \
-	planner=eu.linksmart.selfstarmanager.gm.planner.ADLPlanner; \
-	aql=eu.linksmart.selfstar.aql.AQLService

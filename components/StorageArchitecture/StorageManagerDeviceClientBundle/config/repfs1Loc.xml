@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ReplicatedFileSystemDevice Name="repfs1">
-	<BackendDevice id="http://192.168.30.129:8083/FileSystemDevice-1248087597491" />
-	<BackendDevice id="http://192.168.30.129:8083/FileSystemDevice-1248087623491" />
-</ReplicatedFileSystemDevice>

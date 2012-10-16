@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<StripedFileSystemDevice Name="stripfs1" StripeSize="4096" xmlns="http://www.linksmart.eu/Storage/FileSystemDevice" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.linksmart.eu/Storage/FileSystemDevice FilesystemDevice.xsd">
-	<BackendDevice id="1247757346468" />
-	<BackendDevice id="1247757369437" />
-</StripedFileSystemDevice>
