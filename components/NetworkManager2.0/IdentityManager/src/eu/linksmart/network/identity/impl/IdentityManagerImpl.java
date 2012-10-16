@@ -314,7 +314,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						// hid, [2] is description (only if operation=A)
 						if (updateData[0].equals("A")) {
 							HID newHID = new HID(updateData[1]);
-							HIDInfo newInfo = new HIDInfo(newHID, updateData[1]);
+							HIDInfo newInfo = new HIDInfo(newHID, updateData[2]);
 							// Add the remoteHID to the internal map of remote HIDs
 							addRemoteHID(newHID, newInfo);
 							// Add the backbone route for this remote HID
@@ -322,7 +322,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						} else if (updateData[0].equals("D")) {
 							HID toRemoveHID = new HID(updateData[1]);
 							removeRemoteHID(toRemoveHID);
-							// TODO Marco: Perhaps we should remove the dead route here as well?
 						} else {
 							throw new IllegalArgumentException(
 									"Unexpected update type for IDManager updates: " + updateData[0]);

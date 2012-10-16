@@ -218,7 +218,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	public boolean removeHID(HID hid) throws RemoteException {
 		Boolean hidRemoved = this.identityManager.removeHID(hid);
 		this.connectionManager.deleteHIDPolicy(hid);
-
+		String route = this.backboneRouter.getRoute(hid);
+		this.backboneRouter.removeRoute(hid, route);
 		return hidRemoved;
 	}
 
