@@ -2,11 +2,14 @@ package eu.linksmart.network.identity.impl;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -35,16 +38,20 @@ import eu.linksmart.utils.PartConverter;
 public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
-			.getSimpleName();
-
+	.getSimpleName();
+	protected static Long HID_KEEP_ALIVE_MS = new Long(5*60*1000);
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
 	protected ConcurrentHashMap<HID, HIDInfo> localHIDs;
 	protected ConcurrentHashMap<HID, HIDInfo> remoteHIDs;
 
+	protected ConcurrentHashMap<HID, Long> hidLastUpdate;
 	protected ConcurrentLinkedQueue<String> queue;
 
 	protected NetworkManagerCore networkManagerCore;
+
+	/*Thread to delete not updated hids*/
+	protected Thread hidClearerThread;
 
 	/* Thread that checks for updated in HIDList and sends respective broadcasts */
 	protected Thread hidUpdaterThread;
@@ -55,12 +62,17 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected Thread advertisingThread;
 	/* Time in milliseconds to wait between advertisements */
 	protected int advertisementSleepMillis = 60000;
+	private boolean advertisingThreadRunning;
+	private boolean hidUpdaterThreadRunning;
+	private boolean hidClearerThreadRunning;
 
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting " + IDENTITY_MGR);
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
+		this.hidLastUpdate = new ConcurrentHashMap<HID, Long>();
+
 		LOG.info(IDENTITY_MGR + " started");
 	}
 
@@ -173,7 +185,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			// once, which is the
 			// desired behavior
 			for (Iterator<HIDInfo> it = allDescriptions.iterator(); it
-					.hasNext();) {
+			.hasNext();) {
 				HIDInfo hidInfo = it.next();
 				try {
 					oneDescription = hidInfo.getDescription();
@@ -231,7 +243,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		/* Parse the query. */
 		HashSet<HIDInfo> results = new HashSet<HIDInfo>();
 
-		
+
 		HashSet<Map.Entry<HID, HIDInfo>> allHIDs = new HashSet<Map.Entry<HID,HIDInfo>>();
 		//search in local and remote HIDs
 		allHIDs.addAll(localHIDs.entrySet());
@@ -393,7 +405,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	/*
-	 * Adds a remote HID to the IdTable
+	 * Adds a remote HID to the IdTable and updates 
+	 * the time stamp of last update
 	 * 
 	 * @param hid The HID to be added
 	 * 
@@ -404,6 +417,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected HIDInfo addRemoteHID(HID hid, HIDInfo info) {
 		if (!remoteHIDs.containsKey(hid)) {
 			remoteHIDs.put(hid, info);
+			hidLastUpdate.put(hid, Calendar.getInstance().getTimeInMillis());
+		} else {
+			hidLastUpdate.put(hid, Calendar.getInstance().getTimeInMillis());
 		}
 		return remoteHIDs.get(hid);
 	}
@@ -428,6 +444,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * @return the result, null if
 	 */
 	protected HIDInfo removeRemoteHID(HID hid) {
+		hidLastUpdate.remove(hid);
 		return remoteHIDs.remove(hid);
 	}
 
@@ -460,7 +477,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		@Override
 		public void run() {
-			while (true) {
+			while (hidUpdaterThreadRunning) {
 				if (!queue.isEmpty()) {
 					BroadcastMessage m = getHIDListUpdate();
 					LOG.debug("Broadcasting Message: " + m);
@@ -469,8 +486,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				try {
 					Thread.sleep(broadcastSleepMillis);
 				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					LOG.info("Interrupt Thread");
+					LOG.info("Thread broadcasting updates stopped!", e);
+					hidUpdaterThreadRunning = false;
 					break;
 				}
 			}
@@ -485,25 +502,25 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		@Override
 		public void run() {
-			while (true) {
+			while (advertisingThreadRunning) {
 				if (networkManagerCore != null) {
 
 					//#NM refactoring put list of local HIDs into message
 					Set<HIDInfo> localHIDs = getLocalHIDs();
 					byte[] localHIDbytes = null;
-					
+
 					try {
 						localHIDbytes = ByteArrayCodec.encodeObjectToBytes(localHIDs);
 					} catch (IOException e) {
 						LOG.error("Cannot convert local HIDs set to bytearray; " + e);
-					
+
 					}
 					BroadcastMessage m = null;
 
 					try {
 						m = new BroadcastMessage(
 								Message.IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
-									.getHID(), localHIDbytes);
+								.getHID(), localHIDbytes);
 					} catch (RemoteException e) {
 						// local invocation
 						LOG.debug("RemoteException: " + e);
@@ -513,8 +530,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				try {
 					Thread.sleep(advertisementSleepMillis);
 				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					LOG.info("Interrupt Thread");
+					advertisingThreadRunning = false;
+					LOG.error("Thread advertising NetworkManager stopped!",e);
 					break;
 				}
 			}
@@ -526,11 +543,17 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.networkManagerCore = networkManagerCore;
 
 		// Start the threads once NetworkManagerCore is available
+		this.hidClearerThread = new Thread(new HIDClearer());
+		hidClearerThread.start();
+		hidClearerThreadRunning = true;
+
 		hidUpdaterThread = new Thread(new HIDUpdaterThread());
 		hidUpdaterThread.start();
+		hidUpdaterThreadRunning = true;
 
 		advertisingThread = new Thread(new AdvertisingThread());
 		advertisingThread.start();
+		advertisingThreadRunning = true;
 
 		//subscribe to messages sent by other identity managers
 		((MessageDistributor)this.networkManagerCore).subscribe(
@@ -540,10 +563,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
-		advertisingThread.interrupt();
-		hidUpdaterThread.interrupt();
+		advertisingThreadRunning = false;
+		hidUpdaterThreadRunning = false;
+		hidClearerThreadRunning = false;
 		this.networkManagerCore = null;
-		
+
 		//unsubscribe to messages sent by other identity managers
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
 				Message.IDMANAGER_NMADVERTISMENT_TOPIC, this);
@@ -553,5 +577,39 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	public String getIdentifier() {
 		return IDENTITY_MGR;
+	}
+
+	protected class HIDClearer implements Runnable {
+		public void run() {
+			try {
+			while(hidClearerThreadRunning) {
+				Thread.sleep(advertisementSleepMillis);
+				
+				List<HID> toDelete = new ArrayList<HID>();
+				//check the HIDs to be deleted
+				for(HID hid : hidLastUpdate.keySet()) {
+					if(hidLastUpdate.get(hid) + HID_KEEP_ALIVE_MS <
+							Calendar.getInstance().getTimeInMillis()) {
+						toDelete.add(hid);
+					}
+				}
+				//delete the HIDs from the local id table and last update
+				for(HID hid : toDelete) {
+					if(networkManagerCore != null) {
+						try {
+						LOG.debug("Removing HID " + hid.toString() + 
+								"as it was not updated recently.");
+						networkManagerCore.removeHID(hid);
+						} catch(RemoteException e) {
+							//local access
+						}
+					}
+				}
+			}
+			} catch(InterruptedException e) {
+				LOG.error("Thread removing not advertised HIDs stopped!", e);
+				hidClearerThreadRunning = false;
+			}
+		}
 	}
 }
