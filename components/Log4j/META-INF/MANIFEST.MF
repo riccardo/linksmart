@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Log4j Fragment
-Bundle-SymbolicName: Log4j
+Bundle-SymbolicName: Log4jFragment
 Bundle-Version: 1.0.0
 Fragment-Host: com.springsource.org.apache.log4j
 Bundle-Vendor: TID
