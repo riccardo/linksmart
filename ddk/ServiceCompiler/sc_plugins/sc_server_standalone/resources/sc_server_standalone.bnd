@@ -1,3 +1,0 @@
-Private-Package: eu.linksmart.limbo.backend.server.standalone
-Include-Resource: resources = templates
-Service-Component: eu.linksmart.limbo.backend.server.standalone.*

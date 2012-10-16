@@ -1,9 +1,0 @@
-package $package;
-
-$importTypes
-
-public interface $interface {
-
-	$operations
-	
-}

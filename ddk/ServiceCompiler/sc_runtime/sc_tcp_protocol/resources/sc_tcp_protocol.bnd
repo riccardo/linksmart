@@ -1,2 +1,0 @@
-Private-Package=eu.linksmart.limbo.protocol.tcp
-Service-Component=eu.linksmart.limbo.protocol.tcp.*

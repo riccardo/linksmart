@@ -1,3 +1,0 @@
-Private-Package: eu.linksmart.limbo.*
-Include-Resource: resources = include
-Service-Component: eu.linksmart.limbo.eclipse.*;
