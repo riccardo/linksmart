@@ -23,9 +23,7 @@ public class Message {
 	private HID receiverHID = null;
 	
 	public final static String TOPIC_APPLICATION = "eu.linksmart.application";
-	//TODO Move this no identity manager
-	public final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
-	public final static String IDMANAGER_NMADVERTISMENT_TOPIC = "NMAdvertisement";
+	
 	
 	/**
 	 * 

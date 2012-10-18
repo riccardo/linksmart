@@ -1,17 +1,24 @@
 package eu.linksmart.network.identity.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,6 +35,7 @@ import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.identity.util.AttributeQueryParser;
+import eu.linksmart.network.identity.util.BloomFilterFactory;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.utils.ByteArrayCodec;
 import eu.linksmart.utils.Part;
@@ -35,10 +43,21 @@ import eu.linksmart.utils.PartConverter;
 
 @SuppressWarnings("deprecation")
 public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
+	public final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
+	public final static String IDMANAGER_NMADVERTISMENT_TOPIC = "NMAdvertisement";
+	public final static String IDMANAGER_HID_ATTRIBUTE_RESOLVE_REQ = "NMHIDAttributeResolveRequest";
+	public final static String IDMANAGER_HID_ATTRIBUTE_RESOLVE_RESP = "NMHIDAttributeResolveResponse";
+	public final static String HID_ATTR_RESOLVE_KEYS = "AttributeKeys";
+	public final static String HID_ATTR_RESOLVE_FILTER = "BloomFilter";
+	public final static String HID_ATTR_RESOLVE_RANDOM = "Random";
+	public final static String HID_ATTR_RESOLVE_ID = "RequestIdentifier";
 
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
 	.getSimpleName();
-	protected static Long HID_KEEP_ALIVE_MS = new Long(2*60*1000);
+	
+	protected static long HID_KEEP_ALIVE_MS = (long)(2*60*1000);
+	protected static long HID_RESOLVE_TIMEOUT = 30000;
+
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
 	protected ConcurrentHashMap<HID, HIDInfo> localHIDs;
@@ -46,23 +65,29 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected ConcurrentHashMap<HID, Long> hidLastUpdate;
 	protected ConcurrentLinkedQueue<String> queue;
+	protected List<Long> waitingAttrResolveIds;
+	protected ConcurrentHashMap<Long, Message> resolveResponses;
 
 	protected NetworkManagerCore networkManagerCore;
 
-	/*Thread to delete not updated hids*/
+	/**Thread to delete not updated HIDs.*/
 	protected Thread hidClearerThread;
 
-	/* Thread that checks for updated in HIDList and sends respective broadcasts */
+	/** Thread that checks for updated in HIDList and sends respective broadcasts. */
 	protected Thread hidUpdaterThread;
-	/* Time in milliseconds to wait between broadcasts */
+	/** Time in milliseconds to wait between broadcasts. */
 	protected int broadcastSleepMillis = 1000;
 
-	/* Thread that sends network manager advertisement broadcasts */
+	/** Thread that sends network manager advertisement broadcasts. */
 	protected Thread advertisingThread;
-	/* Time in milliseconds to wait between advertisements */
+	/** Time in milliseconds to wait between advertisements. */
 	protected int advertisementSleepMillis = 60000;
+
+	/** Flag controlling advertising thread.*/
 	private boolean advertisingThreadRunning;
+	/** Flag controlling update broadcaster thread.*/
 	private boolean hidUpdaterThreadRunning;
+	/** Flag controlling hid clearer thread.*/
 	private boolean hidClearerThreadRunning;
 
 	protected void activate(ComponentContext context) {
@@ -71,6 +96,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
 		this.hidLastUpdate = new ConcurrentHashMap<HID, Long>();
+		this.waitingAttrResolveIds = new ArrayList<Long>();
 
 		LOG.info(IDENTITY_MGR + " started");
 	}
@@ -302,7 +328,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		BroadcastMessage updateMsg = null;
 		try {
 			updateMsg = new BroadcastMessage(
-					Message.IDMANAGER_UPDATE_HID_LIST_TOPIC, networkManagerCore.getHID(),
+					IDMANAGER_UPDATE_HID_LIST_TOPIC, networkManagerCore.getHID(),
 					update.getBytes());
 		} catch (RemoteException e) {
 			// local invocation
@@ -312,68 +338,16 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	@Override
 	public Message processMessage(Message msg) {
-		if (msg.getTopic().contentEquals(Message.IDMANAGER_UPDATE_HID_LIST_TOPIC)) {
-			try {
-				if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
-					// this is not an echo of our own broadcast
-					// otherwise we do not need to do anything with it
-					// else it is a genuine update
-					String updates = new String(msg.getData()); 
-					for (String oneUpdate : updates.split(" ")) {
-						String[] updateData = oneUpdate.split(";");
-						// at this point updateData 0 is operation type A/D, [1] is
-						// hid, [2] is description (only if operation=A)
-						if (updateData[0].equals("A")) {
-							HID newHID = new HID(updateData[1]);
-							HIDInfo newInfo = new HIDInfo(newHID, updateData[2]);
-							// Add the remoteHID to the internal map of remote HIDs
-							addRemoteHID(newHID, newInfo);
-							// Add the backbone route for this remote HID
-							networkManagerCore.addRemoteHID(msg.getSenderHID(),newHID);
-						} else if (updateData[0].equals("D")) {
-							HID toRemoveHID = new HID(updateData[1]);
-							removeRemoteHID(toRemoveHID);
-						} else {
-							throw new IllegalArgumentException(
-									"Unexpected update type for IDManager updates: " + updateData[0]);
-						}
-					}
-				}
-			} catch (RemoteException e) {
-				// local invocation
-			}
-			return null; // the complete message has been processed
-		} else if (msg.getTopic().contentEquals(Message.IDMANAGER_NMADVERTISMENT_TOPIC)){
-			try {
-				if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
-					//check if we already know this network manager
-					if(!getRemoteHIDs().contains(msg.getSenderHID())){
-						//if we do not know it add HIDs reachable through it
-						@SuppressWarnings("unchecked")
-						Set<HIDInfo> hidInfos = (Set<HIDInfo>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
-						if (hidInfos != null) {
-							Iterator<HIDInfo> i = hidInfos.iterator();
-							while (i.hasNext()) {
-								HIDInfo oneHIDInfo = i.next();
-								addRemoteHID(oneHIDInfo.getHid(), oneHIDInfo);
-								// Add the backbone route for this remote HID
-								networkManagerCore.addRemoteHID(msg.getSenderHID(), oneHIDInfo.getHid());
-							}
-						}
-					}
-				}
-			} catch (RemoteException e) {
-				LOG.debug("Remote Exception " + e);
-			} catch (IOException e) {
-				LOG.debug("IO Exception in communication, message maybe damaged? " + e);
-			} catch (ClassNotFoundException e) {
-				LOG.error("Class not found in reconstructing message. Why? " + e);
-			}
-			//message is processed
-			return null;
-		} else { // other message type
-			// TODO
-			return msg; // for the moment pass it on
+		if (msg.getTopic().contentEquals(IDMANAGER_UPDATE_HID_LIST_TOPIC)) {
+			return processNMUpdate(msg);
+		} else if (msg.getTopic().contentEquals(IDMANAGER_NMADVERTISMENT_TOPIC)) {
+			return processNMAdvertisement(msg);
+		} else if (msg.getTopic().contentEquals(IDMANAGER_HID_ATTRIBUTE_RESOLVE_REQ)) {
+			return processHIDAttributeResolveReq(msg);
+		} else if (msg.getTopic().contentEquals(IDMANAGER_HID_ATTRIBUTE_RESOLVE_RESP)) {
+			return processHIDAttributeResolveResp(msg);
+		}else { // other message types should not have been passed
+			return msg;
 		}
 	}
 
@@ -384,6 +358,302 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			return true;
 		}
 		return false;
+	}
+
+	protected Message processHIDAttributeResolveResp(Message msg) {
+		//check if there is resolve waiting with this id
+		Long reqId = new Long(msg.getProperty(HID_ATTR_RESOLVE_ID));
+		int index = 0;
+		if((index = waitingAttrResolveIds.indexOf(reqId)) != -1) {
+			Long reqLock = waitingAttrResolveIds.get(index);
+			//put message into map for waiting thread to access
+			resolveResponses.put(reqLock, msg);
+			//take out lock object and inform waiting thread
+			waitingAttrResolveIds.remove(index);
+			//TODO wait for more messages
+			synchronized(reqLock){
+				reqLock.notify();
+			}
+		}
+		//the message was either not relevant or has been processed
+		return null;
+	}
+
+	protected boolean checkAttributesAgainstFilter(
+			AttributeResolveFilter filter,
+			Part[] attributes) {
+		//go through the attributes
+		for(Part part : attributes) {
+			//if one of the attributes does not match return false
+			if(filter.getAttributeKeys().contains(part.getKey())) {
+				if(!BloomFilterFactory.
+						containsValue(
+								part.getValue(),
+								filter.getBloomFilter(),
+								filter.getRandom())) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	protected Message processHIDAttributeResolveReq(Message msg) {
+		//open message
+		ByteArrayInputStream bis = new ByteArrayInputStream(msg.getData());
+		ObjectInputStream ois;
+		AttributeResolveFilter filter = null;
+		try {
+			ois = new ObjectInputStream(bis);
+			filter = (AttributeResolveFilter)ois.readObject();
+		} catch (IOException e) {
+			LOG.warn("Cannot open attribute resolve message!",e);
+			return null;
+		} catch (ClassNotFoundException e) {
+			//cannot occur
+			return null;
+		}
+		//check if requester has the rights to access hid
+		//TODO
+		//check if attributes can be found in local store
+		Set<HIDInfo> localHids = getLocalHIDs();
+		Set<HIDInfo> matches = new HashSet<HIDInfo>();
+		//go through all local HIDs
+		for(HIDInfo hidInfo : localHids) {
+			if(checkAttributesAgainstFilter(
+					filter,
+					hidInfo.getAttributes())) {
+				matches.add(hidInfo);
+			}
+		}
+
+		//return message confirming HID
+		Random rand = new Random();
+		long respRandom = rand.nextLong();
+		List<AttributeResolveResponse> matchesFilterList = 
+			new ArrayList<IdentityManagerImpl.AttributeResolveResponse>();
+		//create Bloom-filters for all matches
+		for(HIDInfo hidInfo : matches) {
+			//collect queried attributes
+			String attrKeys = null;
+			List<String> attributes = new ArrayList<String>();
+			StringBuilder sb = new StringBuilder();
+			for(Part part : hidInfo.getAttributes()) {
+				//only include attributes which were searched
+				if(filter.getAttributeKeys().contains(part.getKey())) {
+					sb.append(part.getKey()+";");
+					attributes.add(part.getValue());
+				}
+				attrKeys = sb.toString();
+				//remove last ';' separator
+				attrKeys = attrKeys.substring(0, attrKeys.length()-1);
+			}
+			//create bloom filter with new random
+			String[] values = new String[attributes.size()];
+			boolean[] bloom = 
+				BloomFilterFactory.createBloomFilter(attributes.toArray(values), respRandom);
+			AttributeResolveFilter match = new AttributeResolveFilter(bloom, attrKeys, respRandom);
+			//put filter of match into collection of matches
+			matchesFilterList.add(new AttributeResolveResponse(hidInfo.getHid(), match));
+		}
+
+		//create message from collected matches
+		byte[] serializedResp = null;
+		try{
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			oos.writeObject(matchesFilterList);
+			serializedResp = bos.toByteArray();
+		} catch(IOException e) {
+			LOG.warn("Cannot create response to attribute resolve.",e);
+			return null;
+		}
+
+		try {
+			Message respMsg = new Message(
+					IDMANAGER_HID_ATTRIBUTE_RESOLVE_RESP,
+					networkManagerCore.getHID(),
+					msg.getSenderHID(),
+					serializedResp);
+			return respMsg;
+		} catch(RemoteException e) {
+			//local call
+		}
+		return null;
+	}
+
+	protected Set<HIDInfo> sendResolveAttributesMsg(Part[] attributes) {
+		Message msg = composeResolveAttributesMsg(attributes);
+		//send message and wait for response
+		networkManagerCore.broadcastMessage(msg);
+		//create message identifier
+		Random rand = new Random();
+		Long attrReqId = new Long(rand.nextLong());
+		msg.setProperty(HID_ATTR_RESOLVE_ID, attrReqId.toString());
+		waitingAttrResolveIds.add(new Long(attrReqId));
+		//wait for responses to arrive
+		synchronized(attrReqId) {
+			try {
+				attrReqId.wait(HID_RESOLVE_TIMEOUT);
+			} catch (InterruptedException e) {
+				LOG.warn("Interrupted thread waiting for attribute resolve!",e);
+				return null;
+			}
+		}
+		//check if resolve response is available
+		if(resolveResponses.contains(attrReqId)) {
+			Message resp = resolveResponses.remove(attrReqId);
+			//double check  bloom filters
+			//open message
+			List<AttributeResolveFilter> filterResponses = null;
+			try{
+			ByteArrayInputStream bis = new ByteArrayInputStream(resp.getData());
+			ObjectInputStream ois = new ObjectInputStream(bis);
+			filterResponses = 
+				(List<AttributeResolveFilter>) ois.readObject();
+			} catch (IOException e) {
+				LOG.warn("Could not read attribute resolve response.",e);
+				return null;
+			} catch (ClassNotFoundException e) {
+				return null; //cannot occur
+			}
+
+			//collect HIDs which match
+			HashSet<HIDInfo> foundHids = new HashSet<HIDInfo>();
+			for(AttributeResolveFilter filter : filterResponses) {
+				if(checkAttributesAgainstFilter(filter, attributes)) {
+					//choose attributes which were discovered
+					Part[] foundAttr = 
+						new Part[filter.getAttributeKeys().split(";").length];
+					int nrAttrs = 0;
+					for(Part part : attributes) {
+						if(filter.getAttributeKeys().contains(part.getKey())) {
+							foundAttr[nrAttrs] = part;
+							nrAttrs++;
+						}
+					}
+					foundHids.add(new HIDInfo(null, foundAttr));
+				}
+			}
+			return foundHids;
+		} else {
+			//timeout occurred so return null
+			return null;
+		}
+	}
+
+	protected Message composeResolveAttributesMsg(Part[] attributes) {
+		//create string of attributes searched
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		for(Part part : attributes) {
+			i++;
+			sb.append(part.getKey());
+			if(i != attributes.length) {
+				sb.append(";");
+			}
+		}
+		String attrKeys = sb.toString();
+
+		//create bloom-filter from attributes
+		String[] attrValues = new String[attributes.length];
+		for (int j=0; j< attributes.length; j++) {
+			attrValues[j] = attributes[j].getValue();
+		}
+		Random rand = new Random();
+		long random = rand.nextLong();
+		boolean[] bloomFilter = BloomFilterFactory.createBloomFilter(attrValues, random);
+
+		//compose the message
+		AttributeResolveFilter attrRF = 
+			new AttributeResolveFilter(bloomFilter, attrKeys, random);
+
+		//serialize query
+		byte[] serializedMsg = null;
+		try {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
+			oos.writeObject(attrRF);
+			serializedMsg = bos.toByteArray();
+		} catch (IOException e1) {
+			LOG.error("Cannot create attribute query object!",e1);
+			return null;
+		}
+		//compose message
+		BroadcastMessage msg = null;
+		try {
+			msg = new BroadcastMessage(
+					IDMANAGER_HID_ATTRIBUTE_RESOLVE_REQ,
+					networkManagerCore.getHID(),
+					serializedMsg);
+		} catch (RemoteException e) {
+			//local access
+		}
+		return msg;
+	}
+
+	protected Message processNMAdvertisement(Message msg) {
+		try {
+			if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
+				//check if we already know this network manager
+				if(!getRemoteHIDs().contains(msg.getSenderHID())){
+					//if we do not know it add HIDs reachable through it
+					@SuppressWarnings("unchecked")
+					Set<HIDInfo> hidInfos = (Set<HIDInfo>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+					if (hidInfos != null) {
+						Iterator<HIDInfo> i = hidInfos.iterator();
+						while (i.hasNext()) {
+							HIDInfo oneHIDInfo = i.next();
+							addRemoteHID(oneHIDInfo.getHid(), oneHIDInfo);
+							// Add the backbone route for this remote HID
+							networkManagerCore.addRemoteHID(msg.getSenderHID(), oneHIDInfo.getHid());
+						}
+					}
+				}
+			}
+		} catch (RemoteException e) {
+			LOG.debug("Remote Exception " + e);
+		} catch (IOException e) {
+			LOG.debug("IO Exception in communication, message maybe damaged? " + e);
+		} catch (ClassNotFoundException e) {
+			LOG.error("Class not found in reconstructing message. Why? " + e);
+		}
+		//message is processed
+		return null;
+	}
+
+	protected Message processNMUpdate(Message msg) {
+		try {
+			if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
+				// this is not an echo of our own broadcast
+				// otherwise we do not need to do anything with it
+				// else it is a genuine update
+				String updates = new String(msg.getData()); 
+				for (String oneUpdate : updates.split(" ")) {
+					String[] updateData = oneUpdate.split(";");
+					// at this point updateData 0 is operation type A/D, [1] is
+					// hid, [2] is description (only if operation=A)
+					if (updateData[0].equals("A")) {
+						HID newHID = new HID(updateData[1]);
+						HIDInfo newInfo = new HIDInfo(newHID, updateData[2]);
+						// Add the remoteHID to the internal map of remote HIDs
+						addRemoteHID(newHID, newInfo);
+						// Add the backbone route for this remote HID
+						networkManagerCore.addRemoteHID(msg.getSenderHID(),newHID);
+					} else if (updateData[0].equals("D")) {
+						HID toRemoveHID = new HID(updateData[1]);
+						removeRemoteHID(toRemoveHID);
+					} else {
+						throw new IllegalArgumentException(
+								"Unexpected update type for IDManager updates: " + updateData[0]);
+					}
+				}
+			}
+		} catch (RemoteException e) {
+			// local invocation
+		}
+		//message is processed
+		return null;
 	}
 
 	/*
@@ -498,7 +768,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * Thread that broadcasts all localHIDs stored by this IdentityManager 
 	 */
 	protected class AdvertisingThread implements Runnable {
-
 		@Override
 		public void run() {
 			while (advertisingThreadRunning) {
@@ -518,8 +787,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 					try {
 						m = new BroadcastMessage(
-								Message.IDMANAGER_NMADVERTISMENT_TOPIC, networkManagerCore
-								.getHID(), localHIDbytes);
+								IDMANAGER_NMADVERTISMENT_TOPIC, 
+								networkManagerCore.getHID(), localHIDbytes);
 					} catch (RemoteException e) {
 						// local invocation
 						LOG.debug("RemoteException: " + e);
@@ -556,9 +825,13 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		//subscribe to messages sent by other identity managers
 		((MessageDistributor)this.networkManagerCore).subscribe(
-				Message.IDMANAGER_NMADVERTISMENT_TOPIC, this);
+				IDMANAGER_NMADVERTISMENT_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).subscribe(
-				Message.IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
+				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
+		((MessageDistributor)this.networkManagerCore).subscribe(
+				IDMANAGER_HID_ATTRIBUTE_RESOLVE_REQ, this);
+		((MessageDistributor)this.networkManagerCore).subscribe(
+				IDMANAGER_HID_ATTRIBUTE_RESOLVE_RESP, this);
 	}
 
 	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
@@ -569,9 +842,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		//unsubscribe to messages sent by other identity managers
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
-				Message.IDMANAGER_NMADVERTISMENT_TOPIC, this);
+				IDMANAGER_NMADVERTISMENT_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
-				Message.IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
+				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
 	}
 
 	public String getIdentifier() {
@@ -581,34 +854,75 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected class HIDClearer implements Runnable {
 		public void run() {
 			try {
-			while(hidClearerThreadRunning) {
-				Thread.sleep(advertisementSleepMillis);
-				
-				List<HID> toDelete = new ArrayList<HID>();
-				//check the HIDs to be deleted
-				for(HID hid : hidLastUpdate.keySet()) {
-					if(hidLastUpdate.get(hid) + HID_KEEP_ALIVE_MS <
-							Calendar.getInstance().getTimeInMillis()) {
-						toDelete.add(hid);
+				while(hidClearerThreadRunning) {
+					Thread.sleep(advertisementSleepMillis);
+
+					List<HID> toDelete = new ArrayList<HID>();
+					//check the HIDs to be deleted
+					for(HID hid : hidLastUpdate.keySet()) {
+						if(hidLastUpdate.get(hid) + HID_KEEP_ALIVE_MS <
+								Calendar.getInstance().getTimeInMillis()) {
+							toDelete.add(hid);
+						}
 					}
-				}
-				//delete the HIDs from the local id table and last update
-				for(HID hid : toDelete) {
-					if(networkManagerCore != null) {
-						try {
-						LOG.debug("Removing HID " + hid.toString() + 
+					//delete the HIDs from the local id table and last update
+					for(HID hid : toDelete) {
+						if(networkManagerCore != null) {
+							try {
+								LOG.debug("Removing HID " + hid.toString() + 
 								"as it was not updated recently.");
-						networkManagerCore.removeHID(hid);
-						} catch(RemoteException e) {
-							//local access
+								networkManagerCore.removeHID(hid);
+							} catch(RemoteException e) {
+								//local access
+							}
 						}
 					}
 				}
-			}
 			} catch(InterruptedException e) {
 				LOG.error("Thread removing not advertised HIDs stopped!", e);
 				hidClearerThreadRunning = false;
 			}
+		}
+	}
+
+	protected class AttributeResolveFilter implements Serializable {
+		static final long serialVersionUID = 1L;
+		boolean[] bloomFilter;
+		String attributeKeys;
+		long random;
+
+		public AttributeResolveFilter(boolean[] bloom, String attr, long rand) {
+			bloomFilter = bloom;
+			attributeKeys = attr;
+			random = rand;
+		}
+
+		public boolean[] getBloomFilter() {
+			return bloomFilter;
+		}
+		public String getAttributeKeys() {
+			return attributeKeys;
+		}
+		public long getRandom() {
+			return random;
+		}
+	}
+
+	protected class AttributeResolveResponse implements Serializable {
+		HID hid;
+		AttributeResolveFilter filter;
+
+		public AttributeResolveResponse(HID hid, AttributeResolveFilter filter) {
+			this.hid = hid;
+			this.filter = filter;
+		}
+
+		public HID getHid() {
+			return this.hid;
+		}
+
+		public AttributeResolveFilter getFilter() {
+			return this.filter;
 		}
 	}
 }
