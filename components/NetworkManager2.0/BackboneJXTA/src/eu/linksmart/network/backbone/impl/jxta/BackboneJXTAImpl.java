@@ -215,7 +215,19 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @param message
 	 */
 	private NMResponse sendData(HID senderHID, HID receiverHID, byte[] data, boolean synch) {
+		//check parameters
+		if(senderHID == null || receiverHID == null)
+		{
+			throw new IllegalArgumentException("Parameter cannot be null or empty when sending!");
+		}	
 		NMResponse response = new NMResponse();
+		
+		//check message - errors can be handled by application
+		if(data == null || data.length == 0) {
+			response.setStatus(NMResponse.STATUS_ERROR);
+			response.setMessage("Must not send empty data!");
+			return response;
+		}
 
 		// add senderHID to data
 		logger.debug("Sending data over pipe to HID= " + receiverHID);
@@ -291,7 +303,19 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * @return
 	 */
 	public NMResponse broadcastData(HID senderHID, byte[] data) {
+		//check parameters
+		if(senderHID == null)
+		{
+			throw new IllegalArgumentException("SenderHID cannot be null!");
+		}	
 		NMResponse response = new NMResponse();
+		
+		//check message - errors can be handled by application
+		if(data == null || data.length == 0) {
+			response.setStatus(NMResponse.STATUS_ERROR);
+			response.setMessage("Must not send empty data!");
+			return response;
+		}
 
 		logger.debug("BBJXTA - broadcastData: "
 				+ BackboneJXTAUtils.ConvertByteArrayToString(data));
@@ -858,6 +882,12 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	@Override
 	public boolean addEndpoint(HID hid, String endpoint) {
+		if(endpoint == null || hid == null || endpoint.length() == 0) {
+			//do not hide error by only returning false as these can be fixed by application
+			throw new IllegalArgumentException(
+					"Cannot add null or empty endpoints!");
+		}
+		
 		try {
 			listOfRemoteEndpoints.put(hid, endpoint);
 			return true;
