@@ -99,6 +99,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.queue = new ConcurrentLinkedQueue<String>();
 		this.hidLastUpdate = new ConcurrentHashMap<HID, Long>();
 		this.waitingAttrResolveIds = new ArrayList<Long>();
+		this.resolveResponses = new ConcurrentHashMap<Long, Message>();
 
 		LOG.info(IDENTITY_MGR + " started");
 	}
@@ -400,7 +401,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				if(!BloomFilterFactory.
 						containsValue(
 								part.getValue(),
-								null,//filter.getBloomFilter(),
+								filter.getBloomFilter(),
 								filter.getRandom())) {
 					return false;
 				}
@@ -457,10 +458,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					sb.append(part.getKey()+";");
 					attributes.add(part.getValue());
 				}
-				attrKeys = sb.toString();
-				//remove last ';' separator
-				attrKeys = attrKeys.substring(0, attrKeys.length()-1);
 			}
+			attrKeys = sb.toString();
+			//remove last ';' separator
+			attrKeys = attrKeys.substring(0, attrKeys.length()-1);
 			//create bloom filter with new random
 			String[] values = new String[attributes.size()];
 			boolean[] bloom = 
