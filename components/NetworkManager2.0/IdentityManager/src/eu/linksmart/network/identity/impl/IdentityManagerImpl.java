@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -39,7 +38,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
 	.getSimpleName();
-	protected static Long HID_KEEP_ALIVE_MS = new Long(5*60*1000);
+	protected static Long HID_KEEP_ALIVE_MS = new Long(2*60*1000);
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
 	protected ConcurrentHashMap<HID, HIDInfo> localHIDs;
