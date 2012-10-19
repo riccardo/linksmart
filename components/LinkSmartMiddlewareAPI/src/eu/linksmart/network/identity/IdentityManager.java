@@ -14,7 +14,9 @@ import eu.linksmart.utils.Part;
  * 
  */
 public interface IdentityManager {
-
+	public static long HID_RESOLVE_TIMEOUT = 30000;
+	
+	
 	/**
 	 * Creates a local {@link HID} with the given attributes and stores it. It
 	 * creates a random deviceID. The result will be 0.0.0.randomDeviceId.
@@ -96,14 +98,15 @@ public interface IdentityManager {
 	public Set<HIDInfo> getHIDsByDescription(String description);
 
 	/**
-	 * Returns all {@link HIDInfo}s that match the given query. TODO Explian the
+	 * Returns all locally available {@link HIDInfo}s
+	 * that match the given query. TODO Explian the
 	 * query language
 	 * 
 	 * @param query
 	 * @param maxNum
 	 * @return
 	 */
-	public Set<HIDInfo> getHIDsByAttributes(String query);
+	public HIDInfo[] getHIDsByAttributes(String query);
 
 	/**
 	 * Removes the given {@link HID} from the internal HID-store. Does nothing
@@ -119,4 +122,17 @@ public interface IdentityManager {
 	 * @return Class name string.
 	 */
 	public String getIdentifier();
+	
+	/**
+	 * Method to exactly control gathering of HIDs. 
+	 * @param attributes The attributes the service should have
+	 * @param timeOut Time to wait for discovery responses
+	 * @param returnFirst If true method returns at first found service
+	 * @param isStrictRequest <br/>
+	 * true - only services will be discovered which possess all attributes <br/>
+	 * false - attribute types which a service does not have are ignored
+	 * @return
+	 */
+	HIDInfo[] getHIDByAttributes(Part[] attributes, long timeOut,
+			boolean returnFirst, boolean isStrict);
 }

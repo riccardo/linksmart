@@ -14,11 +14,21 @@ public class AttributeResolveFilter implements Serializable {
 	boolean[] bloomFilter;
 	String attributeKeys;
 	Long random;
+	boolean isStrictRequest;
 
-	public AttributeResolveFilter(boolean[] bloom, String attr, long rand) {
+	/**
+	 * 
+	 * @param bloom
+	 * @param attr
+	 * @param rand
+	 * @param isStrict true - the queried entity has to match all attributes
+	 * false - attributes the queried entity does not have are ignored
+	 */
+	public AttributeResolveFilter(boolean[] bloom, String attr, long rand, boolean isStrict) {
 		bloomFilter = bloom;
 		attributeKeys = attr;
 		random = new Long(rand);
+		isStrictRequest = isStrict;
 	}
 
 	public boolean[] getBloomFilter() {
@@ -29,5 +39,8 @@ public class AttributeResolveFilter implements Serializable {
 	}
 	public long getRandom() {
 		return random.longValue();
+	}
+	public boolean getIsStrictRequest(){
+		return isStrictRequest;
 	}
 }

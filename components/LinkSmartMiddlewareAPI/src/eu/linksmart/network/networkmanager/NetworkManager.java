@@ -89,21 +89,28 @@ public interface NetworkManager extends java.rmi.Remote {
 	public String[] getAvailableBackbones() throws RemoteException;
 	
 	/**
-	 * Gets the HID for the available services with the given attributes. 
-	 * Attributes are connected via conjunction.
+	 * Simplest method to get services which match attributes. HIDs are
+	 * returned at best effort, meaning that if an entity does not
+	 * include some of the searched attributes they are ignored. Will
+	 * wait default timeout to discover remote HIDs.
 	 * @param attributes The attributes the service is supposed to have
 	 * @return The HIDs in HIDInfo objects
 	 */
 	public HIDInfo[] getHIDByAttributes(Part[] attributes);
 	
 	/**
-	 * Gets the HID for the available services with the given attributes. 
-	 * @param attributes The attributes the service is supposed to have
-	 * @param isConjunction if true the attributes are connected with a logical "AND", 
-	 * 			if false attributes are connected with a logical "OR"
-	 * @return The HIDs in HIDInfo objects
+	 * Method to exactly control gathering of HIDs. 
+	 * @param attributes The attributes the service should have
+	 * @param timeOut Time to wait for discovery responses
+	 * @param returnFirst If true method returns at first found service
+	 * @param isStrictRequest <br/>
+	 * true - only services will be discovered which possess all attributes <br/>
+	 * false - attribute types which a service does not have are ignored
+	 * @return Even if returnFirst is set true more HIDInfos may be available
 	 */
-	public HIDInfo[] getHIDByAttributes(Part[] attributes, boolean isConjunction);
+	public HIDInfo[] getHIDByAttributes(
+			Part[] attributes,long timeOut,
+			boolean returnFirst, boolean isStrictRequest);
 	
 	/**
 	 * Gets the HID for the available service with the passed PID.
@@ -121,7 +128,9 @@ public interface NetworkManager extends java.rmi.Remote {
 	public HIDInfo [] getHIDByDescription(String description);
 	
 	/**
-	 * Gets the HID for the available services for the passed query. 
+	 * Gets the HID for the locally available services for the passed query.
+	 * Remote HIDs cannot be tested against the query containing other
+	 * attributes then description. 
 	 * This method should only be used by advanced developers.
 	 * @param query The formulated query.
 	 * @return The HIDInfo objects.

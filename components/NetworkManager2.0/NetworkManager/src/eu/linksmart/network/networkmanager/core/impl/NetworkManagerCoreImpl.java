@@ -712,30 +712,23 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 	@Override
 	public HIDInfo[] getHIDByAttributes(Part[] attributes) {
-		return getHIDByAttributes(attributes, true);
-	}
-
-	@Override
-	public HIDInfo[] getHIDByAttributes(Part[] attributes, boolean isConjunction) {
-		String relation = (isConjunction) ? "&&" : "||";
-
-		StringBuilder query = new StringBuilder();
-		for (Part attribute : attributes) {
-			query.append("(" + attribute.getKey() + "==" + attribute.getValue()
-					+ ")" + relation);
-		}
-		query.delete(query.length() - 2, query.length());
-		Set<HIDInfo> hids = identityManager.getHIDsByAttributes(query
-				.toString());
-
-		return hids.toArray(new HIDInfo[hids.size()]);
+		return identityManager.getHIDByAttributes(
+				attributes,
+				IdentityManager.HID_RESOLVE_TIMEOUT,
+				false,
+				false);
 	}
 
 	@Override
 	public HIDInfo[] getHIDByQuery(String query) {
+		return identityManager.getHIDsByAttributes(query);
+	}
 
-		Set<HIDInfo> hids = identityManager.getHIDsByAttributes(query);
-		return hids.toArray(new HIDInfo[hids.size()]);
+	@Override
+	public HIDInfo[] getHIDByAttributes(Part[] attributes, long timeOut,
+			boolean returnFirst, boolean isStrictRequest) {
+		return identityManager.getHIDByAttributes(
+				attributes, timeOut, returnFirst, isStrictRequest);
 	}
 
 }

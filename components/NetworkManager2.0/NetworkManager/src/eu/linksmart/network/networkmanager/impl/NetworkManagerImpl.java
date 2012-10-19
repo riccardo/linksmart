@@ -74,13 +74,6 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public HIDInfo[] getHIDByAttributes(Part[] attributes,
-				boolean isConjunction) {
-			
-			return this.core.getHIDByAttributes(attributes, isConjunction);
-		}
-
-		@Override
 		public HIDInfo getHIDByPID(String PID) throws IllegalArgumentException {
 			return this.core.getHIDByPID(PID);
 		}
@@ -93,5 +86,12 @@ import eu.linksmart.utils.Part;
 		@Override
 		public HIDInfo[] getHIDByQuery(String query) {
 			return this.core.getHIDByQuery(query);
+		}
+
+		@Override
+		public HIDInfo[] getHIDByAttributes(Part[] attributes, long timeOut,
+				boolean returnFirst, boolean isStrictRequest) {
+			return this.core.getHIDByAttributes(
+					attributes, timeOut, returnFirst, isStrictRequest);
 		}
 }

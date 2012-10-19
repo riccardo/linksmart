@@ -58,7 +58,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	.getSimpleName();
 
 	protected static long HID_KEEP_ALIVE_MS = (long)(2*60*1000);
-	protected static long HID_RESOLVE_TIMEOUT = 30000;
 
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
@@ -67,8 +66,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected ConcurrentHashMap<HID, Long> hidLastUpdate;
 	protected ConcurrentLinkedQueue<String> queue;
-	protected List<Long> waitingAttrResolveIds;
-	protected ConcurrentHashMap<Long, Message> resolveResponses;
+	protected ConcurrentHashMap<String, List<Message>> resolveResponses;
+	protected ConcurrentHashMap<String, Object> locks;
 
 	protected NetworkManagerCore networkManagerCore;
 
@@ -98,8 +97,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
 		this.hidLastUpdate = new ConcurrentHashMap<HID, Long>();
-		this.waitingAttrResolveIds = new ArrayList<Long>();
-		this.resolveResponses = new ConcurrentHashMap<Long, Message>();
+		this.resolveResponses = new ConcurrentHashMap<String, List<Message>>();
+		this.locks = new ConcurrentHashMap<String, Object>();
 
 		LOG.info(IDENTITY_MGR + " started");
 	}
@@ -170,6 +169,55 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 */
 	public Set<HIDInfo> getRemoteHIDs() {
 		return new HashSet<HIDInfo>(remoteHIDs.values());
+	}
+
+	@Override
+	public HIDInfo[] getHIDByAttributes(
+			Part[] attributes, long timeOut,
+			boolean returnFirst, boolean isStrict) {
+		Set<HIDInfo> matchingHids = new HashSet<HIDInfo>();
+		//first collect local HIDs that match
+		for(HIDInfo hidInfo : getLocalHIDs()) {
+			//check if all searched keys are available
+			Part[] attrs = hidInfo.getAttributes();
+			boolean foundAllKeys = true;
+			boolean attrsMatched = true;
+			for(Part searchedAttr : attributes) {
+				boolean foundKey = false;
+				for(Part attr : attrs) {
+					if(searchedAttr.getKey().equals(attr.getKey())) {
+						if(!searchedAttr.getValue().equals(attr.getValue())) {
+							attrsMatched = false;
+							break;//loop checking key
+						}
+						foundKey = true;
+						break;//loop checking key
+					}
+				}
+				//did not find key or exited because found key
+				if((!foundKey && isStrict) || !attrsMatched) {
+					foundAllKeys = false;
+					break;//loop checking  all keys
+				}
+			}
+			//all searched attributes were found
+			//or exited because key missed or value did not match
+			if((foundAllKeys || !isStrict) && attrsMatched) {
+				matchingHids.add(hidInfo);
+			}
+		}
+
+		//only search remotely if required
+		if(matchingHids.size() == 0 || !returnFirst) {		
+			//search remotely for HIDs
+			Set<HIDInfo> remoteHids = sendResolveAttributesMsg(
+					attributes, timeOut, returnFirst, isStrict);
+			matchingHids.addAll(remoteHids);
+		}
+		//create array from matches
+		HIDInfo[] hidInfos = new HIDInfo[matchingHids.size()];
+		matchingHids.toArray(hidInfos);
+		return hidInfos;
 	}
 
 	@Override
@@ -266,7 +314,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	@Override
-	public Set<HIDInfo> getHIDsByAttributes(String query) {
+	public HIDInfo[] getHIDsByAttributes(String query) {
 		LinkedList<String> parsedQuery = AttributeQueryParser.parseQuery(query);
 		/* Parse the query. */
 		HashSet<HIDInfo> results = new HashSet<HIDInfo>();
@@ -288,7 +336,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			}
 		}
 
-		return results;
+		HIDInfo[] hidInfos = new HIDInfo[results.size()];
+		results.toArray(hidInfos);
+		return hidInfos;
 	}
 
 	@Override
@@ -374,26 +424,58 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected Message processHIDAttributeResolveResp(Message msg) {
 		//check if there is resolve waiting with this id
-		Long reqId = new Long(msg.getProperty(HID_ATTR_RESOLVE_ID));
-		int index = 0;
-		if((index = waitingAttrResolveIds.indexOf(reqId)) != -1) {
-			Long reqLock = waitingAttrResolveIds.get(index);
+		String reqId = msg.getProperty(HID_ATTR_RESOLVE_ID);
+		//does anyone wait for this resolve id
+		if(locks.containsKey(reqId)) {
+			Object lock = locks.get(reqId);
 			//put message into map for waiting thread to access
-			resolveResponses.put(reqLock, msg);
-			//take out lock object and inform waiting thread
-			waitingAttrResolveIds.remove(index);
-			//TODO wait for more messages
-			synchronized(reqLock){
-				reqLock.notify();
+			if(resolveResponses.containsKey(reqId)) {
+				resolveResponses.get(reqId).add(msg);
+			} else {
+				List<Message> msgs = new ArrayList<Message>();
+				msgs.add(msg);
+				resolveResponses.put(reqId, msgs);
+			}
+			//inform waiting thread after each incoming message
+			synchronized(lock){
+				lock.notify();
 			}
 		}
 		//the message was either not relevant or has been processed
 		return null;
 	}
 
+	/**
+	 * Checks if a filter object matches the
+	 * provided attributes. Strictness and random
+	 * are automatically handled.
+	 * @param filter
+	 * @param attributes
+	 * @return
+	 */
 	protected boolean checkAttributesAgainstFilter(
 			AttributeResolveFilter filter,
 			Part[] attributes) {
+		//check if all attributes are available which are
+		//in the attribute key string
+		if(filter.getIsStrictRequest()) {
+			String[] keys = filter.getAttributeKeys().split(";");
+			for(String key : keys) {
+				boolean found = false;
+				for(Part part : attributes) {
+					//exit loop if there is a match
+					if(part.getKey().equals(key)) {
+						found = true;
+						break;
+					}
+				}
+				//if key not found there is no strict match
+				if(!found) {
+					return false;
+				}
+			}
+			//we get here if there was no key which was not found
+		}
 		//go through the attributes
 		for(Part part : attributes) {
 			//if one of the attributes does not match return false
@@ -466,7 +548,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			String[] values = new String[attributes.size()];
 			boolean[] bloom = 
 				BloomFilterFactory.createBloomFilter(attributes.toArray(values), respRandom);
-			AttributeResolveFilter match = new AttributeResolveFilter(bloom, attrKeys, respRandom);
+			AttributeResolveFilter match = 
+				new AttributeResolveFilter(bloom, attrKeys, respRandom, filter.getIsStrictRequest());
 			//put filter of match into collection of matches
 			matchesFilterList.add(new AttributeResolveResponse(hidInfo.getHid(), match));
 		}
@@ -489,7 +572,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					networkManagerCore.getHID(),
 					msg.getSenderHID(),
 					serializedResp);
-			//put in request id so requester knows this is resposne
+			//put in request id so requester knows this is response
 			respMsg.setProperty(HID_ATTR_RESOLVE_ID, String.valueOf(reqId));
 			return respMsg;
 		} catch(RemoteException e) {
@@ -498,58 +581,99 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		return null;
 	}
 
-	protected Set<HIDInfo> sendResolveAttributesMsg(Part[] attributes) {
-		Message msg = composeResolveAttributesMsg(attributes);
+	protected Set<HIDInfo> sendResolveAttributesMsg(
+			Part[] attributes,
+			long timeout,
+			boolean returnFirst,
+			boolean isStrictRequest) {
+		Message msg = composeResolveAttributesMsg(attributes, isStrictRequest);
 		//create message identifier
 		Random rand = new Random();
-		Long attrReqId = new Long(rand.nextLong());
-		msg.setProperty(HID_ATTR_RESOLVE_ID, attrReqId.toString());
-		waitingAttrResolveIds.add(new Long(attrReqId));
-		//send message and wait for responses to arrive
-		synchronized(attrReqId) {
+		String attrReqId = String.valueOf(rand.nextLong());
+		msg.setProperty(HID_ATTR_RESOLVE_ID, attrReqId);
+		Object lock = new Object();
+		locks.put(attrReqId, lock);
+		boolean found = false;
+		synchronized(lock) {
 			try {
 				networkManagerCore.broadcastMessage(msg);
-				attrReqId.wait(HID_RESOLVE_TIMEOUT);
+				//send message and wait for responses to arrive within timeout
+				Long startTime = Calendar.getInstance().getTimeInMillis();
+				//if returnFirst then stop waiting when first answer arrives
+				//always stop on timeout
+				while((!found && returnFirst) 
+						|| (startTime + timeout > Calendar.getInstance().getTimeInMillis())) {
+					lock.wait(timeout);
+					if(returnFirst && resolveResponses.containsKey(attrReqId)) {
+						found = true;
+					}
+				}
 			} catch (InterruptedException e) {
 				LOG.warn("Interrupted thread waiting for attribute resolve!",e);
 				return null;
 			}
 		}
 		//check if resolve response is available
-		if(resolveResponses.contains(attrReqId)) {
-			Message resp = resolveResponses.remove(attrReqId);
-			//double check  bloom filters
-			//open message
-			List<AttributeResolveFilter> filterResponses = null;
-			try{
-				ByteArrayInputStream bis = new ByteArrayInputStream(resp.getData());
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				filterResponses = 
-					(List<AttributeResolveFilter>) ois.readObject();
-			} catch (IOException e) {
-				LOG.warn("Could not read attribute resolve response.",e);
-				return null;
-			} catch (ClassNotFoundException e) {
-				return null; //cannot occur
-			}
+		if(resolveResponses.containsKey(attrReqId)) {
+			List<Message> resps = resolveResponses.remove(attrReqId);
+			//go over each found message
+			Set<HIDInfo> foundHids = new HashSet<HIDInfo>();
+			for(Message resp : resps) {
+				//open message
+				List<AttributeResolveResponse> filterResponses = null;
+				try{
+					ByteArrayInputStream bis = new ByteArrayInputStream(resp.getData());
+					ObjectInputStream ois = new ObjectInputStream(bis);
+					filterResponses = 
+						(List<AttributeResolveResponse>) ois.readObject();
+				} catch (IOException e) {
+					LOG.warn("Could not read attribute resolve response.",e);
+					return null;
+				} catch (ClassNotFoundException e) {
+					LOG.warn(
+							"Attribute resolve response contained wrong object from HID:"
+							+ msg.getSenderHID(),e);
+				}
 
-			//collect HIDs which match
-			HashSet<HIDInfo> foundHids = new HashSet<HIDInfo>();
-			for(AttributeResolveFilter filter : filterResponses) {
-				if(checkAttributesAgainstFilter(filter, attributes)) {
-					//choose attributes which were discovered
-					Part[] foundAttr = 
-						new Part[filter.getAttributeKeys().split(";").length];
-					int nrAttrs = 0;
-					for(Part part : attributes) {
-						if(filter.getAttributeKeys().contains(part.getKey())) {
-							foundAttr[nrAttrs] = part;
-							nrAttrs++;
+				//check all HIDs in message which possibly match
+				for(AttributeResolveResponse response : filterResponses) {
+					AttributeResolveFilter filter = response.getFilter();
+					//if it was a strict request check if all searched keys are present
+					if(isStrictRequest) {
+						//check if all attributes are present in key string
+						boolean allPresent = true;
+						for(Part part : attributes) {
+							//if it is not present skip this filter
+							if(!filter.getAttributeKeys().contains(part.getKey())) {
+								allPresent = false;
+								break; //inner loop checking attributes
+							}
+						}
+						if(!allPresent) {
+							break; //outer loop checking filters
 						}
 					}
-					foundHids.add(new HIDInfo(null, foundAttr));
+					//double check bloom filter
+					if(checkAttributesAgainstFilter(filter, attributes)) {
+						//only include attributes in HIDInfo which matched
+						Part[] foundAttr = 
+							new Part[filter.getAttributeKeys().split(";").length];
+						int nrAttrs = 0;
+						for(Part part : attributes) {
+							if(filter.getAttributeKeys().contains(part.getKey())) {
+								foundAttr[nrAttrs] = part;
+								nrAttrs++;
+							}
+						}
+						foundHids.add(new HIDInfo(response.getHid(), foundAttr));
+					}
 				}
 			}
+			//put found hids in remoteHID store
+			for(HIDInfo hidInfo : foundHids) {
+				addRemoteHID(hidInfo.getHid(), hidInfo);
+			}
+			//return found hids
 			return foundHids;
 		} else {
 			//timeout occurred so return null
@@ -557,7 +681,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		}
 	}
 
-	protected Message composeResolveAttributesMsg(Part[] attributes) {
+	protected Message composeResolveAttributesMsg(Part[] attributes, boolean isStrictRequest) {
 		//create string of attributes searched
 		StringBuilder sb = new StringBuilder();
 		int i = 0;
@@ -581,7 +705,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		//compose the message
 		AttributeResolveFilter attrRF = 
-			new AttributeResolveFilter(bloomFilter, attrKeys, random);
+			new AttributeResolveFilter(bloomFilter, attrKeys, random, isStrictRequest);
 
 		//serialize query
 		byte[] serializedMsg = null;
@@ -688,7 +812,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		return localHIDs.get(hid);
 	}
 
-	/*
+	/**
 	 * Adds a remote HID to the IdTable and updates 
 	 * the time stamp of last update
 	 * 
@@ -699,13 +823,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * @return The previous value associated with that HID, null otherwise
 	 */
 	protected HIDInfo addRemoteHID(HID hid, HIDInfo info) {
-		if (!remoteHIDs.containsKey(hid)) {
-			remoteHIDs.put(hid, info);
-			hidLastUpdate.put(hid, Calendar.getInstance().getTimeInMillis());
-		} else {
-			hidLastUpdate.put(hid, Calendar.getInstance().getTimeInMillis());
-		}
-		return remoteHIDs.get(hid);
+		HIDInfo prev = remoteHIDs.put(hid, info);
+		hidLastUpdate.put(hid, Calendar.getInstance().getTimeInMillis());
+		return prev;
 	}
 
 	/*
@@ -790,10 +910,22 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 					//#NM refactoring put list of local HIDs into message
 					Set<HIDInfo> localHIDs = getLocalHIDs();
+					//only keep hid and description in sent data
+					Set<HIDInfo> hidsToSend = new HashSet<HIDInfo>();
+					for(HIDInfo hidInfo : localHIDs) {
+						if(hidInfo.getDescription() != null) {
+							hidsToSend.add(
+									new HIDInfo(
+											hidInfo.getHid(),
+											new Part[]{new Part(
+													HIDAttribute.DESCRIPTION.name(),
+													hidInfo.getDescription())}));
+						}
+					}
 					byte[] localHIDbytes = null;
 
 					try {
-						localHIDbytes = ByteArrayCodec.encodeObjectToBytes(localHIDs);
+						localHIDbytes = ByteArrayCodec.encodeObjectToBytes(hidsToSend);
 					} catch (IOException e) {
 						LOG.error("Cannot convert local HIDs set to bytearray; " + e);
 
@@ -898,18 +1030,5 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				hidClearerThreadRunning = false;
 			}
 		}
-	}
-
-	@Override
-	public HIDInfo[] getHIDByAttributes(Part[] attributes) {
-		//search remotely for HIDs
-		Set<HIDInfo> remoteHids = sendResolveAttributesMsg(attributes);
-		HIDInfo[] hidInfos = new HIDInfo[remoteHids.size()];
-		int i=0;
-		for(HIDInfo hidInfo : remoteHids) {
-			hidInfos[i] = hidInfo;
-			i++;
-		}
-		return hidInfos;
 	}
 }
