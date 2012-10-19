@@ -175,6 +175,17 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	public HIDInfo[] getHIDByAttributes(
 			Part[] attributes, long timeOut,
 			boolean returnFirst, boolean isStrict) {
+		//if only descriptions are searched use other method
+		if(attributes.length == 1 
+				&& attributes[0].getKey().equals(
+						HIDAttribute.DESCRIPTION.name())) {
+			Set<HIDInfo> hidInfos = getHIDsByDescription(attributes[0].getValue());
+			//create array from set
+			HIDInfo[] hidInfoRet = new HIDInfo[hidInfos.size()];
+			hidInfos.toArray(hidInfoRet);
+			return hidInfoRet;
+		}
+		
 		Set<HIDInfo> matchingHids = new HashSet<HIDInfo>();
 		//first collect local HIDs that match
 		for(HIDInfo hidInfo : getLocalHIDs()) {
