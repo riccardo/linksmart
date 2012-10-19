@@ -130,7 +130,7 @@ public class HIDInfo implements Serializable {
 			// description does not exist yet
 			Part[] attributes = new Part[this.attributes.length + 1];
 			System.arraycopy(this.attributes, 0, attributes, 0,
-					attributes.length);
+					this.attributes.length);
 			attributes[this.attributes.length] = new Part(
 					HIDAttribute.DESCRIPTION.name(), description);
 			this.attributes = attributes;

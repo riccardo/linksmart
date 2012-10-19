@@ -182,11 +182,13 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			Part[] attrs = hidInfo.getAttributes();
 			boolean foundAllKeys = true;
 			boolean attrsMatched = true;
+			boolean atLeastOneMatch = false;
 			for(Part searchedAttr : attributes) {
 				boolean foundKey = false;
 				for(Part attr : attrs) {
 					if(searchedAttr.getKey().equals(attr.getKey())) {
 						if(!searchedAttr.getValue().equals(attr.getValue())) {
+							atLeastOneMatch = true;
 							attrsMatched = false;
 							break;//loop checking key
 						}
@@ -197,12 +199,12 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				//did not find key or exited because found key
 				if((!foundKey && isStrict) || !attrsMatched) {
 					foundAllKeys = false;
-					break;//loop checking  all keys
+					break;//loop checking all keys
 				}
 			}
 			//all searched attributes were found
 			//or exited because key missed or value did not match
-			if((foundAllKeys || !isStrict) && attrsMatched) {
+			if((foundAllKeys || !isStrict) && attrsMatched && atLeastOneMatch) {
 				matchingHids.add(hidInfo);
 			}
 		}
@@ -212,7 +214,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			//search remotely for HIDs
 			Set<HIDInfo> remoteHids = sendResolveAttributesMsg(
 					attributes, timeOut, returnFirst, isStrict);
-			matchingHids.addAll(remoteHids);
+			if(remoteHids != null) {
+				matchingHids.addAll(remoteHids);
+			}
 		}
 		//create array from matches
 		HIDInfo[] hidInfos = new HIDInfo[matchingHids.size()];
@@ -477,9 +481,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			//we get here if there was no key which was not found
 		}
 		//go through the attributes
+		boolean atLeastOneMatch = false;
 		for(Part part : attributes) {
 			//if one of the attributes does not match return false
 			if(filter.getAttributeKeys().contains(part.getKey())) {
+				atLeastOneMatch = true;
 				if(!BloomFilterFactory.
 						containsValue(
 								part.getValue(),
@@ -489,7 +495,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				}
 			}
 		}
-		return true;
+		if(atLeastOneMatch) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	protected Message processHIDAttributeResolveReq(Message msg) {
@@ -601,10 +611,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				Long startTime = Calendar.getInstance().getTimeInMillis();
 				//if returnFirst then stop waiting when first answer arrives
 				//always stop on timeout
-				while((!found && returnFirst) 
+				while((!found && returnFirst && (startTime + timeout > Calendar.getInstance().getTimeInMillis())) 
 						|| (startTime + timeout > Calendar.getInstance().getTimeInMillis())) {
 					lock.wait(timeout);
-					if(returnFirst && resolveResponses.containsKey(attrReqId)) {
+					if(resolveResponses.containsKey(attrReqId)) {
 						found = true;
 					}
 				}
@@ -671,6 +681,18 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			}
 			//put found hids in remoteHID store
 			for(HIDInfo hidInfo : foundHids) {
+				//descriptions are usually available before put may not
+				//have been queried - so include them
+				if(hidInfo.getDescription() == null) {
+					//check if description was available before
+					HIDInfo HIDInfoOld = remoteHIDs.get(hidInfo.getHid());
+					if(HIDInfoOld != null) {
+						String description = HIDInfoOld.getDescription();
+						if(description != null) {
+							hidInfo.setDescription(description);
+						}
+					}
+				}
 				addRemoteHID(hidInfo.getHid(), hidInfo);
 			}
 			//return found hids
