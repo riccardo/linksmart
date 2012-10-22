@@ -25,6 +25,9 @@ public class BloomFilterFactory {
 	 * @return
 	 */
 	public static boolean[] createBloomFilter(String[] values, long random) {
+		if(values == null || values.length == 0) {
+			throw new IllegalArgumentException("Cannot create filter for no values!");
+		}
 		int length = values.length * BITS_PER_ITEM;
 		boolean[] bloomFilter = new boolean[length];
 		//calculate hash for each value

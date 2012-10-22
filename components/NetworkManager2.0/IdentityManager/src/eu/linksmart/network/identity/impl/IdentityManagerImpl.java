@@ -93,14 +93,17 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting " + IDENTITY_MGR);
+		init();
+		LOG.info(IDENTITY_MGR + " started");
+	}
+	
+	protected void init() {
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.queue = new ConcurrentLinkedQueue<String>();
 		this.hidLastUpdate = new ConcurrentHashMap<HID, Long>();
 		this.resolveResponses = new ConcurrentHashMap<String, List<Message>>();
 		this.locks = new ConcurrentHashMap<String, Object>();
-
-		LOG.info(IDENTITY_MGR + " started");
 	}
 
 	protected void deactivate(ComponentContext context) {
@@ -198,8 +201,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				boolean foundKey = false;
 				for(Part attr : attrs) {
 					if(searchedAttr.getKey().equals(attr.getKey())) {
+						atLeastOneMatch = true;
 						if(!searchedAttr.getValue().equals(attr.getValue())) {
-							atLeastOneMatch = true;
 							attrsMatched = false;
 							break;//loop checking key
 						}
