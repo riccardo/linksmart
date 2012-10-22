@@ -196,6 +196,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			Part[] attrs = hidInfo.getAttributes();
 			boolean foundAllKeys = true;
 			boolean attrsMatched = true;
+			//used to say that at least one of the attribute keys was found
 			boolean atLeastOneMatch = false;
 			for(Part searchedAttr : attributes) {
 				boolean foundKey = false;
@@ -494,7 +495,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			}
 			//we get here if there was no key which was not found
 		}
-		//go through the attributes
+		/*go through the attributes*/
+		
+		//used to say that at least one of the searched keys was available
 		boolean atLeastOneMatch = false;
 		for(Part part : attributes) {
 			//if one of the attributes does not match return false
