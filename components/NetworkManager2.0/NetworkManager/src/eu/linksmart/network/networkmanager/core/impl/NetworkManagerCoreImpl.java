@@ -523,21 +523,29 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			data = connection.processMessage(tempMessage);
 			response = this.backboneRouter.sendDataSynch(senderHID,
 					receiverHID, data);
-			// process response message with logical endpoints in connection
-			// with physical endpoints
-			tempMessage = connection.processData(message.getReceiverHID(),
-					message.getSenderHID(), response.getMessage().getBytes());
-			// repeat sending and receiving until security protocol is over
-			while (tempMessage != null
-					&& tempMessage
-					.getTopic()
-					.contentEquals(
-							CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
-				response = this.backboneRouter.sendDataSynch(senderHID,
-						receiverHID, connection.processMessage(tempMessage));
+			if(response.getStatus() == NMResponse.STATUS_SUCCESS) {
+				// process response message with logical endpoints in connection
+				// with physical endpoints
 				tempMessage = connection.processData(message.getReceiverHID(),
-						message.getSenderHID(), response.getMessage()
-						.getBytes());
+						message.getSenderHID(), response.getMessage().getBytes());
+				// repeat sending and receiving until security protocol is over
+				while (tempMessage != null
+						&& tempMessage
+						.getTopic()
+						.contentEquals(
+								CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
+					response = this.backboneRouter.sendDataSynch(senderHID,
+							receiverHID, connection.processMessage(tempMessage));
+					if(response.getStatus() == NMResponse.STATUS_SUCCESS) {
+						tempMessage = connection.processData(message.getReceiverHID(),
+								message.getSenderHID(), response.getMessage()
+								.getBytes());
+					} else {
+						return response;
+					}
+				}
+			} else {
+				return response;
 			}
 		} catch (Exception e) {
 			LOG.warn("Could not create packet from message from HID: "
