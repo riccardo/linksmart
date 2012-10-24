@@ -1,11 +1,13 @@
 package eu.linksmart.network.networkmanager.core;
 
 import java.io.IOException;
+import java.util.List;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.networkmanager.NetworkManager;
+import eu.linksmart.security.communication.SecurityProperty;
 
 /*
  * Internal NetworkManager interface used by internal components as backbone router etc.
@@ -51,4 +53,12 @@ public interface NetworkManagerCore extends NetworkManager {
 	 */
 	public void addRemoteHID(HID senderHID, HID remoteHID);
 
+	/**
+	 * Informs if the security properties of any HID changed
+	 * because of change in the Backbone.
+	 * @param hidsToUpdate
+	 * @param properties
+	 */
+	public void updateSecurityProperties(List<HID> hidsToUpdate, List<SecurityProperty> properties);
+	
 }

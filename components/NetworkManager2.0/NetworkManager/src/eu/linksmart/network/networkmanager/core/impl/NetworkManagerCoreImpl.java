@@ -51,10 +51,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class
-			.getSimpleName();
+	.getSimpleName();
 	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
 	private static final String STARTING_MESSAGE = "Starting"
-			+ NETWORK_MGR_CORE;
+		+ NETWORK_MGR_CORE;
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
 	/** The name of the class implementing CryptoHID **/
@@ -127,7 +127,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				context.getBundleContext());
 		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
-				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
+		.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
 				this.myDescription) };
 
@@ -137,8 +137,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		// BackboneSOAPImpl.
 		try {
 			this.myHID = createHID(attributes, NETWORK_MGR_ENDPOINT,
-					"eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl")
-					.getHid();
+			"eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl")
+			.getHid();
 		} catch (RemoteException e) {
 			LOG.error(
 					"PANIC - RemoteException thrown on local access of own method",
@@ -181,7 +181,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		}
 		if (!backboneFound) {
 			throw new IllegalArgumentException(
-					"Required backbone not available");
+			"Required backbone not available");
 		}
 
 		// PID should be unique, if the PID is already used, throw exception
@@ -190,17 +190,19 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				HIDInfo hidInfo = getHIDByPID(attribute.getValue());
 				if (hidInfo != null) {
 					throw new IllegalArgumentException(
-							"PID already in use. Please choose a different one.");
+					"PID already in use. Please choose a different one.");
 				}
 			}
 		}
 
 		HIDInfo newHID = this.identityManager
-				.createHIDForAttributes(attributes);
+		.createHIDForAttributes(attributes);
 		List<SecurityProperty> properties = this.backboneRouter
-				.getBackboneSecurityProperties(backboneName);
-		// register HID with backbone policies in connection manager
-		this.connectionManager.registerHIDPolicy(newHID.getHid(), properties);
+		.getBackboneSecurityProperties(backboneName);
+		if(properties != null) {
+			// register HID with backbone policies in connection manager
+			this.connectionManager.registerHIDPolicy(newHID.getHid(), properties);
+		}
 		// add route to selected backbone
 		this.backboneRouter.addRouteToBackbone(newHID.getHid(), backboneName,
 				endpoint);
@@ -247,7 +249,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			} catch (Exception e) {
 				LOG.warn(
 						"Error getting connection for HIDs: "
-								+ senderHID.toString() + " " + myHID.toString(),
+						+ senderHID.toString() + " " + myHID.toString(),
 						e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
@@ -345,8 +347,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			} catch (Exception e) {
 				LOG.warn(
 						"Error getting connection for HIDs: "
-								+ senderHID.toString() + " "
-								+ receiverHID.toString(), e);
+						+ senderHID.toString() + " "
+						+ receiverHID.toString(), e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
 				response.setMessage("Error getting connection for HIDs: "
@@ -446,7 +448,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		byte[] data;
 		try {
 			data = this.connectionManager.getBroadcastConnection(senderHID)
-					.processMessage(message);
+			.processMessage(message);
 		} catch (Exception e) {
 			LOG.warn("Could not create packet from message from HID: "
 					+ message.getSenderHID(), e);
@@ -457,7 +459,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			return response;
 		}
 		NMResponse response = this.backboneRouter
-				.broadcastData(senderHID, data);
+		.broadcastData(senderHID, data);
 
 		return response;
 	}
@@ -541,14 +543,14 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			// repeat sending and receiving until security protocol is over
 			while (tempMessage != null
 					&& tempMessage
-							.getTopic()
-							.contentEquals(
-									CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
+					.getTopic()
+					.contentEquals(
+							CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
 				response = this.backboneRouter.sendDataSynch(senderHID,
 						receiverHID, connection.processMessage(tempMessage));
 				tempMessage = connection.processData(message.getReceiverHID(),
 						message.getSenderHID(), response.getMessage()
-								.getBytes());
+						.getBytes());
 			}
 		} catch (Exception e) {
 			LOG.warn("Could not create packet from message from HID: "
@@ -625,9 +627,11 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 		// add it to backbonesoap as this method is deprecated anyway
 		List<SecurityProperty> properties = this.backboneRouter
-				.getBackboneSecurityProperties(BACKBONE_SOAP);
-		// register HID with backbone policies in connection manager
-		this.connectionManager.registerHIDPolicy(hid, properties);
+		.getBackboneSecurityProperties(BACKBONE_SOAP);
+		if(properties != null) {
+			// register HID with backbone policies in connection manager
+			this.connectionManager.registerHIDPolicy(hid, properties);
+		}
 		// add route to selected backbone
 		this.backboneRouter.addRouteToBackbone(hid, BACKBONE_SOAP, endpoint);
 
@@ -662,9 +666,11 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 		// add it to backbonesoap as this method is deprecated anyway
 		List<SecurityProperty> properties = this.backboneRouter
-				.getBackboneSecurityProperties(BACKBONE_SOAP);
-		// register HID with backbone policies in connection manager
-		this.connectionManager.registerHIDPolicy(hid, properties);
+		.getBackboneSecurityProperties(BACKBONE_SOAP);
+		if(properties != null) {
+			// register HID with backbone policies in connection manager
+			this.connectionManager.registerHIDPolicy(hid, properties);
+		}
 		// add route to selected backbone
 		this.backboneRouter.addRouteToBackbone(hid, BACKBONE_SOAP, endpoint);
 
@@ -729,6 +735,16 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			boolean returnFirst, boolean isStrictRequest) {
 		return identityManager.getHIDByAttributes(
 				attributes, timeOut, returnFirst, isStrictRequest);
+	}
+
+	@Override
+	public void updateSecurityProperties(List<HID> hidsToUpdate,
+			List<SecurityProperty> properties) {
+		for(HID hid : hidsToUpdate) {
+			// register HID with backbone policies in connection manager
+			this.connectionManager.registerHIDPolicy(hid, properties);
+		}
+
 	}
 
 }

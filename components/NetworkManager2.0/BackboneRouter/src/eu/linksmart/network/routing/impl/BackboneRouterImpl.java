@@ -375,20 +375,17 @@ public class BackboneRouterImpl implements BackboneRouter {
 	}
 
 	/**
-	 * returns list of security properties available via a given backbone
-	 * necessary because we do not know what backbones we have, and there is no point in creating backbones on the fly to ask them
-	 * about the security types they provide
-	 * @param backbone A string with the (class)name of the backbone we are interested in. This must be loaded already
+	 * Returns list of security properties required via a given backbone.
+	 * @param backbone A string with the (class)name of the backbone we are interested in.
 	 * @return a list of security parameters configured for that backbone. See the backbone's parameters file and/or the configuraton interface for more details
+	 * ,null if backbone not available yet
 	 */
 	public List<SecurityProperty> getBackboneSecurityProperties(String backbone) {
-		ArrayList<SecurityProperty> answer = new ArrayList<SecurityProperty>();
 		if (!availableBackbones.containsKey(backbone)) {
-			logger.error("Requested backbone does not exist in availableBackbones: " + backbone);
-			return answer;
+			return null;
 		} else {
 			Backbone b = availableBackbones.get(backbone);
-			return b.getSecurityTypesAvailable();
+			return b.getSecurityTypesRequired();
 		}
 	}
 

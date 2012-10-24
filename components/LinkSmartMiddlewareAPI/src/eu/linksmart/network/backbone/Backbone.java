@@ -105,12 +105,12 @@ public interface Backbone {
 	
 	
 	/**
-	 * returns security types available by using this backbone implementation. 
+	 * Returns security types required by using this backbone implementation.
 	 * The security types are configured via the LS configuration interface.
 	 * See resources/BBJXTA.properties for details on configuration
-	 * @return a list of security types available
+	 * @return a list of security types required
 	 */
-	public List<SecurityProperty> getSecurityTypesAvailable();
+	public List<SecurityProperty> getSecurityTypesRequired();
 	
 	/**
 	 * 
