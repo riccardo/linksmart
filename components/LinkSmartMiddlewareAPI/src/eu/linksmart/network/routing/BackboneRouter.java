@@ -84,14 +84,14 @@ public interface BackboneRouter {
 
 	/**
 	 * Adds a new route to the BackboneRouter. This will succeed if (and only
-	 * if) a route to the HID does not exist yet and there is a backbone with
-	 * the given name.
+	 * if) a route to the HID does not exist yet. If the backbone is unavailable a potential route is registered, 
+	 * which becomes active as soon as the indicated backbone could be bound. 
 	 * 
 	 * @param hid
 	 *            the HID of which the route is added
 	 * @param backbone
 	 *            the Backbone through which the HID can be reached
-	 * @return whether adding the route was successful
+	 * @return whether adding the route was successful (at the moment it is only possible to have one route for an HID.
 	 * @see {@link getAvailableCommunicationChannels()}
 	 */
 	public boolean addRoute(HID hid, String backbone);
