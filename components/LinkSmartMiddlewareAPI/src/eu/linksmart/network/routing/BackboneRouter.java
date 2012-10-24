@@ -1,11 +1,10 @@
 package eu.linksmart.network.routing;
 
-import java.io.ObjectInputStream.GetField;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import eu.linksmart.network.HID;
-import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.security.communication.SecurityProperty;
@@ -167,5 +166,9 @@ public interface BackboneRouter {
 	 * @return "BackboneType:BackboneAddress"
 	 */
 	public String getRoute(HID hid);
+
+	Map<HID, Backbone> getCopyOfActiveRouteMap();
+
+	Map<HID, List<RouteEntry>> getCopyOfPotentialRouteMap();
 	
 }
