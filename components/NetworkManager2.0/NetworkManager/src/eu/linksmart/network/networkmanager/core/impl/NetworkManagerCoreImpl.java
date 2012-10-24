@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
@@ -171,18 +170,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	@Override
 	public HIDInfo createHID(Part[] attributes, String endpoint,
 			String backboneName) throws RemoteException {
-		// check if backbone exist before creating the HID
-		boolean backboneFound = false;
-		for (String backbone : this.backboneRouter.getAvailableBackbones()) {
-			if (backbone.equals(backboneName)) {
-				backboneFound = true;
-				break;
-			}
-		}
-		if (!backboneFound) {
-			throw new IllegalArgumentException(
-			"Required backbone not available");
-		}
 
 		// PID should be unique, if the PID is already used, throw exception
 		for (Part attribute : attributes) {
