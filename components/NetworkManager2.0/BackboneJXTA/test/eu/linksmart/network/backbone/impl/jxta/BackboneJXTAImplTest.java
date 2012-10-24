@@ -1,8 +1,11 @@
 package eu.linksmart.network.backbone.impl.jxta;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.net.DatagramPacket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Hashtable;
@@ -17,7 +20,6 @@ import org.junit.Test;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
-import static org.mockito.Mockito.*;
 
 /**
  * The tests cover only the one class. Calls to other classes are mocked
