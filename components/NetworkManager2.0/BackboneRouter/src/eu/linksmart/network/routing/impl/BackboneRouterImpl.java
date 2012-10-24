@@ -1,7 +1,6 @@
 package eu.linksmart.network.routing.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -18,39 +17,12 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
+import eu.linksmart.network.routing.RouteEntry;
 import eu.linksmart.security.communication.SecurityProperty;
 
 public class BackboneRouterImpl implements BackboneRouter {
 
-	public class RouteEntry {
-		
-		private String backboneName;
-		
-		private String endpoint;
-
-		public String getBackboneName() {
-			return backboneName;
-		}
-
-		public void setBackboneName(String backboneName) {
-			this.backboneName = backboneName;
-		}
-
-		public String getEndpoint() {
-			return endpoint;
-		}
-
-		public void setEndpoint(String endpoint) {
-			this.endpoint = endpoint;
-		}
-
-		public RouteEntry(String backboneName, String endpoint) {
-			super();
-			this.backboneName = backboneName;
-			this.endpoint = endpoint;
-		}
-
-	}
+	
 
 	private Logger logger = Logger
 	.getLogger(BackboneRouterImpl.class.getName());
@@ -66,8 +38,6 @@ public class BackboneRouterImpl implements BackboneRouter {
 	private Map<String, Backbone> availableBackbones = new ConcurrentHashMap<String, Backbone>();
 	private NetworkManagerCore nmCore;
 	
-	private String defaultRoute;
-
 	private static String BACKBONE_ROUTER = BackboneRouterImpl.class.getSimpleName();
 //	private static String ROUTING_JXTA = "JXTA";
 	BackboneRouterConfigurator configurator;
@@ -92,12 +62,12 @@ public class BackboneRouterImpl implements BackboneRouter {
 	protected void bindBackbone(Backbone backbone) {
 		
 		if(addBackbone(backbone)){		
-			movePotentialRoutesToActiveRoutes(backbone);
+			movePotentialToActiveRoutes(backbone);
 		}
 		
 	}
 
-	private void movePotentialRoutesToActiveRoutes(Backbone backbone) {
+	private void movePotentialToActiveRoutes(Backbone backbone) {
 		
 		synchronized(backboneAddingLock){
 			List<HID> movedHIDList = new ArrayList<HID>();
@@ -115,7 +85,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 					for(RouteEntry routeEntry : routeEntryList){
 							String backboneName = routeEntry.getBackboneName();
 							
-							if(backbone.getName().contains(backboneName)){
+							if((backbone.getName()!=null) && backbone.getName().contains(backboneName)){
 								
 								HID hid = (HID) entry.getKey();
 								
@@ -135,9 +105,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 				}
 				
 				//tell nmcore which hids have new securityproperties
-				nmCore.updateSecurityProperties(movedHIDList, backbone.getSecurityTypesRequired());
-				for(HID hid : movedHIDList){
-					potentialRouteMap.remove(hid);
+				if(backbone.getSecurityTypesRequired()!=null){
+					nmCore.updateSecurityProperties(movedHIDList, backbone.getSecurityTypesRequired());
+					for(HID hid : movedHIDList){
+						potentialRouteMap.remove(hid);
+					}
 				}
 			
 			}
@@ -343,7 +315,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@SuppressWarnings("rawtypes")
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(BackboneRouterConfigurator.COMMUNICATION_TYPE)) {
-			this.defaultRoute = (String) configurator.get(BackboneRouterConfigurator.COMMUNICATION_TYPE);
+			logger.info("default route: "+(String) configurator.get(BackboneRouterConfigurator.COMMUNICATION_TYPE));
 		}
 	}
 
@@ -405,7 +377,16 @@ public class BackboneRouterImpl implements BackboneRouter {
 	}
 
 	private boolean processAddingRoute(HID hid, String backboneName, String endpoint) {
+		
+		
+		
 		synchronized(backboneAddingLock){
+			
+			if(backboneName==null || backboneName.isEmpty())
+			{
+				return false;
+			}
+			
 			Backbone backbone = availableBackbones.get(backboneName);
 			
 			if (backbone == null) {
@@ -431,8 +412,8 @@ public class BackboneRouterImpl implements BackboneRouter {
 				}
 				
 			}
-			else{				
-								
+			else{	
+				
 				//Assign a backbone to the hid route
 				
 				if(activeRouteMap.containsKey(hid)){
@@ -475,14 +456,29 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public boolean addRouteToBackbone(HID hid, String backboneName,
 			String endpoint) {
+		
+		if(hid==null){
+			return false;
+		}
+		
+		if(endpoint==null || endpoint.isEmpty()){
+			return false;
+		}
+		
 		return processAddingRoute(hid, backboneName, endpoint);
 	}
 
 	@Override
 	public boolean removeRoute(HID hid, String backbone) {
-		synchronized (activeRouteMap) {
+		synchronized (backboneAddingLock) {
+			
+			if(potentialRouteMap.get(hid) !=null){
+				return (potentialRouteMap.remove(hid)!=null);
+			}
+			
 			if (activeRouteMap.get(hid) == null || 
 					!activeRouteMap.get(hid).getClass().getName().equals(backbone)) {
+				
 				return false;
 			}
 			activeRouteMap.remove(hid);
@@ -510,6 +506,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * @return whether the Backbone was added
 	 */
 	private boolean addBackbone(Backbone backbone) {
+		
+		if(backbone==null ){
+			return false;
+		}
+		
 		if (availableBackbones.containsValue(backbone)) {
 			return false;
 		}
@@ -530,6 +531,20 @@ public class BackboneRouterImpl implements BackboneRouter {
 			Backbone b = availableBackbones.get(backbone);
 			return b.getSecurityTypesRequired();
 		}
+	}
+
+	@Override
+	public Map<HID, Backbone> getCopyOfActiveRouteMap() {
+		HashMap<HID, Backbone> copiedMap = new HashMap<HID, Backbone>();
+		copiedMap.putAll(activeRouteMap);
+		return copiedMap;
+	}
+
+	@Override
+	public Map<HID, List<RouteEntry>> getCopyOfPotentialRouteMap() {
+		HashMap<HID, List<RouteEntry>> copiedMap = new HashMap<HID, List<RouteEntry>>();
+		copiedMap.putAll(potentialRouteMap);
+		return copiedMap;
 	}
 
 }

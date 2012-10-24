@@ -2,12 +2,12 @@ package eu.linksmart.network.routing.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import eu.linksmart.network.HID;
@@ -20,8 +20,7 @@ public class BackboneRouterImplTest {
 	private BackboneRouterImpl backboneRouter = new BackboneRouterImpl();
 	private HID receiverHID = new HID("354.453.455.323");
 	private HID senderHID = new HID("354.453.993.323");
-	
-	
+	private NetworkManagerCore networkManagerCore;
 	/**
 	 * Test sendDataSync of BackboneRouter. Backbone and route must be predefined.
 	 */
@@ -41,37 +40,25 @@ public class BackboneRouterImplTest {
 	}
 	
 	/**
-	 * Test sendDataSync of BackboneRouter. Backbone and route must not be predefined,
-	 * so that an IllegalArgumentException will be thrown as no backbone to sent 
-	 * the message to can be found.
+	 * Test sendDataSync of BackboneRouter. Route must not be predefined,
+	 * so that an NMResponse with status error is returned.
 	 */
 	@Test
-	public void testSendDataSyncWithException() {
-		// as the route was not set, there should be an exception
-		try {
-			backboneRouter.sendDataSynch(senderHID, receiverHID, new byte[]{});
-			fail("IllegalArgumentException should be thrown.");
-		} catch (IllegalArgumentException e) {
-			assertEquals("No Backbone found to reach HID " + receiverHID, 
-					e.getMessage());
-		}
+	public void testSendDataSyncWithUndefinedRoute() {
+		NMResponse nmResponse = backboneRouter.sendDataSynch(senderHID, receiverHID, new byte[]{});
+		assertEquals("Currently the backbone that is assigned to this HID is not available.", nmResponse.getMessage());
+		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
 	/**
 	 * Test sendDataSync of BackboneRouter. Backbone and route must not be predefined,
-	 * so that an IllegalArgumentException will be thrown as no backbone to sent 
-	 * the message to can be found.
+	 * an according NMResponse will be sent.
 	 */
 	@Test
-	public void testSendDataSyncSendNullWithException() {
-		// as the route was not set, there should be an exception
-		try {
-			backboneRouter.sendDataSynch(senderHID, null, new byte[]{});
-			fail("IllegalArgumentException should be thrown.");
-		} catch (IllegalArgumentException e) {
-			assertEquals("No Backbone found to reach HID " + null, 
-					e.getMessage());
-		}
+	public void testSendDataSyncSendNullForReceiverHID() {
+		NMResponse nmResponse = backboneRouter.sendDataSynch(senderHID, null, new byte[]{});
+		assertEquals("Currently the backbone that is assigned to this HID is not available.", nmResponse.getMessage());
+		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
 	/**
@@ -97,19 +84,14 @@ public class BackboneRouterImplTest {
 	
 	/**
 	 * Test sendDataAsync of BackboneRouter. Backbone and route must not be predefined,
-	 * so that an IllegalArgumentException will be thrown as no backbone to sent 
-	 * the message to can be found.
+	 * so that an NM Response with status error is returned.
 	 */
 	@Test
-	public void testSendDataAsyncWithException() {
+	public void testSendDataAsyncWithUndefinedRoute() {
 		// as the route was not set, there should be an exception
-		try {
-			backboneRouter.sendDataAsynch(senderHID, receiverHID, new byte[]{});
-			fail("IllegalArgumentException should be thrown.");
-		} catch (IllegalArgumentException e) {
-			assertEquals("No Backbone found to reach HID " + receiverHID, 
-					e.getMessage());
-		}
+		NMResponse nmResponse = backboneRouter.sendDataAsynch(senderHID, receiverHID, new byte[]{});
+		assertEquals("Currently the backbone that is assigned to this HID is not available.", nmResponse.getMessage());
+		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
 	/**
@@ -122,7 +104,6 @@ public class BackboneRouterImplTest {
 		backboneRouter.bindBackbone(backbone);
 		backboneRouter.addRoute(senderHID, backbone.getClass().getName());
 		
-		NetworkManagerCore networkManagerCore = mock(NetworkManagerCore.class);
 		backboneRouter.bindNMCore(networkManagerCore);
 		when(networkManagerCore.receiveDataSynch(
 					eq(senderHID), eq(receiverHID), any(byte[].class))).
@@ -323,6 +304,12 @@ public class BackboneRouterImplTest {
 				NMResponse.STATUS_ERROR, response.getStatus());
 	}
 	
+	// Set mock data for tests
+    @Before
+    public void setUp(){   
+    	networkManagerCore = mock(NetworkManagerCore.class);
+    }
+	
 	/**
 	 * Tests method addRouteToBackbone. As all parameters are set, the call 
 	 * should return true.
@@ -367,8 +354,7 @@ public class BackboneRouterImplTest {
 	}
 	
 	/**
-	 * Tests method addRouteToBackbone. As backbone name is null, the call 
-	 * should return false.
+	 * Tests method addRouteToBackbone. As the backbone name is null, the call should return false.
 	 */
 	@Test
 	public void testAddRouteToBackboneBackboneNull() {
@@ -376,10 +362,12 @@ public class BackboneRouterImplTest {
 		String endpoint = "endpoint";
 		
 		// call method to test
-		boolean successful = backboneRouter.addRouteToBackbone(
+		boolean successful = 
+				backboneRouter.addRouteToBackbone(
 				senderHID, 
 				null, 
 				endpoint);
+				
 		// check results
 		assertEquals("Adding the backbone should fail.", 
 				false, successful);
@@ -400,43 +388,6 @@ public class BackboneRouterImplTest {
 				senderHID, 
 				backbone.getClass().getName(), 
 				null);
-		// check results
-		assertEquals("Adding the backbone should fail.", 
-				false, successful);
-	}
-	
-	/**
-	 * Tests method addRouteToBackbone. All parameters are set, but there will 
-	 * be an error adding the endpoint to the backbone and therefore the 
-	 * method-call should return false.
-	 */
-	@Test
-	public void testAddRouteToBackboneEnpointFailure() {
-		// set up
-		Backbone backbone = mock(Backbone.class);
-		backboneRouter.bindBackbone(backbone);
-
-		// call method to test
-		boolean successful = backboneRouter.addRouteToBackbone(
-				senderHID, 
-				backbone.getClass().getName(), 
-				"Endpoint");
-		// check results
-		assertEquals("Adding the backbone should fail.", 
-				false, successful);
-	}
-	
-	/**
-	 * Tests method addRouteToBackbone. As there is no entry in 
-	 * 'availableBackbones', the call should return false.
-	 */
-	@Test
-	public void testAddRouteToBackboneNotAvailable() {
-		// call method to test
-		boolean successful = backboneRouter.addRouteToBackbone(
-				senderHID, 
-				"BackboneName", 
-				"Endpoint");
 		// check results
 		assertEquals("Adding the backbone should fail.", 
 				false, successful);
@@ -471,6 +422,103 @@ public class BackboneRouterImplTest {
 	}
 	
 	/**
+	 * Tests method addRouteToBackbone. Although, no backbone is bound yet, the route should be added as a potential route.
+	 */
+	@Test
+	public void testAddingPotentialRoute() {
+		// set up
+		String endpoint = "endpoint";
+		Backbone backbone = mock(Backbone.class);
+//		backboneRouter.bindBackbone(backbone);
+		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+						
+		
+//		//Activate move
+		boolean successfulFirst = backboneRouter.addRouteToBackbone(
+				senderHID, 
+				"BackboneSOAPImpl", 
+				endpoint);
+
+		assertEquals("Adding the route without an available backbone should not fail.", 
+				true, successfulFirst);
+		
+		int potentialRouteMapSize= backboneRouter.getCopyOfPotentialRouteMap().size();
+		int activeRouteMapSize = backboneRouter.getCopyOfActiveRouteMap().size();
+		assertEquals(true, potentialRouteMapSize>0);
+		assertEquals(false, activeRouteMapSize>0);
+	}
+	
+	/**
+	 * Tests method addRouteToBackbone. Although, no backbone is bound yet, the first route should be added as a potential route, but the second try should return false
+	 */
+	@Test
+	public void testAddingPotentialRouteWithAlreadyRegisteredHID() {
+		// set up
+		String endpoint = "endpoint";
+		Backbone backbone = mock(Backbone.class);
+//		backboneRouter.bindBackbone(backbone);
+		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+						
+		
+		//Activate move
+		boolean successfulFirst = backboneRouter.addRouteToBackbone(
+				senderHID, 
+				"BackboneSOAPImpl", 
+				endpoint);
+
+		assertEquals("Adding the route without an available backbone should not fail.", 
+				true, successfulFirst);
+		
+		boolean successfulSecond = backboneRouter.addRouteToBackbone(
+				senderHID, 
+				"BackboneSOAPImpl", 
+				endpoint);
+
+		assertEquals("Adding the route without an available backbone with the previous HID should fail.", 
+				false, successfulSecond);
+
+	}
+	
+	/**
+	 * Tests method addRouteToBackbone. 
+	 * Although, no backbone is bound yet, the first route should be added as a potential route. 
+	 * As soon as the backbone is bound, the potential route should become an active.
+	 */
+	@Test
+	public void testMovingPotentialToActiveRoutes() {
+		// set up
+		String endpoint = "endpoint";
+		Backbone backbone = mock(Backbone.class);
+		when(backbone.getName()).thenReturn("BackboneSOAPImpl");
+		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+
+		backboneRouter.bindNMCore(networkManagerCore);
+		
+		//Activate move
+		boolean successfulFirst = backboneRouter.addRouteToBackbone(
+				senderHID, 
+				"BackboneSOAPImpl", 
+				endpoint);
+
+		assertEquals("Adding the route without an available backbone should not fail.", 
+				true, successfulFirst);
+		
+		int potentialRouteMapSize= backboneRouter.getCopyOfPotentialRouteMap().size();
+		int activeRouteMapSize = backboneRouter.getCopyOfActiveRouteMap().size();
+		assertEquals(true, potentialRouteMapSize>0);
+		assertEquals(false, activeRouteMapSize>0);
+		
+		backboneRouter.bindBackbone(backbone);
+		
+				
+		potentialRouteMapSize= backboneRouter.getCopyOfPotentialRouteMap().size();
+		activeRouteMapSize = backboneRouter.getCopyOfActiveRouteMap().size();
+		assertEquals(false, potentialRouteMapSize>0);
+		assertEquals(true, activeRouteMapSize>0);
+
+	}
+	
+	/**
 	 * Tests method removeRoute. As the route was not saved prior to the
 	 * removal, the method under test should return false. 
 	 */
@@ -487,7 +535,7 @@ public class BackboneRouterImplTest {
 	 * Tests method removeRoute. 
 	 */
 	@Test
-	public void testRemoveRoute() {
+	public void testRemovePotentialRoute() {
 		// set up
 		String endpoint = "endpoint";
 		Backbone backbone = mock(Backbone.class);
