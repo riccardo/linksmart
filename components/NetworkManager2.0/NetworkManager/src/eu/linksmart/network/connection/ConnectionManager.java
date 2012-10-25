@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
@@ -29,10 +30,6 @@ public class ConnectionManager {
 	 */
 	private List<Connection> connections = new ArrayList<Connection>();
 	/**
-	 * Designated broadcast connection.
-	 */
-	private Connection broadcastConnection = null;
-	/**
 	 * Number of minutes a connection can at least live after last use.
 	 */
 	private int timeoutMinutes = 30;
@@ -50,6 +47,12 @@ public class ConnectionManager {
 	 */
 	private ArrayList<CommunicationSecurityManager> communicationSecurityManagers = 
 		new ArrayList<CommunicationSecurityManager>();
+
+	/**
+	 * Used to avoid access and change of policies
+	 */
+	private Object policyModificationLock = new Object();
+
 	private HID nmHID = null;;
 
 
@@ -73,7 +76,26 @@ public class ConnectionManager {
 	 * @param regulatedHID 
 	 */
 	public void registerHIDPolicy(HID regulatedHID, List<SecurityProperty> properties){
-		this.hidPolicies.put(regulatedHID, properties);
+		synchronized(policyModificationLock){
+			/*remove all connections which have this hid*/
+			List<Connection> toRemove = new ArrayList<Connection>();
+			//find the relevant connections
+			for(Connection con : connections) {
+				if(con.getServerHID().equals(regulatedHID) 
+						|| (!(con instanceof BroadcastConnection) 
+								&& con.getServerHID().equals(regulatedHID))) {
+					toRemove.add(con);
+				}
+			}
+			if(toRemove.size() != 0) {
+				//remove collected connections
+				for(Connection con : toRemove) {
+					deleteConnection(con);
+				}
+			}
+			//add new policy
+			this.hidPolicies.put(regulatedHID, properties);
+		}
 	}
 
 	/**
@@ -113,58 +135,61 @@ public class ConnectionManager {
 			timeouts.put(conn, cal.getTime());
 		}
 
-		//there was no connection found so create new connection
-		//policies only apply for connections between this NM and other entity
-		List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
-		if(receiverHID.equals(nmHID) || senderHID.equals(nmHID)) {
-			//get hid of remote entity
-			HID remoteHID = nmHID.equals(receiverHID)? senderHID : receiverHID;
-			//check if there are policies for the HID
-			if(this.hidPolicies.containsKey(remoteHID)){
-				//add policies to requirement list
-				policies = hidPolicies.get(remoteHID);
-			}
+		//policies should not be changed while reading them
+		synchronized(policyModificationLock) {
+			//there was no connection found so create new connection
+			//policies only apply for connections between this NM and other entity
+			List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
+			if(receiverHID.equals(nmHID) || senderHID.equals(nmHID)) {
+				//get hid of remote entity
+				HID remoteHID = nmHID.equals(receiverHID)? senderHID : receiverHID;
+				//check if there are policies for the HID
+				if(this.hidPolicies.containsKey(remoteHID)){
+					//add policies to requirement list
+					policies = hidPolicies.get(remoteHID);
+				}
 
-			//check if requirements are not colliding
-			boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
-			boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
-			boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
-			//if there are more requirements and noEnc or noSec is included it must be colliding
-			if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
-				throw new Exception("Colliding policies for HIDs");
-			}
-		}
-
-		//if there was no connection that means that the sender is the client and the receiver is the server
-		//check if an active connection or a dummy connectin is needed
-		Connection conn = null;
-		if(policies.contains(SecurityProperty.NoEncoding)) {
-			conn = new NOPConnection(senderHID, receiverHID);
-		} else {
-			conn = new Connection(senderHID, receiverHID);
-		}
-
-		boolean foundComSecMgr = false;
-		if (!this.communicationSecurityManagers.isEmpty()) {
-			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
-				if (matchingPolicies(policies, comSecMgr.getProperties())){
-					conn.setCommunicationSecMgr(comSecMgr);
-					foundComSecMgr = true;
-					break;
+				//check if requirements are not colliding
+				boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
+				boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
+				boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
+				//if there are more requirements and noEnc or noSec is included it must be colliding
+				if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
+					throw new Exception("Colliding policies for HIDs");
 				}
 			}
-		}
-		if (!foundComSecMgr 
-				&& policies.size() != 0 
-				&& !policies.contains(SecurityProperty.NoSecurity)) {
-			//no available communication security manager although required
-			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
-		}
-		//add connection to list
-		connections.add(conn);
-		timeouts.put(conn, cal.getTime());
 
-		return conn;
+			//if there was no connection that means that the sender is the client and the receiver is the server
+			//check if an active connection or a dummy connectin is needed
+			Connection conn = null;
+			if(policies.contains(SecurityProperty.NoEncoding)) {
+				conn = new NOPConnection(senderHID, receiverHID);
+			} else {
+				conn = new Connection(senderHID, receiverHID);
+			}
+
+			boolean foundComSecMgr = false;
+			if (!this.communicationSecurityManagers.isEmpty()) {
+				for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
+					if (matchingPolicies(policies, comSecMgr.getProperties())){
+						conn.setCommunicationSecMgr(comSecMgr);
+						foundComSecMgr = true;
+						break;
+					}
+				}
+			}
+			if (!foundComSecMgr 
+					&& policies.size() != 0 
+					&& !policies.contains(SecurityProperty.NoSecurity)) {
+				//no available communication security manager although required
+				throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
+			}
+			//add connection to list
+			connections.add(conn);
+			timeouts.put(conn, cal.getTime());
+
+			return conn;
+		}
 	}
 
 	/**
@@ -186,7 +211,7 @@ public class ConnectionManager {
 		}
 
 		//FIXME broadcast messages and policies have to be re-thought
-		
+
 		//there was no connection found so create new connection	
 		List<SecurityProperty> policies = null;
 		if(!senderHID.equals(nmHID)) {
@@ -253,6 +278,15 @@ public class ConnectionManager {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Removes connection and its references in timeout.
+	 * @param con
+	 */
+	private void deleteConnection(Connection con) {
+		connections.remove(con);
+		timeouts.remove(con);
 	}
 
 	/**

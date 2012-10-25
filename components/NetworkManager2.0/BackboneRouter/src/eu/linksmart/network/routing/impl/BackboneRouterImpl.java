@@ -141,10 +141,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 						
 					}
 					
-					for(HID hid : toBeRemovedHIDList){
-						activeRouteMap.remove(hid);
-					}
 					
+				}
+
+				for(HID hid : toBeRemovedHIDList){
+					activeRouteMap.remove(hid);
 				}
 			}
 		}
