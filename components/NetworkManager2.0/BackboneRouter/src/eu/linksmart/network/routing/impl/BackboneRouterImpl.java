@@ -121,7 +121,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	private void removeActiveRoutes(Backbone backbone){
 		
 		synchronized (backboneAddingLock) {
-			List<HID> toBeRemovedHIDList = new ArrayList<HID>();
+			List<HID> obsoleteHIDList = new ArrayList<HID>();
 			
 			if(!activeRouteMap.isEmpty()){
 				logger.debug("Removing active routes reachable over unbound backbone " + backbone.getName());
@@ -137,14 +137,14 @@ public class BackboneRouterImpl implements BackboneRouter {
 						
 						HID hid = (HID) entry.getKey();
 												
-						toBeRemovedHIDList.add(hid);
+						obsoleteHIDList.add(hid);
 						
 					}
 					
 					
 				}
 
-				for(HID hid : toBeRemovedHIDList){
+				for(HID hid : obsoleteHIDList){
 					activeRouteMap.remove(hid);
 				}
 			}
