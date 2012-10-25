@@ -519,6 +519,51 @@ public class BackboneRouterImplTest {
 	}
 	
 	/**
+	 * Tests method addRouteToBackbone. 
+	 * Although, no backbone is bound yet, the first route should be added as a potential route. 
+	 * As soon as the backbone is bound, the potential route should become an active.
+	 */
+	@Test
+	public void testRemovingActiveRoutes() {
+		// set up
+		String endpoint = "endpoint";
+		Backbone backbone = mock(Backbone.class);
+		when(backbone.getName()).thenReturn("BackboneSOAPImpl");
+		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+
+		backboneRouter.bindNMCore(networkManagerCore);
+		
+		//Activate move
+		boolean successfulFirst = backboneRouter.addRouteToBackbone(
+				senderHID, 
+				"BackboneSOAPImpl", 
+				endpoint);
+
+		assertEquals("Adding the route without an available backbone should not fail.", 
+				true, successfulFirst);
+		
+		int potentialRouteMapSize= backboneRouter.getCopyOfPotentialRouteMap().size();
+		int activeRouteMapSize = backboneRouter.getCopyOfActiveRouteMap().size();
+		assertEquals(true, potentialRouteMapSize>0);
+		assertEquals(false, activeRouteMapSize>0);
+		
+		backboneRouter.bindBackbone(backbone);
+		
+				
+		potentialRouteMapSize= backboneRouter.getCopyOfPotentialRouteMap().size();
+		activeRouteMapSize = backboneRouter.getCopyOfActiveRouteMap().size();
+		assertEquals(false, potentialRouteMapSize>0);
+		assertEquals(true, activeRouteMapSize>0);
+		
+		backboneRouter.unbindBackbone(backbone);
+		
+		activeRouteMapSize = backboneRouter.getCopyOfActiveRouteMap().size();
+		assertEquals(false, activeRouteMapSize>0);
+		
+
+	}
+	
+	/**
 	 * Tests method removeRoute. As the route was not saved prior to the
 	 * removal, the method under test should return false. 
 	 */
