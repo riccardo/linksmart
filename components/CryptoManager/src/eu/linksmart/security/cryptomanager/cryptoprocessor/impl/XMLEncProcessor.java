@@ -90,8 +90,8 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 			.getName());
 	private KeyStore ks = KeyManagerImpl.getInstance().getKeystore();
 	private Hashtable<String, Key> keyCache = new Hashtable<String, Key>();
-	private static final String PRIVATE_SIGNING_KEY_ALIAS = "hydrademo-rsa";
-	private static final String PRIVATE_SIGNING_KEY_PASS = "hydrademo";
+	private static final String PRIVATE_SIGNING_KEY_ALIAS = "linksmartdemo-rsa";
+	private static final String PRIVATE_SIGNING_KEY_PASS = "linksmartdemo";
 	private static final String ENCRYPTED_MESSAGE_NAMESPACE =
 		"http://linksmart.eu/ns/security";
 	private static final String ENCRYPTED_MESSAGE_NAME =
@@ -212,7 +212,7 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 					logger.warn("No private key for HID "
 							+ receiverHID
 							+ " available. Trying to use the default key for decrypting the message. This is potentially insecure and happens if a non-Crypto-HID communicates.");
-					receiverCertRef = "hydrademo_identifier";
+					receiverCertRef = "linksmartdemo_identifier";
 					KeyManagerImpl.getInstance().addPrivateKeyForHID(
 							receiverHID, receiverCertRef);
 				}
@@ -298,7 +298,7 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 			logger.warn("Request to encrypt for HID "
 					+ receiverHid
 					+ " but no public key is available for this HID. Trying to continue using the default key but this is probably an error.");
-			identifier = "hydrademo_identifier";
+			identifier = "linksmartdemo_identifier";
 			KeyManagerImpl.getInstance().addPrivateKeyForHID(receiverHid,
 					identifier);
 		}
@@ -390,7 +390,7 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 				logger.warn("Request to encrypt for HID "
 						+ identifier
 						+ " but no public key is available for this HID. Trying to continue using the default key but this is probably an error.");
-				certIdentifier = "hydrademo_identifier";
+				certIdentifier = "linksmartdemo_identifier";
 				KeyManagerImpl.getInstance().addPrivateKeyForHID(identifier, certIdentifier);
 			}
 		}

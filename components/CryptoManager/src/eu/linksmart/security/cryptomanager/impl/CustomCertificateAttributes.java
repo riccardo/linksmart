@@ -49,10 +49,10 @@ public class CustomCertificateAttributes {
 	private Properties certificateAttributes;
 	private final static Logger logger = Logger
 			.getLogger(CustomCertificateAttributes.class.getName());
-	private static final String DEFAULT_PSEUDONYM = "hydraPseudonym";
+	private static final String DEFAULT_PSEUDONYM = "linksmartPseudonym";
 	private static final String DEFAULT_DN_QUALIFIER =
 			"eu.linksmart.security";
-	private static final String DEFAULT_DN = "Hydratest";
+	private static final String DEFAULT_DN = "LinkSmarttest";
 	private static final String DEFAULT_D = "DE";
 
 	private CustomCertificateAttributes() {

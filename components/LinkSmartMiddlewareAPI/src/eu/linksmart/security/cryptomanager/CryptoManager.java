@@ -15,7 +15,7 @@
 package eu.linksmart.security.cryptomanager;
 
 /**
- * Interface for Crypto Management in Hydra.
+ * Interface for Crypto Management in LinkSmart.
  * 
  * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @see {@link KeyManager}, {@link CryptoMessageFormatProcessor}

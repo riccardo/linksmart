@@ -328,7 +328,7 @@ public class BackboneSOAPImpl implements Backbone {
 				+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
 				+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
 				+ "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-				+ "<soap:Body><SendDataResponse xmlns=\"http://se.cnet.hydra/\">"
+				+ "<soap:Body><SendDataResponse xmlns=\"http://eu.linksmart/\">"
 				+ "<SendDataResult>" + msg + "</SendDataResult>"
 				+ "</SendDataResponse></soap:Body></soap:Envelope>";
 	}

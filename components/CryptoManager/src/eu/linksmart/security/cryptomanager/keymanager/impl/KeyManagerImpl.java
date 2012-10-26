@@ -104,7 +104,7 @@ public class KeyManagerImpl implements KeyManager {
 	private static KeyManagerImpl instance;
 	private final static Logger logger = Logger.getLogger(KeyManagerImpl.class
 			.getName());
-	private static final String PRIVATE_ENCRYPTION_KEY_PASS = "hydrademo";
+	private static final String PRIVATE_ENCRYPTION_KEY_PASS = "linksmartdemo";
 	private static int CACHE_SIZE = 10;
 	/**	 Unique random salt for LinkSmart. */
 	private static String KEY_DERIVATION_SALT = "52EA39FD2857E2C85EE291DA02BBC0708D1A3D26E83FBF1522B753A7086AA314";

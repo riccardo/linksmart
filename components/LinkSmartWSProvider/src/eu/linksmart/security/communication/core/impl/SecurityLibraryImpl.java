@@ -157,8 +157,8 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 
 	/**
 	 * Creates a new instance of the SecurityLibrary that will use the default
-	 * key alias for Core Hydra communication. If the keystore file could not be
-	 * opened or the default Core Hydra key alias is not present, an exception
+	 * key alias for Core Sec communication. If the keystore file could not be
+	 * opened or the default Core Sec key alias is not present, an exception
 	 * will be thrown.
 	 * 
 	 * @throws IOException
@@ -351,7 +351,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 				// load the keystore
 				ks.load(fis, KEYSTORE_PASS.toCharArray());
 				if (!ks.containsAlias(CORE_ENC_KEY_ALIAS)) {
-					logger.error("Keystore does not contain alias for Core Hydra: " + CORE_ENC_KEY_ALIAS);
+					logger.error("Keystore does not contain alias for Core Sec: " + CORE_ENC_KEY_ALIAS);
 					throw new Exception("Keystore does not contain alias for Core LinkSmart: " + CORE_ENC_KEY_ALIAS);
 				}
 
@@ -437,7 +437,7 @@ public class SecurityLibraryImpl implements SecurityLibrary {
 			Document document = db.parse(bis);
 
 			/*
-			 * Check if it's a Hydra message
+			 * Check if it's a LS message
 			 */
 
 			if (document.getElementsByTagName(CORE_PROTECTED_MESSAGE_NAME).getLength() != 1) {
