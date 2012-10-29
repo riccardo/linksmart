@@ -20,6 +20,8 @@ import eu.linksmart.remote.service.store.LinkSmartRemoteServiceStore;
 public class LinkSmartRemoteServiceStoreImpl implements
 		LinkSmartRemoteServiceStore {
 
+	public final static String NETWORK_MANAGER_ADDRESS = "http://localhost:8082";
+
 	private class GetRemoteServiceByDescriptionHelper {
 
 		private String serviceDescription;
@@ -47,7 +49,7 @@ public class LinkSmartRemoteServiceStoreImpl implements
 
 				if (StringUtils.isNotEmpty(serviceHID)) {
 
-					String targetUrl4HydraService = "http://localhost:8082/SOAPTunneling/0"
+					String targetUrl4HydraService = NETWORK_MANAGER_ADDRESS + "/SOAPTunneling/0"
 							+ "/" + serviceHID + "/0/hola";
 					LOG.debug("TargetURL for service with pid "
 							+ serviceDescription + " : "
@@ -130,7 +132,7 @@ public class LinkSmartRemoteServiceStoreImpl implements
 
 				if (StringUtils.isNotEmpty(serviceHID)) {
 
-					String targetUrl4HydraService = "http://localhost:8082/SOAPTunneling/0"
+					String targetUrl4HydraService = NETWORK_MANAGER_ADDRESS + "/SOAPTunneling/0"
 							+ "/" + serviceHID + "/0/hola";
 					LOG.debug("TargetURL for service with pid " + servicePID
 							+ " : " + targetUrl4HydraService);
@@ -199,8 +201,7 @@ public class LinkSmartRemoteServiceStoreImpl implements
 			.getSimpleName();
 	private static final String OSGI_SERVICE_HTTP_PORT = System
 			.getProperty("org.osgi.service.http.port");
-	private static final String AXIS_SERVICES_PATH = "http://localhost:"
-			+ OSGI_SERVICE_HTTP_PORT + "/axis/services/";
+	private static final String AXIS_SERVICES_PATH = NETWORK_MANAGER_ADDRESS + "/axis/services/";
 
 	private RemoteWSClientProvider remoteWSClientProvider;
 	private NetworkManagerApplication networkManager;
@@ -305,7 +306,7 @@ public class LinkSmartRemoteServiceStoreImpl implements
 			networkManager = (NetworkManagerApplication) remoteWSClientProvider
 					.getRemoteWSClient(
 							NetworkManagerApplication.class.getName(),
-							"http://localhost:8082/axis/services/NetworkManagerApplication",
+		NETWORK_MANAGER_ADDRESS + 					"/axis/services/NetworkManagerApplication",
 							false);
 		} catch (Exception e) {
 			LOG.error(
