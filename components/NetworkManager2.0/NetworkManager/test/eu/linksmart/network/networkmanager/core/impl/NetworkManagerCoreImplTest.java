@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.linksmart.network.HID;
+import eu.linksmart.network.HIDAttribute;
 import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
@@ -27,6 +28,7 @@ import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.connection.NOPConnection;
 import eu.linksmart.network.identity.IdentityManager;
+import eu.linksmart.network.networkmanager.core.impl.NetworkManagerCoreImpl;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.utils.Part;
 
@@ -345,36 +347,6 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests getHIDByAttribute with a conjunction 
-	 */
-	@Test
-	public void testGetHIDByAttributesConjunction() {
-		Part[] attributes = new Part[]{
-				new Part("description", "description"), 
-				new Part("PID", "Unique PID")};
-		String query = ("(description==description)&&(PID==Unique PID)");
-		
-		HIDInfo[] foundHIDInfos = nmCoreImpl.getHIDByAttributes(attributes);
-		verify(nmCoreImpl.identityManager).getHIDsByAttributes(query);
-		assertNotNull(foundHIDInfos);
-	}
-	
-	/**
-	 * Tests getHIDByAttribute with a disjunction 
-	 */
-	@Test
-	public void testGetHIDByAttributesDisjunction() {
-		Part[] attributes = new Part[] { 
-				new Part("DESCRIPTION", "description"), 
-				new Part("PID", "Unique PID")};
-		String query = ("(DESCRIPTION==description)||(PID==Unique PID)");
-		
-		HIDInfo[] foundHIDInfos = nmCoreImpl.getHIDByAttributes(attributes, false);
-		verify(nmCoreImpl.identityManager).getHIDsByAttributes(query);
-		assertNotNull(foundHIDInfos);
-	}
-	
-	/**
 	 * Tests getHIDByDescription
 	 */
 	@Test
@@ -383,8 +355,11 @@ public class NetworkManagerCoreImplTest {
 		String query = ("(DESCRIPTION==description)");
 		
 		HIDInfo[] foundHIDInfos = nmCoreImpl.getHIDByDescription(description);
-		verify(nmCoreImpl.identityManager).getHIDsByAttributes(query);
-		assertNotNull(foundHIDInfos);
+		verify(nmCoreImpl.identityManager).getHIDByAttributes(new Part[]{
+				new Part(HIDAttribute.DESCRIPTION.name(), description)},
+				IdentityManager.HID_RESOLVE_TIMEOUT,
+				false,
+				false);
 	}
 	
 	/**
@@ -394,13 +369,16 @@ public class NetworkManagerCoreImplTest {
 	public void testGetHIDByPID() {
 		String PID = "Unique PID";
 		String query = ("(PID==Unique PID)");
-		Set<HIDInfo> infos = new HashSet<HIDInfo>();
-		infos.add(new HIDInfo(new HID(), new Part[0]));
-		when(nmCoreImpl.identityManager.getHIDsByAttributes(query)).thenReturn(infos);
+		HIDInfo[] infos = new HIDInfo[1];
+		infos[0] = new HIDInfo(new HID(), new Part[0]);
+		when(nmCoreImpl.identityManager.getHIDByAttributes(
+				new Part[]{new Part(HIDAttribute.PID.name(), PID)},
+				IdentityManager.HID_RESOLVE_TIMEOUT,
+				false,
+				false)).thenReturn(infos);
 		
 		HIDInfo foundHIDInfo = nmCoreImpl.getHIDByPID(PID);
-		verify(nmCoreImpl.identityManager).getHIDsByAttributes(query);
-		assertNotNull(foundHIDInfo);
+		assertEquals(infos[0].getHid(), foundHIDInfo.getHid());
 	}
 	
 	/**
@@ -412,10 +390,14 @@ public class NetworkManagerCoreImplTest {
 		String query = ("(PID==Unique PID)");
 		
 		// Return more than one HID so that an exception is thrown
-		Set<HIDInfo> infos = new HashSet<HIDInfo>();
-		infos.add(new HIDInfo(new HID(), new Part[0]));
-		infos.add(new HIDInfo(new HID(), new Part[0]));
-		when(nmCoreImpl.identityManager.getHIDsByAttributes(query)).thenReturn(infos);
+		HIDInfo[] infos = new HIDInfo[2];
+		infos[0] = new HIDInfo(new HID(), new Part[0]);
+		infos[1] = new HIDInfo(new HID(), new Part[0]);
+		when(nmCoreImpl.identityManager.getHIDByAttributes(
+				new Part[]{new Part(HIDAttribute.PID.name(), PID)},
+				IdentityManager.HID_RESOLVE_TIMEOUT,
+				false,
+				false)).thenReturn(infos);
 		
 		try {
 			nmCoreImpl.getHIDByPID(PID);
@@ -426,7 +408,6 @@ public class NetworkManagerCoreImplTest {
 			// Check if an exception with the right message was thrown
 			assertEquals("More than one hid found to passed PID", e.getMessage());
 		}
-		verify(nmCoreImpl.identityManager).getHIDsByAttributes(query);
 	}
 	
 	/**
@@ -449,18 +430,6 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests getHIDByQuery
-	 */
-	@Test
-	public void testGetHIDByQuery() {
-		String query = ("(PID==Unique PID)");
-		
-		HIDInfo[] foundHIDInfo = nmCoreImpl.getHIDByQuery(query);
-		verify(nmCoreImpl.identityManager).getHIDsByAttributes(query);
-		assertNotNull(foundHIDInfo);
-	}
-	
-	/**
 	 * Tests createHID and checks if a HIDInfo object is returned.
 	 */
 	@Test
@@ -470,10 +439,10 @@ public class NetworkManagerCoreImplTest {
 				new Part("DESCRIPTION", "description"), 
 				new Part("PID", "Unique PID")};
 		String backboneName = "backbone1";
-		List<String> availableBackbones = new ArrayList<String>();
-		availableBackbones.add(backboneName);
-		when(nmCoreImpl.backboneRouter.getAvailableBackbones()).
-			thenReturn(availableBackbones);
+		when(nmCoreImpl.identityManager.getHIDByAttributes(
+				new Part[]{attributes[1]},
+				IdentityManager.HID_RESOLVE_TIMEOUT,
+				false, false)).thenReturn(new HIDInfo[0]);
 		when(nmCoreImpl.identityManager.createHIDForAttributes(attributes)).
 			thenReturn(new HIDInfo(new HID(), attributes));
 		
@@ -494,22 +463,20 @@ public class NetworkManagerCoreImplTest {
 	@Test
 	public void testCreateHIDWithException() {
 		String endpoint = "for test not important";
+		String backboneName = "backbone1";
 		Part[] attributes = new Part[] { 
 				new Part("DESCRIPTION", "description"), 
 				new Part("PID", "Unique PID")};
-		String backboneName = "backbone1";
 		
 		HIDInfo hidInfo = new HIDInfo(new HID(), attributes);
-		Set<HIDInfo> returnedHIDInfos = new HashSet<HIDInfo>();
-		returnedHIDInfos.add(hidInfo);
+		HIDInfo[] returnedHIDInfos = new HIDInfo[1];
+		returnedHIDInfos[0] = hidInfo;
 		
-		List<String> availableBackbones = new ArrayList<String>();
-		availableBackbones.add(backboneName);
-		
-		when(nmCoreImpl.backboneRouter.getAvailableBackbones()).
-			thenReturn(availableBackbones);
 		// "returning" that PID already exists
-		when(nmCoreImpl.identityManager.getHIDsByAttributes("(PID==Unique PID)")).
+		when(nmCoreImpl.identityManager.getHIDByAttributes(
+				new Part[]{attributes[1]},
+				IdentityManager.HID_RESOLVE_TIMEOUT,
+				false, false)).
 			thenReturn(returnedHIDInfos);
 		
 		try {
