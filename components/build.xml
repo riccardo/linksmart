@@ -53,7 +53,7 @@
       Targets
   	-->
 	<target name="make-java" depends="make-dirs" description="Build components">
-		<ant dir="Log4j" target="make" />
+		<!--<ant dir="Log4j" target="make" />-->
 		<ant dir="LinkSmartMiddlewareAPI" target="make" />
         <ant dir="LinkSmartWSProvider" target="make" />
 		<!-- <ant dir="LinkSmartMiddlewareClients" target="make" /> -->
