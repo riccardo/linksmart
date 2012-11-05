@@ -184,15 +184,17 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 		HIDInfo newHID = this.identityManager
 		.createHIDForAttributes(attributes);
-		List<SecurityProperty> properties = this.backboneRouter
-		.getBackboneSecurityProperties(backboneName);
-		if(properties != null) {
-			// register HID with backbone policies in connection manager
-			this.connectionManager.registerHIDPolicy(newHID.getHid(), properties);
+		if(newHID != null) {
+			List<SecurityProperty> properties = this.backboneRouter
+			.getBackboneSecurityProperties(backboneName);
+			if(properties != null) {
+				// register HID with backbone policies in connection manager
+				this.connectionManager.registerHIDPolicy(newHID.getHid(), properties);
+			}
+			// add route to selected backbone
+			this.backboneRouter.addRouteToBackbone(newHID.getHid(), backboneName,
+					endpoint);
 		}
-		// add route to selected backbone
-		this.backboneRouter.addRouteToBackbone(newHID.getHid(), backboneName,
-				endpoint);
 		return newHID;
 	}
 

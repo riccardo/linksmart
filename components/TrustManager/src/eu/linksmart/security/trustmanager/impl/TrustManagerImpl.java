@@ -88,7 +88,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 	private BundleContext context;
 	private boolean activated=false;
 	private ServiceRegistration trustModelConfigService = null;
-	private String trustManagerHID = null;
+	private HIDInfo trustManagerHID = null;
 	private boolean nmOsgi = false;
 	private NetworkManager nm = null;
 	private RemoteWSClientProvider clientProvider;
@@ -333,8 +333,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 												configurator.get(TrustManagerConfigurator.CERTIFICATE_REF))
 										}, 
 								"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH,
-								BACKBONE_SOAP))
-								.toString();
+								BACKBONE_SOAP));
 						if (this.trustManagerHID == null) {
 							//Certificate ref is not valid...
 							this.trustManagerHID = createCertificate();
@@ -353,7 +352,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 
 		if(nm != null){
 			try {
-				nm.removeHID(new HID(trustManagerHID));
+				nm.removeHID(trustManagerHID.getHid());
 			} catch (Exception e) {
 				LOG.error(e);
 			}
@@ -361,7 +360,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		}
 	}
 
-	private String createCertificate() throws IOException{
+	private HIDInfo createCertificate() throws IOException{
 		String pid = configurator.get(TrustManagerConfigurator.PID);
 		//if no PID set use local IP as identifier
 		if ((pid == null)||(pid.equals(""))) {
@@ -384,7 +383,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 						TrustManagerConfigurator.CERTIFICATE_REF, attr.getValue());
 			}
 		}		
-		return hidInfo.getHid().toString();
+		return hidInfo;
 	}
 
 	public Class getTrustModelConfigurator(){
