@@ -269,7 +269,7 @@ public class LinkSmartGroupCreator {
 			TextElement loginElement = loginAndPasswd.createElement("login",
 				loginAndPasswdString);
 			loginAndPasswd.appendChild(loginElement);
-			/* Include it on PeerGroup¿dveertisement. */
+			/* Include it on PeerGroupAdvertisement. */
 			linksmartGroupAdvertisement.putServiceParam(PeerGroup.membershipClassID,
 				loginAndPasswd);
 		}
