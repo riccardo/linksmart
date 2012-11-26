@@ -16,6 +16,41 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 #headinfo a { color:#EFEFEF; }
 #headinfo a:hover { color:#D2D2D2; border-bottom:1px solid #D2D2D2; }
 
+#options {
+	position:relative;
+	left:272px;
+	width: 754px;
+	height: 42px;
+	vertical-align: middle;
+}
+
+
+#configuratorTab {
+	/*
+	position:absolute; 
+	left:0px; 
+	z-index:5;
+*/
+	float:left;
+	width:250px;
+
+}
+
+#networkTab {
+/*	position:absolute; 
+	left:250px; 
+	z-index:6;
+*/
+	float:left;
+	width:250px;
+
+}
+
+#eventTab {
+	float:left;
+	width:250px;
+
+}
 .logoimage { float:left; width:200px;}
 .logotext { float:left; width:200px; margin:25px 0 50px; font-family:Trebuchet MS; font-size:52px; color:#1b44ff; }
 .logotext strong { color:#FFCD59; }
@@ -181,13 +216,6 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 	padding: 0 0 5px 0;
 }
 
-#options {
-	position:relative;
-	left:272px;
-	width: 754px;
-	height: 42px;
-	vertical-align: middle;
-}
 
 #suboptions {
 	position:relative;
@@ -237,12 +265,12 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 }
 
 #infoContentwrap {  
-	background: url(../images/infobg.png) repeat-x;
+	/*background: url(../images/infobg.png) repeat-x;*/
 	border: 1px solid #666666;
 	position:relative;
 	overflow: hidden;
 	width:100%; 
-	max-height:400px;
+/*	max-height:400px;*/
 }
 
 #infoScrollUp {
