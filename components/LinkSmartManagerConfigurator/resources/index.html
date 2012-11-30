@@ -9,18 +9,10 @@
 <script src="LinkSmartStatus/jquery/js/jquery-ui-1.9.2.custom.js"></script>
 <link rel="stylesheet" href="LinkSmartStatus/css/style.css" type="text/css" media="all" />
 
-<!--  
-
-<script type="text/javascript" src="LinkSmartStatus/js/prototype.js"></script>
--->
 <script type="text/javascript" src="LinkSmartStatus/js/configurator.js"></script>
 <script type="text/javascript" src="LinkSmartStatus/js/networkManagerStatus.js"></script>
 <!--
 <script type="text/javascript" src="LinkSmartStatus/js/eventManagerStatus.js"></script>
-<script type="text/javascript" src="LinkSmartStatus/lib/prototype/prototype.js"></script>
-<script type="text/javascript" src="LinkSmartStatus/lib/scriptaculous/scriptaculous.js"></script>
-<script type="text/javascript" src="LinkSmartStatus/lib/scriptaculous/slider.js"></script>
-<script type="text/javascript" src="LinkSmartStatus/js/scroll.js"></script>
 <script type="text/javascript" src="LinkSmartStatus/js/textwrapper.js"></script>
 -->
 <script type="text/javascript" >
@@ -38,219 +30,6 @@ if(typeof String.prototype.trim != 'function') {
 	  };  
 }
 
-
-function showHideHIDViews() {
-
-	if ($('#hid-list-data tr').length > 0) {
-		$('#hid-list-empty').hide();
-		$('#hid-list-data').show();
-	} else {
-		$('#hid-list-empty').show();
-		$('#hid-list-data').hide();
-	}
-
-	if ( $( '#hid-type-nm' ).is(':checked') ) {
-		$('#hid-list-data .network-managers').filter(':visible').filter('.filter-hide').hide('slow');
-		$('#hid-list-data .network-managers').not(':visible').not('.filter-hide').show('slow');
-     } else {
-		$('#hid-list-data .network-managers').hide('slow');
-	 }
-
-	 if ( $( '#hid-type-local' ).is(':checked') ) {
-		$('#hid-list-data .local-hids').filter(':visible').filter('.filter-hide').hide('slow');
-		$('#hid-list-data .local-hids').not(':visible').not('.filter-hide').show('slow');
-	 } else {
- 		$('#hid-list-data .local-hids').hide('slow');
-   	 }
-
-	 if ( $( '#hid-type-remote' ).is(':checked') ) {
-		$('#hid-list-data .remote-hids').filter(':visible').filter('filter-hide').hide('slow');
-		$('#hid-list-data .remote-hids').not(':visible').not('filter-hide').show('slow');
-	 } else {
- 		$('#hid-list-data .remote-hids').hide('slow');
-   	 }
-}
-
-
-$(document).ready(function() {
-	$( '#ui-services' ).tabs();
-	$( '#mgrtabs' ).tabs({
-		beforeActivate: function( event, ui ) {
-			console.log(event);
-			console.log(ui);
-			var justShown = ui.newTab.attr('id').replace(/^li-/, '');
-			getConfigurationData(cssID2mgrID(justShown));
-			if (ui.oldPanel.attr('id')) {
-				//we were showing something until now, delete the controls so as not to have conflicts with same-named controls in other tabs
-				ui.oldPanel.empty();
-			}
-		}
-	}).addClass( "ui-tabs-vertical ui-helper-clearfix" );
-	
-	
-	
-
-     $( "#reset" ).button({
-         label: 'Reset',
-         icons: {
-             primary: "ui-icon-arrowrefresh-1-w"
-         }
-     })
-     .click(function() {
-         var options;
-         if ( $( this ).text() === "play" ) {
-             options = {
-                 label: "pause",
-                 icons: {
-                     primary: "ui-icon-pause"
-                 }
-             };
-         } else {
-             options = {
-                 label: "Reset",
-                 icons: {
-                     primary: "ui-icon-arrowrefresh-1-w"
-                 }
-             };
-         }
-         $( this ).button( "option", options );
-     });
-     
-     $( '#hid-types' ).buttonset();
-     $( '#hid-types' ).change(function() {
-    	 showHideHIDViews();
-     });
-	
-     $('#hid-types .only').button().click(function(event){
-		var whichButton = $(this).attr('id');
-		console.log(whichButton); 
-		switch (whichButton) {
-			case 'hid-nm-only':
-				$('#hid-type-nm').attr('checked', 'checked');
-				$('#hid-type-local').removeAttr('checked');
-				$('#hid-type-remote').removeAttr('checked');
-				break;
-			case 'hid-local-only':
-				$('#hid-type-nm').removeAttr('checked');
-				$('#hid-type-local').attr('checked', 'checked');
-				$('#hid-type-remote').removeAttr('checked');
-				break;
-			case 'hid-remote-only':
-				$('#hid-type-nm').removeAttr('checked');
-				$('#hid-type-local').removeAttr('checked');
-				$('#hid-type-remote').attr('checked', 'checked');
-				break;
-		}
-	    $( "#hid-types" ).buttonset('refresh');
-     	$( "#hid-types" ).change(); //act a change as if user has clicked on the buttons
-	    return false;
-	});
-
-    $('#hid-filter-input').keyup(showSearchResults);
-    
-	$('#hid-list-data').empty(); //sometimes the browser keeps everything in the cache, delete before start
-    startConfigurator();
-    startNetworkManagerStatus();
-});
-
-</script>
-<style>
-
-.network-managers {
-background:red;
-}
-.local-hids {
-background:yellow;
-}
-.remote-hids {
-background:green;
-}
-.search-hids{
-background:gray;
-}
- 
-.ui-tabs-vertical { width: 100%; border:none}
-.ui-tabs-vertical .ui-tabs-nav { padding: 2px 1px 2px 2px; float: left; width: 25%; }
-.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom: 1px #D3D3D3 !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
-.ui-tabs-vertical .ui-tabs-nav li a { display:block; width:100%; padding-right:0; text-indent: 1em; padding-left: 0}
-.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { clear: left; width: 100%; border-bottom: 1px #D3D3D3 !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; padding-bottom: 0; padding-right: 1px; border-right-width: 1px;}
-.ui-tabs-vertical .ui-tabs-panel { padding: 0em; float: right; width: 73%; margin-top: -5px; /*same as .paramform margin top*/}   
-
-#hid-toolbar {
-    padding: 10px 4px;
-}
-
-#hid-filter {
-    color: #555555;
-    font-weight: normal;
-}
-
-#hid-filter label {
-    padding: 0.4em 0.3em 0.4em 1.3em;
-}
-
-#hid-filter-input {
-	border: 1px solid #D3D3D3;
-    padding: 0.4em 1em;
-}
-
-#hid-types .only .ui-button-text {
-	padding: 0.1em 0.2em;
-}
-
-.
-    </style>
-</head>
-<body>
-<noscript>
-<div class="noscript">To use the LinkSmart Configurator you need JavaScript enabled. We use JavaScript to do AJAX posts to the server and update the status in realtime. No data from your computer are used.</div></noscript>
-<div id="wrapper">
-  <div id="header">
-  	<p class="logoimage">
-  		<img src="LinkSmartStatus/images/linksmartlogo.gif" width=100/>
-  	</p>
-    <p class="logotext">LinkSmart<strong>Status</strong></p>
-  </div>
-  
- 
-<div id="ui-services">
-	<ul>
-		<li><a href="#ui-services-nm">Network Manager Status</a></li>
-		<li><a href="#ui-services-configurator">LinkSmart Configurator</a></li>
-
-	</ul>
-	<div id="ui-services-configurator">
-		<div id="mgrtabs">
-			<ul>
-			</ul>
-		</div>
-	</div>  
-	<div id="ui-services-nm">
-		<span id="hid-toolbar" class="ui-widget-header ui-corner-all">
-		    <button id="reset">play</button>
-		    <span id="hid-types">
-		        <input type="checkbox" id="hid-type-nm" checked="checked" name="hid-types"/><label for="hid-type-nm">Show Network Managers <span class="only" id="hid-nm-only">only</span></a></label>
-		        <input type="checkbox" id="hid-type-local" checked="checked" name="hid-types" /><label for="hid-type-local">Show Local HIDs <span class="only" id="hid-local-only">only</span></label>
-		        <input type="checkbox" id="hid-type-remote" checked="checked" name="hid-types" /><label for="hid-type-remote">Show Remote HIDs <span class="only" id="hid-remote-only">only</span></label>
-		    </span>
-	        <span id="hid-filter" class="ui-widget"><label for="hid-filter-input">Filter</label><input type="text" id="hid-filter-input" class="ui-corner-all ui-button-text" name="hid-filter"/></span>
-		</span>
-	<div id="hid-list-empty">No data yet...</div>
-	<table id="hid-list-data"></table>
-	</div>
-</div>
-
-  <div id="footer">
-    <p><center>All content copyright &copy; 2009 <strong>LinkSmart project</strong>, all rights reserved.</center></p>
-  </div>
-</div>
-</body>
-<script type="text/javascript">	
-	
-var networkManagerInfo = {NMAvailable:true, LocalAvailable: true, RemoteAvailable: true, SearchAvailable: true, NMs:[], LocalHIDs:[], RemoteHIDs:[], SearchHIDs:[]};
-//var eventManagerInfo;
-
-
 function startConfigurator() {
 	getConfigurations();
 	setInterval("getConfigurations()",5000);
@@ -263,8 +42,12 @@ function startNetworkManagerStatus() {
 	setInterval("getLocalHidsInfo()",10000);
 	getRemoteHidsInfo();
 	setInterval("getRemoteHidsInfo()",10000);
-	//getNetworkManagerSearch();
-	//timerOption = setInterval("getNetworkManagerSearch()",10000);
+	
+	/*
+	 * the search is anyway done only within the HTML we already got, so this function is not needed for now
+	getNetworkManagerSearch();
+	timerOption = setInterval("getNetworkManagerSearch()",10000);
+	*/
 }
 
 /*
@@ -291,5 +74,168 @@ function showEventManagerSearch(event) {
 	//}
 }
 */
+
+var networkManagerInfo = {NMAvailable:true, LocalAvailable: true, RemoteAvailable: true, SearchAvailable: true, NMs:[], LocalHIDs:[], RemoteHIDs:[], SearchHIDs:[]};
+//var eventManagerInfo;
+
+var origStatusFilters;
+
+$(document).ready(function() {
+	$( '#ui-services' ).tabs();
+	$( '#mgrtabs' ).tabs({
+		beforeActivate: function( event, ui ) {
+			//console.log(event);
+			//console.log(ui);
+			var justShown = ui.newTab.attr('id').replace(/^li-/, '');
+			getConfigurationData(cssID2mgrID(justShown));
+			if (ui.oldPanel.attr('id')) {
+				//we were showing something until now, delete the controls so as not to have conflicts with same-named controls in other tabs
+				ui.oldPanel.empty();
+			}
+		}
+	}).addClass( "ui-tabs-vertical ui-helper-clearfix" );
+	
+	origStatusFilters = {NM:false, Local:false, Remote:false, Filter:''};
+
+	 if($('#hid-type-nm').is(':checked')) {
+		 origStatusFilters.NM = true;
+	 }
+	 if($('#hid-type-local').is(':checked')) {
+		 origStatusFilters.Local = true;
+	 }
+	 if($('#hid-type-remote').is(':checked')) {
+		 origStatusFilters.Remote = true;
+	 }
+	 
+	 origStatusFilters.Filter = $('#hid-filter-input').val().trim();
+
+     $( "#reset" ).button({
+         label: 'Reset',
+         icons: {
+             primary: "ui-icon-arrowrefresh-1-w"
+         }
+     })
+     .click(function() {
+		if (origStatusFilters.NM) {
+			$('#hid-type-nm').attr('checked', 'checked');
+		} else {
+			$('#hid-type-nm').removeAttr('checked');
+		}
+		if (origStatusFilters.Local) {
+			$('#hid-type-local').attr('checked', 'checked');
+		} else {
+			$('#hid-type-local').removeAttr('checked');
+		}
+		if (origStatusFilters.Remote) {
+			$('#hid-type-remote').attr('checked', 'checked');
+		} else {
+			$('#hid-type-remote').removeAttr('checked');
+		}
+		
+		$('#hid-filter-input').val(origStatusFilters.Filter);
+
+		$('#hid-types').buttonset('refresh');
+		
+		showSearchResults(); //needed because the filter may have changed and rows need to be updated. this in turn calls showHideHIDViews which does the final show/hide
+     });
+     
+     $( '#hid-types' ).buttonset();
+     $( '#hid-types' ).change(function() {
+    	 showHideHIDViews();
+     });
+	
+     $('#hid-types .only').button().click(function(event){
+		var whichButton = $(this).attr('id');
+		//console.log(whichButton); 
+		switch (whichButton) {
+			case 'hid-nm-only':
+				$('#hid-type-nm').attr('checked', 'checked');
+				$('#hid-type-local').removeAttr('checked');
+				$('#hid-type-remote').removeAttr('checked');
+				break;
+			case 'hid-local-only':
+				$('#hid-type-nm').removeAttr('checked');
+				$('#hid-type-local').attr('checked', 'checked');
+				$('#hid-type-remote').removeAttr('checked');
+				break;
+			case 'hid-remote-only':
+				$('#hid-type-nm').removeAttr('checked');
+				$('#hid-type-local').removeAttr('checked');
+				$('#hid-type-remote').attr('checked', 'checked');
+				break;
+		}
+	    $( "#hid-types" ).buttonset('refresh');
+	    
+	    $( '#hid-types .only').addClass('ui-corner-all'); //because jQuery mistakenly removes this after click
+	    
+     	$( "#hid-types" ).change(); //act a change as if user has clicked on the buttons
+	    return false;
+	});
+
+    $('#hid-filter-input').keyup(showSearchResults);
+    
+	$('#hid-list-data').empty(); //sometimes the browser keeps everything in the cache, delete before start
+    startConfigurator();
+    startNetworkManagerStatus();
+});
+
 </script>
+</head>
+<body>
+<noscript>
+<div class="noscript">To use the LinkSmart Configurator you need JavaScript enabled. 
+We use JavaScript to do AJAX posts to the server and update the status in realtime. 
+No data from your computer are used.</div></noscript>
+<div id="wrapper">
+  <div id="header" class="ui-corner-top">
+  	<p class="logoimage">
+  		<img src="LinkSmartStatus/images/linksmartlogo.gif" width=100/>
+  	</p>
+    <p class="logotext">LinkSmart<span>Status</span></p>
+  </div>
+
+<div id="ui-services">
+	<ul>
+		<li><a href="#ui-services-nm">Network Manager Status</a></li>
+		<li><a href="#ui-services-configurator">LinkSmart Configurator</a></li>
+	</ul>
+	<div id="ui-services-configurator">
+		<div id="mgrtabs">
+			<ul>
+			</ul>
+		</div>
+	</div>  
+	<div id="ui-services-nm">
+		<span id="hid-toolbar" class="ui-widget-header ui-corner-all">
+		    <button id="reset">play</button>
+		    <span id="hid-types">
+		        <input type="checkbox" id="hid-type-nm" checked="checked" name="hid-types"/><label id="hid-type-nm-label" for="hid-type-nm"><span>Network Managers</span> <button class="only" id="hid-nm-only">only</button></label>
+		        <input type="checkbox" id="hid-type-local" checked="checked" name="hid-types" /><label id="hid-type-local-label" for="hid-type-local"><span>Local HIDs</span> <button class="only" id="hid-local-only">only</button></label>
+		        <input type="checkbox" id="hid-type-remote" checked="checked" name="hid-types" /><label id="hid-type-remote-label" for="hid-type-remote"><span>Remote HIDs</span> <button class="only" id="hid-remote-only">only</button></label>
+		    </span>
+	        <span id="hid-filter" class="ui-widget"><label for="hid-filter-input">Filter</label><input type="text" id="hid-filter-input" class="ui-corner-all ui-button-text" name="hid-filter"/></span>
+		</span>
+	<div id="hid-list-empty">No data yet...</div>
+	<table id="hid-list-data-table">
+	<thead>
+	<tr class="hid-table-header" id="hid-table-header">
+	<th width="20%">HID</th>
+	<th width="30%">Description</th>
+	<th width="10%">Host</th>
+	<th width="40%">Endpoint</th>
+	</tr>
+	<tr class="hid-table-header" id="hid-table-no-data" style="display:none">
+	<th colspan="4">No data remain that fulfill your search and filtering criteria.</th>
+	</tr>
+	</thead>
+	<tbody id="hid-list-data"></tbody>
+	</table>
+	</div>
+</div>
+
+  <div id="footer">
+    <p class="centerizer">All content copyright &copy; <a href="http://linksmart.sourceforge.net">LinkSmart project</a>, all rights reserved.</p>
+  </div>
+</div>
+</body>
 </html>

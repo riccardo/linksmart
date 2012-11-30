@@ -70,6 +70,9 @@ function getRemoteHidsInfo() {
 	});
 }
 
+/*
+ * the search is anyway done only within the HTML we already got, so this function is not needed for now
+ *
 function getNetworkManagerSearch() {
 	var searchWord=$('#hid-filter-input').val().trim();
 	
@@ -95,6 +98,7 @@ function getNetworkManagerSearch() {
 		});
 	}
 }
+*/
 
 function updateNMViews(view) {
 //sync the data to their availability
@@ -114,8 +118,8 @@ function updateNMViews(view) {
 		networkManagerInfo.SearchHIDs = [];
 	}
 
-	console.log(view);
-	console.log(networkManagerInfo); 
+	//console.log(view);
+	//console.log(networkManagerInfo); 
 
 	if (view=='network-managers') {
 		syncHIDListToView('network-managers', networkManagerInfo.NMs);
@@ -167,7 +171,7 @@ function syncHIDListToView(cssClass, newData) {
 		var HIDTable = $('#hid-list-data');
 		for (var i = 0; i < newData.length; i++) {
 			var foundIn = $.each(knownHIDs, function(index, value) { 
-					console.log(value);
+					//console.log(value);
 					if ($(value).html().trim() == newData[i].hid.trim()) {
 						return true;
 					} else {
@@ -215,4 +219,53 @@ function showSearchResults() {
 		HIDRows.removeClass('filter-hide');
 	}
 	showHideHIDViews();
+}
+
+function showHideHIDViews() {
+
+	if ($('#hid-list-data tr').length > 0) {
+		$('#hid-list-empty').hide();
+		$('#hid-list-data-table').show();
+	} else {
+		$('#hid-list-empty').show();
+		$('#hid-list-data-table').hide();
+	}
+
+	var stillVisible=jQuery();
+	
+	if ( $( '#hid-type-nm' ).is(':checked') ) {
+		$('#hid-list-data .network-managers').filter('.filter-hide').hide('slow');
+		$('#hid-list-data .network-managers').not('.filter-hide').show('slow');
+		stillVisible = stillVisible.add($('#hid-list-data .network-managers').not('.filter-hide'));
+	 } else {
+		$('#hid-list-data .network-managers').hide('slow');
+	 }
+
+	 if ( $( '#hid-type-local' ).is(':checked') ) {
+		$('#hid-list-data .local-hids').filter('.filter-hide').hide('slow');
+		$('#hid-list-data .local-hids').not('.filter-hide').show('slow');
+		stillVisible = stillVisible.add($('#hid-list-data .local-hids').not('.filter-hide'));
+	 } else {
+ 		$('#hid-list-data .local-hids').hide('slow');
+   	 }
+
+	 if ( $( '#hid-type-remote' ).is(':checked') ) {
+		$('#hid-list-data .remote-hids').filter('filter-hide').hide('slow');
+		$('#hid-list-data .remote-hids').not('filter-hide').show('slow');
+		stillVisible = stillVisible.add($('#hid-list-data .remote-hids').not('.filter-hide'));
+	 } else {
+ 		$('#hid-list-data .remote-hids').hide('slow');
+   	 }
+	 
+	 if (stillVisible.length > 0) {
+		 //there are at least some rows after filtering; make sure table header is shown and the "no data in this view" is not
+		 $('#hid-table-header').show();
+		 $('#hid-table-no-data').hide();
+	 } else {
+		 //there are no rows after filtering; make sure table header is hidden and the "no data in this view" is shown
+		 $('#hid-table-header').hide();
+		 $('#hid-table-no-data').show();
+	 }
+	 
+	 //console.log(stillVisible);
 }

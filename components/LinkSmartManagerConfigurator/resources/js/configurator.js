@@ -21,7 +21,7 @@ function isNumeric(s) {
 }
 
 function getConfigurations(){
-		console.log('getting configs');
+		//console.log('getting configs');
 		$.ajax({
 			url: configurationServletAddress, 
 			type: 'GET',
@@ -134,9 +134,8 @@ function showConfigurationDataForm(configuration){
 					.addClass((zebraDark?'postinfoeven':'postinfoodd'))
 					.addClass('paramform')
 					.attr('id',  formCssID + '_form_div')
-					.append($('<span/>').addClass('errormsg').attr('id', formCssID + '_form_errormsg'))
 					.append($('<label/>').attr('for', formCssID + '_form').text(labelText));
-		console.log(formDiv);
+		//console.log(formDiv);
 		var formElement='';
 		var cssParamName = mgrID2cssID(paramName);
 		
@@ -312,7 +311,7 @@ function submitConfiguration(configuration){
 		data: {	method: 'postConfiguration', configuration: jsonText },
 		//dataType: 'json',
 		success: function(response){
-			console.log(response);
+			//console.log(response);
 			alert("Configuration saved");
 			
 		}
@@ -399,14 +398,16 @@ function validateInputsAndGetAnswers(configuration) {
 
 function setErrorMessageForInput(paramName, errormsg) {
 	cssID = mgrID2cssID(paramName)
-	$('#' + cssID + '_form_div').addClass('ui-state-error');
-	$('#' + cssID + '_form_errormsg').text(errormsg);
+	$('#' + cssID + '_form_div')
+		.addClass('errorform')
+		.append($('<span/>').addClass('errormsg').text(errormsg));
 }
 
 function clearErrorMessageforInput(paramName) {
 	cssID = mgrID2cssID(paramName)
-	$('#' + cssID + '_form_div').removeClass('ui-state-error');
-	$('#' + cssID + '_form_errormsg').text('');
+	$('#' + cssID + '_form_div')
+		.removeClass('errorform')
+		.children('.errormsg').remove();
 }
 
 function validateChoiceAndGetAnswer(paramName, choices) {

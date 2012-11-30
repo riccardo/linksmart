@@ -90,36 +90,7 @@ function printEventManagerSubscriptions(){
 	}
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
-		
-/*	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-		document.getElementById("tableContainer").style.width = "98%";
-		document.getElementById("infoContentwrap").style.width = "98%";
-		text = document.getElementById("infoContent").innerHTML;
-		text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"LinkSmartStatus/images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"LinkSmartStatus/images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"LinkSmartStatus/images/imageflow/slider.png\"/></div></div></div>"
-		document.getElementById("infoContent").innerHTML = text;
-			    
-		handled = 'infoContentwrap';
-		handlerer = 'infoScrollbarHandler';
-		tracker = 'infoScrollbarTrack';
-				
-		var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-			axis: 'vertical',
-			onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-			onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
-		});
-				
-		if (window.addEventListener) {
-			document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-			document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-		}
-		
-		if (previousScroll < (document.getElementById("infoContentwrap").scrollHeight - 402)) document.getElementById("infoContentwrap").scrollTop = previousScroll;
-		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
-		scrollBarUpdate (handled, handlerer, tracker);
-	}
-	*/
+
 }
 
 function printEventManagerSearch() {
@@ -142,36 +113,5 @@ function printEventManagerSearch() {
 	text += "</TABLE></div>";
 	document.getElementById("infoContent").innerHTML = text;
 
-	/*
-	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-		document.getElementById("tableContainer").style.width = "98%";
-		document.getElementById("infoContentwrap").style.width = "98%";
-		text = document.getElementById("infoContent").innerHTML;
-		text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"LinkSmartStatus/images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"LinkSmartStatus/images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"LinkSmartStatus/images/imageflow/slider.png\"/></div></div></div>"
-		document.getElementById("infoContent").innerHTML = text;
-			    
-		handled = 'infoContentwrap';
-		handlerer = 'infoScrollbarHandler';
-		tracker = 'infoScrollbarTrack';
-				
-		var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-			axis: 'vertical',
-			onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-			onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
-		});
-				
-		if (window.addEventListener) {
-			document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-			document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-		}
-		
-		if (previousScroll < (document.getElementById("infoContentwrap").scrollHeight - 402)) document.getElementById("infoContentwrap").scrollTop = previousScroll;
-		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
-		scrollBarUpdate (handled, handlerer, tracker);
-	}
-	else {
-		document.getElementById("infoContentwrap").scrollTop = 0;
-	}*/
+	
 }
