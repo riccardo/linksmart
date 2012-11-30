@@ -9,18 +9,14 @@ function getNetworkManagerInfo() {
 		url: NMServletURL,
 		type: 'GET',
 		data: {	method: 'getNetworkManagers' },
-		dataType: 'html',
+		dataType: 'json',
 		error: function(jqXHR, textStatus, errorThrown) {
 			networkManagerInfo.NMAvailable = false;
+			networkManagerInfo.NMs = [];
 			updateNMViews('network-managers');
 		},
 		success: function(response) {
-			var networkManagers = response.split("<br>");
-			for (var i = 0; i < networkManagers.length; i++) {
-				if (networkManagers[i] == '') continue; //empty lines at end
-				var data = networkManagers[i].split("|");
-				networkManagerInfo.NMs[i] = {hid:data[0], description:data[1], host:data[2], endpoint:data[3] };
-			}
+			networkManagerInfo.NMs = response.HIDs;
 			updateNMViews('network-managers');
 		}
 	});
@@ -31,18 +27,14 @@ function getLocalHidsInfo() {
 		url: NMServletURL, 
 		type: 'GET',
 		data: {	method: 'getLocalHids'	},
-		dataType: 'html',
+		dataType: 'json',
 		error: function(jqXHR, textStatus, errorThrown) {
 			networkManagerInfo.LocalAvailable = false;
+			networkManagerInfo.LocalHIDs = [];
 			updateNMViews('local-hids');
 		},
 		success: function(response) {
-			var localHids = response.split("<br>");
-			for (var i = 0; i < localHids.length; i++) {
-				if (localHids[i] == '') continue; //empty lines at end
-				var data = localHids[i].split("|");
-				networkManagerInfo.LocalHIDs[i] = {hid:data[0], description:data[1], host:data[2], endpoint:data[3] };
-			}
+			networkManagerInfo.LocalHIDs = response.HIDs;
 			updateNMViews('local-hids');
 		}
 	});
@@ -53,18 +45,14 @@ function getRemoteHidsInfo() {
 		url: NMServletURL,
 		type: 'GET',
 		data: {	method: 'getRemoteHids'	},
-		dataType: 'html',
+		dataType: 'json',
 		error: function(jqXHR, textStatus, errorThrown) {
 			networkManagerInfo.RemoteAvailable = false;
+			networkManagerInfo.RemoteHids = [];
 			updateNMViews('remote-hids');
 		},
 		success: function(response) {
-			var remoteHids = response.split("<br>");
-			for (var i = 0; i < remoteHids.length; i++) {
-				if (remoteHids[i] == "") continue; //empty lines at end
-				var data = remoteHids[i].split("|");
-				networkManagerInfo.RemoteHids[i] = {hid:data[0], description:data[1], host:data[2], endpoint:data[3] };
-			}
+			networkManagerInfo.RemoteHids = response.HIDs;
 			updateNMViews('remote-hids');
 		}
 	});
@@ -81,18 +69,14 @@ function getNetworkManagerSearch() {
 			url: NMServletURL,
 			type: 'GET',
 			data: {	method: 'getNetworkManagerSearch' },
-			dataType: 'html',
+			dataType: 'json',
 			error: function(jqXHR, textStatus, errorThrown) {
 				networkManagerInfo.SearchAvailable = false;
+				networkManagerInfo.SearchHIDs = [];
 				updateNMViews('search-hids');
 			},
 			success: function(response) {
-				var remoteHids = response.split("<br>");
-				for (var i = 0; i < remoteHids.length; i++) {
-					if (remoteHids[i] == "") continue; //empty lines at end
-					var data = remoteHids[i].split("|");
-					networkManagerInfo.SearchHIDs[i] = {hid:data[0], description:data[1], host:data[2], endpoint:data[3] };
-				}
+				networkManagerInfo.SearchHIDs = response.HIDs;
 				updateNMViews('search-hids');
 			}
 		});
@@ -101,26 +85,6 @@ function getNetworkManagerSearch() {
 */
 
 function updateNMViews(view) {
-//sync the data to their availability
-	if (!networkManagerInfo.NMAvailable) {
-		networkManagerInfo.NMs = [];
-	} 
-	
-	if (!networkManagerInfo.LocalAvailable) {
-		networkManagerInfo.LocalHIDs = [];
-	}
-	
-	if (!networkManagerInfo.RemoteAvailable) {
-		networkManagerInfo.RemoteHIDs = [];
-	}
-	
-	if (!networkManagerInfo.SearchAvailable) {
-		networkManagerInfo.SearchHIDs = [];
-	}
-
-	//console.log(view);
-	//console.log(networkManagerInfo); 
-
 	if (view=='network-managers') {
 		syncHIDListToView('network-managers', networkManagerInfo.NMs);
 	} else 	if (view=='local-hids') {
@@ -151,7 +115,7 @@ function syncHIDListToView(cssClass, newData) {
 
 		//delete gone HIDs
 		for (var i = 0; i < HIDRows.length; i++) { //as long as there are
-			var oneHID = HIDRows.eq(i).find('td:first').html(); //not text because the server sends us HTML!!
+			var oneHID = HIDRows.eq(i).find('.hid').text();
 			var foundIn = $.each(newData, function(index, value) { 
 									return doesNMDataHaveThisHID(newData[index], oneHID);
 								});
@@ -167,7 +131,7 @@ function syncHIDListToView(cssClass, newData) {
 		var knownHIDs = HIDRows.find('.hid');
 
 		//now insert new HIDs
-		var rowTemplate = '<tr class="' + cssClass + '"><td class="hid">{hid}</td><td class="description">{description}</td><td class"host">{host}</td><td class="endpoint">{endpoint}</td></tr>';
+		var rowTemplate = '<tr class="' + cssClass + '"><td class="hid">{hid}<span class="hid-extras"><a class="hid-path" href="{path}">link</a> <a class="hid-wsdl" href="{wsdl}">wsdl</a></span></td><td class="description">{description}</td><td class"host">{host}</td><td class="endpoint">{endpoint}</td></tr>';
 		var HIDTable = $('#hid-list-data');
 		for (var i = 0; i < newData.length; i++) {
 			var foundIn = $.each(knownHIDs, function(index, value) { 
@@ -183,7 +147,9 @@ function syncHIDListToView(cssClass, newData) {
 			    var newRow = $(	 rowTemplate.replace( /\{hid\}/g, newData[i].hid )
 			    							.replace( /\{description\}/g, newData[i].description )
 			    							.replace( /\{host\}/g, newData[i].host )
-			    							.replace( /\{endpoint\}/g, newData[i].endpoint) );
+			    							.replace( /\{endpoint\}/g, newData[i].endpoint)
+			    							.replace(/\{path\}/g, newData[i].path)
+			    							.replace (/\{wsdl\}/g, newData[i].wsdl) );
 
 			    var searchWord=$('#hid-filter-input').val().trim();
 			    if (searchWord.length > 0) {
