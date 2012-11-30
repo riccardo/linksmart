@@ -17,6 +17,7 @@ function getNetworkManagerInfo() {
 		},
 		success: function(response) {
 			networkManagerInfo.NMs = response.HIDs;
+			//console.log(response.HIDs);
 			updateNMViews('network-managers');
 		}
 	});
@@ -109,7 +110,7 @@ function syncHIDListToView(cssClass, newData) {
 	var filter = '.' + cssClass;
 	
 	if (newData.length == 0) {
-		$('#hid-list-data tr').filter(filter).addClass('ui-state-highlight').hide('slow', function(){ $('#hid-list-data tr').filter(filter).remove(); showHideHIDView(); });
+		$('#hid-list-data tr').filter(filter).addClass('ui-state-highlight').hide('slow', function(){ $('#hid-list-data tr').filter(filter).remove(); showHideHIDViews(); });
 	} else {
 		var HIDRows=$('#hid-list-data tr').filter(filter);
 

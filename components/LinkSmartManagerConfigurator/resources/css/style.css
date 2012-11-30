@@ -229,3 +229,7 @@ text-indent: 5px;
 .hid-extras .hid-path {
 	margin-right: 10px;
 }
+
+#hid-list-empty {
+	margin-top: 30px;
+}
