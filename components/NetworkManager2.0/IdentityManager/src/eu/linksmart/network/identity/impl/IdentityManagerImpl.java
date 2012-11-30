@@ -5,14 +5,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -284,8 +282,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				HIDInfo hidInfo = it.next();
 				try {
 					oneDescription = hidInfo.getDescription();
-					if ((oneDescription != null && !exactMatch && oneDescription.contains(toMatch[i]))
-							|| (exactMatch && oneDescription.equals(toMatch[i]))) { // the
+					if (oneDescription != null 
+							&& ((!exactMatch && oneDescription.contains(toMatch[i]))
+									|| (exactMatch && oneDescription.equals(toMatch[i])))) {
+						// the
 						// match
 						// criteria
 						// is

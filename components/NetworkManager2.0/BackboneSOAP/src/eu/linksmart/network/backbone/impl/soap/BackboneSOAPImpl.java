@@ -3,6 +3,7 @@ package eu.linksmart.network.backbone.impl.soap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
@@ -22,8 +23,10 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.security.communication.SecurityProperty;
 
-/*
- * TODO #NM refactoring
+/**
+ * Implements the Backbone interface in sending HTTP messages to the provided endpoints.
+ * Can handle both GET and POST messages.
+ *
  */
 public class BackboneSOAPImpl implements Backbone {
 
@@ -34,6 +37,11 @@ public class BackboneSOAPImpl implements Backbone {
 	private static final int MAXNUMRETRIES = 15;
 	private static final long SLEEPTIME = 20;
 	private static final int BUFFSIZE = 16384;
+	
+	/**
+	 * Timeout to the web service endpoint in MS.
+	 */
+	private static final int TIMEOUT = 30000;
 
 	private BackboneSOAPConfigurator configurator;
 
@@ -81,7 +89,8 @@ public class BackboneSOAPImpl implements Backbone {
 		String soapMsg = "Error in SOAP tunneling receiveData";
 		resp.setStatus(NMResponse.STATUS_ERROR);
 		resp.setMessage(generateSoapResponse(soapMsg));
-//decode properties & Decode64
+		
+		//decode properties & Decode64
 		if (data.startsWith("GET")) {
 			// It is a GET request
 			resp = processGetMessage(urlEndpoint, data, resp);
@@ -221,8 +230,9 @@ public class BackboneSOAPImpl implements Backbone {
 	private NMResponse getResponse(URL urlEndpoint, NMResponse resp, String dataproc) {
 		try {
 			// Create Socket to local axis service
-			Socket clientSocket = new Socket(urlEndpoint.getHost(), urlEndpoint
-					.getPort());
+			Socket clientSocket = new Socket();
+			clientSocket.connect(new InetSocketAddress(urlEndpoint.getHost(), urlEndpoint
+					.getPort()), TIMEOUT);
 
 			flushMessage(dataproc, clientSocket);
 			String response = parseResponse(resp, clientSocket);
