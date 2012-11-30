@@ -3,16 +3,203 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>LinkSmart Status and Configuration Tool</title>
+
+<link href="LinkSmartStatus/jquery/css/smoothness/jquery-ui-1.9.2.custom.css" rel="stylesheet" />
+<script src="LinkSmartStatus/jquery/js/jquery-1.8.3.js"></script>
+<script src="LinkSmartStatus/jquery/js/jquery-ui-1.9.2.custom.js"></script>
 <link rel="stylesheet" href="LinkSmartStatus/css/style.css" type="text/css" media="all" />
+
+<!--  
+
 <script type="text/javascript" src="LinkSmartStatus/js/prototype.js"></script>
+-->
 <script type="text/javascript" src="LinkSmartStatus/js/configurator.js"></script>
 <script type="text/javascript" src="LinkSmartStatus/js/networkManagerStatus.js"></script>
+<!--
 <script type="text/javascript" src="LinkSmartStatus/js/eventManagerStatus.js"></script>
 <script type="text/javascript" src="LinkSmartStatus/lib/prototype/prototype.js"></script>
 <script type="text/javascript" src="LinkSmartStatus/lib/scriptaculous/scriptaculous.js"></script>
 <script type="text/javascript" src="LinkSmartStatus/lib/scriptaculous/slider.js"></script>
 <script type="text/javascript" src="LinkSmartStatus/js/scroll.js"></script>
 <script type="text/javascript" src="LinkSmartStatus/js/textwrapper.js"></script>
+-->
+<script type="text/javascript" >
+
+if (typeof String.prototype.startsWith != 'function') {
+	  // see below for better implementation!
+	  String.prototype.startsWith = function (str){
+	    return this.indexOf(str) == 0;
+	  };
+}
+
+if(typeof String.prototype.trim != 'function') {  
+	  String.prototype.trim = function () {  
+	    return this.replace(/^\s+|\s+$/g,'');  
+	  };  
+}
+
+
+function showHideHIDViews() {
+
+	if ($('#hid-list-data tr').length > 0) {
+		$('#hid-list-empty').hide();
+		$('#hid-list-data').show();
+	} else {
+		$('#hid-list-empty').show();
+		$('#hid-list-data').hide();
+	}
+
+	if ( $( '#hid-type-nm' ).is(':checked') ) {
+		$('#hid-list-data .network-managers').filter(':visible').filter('.filter-hide').hide('slow');
+		$('#hid-list-data .network-managers').not(':visible').not('.filter-hide').show('slow');
+     } else {
+		$('#hid-list-data .network-managers').hide('slow');
+	 }
+
+	 if ( $( '#hid-type-local' ).is(':checked') ) {
+		$('#hid-list-data .local-hids').filter(':visible').filter('.filter-hide').hide('slow');
+		$('#hid-list-data .local-hids').not(':visible').not('.filter-hide').show('slow');
+	 } else {
+ 		$('#hid-list-data .local-hids').hide('slow');
+   	 }
+
+	 if ( $( '#hid-type-remote' ).is(':checked') ) {
+		$('#hid-list-data .remote-hids').filter(':visible').filter('filter-hide').hide('slow');
+		$('#hid-list-data .remote-hids').not(':visible').not('filter-hide').show('slow');
+	 } else {
+ 		$('#hid-list-data .remote-hids').hide('slow');
+   	 }
+}
+
+
+$(document).ready(function() {
+	$( '#ui-services' ).tabs();
+	$( '#mgrtabs' ).tabs({
+		beforeActivate: function( event, ui ) {
+			console.log(event);
+			console.log(ui);
+			var justShown = ui.newTab.attr('id').replace(/^li-/, '');
+			getConfigurationData(cssID2mgrID(justShown));
+			if (ui.oldPanel.attr('id')) {
+				//we were showing something until now, delete the controls so as not to have conflicts with same-named controls in other tabs
+				ui.oldPanel.empty();
+			}
+		}
+	}).addClass( "ui-tabs-vertical ui-helper-clearfix" );
+	
+	
+	
+
+     $( "#reset" ).button({
+         label: 'Reset',
+         icons: {
+             primary: "ui-icon-arrowrefresh-1-w"
+         }
+     })
+     .click(function() {
+         var options;
+         if ( $( this ).text() === "play" ) {
+             options = {
+                 label: "pause",
+                 icons: {
+                     primary: "ui-icon-pause"
+                 }
+             };
+         } else {
+             options = {
+                 label: "Reset",
+                 icons: {
+                     primary: "ui-icon-arrowrefresh-1-w"
+                 }
+             };
+         }
+         $( this ).button( "option", options );
+     });
+     
+     $( '#hid-types' ).buttonset();
+     $( '#hid-types' ).change(function() {
+    	 showHideHIDViews();
+     });
+	
+     $('#hid-types .only').button().click(function(event){
+		var whichButton = $(this).attr('id');
+		console.log(whichButton); 
+		switch (whichButton) {
+			case 'hid-nm-only':
+				$('#hid-type-nm').attr('checked', 'checked');
+				$('#hid-type-local').removeAttr('checked');
+				$('#hid-type-remote').removeAttr('checked');
+				break;
+			case 'hid-local-only':
+				$('#hid-type-nm').removeAttr('checked');
+				$('#hid-type-local').attr('checked', 'checked');
+				$('#hid-type-remote').removeAttr('checked');
+				break;
+			case 'hid-remote-only':
+				$('#hid-type-nm').removeAttr('checked');
+				$('#hid-type-local').removeAttr('checked');
+				$('#hid-type-remote').attr('checked', 'checked');
+				break;
+		}
+	    $( "#hid-types" ).buttonset('refresh');
+     	$( "#hid-types" ).change(); //act a change as if user has clicked on the buttons
+	    return false;
+	});
+
+    $('#hid-filter-input').keyup(showSearchResults);
+    
+	$('#hid-list-data').empty(); //sometimes the browser keeps everything in the cache, delete before start
+    startConfigurator();
+    startNetworkManagerStatus();
+});
+
+</script>
+<style>
+
+.network-managers {
+background:red;
+}
+.local-hids {
+background:yellow;
+}
+.remote-hids {
+background:green;
+}
+.search-hids{
+background:gray;
+}
+ 
+.ui-tabs-vertical { width: 100%; border:none}
+.ui-tabs-vertical .ui-tabs-nav { padding: 2px 1px 2px 2px; float: left; width: 25%; }
+.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom: 1px #D3D3D3 !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+.ui-tabs-vertical .ui-tabs-nav li a { display:block; width:100%; padding-right:0; text-indent: 1em; padding-left: 0}
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { clear: left; width: 100%; border-bottom: 1px #D3D3D3 !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; padding-bottom: 0; padding-right: 1px; border-right-width: 1px;}
+.ui-tabs-vertical .ui-tabs-panel { padding: 0em; float: right; width: 73%; margin-top: -5px; /*same as .paramform margin top*/}   
+
+#hid-toolbar {
+    padding: 10px 4px;
+}
+
+#hid-filter {
+    color: #555555;
+    font-weight: normal;
+}
+
+#hid-filter label {
+    padding: 0.4em 0.3em 0.4em 1.3em;
+}
+
+#hid-filter-input {
+	border: 1px solid #D3D3D3;
+    padding: 0.4em 1em;
+}
+
+#hid-types .only .ui-button-text {
+	padding: 0.1em 0.2em;
+}
+
+.
+    </style>
 </head>
 <body>
 <noscript>
@@ -24,126 +211,62 @@
   	</p>
     <p class="logotext">LinkSmart<strong>Status</strong></p>
   </div>
-  <div id="options">
-  	<div class="normal-tab" id="configuratorTab" onclick="startConfigurator()" ><h3>LinkSmart Configurator</h3></div>
-  	<div class="normal-tab" id="networkTab" onclick="startNetworkManagerStatus()" ><h3>Network Manager Status</h3></div>
-  	<!--  uncomment also the startEventManagerStatus below and all references to eventTab
-  	<div class="right-tab" id="eventTab" onclick="startEventManagerStatus()" ><h3>Event Manager Status</h3></div> 
-  	-->
-  </div>
-  <div id="nav">
-  </div>
-  <div id="content">
-    <div id="left">
-      <h2>Available Configurations</h2>
-    </div>
-    <div id="right">
-	    <div id="selectedconftitle">
-	    	<h1>No configuration selected yet</h1>
-		</div>	
-		<table class="tabletitle">
-	      		<tr>
-	      			<td class="tabletdleft">
-	      				Property
-	      			</td>
-					<td class="tabletdright">
-						Value
-					</td>
-	      		</tr>
-	      	</table>
-	    <div id="selectedconfcontent">  
+  
+ 
+<div id="ui-services">
+	<ul>
+		<li><a href="#ui-services-nm">Network Manager Status</a></li>
+		<li><a href="#ui-services-configurator">LinkSmart Configurator</a></li>
+
+	</ul>
+	<div id="ui-services-configurator">
+		<div id="mgrtabs">
+			<ul>
+			</ul>
 		</div>
-    </div>
-  </div>
-  <br class="clear" />
+	</div>  
+	<div id="ui-services-nm">
+		<span id="hid-toolbar" class="ui-widget-header ui-corner-all">
+		    <button id="reset">play</button>
+		    <span id="hid-types">
+		        <input type="checkbox" id="hid-type-nm" checked="checked" name="hid-types"/><label for="hid-type-nm">Show Network Managers <span class="only" id="hid-nm-only">only</span></a></label>
+		        <input type="checkbox" id="hid-type-local" checked="checked" name="hid-types" /><label for="hid-type-local">Show Local HIDs <span class="only" id="hid-local-only">only</span></label>
+		        <input type="checkbox" id="hid-type-remote" checked="checked" name="hid-types" /><label for="hid-type-remote">Show Remote HIDs <span class="only" id="hid-remote-only">only</span></label>
+		    </span>
+	        <span id="hid-filter" class="ui-widget"><label for="hid-filter-input">Filter</label><input type="text" id="hid-filter-input" class="ui-corner-all ui-button-text" name="hid-filter"/></span>
+		</span>
+	<div id="hid-list-empty">No data yet...</div>
+	<table id="hid-list-data"></table>
+	</div>
+</div>
+
   <div id="footer">
     <p><center>All content copyright &copy; 2009 <strong>LinkSmart project</strong>, all rights reserved.</center></p>
   </div>
 </div>
 </body>
-<script type="text/javascript" charset="utf-8">	
+<script type="text/javascript">	
 	
-var networkManagerInfo;
-var eventManagerInfo;
-var timerOption;
-var previousScroll = 0;
-var loadPrevScroll;
+var networkManagerInfo = {NMAvailable:true, LocalAvailable: true, RemoteAvailable: true, SearchAvailable: true, NMs:[], LocalHIDs:[], RemoteHIDs:[], SearchHIDs:[]};
+//var eventManagerInfo;
 
-getConfigurations();
-document.getElementById("configuratorTab").innerHTML = "<h4>LinkSmart Configurator</h4>";
-timerOption = setInterval("getConfigurations()",5000);
 
 function startConfigurator() {
 	getConfigurations();
-	clearInterval(timerOption);
-	document.getElementById("configuratorTab").innerHTML = "<h4>LinkSmart Configurator</h4>";
-	document.getElementById("networkTab").innerHTML = "<h3>Network Manager Status</h3>";
-	//document.getElementById("eventTab").innerHTML = "<h3>Event Manager Status</h3>";
-	var text = "<div id=\"left\"><h2>Available Configurations</h2></div>";
-    text += "<div id=\"right\"><div id=\"selectedconftitle\"><h1>No configuration selected yet</h1></div>";	
-//	text +=	"<table class=\"tabletitle\"><tr><td class=\"tabletdleft\">Property</td><td class=\"tabletdright\">Value</td></tr></table>";
-	text += "<div id=\"selectedconfcontent\"></div></div>";
-	document.getElementById("content").innerHTML = text;
-	timerOption = setInterval("getConfigurations()",5000);
+	setInterval("getConfigurations()",5000);
 }
 
 function startNetworkManagerStatus() {
-	clearInterval(timerOption);
-	document.getElementById("configuratorTab").innerHTML = "<h3>LinkSmart Configurator</h3>";
-	document.getElementById("networkTab").innerHTML = "<h4>Network Manager Status</h4>";
-	//document.getElementById("eventTab").innerHTML = "<h3>Event Manager Status</h3>";
-	var text = "<div id=\"suboptions\"><div class=\"left-tab-2\" id=\"networkManagers\" onclick=\"showNetworkManagers()\" style=\"position:absolute; left:0px; z-index:7\"><h3>Network Managers</h3></div>";
-	text += "<div class=\"normal-tab-2\" id=\"localHids\" onclick=\"showLocalHids()\" style=\"position:absolute; left:167px; z-index:6\"><h3>Local HIDs</h3></div>";
-	text += "<div class=\"normal-tab-2\" id=\"remoteHids\" onclick=\"showRemoteHids()\" style=\"position:absolute; left:335px; z-index:5\"><h3>Remote HIDs</h3></div></div>";
-	text += "<div id=\"search\"><div style=\"float:left; width:250px\"><h3>Seach Network Manager Entities: </h3></div><input id=\"searchtext\" type=\"text\" value=\"\" onkeypress=\"showNetworkManagerSearch(event)\"/></div>";
-	text += "<div id=\"infoContent\"></div>";
-	document.getElementById("content").innerHTML = text;
-	showNetworkManagers();
-}
-
-function showNetworkManagers() {
-	clearInterval(timerOption);
-	document.getElementById("networkManagers").innerHTML = "<h4>Network Managers</h4>";
-	document.getElementById("localHids").innerHTML = "<h3>Local HIDs</h3>";
-	document.getElementById("remoteHids").innerHTML = "<h3>Remote HIDs</h3>";
-	loadPrevScroll = 0;	
 	getNetworkManagerInfo();
-	timerOption = setInterval("getNetworkManagerInfo()",5000);
-}
-
-function showLocalHids() {
-	clearInterval(timerOption);
-	document.getElementById("networkManagers").innerHTML = "<h3>Network Managers</h3>";
-	document.getElementById("localHids").innerHTML = "<h4>Local HIDs</h4>";
-	document.getElementById("remoteHids").innerHTML = "<h3>Remote HIDs</h3>";	
-	loadPrevScroll = 0;
+	setInterval("getNetworkManagerInfo()",10000);
 	getLocalHidsInfo();
-	timerOption = setInterval("getLocalHidsInfo()",5000);
-}
-
-function showRemoteHids() {
-	clearInterval(timerOption);
-	document.getElementById("networkManagers").innerHTML = "<h3>Network Managers</h3>";
-	document.getElementById("localHids").innerHTML = "<h3>Local HIDs</h3>";
-	document.getElementById("remoteHids").innerHTML = "<h4>Remote HIDs</h4>";
-	loadPrevScroll = 0;
+	setInterval("getLocalHidsInfo()",10000);
 	getRemoteHidsInfo();
-	timerOption = setInterval("getRemoteHidsInfo()",5000);
+	setInterval("getRemoteHidsInfo()",10000);
+	//getNetworkManagerSearch();
+	//timerOption = setInterval("getNetworkManagerSearch()",10000);
 }
 
-
-function showNetworkManagerSearch(event) {
-	document.getElementById("networkManagers").innerHTML = "<h3>Network Managers</h3>";
-	document.getElementById("localHids").innerHTML = "<h3>Local HIDs</h3>";
-	document.getElementById("remoteHids").innerHTML = "<h3>Remote HIDs</h3>";
-	//var keynum = event.which;
-	//if (keynum == 13) {
-		clearInterval(timerOption);
-		loadPrevScroll = 0;
-		getNetworkManagerSearch();
-		timerOption = setInterval("getNetworkManagerSearch()",5000);
-	//}
-}
 /*
 function startEventManagerStatus() {
 	clearInterval(timerOption);
@@ -157,7 +280,7 @@ function startEventManagerStatus() {
 	getEventManagerInfo();
 	timerOption = setInterval("getEventManagerInfo()",5000);
 }
-*/
+
 function showEventManagerSearch(event) {
 	//var keynum = event.which;
 	//if (keynum == 13) {
@@ -167,6 +290,6 @@ function showEventManagerSearch(event) {
 		timerOption = setInterval("getEventManagerSearch()",5000);
 	//}
 }
-
+*/
 </script>
 </html>

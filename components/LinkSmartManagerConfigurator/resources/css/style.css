@@ -63,18 +63,23 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 	font-size: 9pt;
 	line-height: 1.3em;
 	text-align: left;
-	width:95%; 
+	/*width:95%;*/ 
 	margin:5px; 
 	padding:6px; 
 	border:1px solid #D4D4D4;
 	position: relative;
 }
 
-.paramform label {
-	display:block;
+.paramform > label {
 	margin: 5px 0 5px 0;
+	font-weight:bold;
+	display:block;
 }
 
+.submit_button_centerizer {
+	display: block;
+	text-align: center;
+}
 .postinfoodd { background-color:#EFEFEF;  }
 .postinfoeven { background-color:#FEFEFE; }
 .range {
@@ -101,13 +106,6 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 	background: url(../images/attention.png) center left no-repeat;
 	padding-left: 20px;
 }
-
-
-#nav { width:100%; overflow:auto; padding:1px; margin:0; background-color:#D2D2D2; }
-#nav ul { margin:0; padding:0; }
-#nav ul li { float:left; list-style:none; padding:0; }
-#nav ul li a { display:block; width:100px; height:15px; padding:8px 0; margin:0 1px 0 0; background-color:#EFEFEF; text-align:center; }
-#nav ul li a:hover { background-color: #FFFFFF; color:#999999;}
 
 #content { width:100%; }
 
@@ -356,7 +354,7 @@ h4 { font-size:16px; font-weight:bold; font-family:Trebuchet MS; margin:0; color
 }
 
 input.text {
-width: 640px;
+width: 98%;
 } 
 
 input.btn { 

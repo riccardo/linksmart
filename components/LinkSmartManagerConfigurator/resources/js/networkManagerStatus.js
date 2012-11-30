@@ -2,526 +2,217 @@
  * @author Adrian
  */
 
+var NMServletURL = 'http://localhost:8082/GetNetworkManagerStatus';
+
 function getNetworkManagerInfo() {
-	networkManagerInfo = '{"available":"yes", "networkManagers":[], "localHids":[], "remoteHids":[]}'.evalJSON();
-	networkManagerInfo.networkManagers.splice(0,networkManagerInfo.networkManagers.length);	
-	
-	new Ajax.Request('http://localhost:8082/GetNetworkManagerStatus', {
-		method: 'get',
-		parameters: {
-			method: 'getNetworkManagers'
+	$.ajax({
+		url: NMServletURL,
+		type: 'GET',
+		data: {	method: 'getNetworkManagers' },
+		dataType: 'html',
+		error: function(jqXHR, textStatus, errorThrown) {
+			networkManagerInfo.NMAvailable = false;
+			updateNMViews('network-managers');
 		},
-		onComplete: function(transport){
-			var response = transport.responseText;
-			if (response.indexOf("Error 404") != -1) {
-				networkManagerInfo.available = "no";
-				printNetworkManagers();
-				return;
-			}
+		success: function(response) {
 			var networkManagers = response.split("<br>");
 			for (var i = 0; i < networkManagers.length; i++) {
-				networkManagerInfo.networkManagers[i] = '{"hid":"", "description":"", "host":"", "endpoint":"" }'.evalJSON();
+				if (networkManagers[i] == '') continue; //empty lines at end
 				var data = networkManagers[i].split("|");
-				networkManagerInfo.networkManagers[i].hid = data[0];
-				networkManagerInfo.networkManagers[i].description = data[1];
-				networkManagerInfo.networkManagers[i].host = data[2];
-				networkManagerInfo.networkManagers[i].endpoint = data[3];
+				networkManagerInfo.NMs[i] = {hid:data[0], description:data[1], host:data[2], endpoint:data[3] };
 			}
-			if (loadPrevScroll == 1) {
-				previousScroll = document.getElementById("infoContentwrap").scrollTop;
-			}
-			else {
-				previousScroll = 0;
-				loadPrevScroll = 1;
-			}
-			printNetworkManagers();
+			updateNMViews('network-managers');
 		}
 	});
 }
 
 function getLocalHidsInfo() {
-	networkManagerInfo.localHids.splice(0,networkManagerInfo.localHids.length);	
-	new Ajax.Request('http://localhost:8082/GetNetworkManagerStatus', {
-		method: 'get',
-		parameters: {
-			method: 'getLocalHids'
+	$.ajax({
+		url: NMServletURL, 
+		type: 'GET',
+		data: {	method: 'getLocalHids'	},
+		dataType: 'html',
+		error: function(jqXHR, textStatus, errorThrown) {
+			networkManagerInfo.LocalAvailable = false;
+			updateNMViews('local-hids');
 		},
-		onComplete: function(transport){
-			var response = transport.responseText;
-			if (response.indexOf("Error 404") != -1) {
-				networkManagerInfo.available = "no";
-				showNetworkManagers();
-				return;
-			}
+		success: function(response) {
 			var localHids = response.split("<br>");
 			for (var i = 0; i < localHids.length; i++) {
+				if (localHids[i] == '') continue; //empty lines at end
 				var data = localHids[i].split("|");
-				networkManagerInfo.localHids[i] = '{"hid":"", "description":"", "host":"", "endpoint":"" }'.evalJSON();
-				networkManagerInfo.localHids[i].hid = data[0];
-				networkManagerInfo.localHids[i].description = data[1];
-				networkManagerInfo.localHids[i].host = data[2];
-				networkManagerInfo.localHids[i].endpoint = data[3];
+				networkManagerInfo.LocalHIDs[i] = {hid:data[0], description:data[1], host:data[2], endpoint:data[3] };
 			}
-			if (loadPrevScroll == 1) {
-				previousScroll = document.getElementById("infoContentwrap").scrollTop;
-			}
-			else {
-				previousScroll = 0;
-				loadPrevScroll = 1;
-			}
-			printLocalHids();
+			updateNMViews('local-hids');
 		}
 	});
 }
 
 function getRemoteHidsInfo() {	
-	networkManagerInfo.remoteHids.splice(0,networkManagerInfo.remoteHids.length);	
-	new Ajax.Request('http://localhost:8082/GetNetworkManagerStatus', {
-		method: 'get',
-		parameters: {
-			method: 'getRemoteHids'
+	$.ajax({
+		url: NMServletURL,
+		type: 'GET',
+		data: {	method: 'getRemoteHids'	},
+		dataType: 'html',
+		error: function(jqXHR, textStatus, errorThrown) {
+			networkManagerInfo.RemoteAvailable = false;
+			updateNMViews('remote-hids');
 		},
-		onComplete: function(transport){
-			var response = transport.responseText;
-			if (response.indexOf("Error 404") != -1) {
-				networkManagerInfo.available = "no";
-				showNetworkManagers();
-				return;
-			}
+		success: function(response) {
 			var remoteHids = response.split("<br>");
 			for (var i = 0; i < remoteHids.length; i++) {
-				if (i == remoteHids.length - 1) {
-					if (remoteHids[i] == "")				
-						continue;
-				}
+				if (remoteHids[i] == "") continue; //empty lines at end
 				var data = remoteHids[i].split("|");
-				networkManagerInfo.remoteHids[i] = '{"hid":"", "description":"", "host":"", "endpoint":"" }'.evalJSON();
-				networkManagerInfo.remoteHids[i].hid = data[0];
-				networkManagerInfo.remoteHids[i].description = data[1];
-				networkManagerInfo.remoteHids[i].host = data[2];
-				networkManagerInfo.remoteHids[i].endpoint = data[3];
+				networkManagerInfo.RemoteHids[i] = {hid:data[0], description:data[1], host:data[2], endpoint:data[3] };
 			}
-			if (loadPrevScroll == 1) {
-				previousScroll = document.getElementById("infoContentwrap").scrollTop;
-			}
-			else {
-				previousScroll = 0;
-				loadPrevScroll = 1;
-			}
-			printRemoteHids();
+			updateNMViews('remote-hids');
 		}
 	});
 }
 
-function getNetworkManagerSearch() {	
-	new Ajax.Request('http://localhost:8082/GetNetworkManagerStatus', {
-		method: 'get',
-		parameters: {
-			method: 'getNetworkManagerSearch'
-		},
-		onComplete: function(transport){
-			var response = transport.responseText;
-			if (response.indexOf("Error 404") != -1) {
-				networkManagerInfo.available = "no";
-				showNetworkManagers();
-				return;
-			}
-			var remoteHids = response.split("<br>");
-			for (var i = 0; i < remoteHids.length; i++) {
-				if (i == remoteHids.length - 1) {
-					if (remoteHids[i] == "")				
-						continue;
-				}
-				var data = remoteHids[i].split("|");
-				networkManagerInfo.remoteHids[i] = '{"hid":"", "description":"", "host":"", "endpoint":"" }'.evalJSON();
-				networkManagerInfo.remoteHids[i].hid = data[0];
-				networkManagerInfo.remoteHids[i].description = data[1];
-				networkManagerInfo.remoteHids[i].host = data[2];
-				networkManagerInfo.remoteHids[i].endpoint = data[3];
-			}
-			if (loadPrevScroll == 1) {
-				previousScroll = document.getElementById("infoContentwrap").scrollTop;
-			}
-			else {
-				previousScroll = 0;
-				loadPrevScroll = 1;
-			}
-			printNetworkManagerSearch();
-		}
-	});
-}
-
-function printNetworkManagers(){
-	if (networkManagerInfo.available == "no") {
-		var text = "<h1>Network Manager not available</h1>";
-		document.getElementById("search").style.visibility = "hidden";
-		document.getElementById("suboptions").style.visibility = "hidden";
-		document.getElementById("suboptions").style.display = "none";
-		document.getElementById("infoContent").innerHTML = text;
-		return;
-	}
-	document.getElementById("search").style.visibility = "visible";
-	document.getElementById("suboptions").style.visibility = "visible";
-	document.getElementById("suboptions").style.display = "block";
-	var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>ATTRIBUTES</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
-	text += "<TABLE class=\"stats\" WIDTH=100%>";
-	for (var i = 0; i < networkManagerInfo.networkManagers.length; i++) {
-		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.networkManagers[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.networkManagers[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.networkManagers[i].endpoint + "</TD></TR>";
-	}
-	text += "</TABLE></div>";
-	document.getElementById("infoContent").innerHTML = text;
-
-	/*
+function getNetworkManagerSearch() {
+	var searchWord=$('#hid-filter-input').val().trim();
 	
-	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-		document.getElementById("tableContainer").style.width = "98%";
-		document.getElementById("infoContentwrap").style.width = "98%";
-		text = document.getElementById("infoContent").innerHTML;
-		text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"LinkSmartStatus/images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"NetworkManagerStatus2/images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"LinkSmartStatus/images/imageflow/slider.png\"/></div></div></div>"
-		document.getElementById("infoContent").innerHTML = text;
-			    
-		handled = 'infoContentwrap';
-		handlerer = 'infoScrollbarHandler';
-		tracker = 'infoScrollbarTrack';
-				
-		var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-			axis: 'vertical',
-			onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-			onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
+	if (searchWord != '') {
+		$.ajax({
+			url: NMServletURL,
+			type: 'GET',
+			data: {	method: 'getNetworkManagerSearch' },
+			dataType: 'html',
+			error: function(jqXHR, textStatus, errorThrown) {
+				networkManagerInfo.SearchAvailable = false;
+				updateNMViews('search-hids');
+			},
+			success: function(response) {
+				var remoteHids = response.split("<br>");
+				for (var i = 0; i < remoteHids.length; i++) {
+					if (remoteHids[i] == "") continue; //empty lines at end
+					var data = remoteHids[i].split("|");
+					networkManagerInfo.SearchHIDs[i] = {hid:data[0], description:data[1], host:data[2], endpoint:data[3] };
+				}
+				updateNMViews('search-hids');
+			}
 		});
-				
-		if (window.addEventListener) {
-			document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-			document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-		}
-		
-		if (previousScroll < (document.getElementById("infoContentwrap").scrollHeight - 402)) document.getElementById("infoContentwrap").scrollTop = previousScroll;
-		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
-		scrollBarUpdate (handled, handlerer, tracker);
 	}
-	*/
 }
 
-function printLocalHids() {
-	if (networkManagerInfo.available == "no") {
-		var text = "<h1>Network Manager not available</h1>";
-		document.getElementById("search").style.visibility = "hidden";
-		document.getElementById("suboptions").style.visibility = "hidden";
-		document.getElementById("suboptions").style.display = "none";
-		document.getElementById("infoContent").innerHTML = text;
-		return;
-	}
-	document.getElementById("search").style.visibility = "visible";
-	document.getElementById("suboptions").style.visibility = "visible";
-	document.getElementById("suboptions").style.display = "block";
-	var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>ATTRIBUTES</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
-	text += "<TABLE class=\"stats\" WIDTH=100%>";
-	for (var i = 0; i < networkManagerInfo.localHids.length; i++) {
-		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.localHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.localHids[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.localHids[i].endpoint + "</TD></TR>";
-	}
-	text += "</TABLE></div>";
-	document.getElementById("infoContent").innerHTML = text;
-		
-/*
-	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-		document.getElementById("tableContainer").style.width = "98%";
-		document.getElementById("infoContentwrap").style.width = "98%";
-		text = document.getElementById("infoContent").innerHTML;
-		text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"LinkSmartStatus/images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"LinkSmartStatus/images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"LinkSmartStatus/images/imageflow/slider.png\"/></div></div></div>"
-		document.getElementById("infoContent").innerHTML = text;
-			    
-		handled = 'infoContentwrap';
-		handlerer = 'infoScrollbarHandler';
-		tracker = 'infoScrollbarTrack';
-				
-		var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-			axis: 'vertical',
-			onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-			onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
-		});
-				
-		if (window.addEventListener) {
-			document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-			document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-		}
-		
-		if (previousScroll < (document.getElementById("infoContentwrap").scrollHeight - 402)) document.getElementById("infoContentwrap").scrollTop = previousScroll;
-		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
-		scrollBarUpdate (handled, handlerer, tracker);
-	}
-	*/
-}
-
-function printRemoteHids() {
-	if (networkManagerInfo.available == "no") {
-		var text = "<h1>Network Manager not available</h1>";
-		document.getElementById("search").style.visibility = "hidden";
-		document.getElementById("suboptions").style.visibility = "hidden";
-		document.getElementById("suboptions").style.display = "none";
-		document.getElementById("infoContent").innerHTML = text;
-		return;
-	}
-	document.getElementById("search").style.visibility = "visible";
-	document.getElementById("suboptions").style.visibility = "visible";
-	document.getElementById("suboptions").style.display = "block";
-	var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>ATTRIBUTES</h3></TD><TD class=\"hed\" WIDTH=34%><h3>BACKBONE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
-	text += "<TABLE class=\"stats\" WIDTH=100%>";
-	for (var i = 0; i < networkManagerInfo.remoteHids.length; i++) {
-		text += "<TR><TD WIDTH=20%>" + networkManagerInfo.remoteHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.remoteHids[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.remoteHids[i].endpoint + "</TD></TR>";
-	}
-	text += "</TABLE></div>";
-	document.getElementById("infoContent").innerHTML = text;
+function updateNMViews(view) {
+//sync the data to their availability
+	if (!networkManagerInfo.NMAvailable) {
+		networkManagerInfo.NMs = [];
+	} 
 	
-	/*
-	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-		document.getElementById("tableContainer").style.width = "98%";
-		document.getElementById("infoContentwrap").style.width = "98%";
-		text = document.getElementById("infoContent").innerHTML;
-		text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"LinkSmartStatus/images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"LinkSmartStatus/images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"LinkSmartStatus/images/imageflow/slider.png\"/></div></div></div>"
-		document.getElementById("infoContent").innerHTML = text;
-			    
-		handled = 'infoContentwrap';
-		handlerer = 'infoScrollbarHandler';
-		tracker = 'infoScrollbarTrack';
-				
-		var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-			axis: 'vertical',
-			onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-			onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
-		});
-				
-		if (window.addEventListener) {
-			document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-			document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-		}
-		
-		if (previousScroll < (document.getElementById("infoContentwrap").scrollHeight - 402)) document.getElementById("infoContentwrap").scrollTop = previousScroll;
-		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
-		scrollBarUpdate (handled, handlerer, tracker);
+	if (!networkManagerInfo.LocalAvailable) {
+		networkManagerInfo.LocalHIDs = [];
 	}
-	*/
+	
+	if (!networkManagerInfo.RemoteAvailable) {
+		networkManagerInfo.RemoteHIDs = [];
+	}
+	
+	if (!networkManagerInfo.SearchAvailable) {
+		networkManagerInfo.SearchHIDs = [];
+	}
+
+	console.log(view);
+	console.log(networkManagerInfo); 
+
+	if (view=='network-managers') {
+		syncHIDListToView('network-managers', networkManagerInfo.NMs);
+	} else 	if (view=='local-hids') {
+		syncHIDListToView('local-hids', networkManagerInfo.LocalHIDs);
+	} else 	if (view=='remote-hids') {
+		syncHIDListToView('remote-hids', networkManagerInfo.RemoteHIDs);
+	} else 	if (view=='network-managers') {
+		syncHIDListToView('search-hids', networkManagerInfo.SearchHIDs);
+	}
 }
 
-function printNetworkManagerSearch() {
-	var search = document.getElementById('searchtext').value
-	if (networkManagerInfo.available == "no") {
-		var text = "<h1>Network Manager not available</h1>";
-		document.getElementById("search").style.visibility = "hidden";
-		document.getElementById("suboptions").style.visibility = "hidden";
-		document.getElementById("suboptions").style.display = "none";
-		document.getElementById("infoContent").innerHTML = text;
-		return;
-	}
-	document.getElementById("search").style.visibility = "visible";
-	document.getElementById("suboptions").style.visibility = "visible";
-	document.getElementById("suboptions").style.display = "block";
-	var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-	text += "<TR><TD class=\"hed\" WIDTH=20%><h3>HID</h3></TD><TD class=\"hed\" WIDTH=38%><h3>ATTRIBUTES</h3></TD><TD class=\"hed\" WIDTH=34%><h3>ROUTE</h3></TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
-	text += "<TABLE class=\"stats\" WIDTH=100%>";
-	for (var i = 0; i < networkManagerInfo.localHids.length; i++) {
-		if ((networkManagerInfo.localHids[i].hid.indexOf(search) != -1)||(networkManagerInfo.localHids[i].description.indexOf(search) != -1)||(networkManagerInfo.localHids[i].host.indexOf(search) != -1)||(networkManagerInfo.localHids[i].endpoint.indexOf(search) != -1)) {
-			text += "<TR><TD WIDTH=20%>" + networkManagerInfo.localHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.localHids[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.localHids[i].endpoint + "</TD></TR>";
-		}
-	}
-	for (var i = 0; i < networkManagerInfo.remoteHids.length; i++) {
-		if ((networkManagerInfo.remoteHids[i].hid.indexOf(search) != -1)||(networkManagerInfo.remoteHids[i].description.indexOf(search) != -1)||(networkManagerInfo.remoteHids[i].host.indexOf(search) != -1)||(networkManagerInfo.remoteHids[i].endpoint.indexOf(search) != -1)) {
-			text += "<TR><TD WIDTH=20%>" + networkManagerInfo.remoteHids[i].hid + "</TD><TD WIDTH=38%>" + wrap(networkManagerInfo.remoteHids[i].description,55) + "</TD><TD WIDTH=34%>" + networkManagerInfo.remoteHids[i].endpoint + "</TD></TR>";
-		}
-	}
-	text += "</TABLE></div>";
-	document.getElementById("infoContent").innerHTML = text;
-		
-	/*
-	if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-		document.getElementById("tableContainer").style.width = "98%";
-		document.getElementById("infoContentwrap").style.width = "98%";
-		text = document.getElementById("infoContent").innerHTML;
-		text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"LinkSmartStatus/images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"LinkSmartStatus/images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-		text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"LinkSmartStatus/images/imageflow/slider.png\"/></div></div></div>"
-		document.getElementById("infoContent").innerHTML = text;
-			    
-		handled = 'infoContentwrap';
-		handlerer = 'infoScrollbarHandler';
-		tracker = 'infoScrollbarTrack';
-				
-		var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-			axis: 'vertical',
-			onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-			onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
-		});
-				
-		if (window.addEventListener) {
-			document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-			document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-		}
-		
-		if (previousScroll < (document.getElementById("infoContentwrap").scrollHeight - 402)) document.getElementById("infoContentwrap").scrollTop = previousScroll;
-		else document.getElementById("infoContentwrap").scrollTop = (document.getElementById("infoContentwrap").scrollHeight - 402);
-		scrollBarUpdate (handled, handlerer, tracker);
 
+function doesNMDataHaveThisHID(NMData, HID) {
+	if (NMData.hid === HID) {
+		return true;
+	} else {
+		return false;
 	}
-	*/
 }
 
-/*function getNetworkManagers(){
-	new Ajax.Request('php/getNetworkManagers.php', {
-		method: 'post',
-		parameters: {},
-		onComplete: function(transport){
-			var response = transport.responseText;
-			var networkManagers = response.split("<br>");
-			var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-			text += "<TR><TD class=\"hed\" WIDTH=20%>HID</TD><TD class=\"hed\" WIDTH=38%>DESCRIPTION</TD><TD class=\"hed\" WIDTH=10%>  HOST</TD><TD class=\"hed\" WIDTH=34%>ROUTE</TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
-			text += "<TABLE class=\"stats\" WIDTH=100%>";
-			for (var i = 0; i < networkManagers.length; i++) {
-				var data = networkManagers[i].split("|");
-				text += "<TR><TD WIDTH=20%>" + data[0] + "</TD><TD WIDTH=38%>" + data[1] + "</TD><TD WIDTH=10%>" + data[2] + "</TD><TD WIDTH=34%>" + data[3] + "</TD></TR>";
+function syncHIDListToView(cssClass, newData) {
+	var filter = '.' + cssClass;
+	
+	if (newData.length == 0) {
+		$('#hid-list-data tr').filter(filter).addClass('ui-state-highlight').hide('slow', function(){ $('#hid-list-data tr').filter(filter).remove(); showHideHIDView(); });
+	} else {
+		var HIDRows=$('#hid-list-data tr').filter(filter);
+
+		//delete gone HIDs
+		for (var i = 0; i < HIDRows.length; i++) { //as long as there are
+			var oneHID = HIDRows.eq(i).find('td:first').html(); //not text because the server sends us HTML!!
+			var foundIn = $.each(newData, function(index, value) { 
+									return doesNMDataHaveThisHID(newData[index], oneHID);
+								});
+			if (foundIn.length == 0) {
+				//not found anywhere, this HID should be removed
+				var thisRow = HIDRows.eq(i);
+				thisRow.addClass('ui-state-highlight').hide('slow', function(){ thisRow.remove();});
+				i--; //because one was just removed, so the i+1th new order would be the i+2 old order
 			}
-			text += "</TABLE></div>";
-			document.getElementById("infoContent").innerHTML = text;
-			
-			if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-				document.getElementById("tableContainer").style.width = "97%";
-				document.getElementById("infoContentwrap").style.width = "97%";
-				text = document.getElementById("infoContent").innerHTML;
-				text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-				text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-				text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"images/imageflow/slider.png\"/></div></div></div>"
-				document.getElementById("infoContent").innerHTML = text;
-			    
-				handled = 'infoContentwrap';
-				handlerer = 'infoScrollbarHandler';
-				tracker = 'infoScrollbarTrack';
-				
-				var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-					axis: 'vertical',
-					onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-					onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
-				});
-				
-				if (window.addEventListener) {
-					document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-					document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-				}
-				
-				if (num != undefined) {
-					document.getElementById("infoContentwrap").scrollTop = prevscroll;
-					div2 = document.getElementById("infoScrollbarHandler");
-					div2.style.top = prevbarpos;
-				}
-			}	
 		}
-	});
+
+		//at this point all that remains are the known and still-active HIDs
+		var knownHIDs = HIDRows.find('.hid');
+
+		//now insert new HIDs
+		var rowTemplate = '<tr class="' + cssClass + '"><td class="hid">{hid}</td><td class="description">{description}</td><td class"host">{host}</td><td class="endpoint">{endpoint}</td></tr>';
+		var HIDTable = $('#hid-list-data');
+		for (var i = 0; i < newData.length; i++) {
+			var foundIn = $.each(knownHIDs, function(index, value) { 
+					console.log(value);
+					if ($(value).html().trim() == newData[i].hid.trim()) {
+						return true;
+					} else {
+						return false;
+					}
+			});
+
+			if (foundIn.length == 0) { //i.e. not known
+			    var newRow = $(	 rowTemplate.replace( /\{hid\}/g, newData[i].hid )
+			    							.replace( /\{description\}/g, newData[i].description )
+			    							.replace( /\{host\}/g, newData[i].host )
+			    							.replace( /\{endpoint\}/g, newData[i].endpoint) );
+
+			    var searchWord=$('#hid-filter-input').val().trim();
+			    if (searchWord.length > 0) {
+					if (newRow.html().indexOf(searchWord) == -1) { //this new row does not have the search word we're currently searching, mark it to be hidden
+						newRow.addClass('filter-hide');
+					}
+				}
+			    HIDTable.append( newRow );
+		    }
+		}
+	}
+	
+	showHideHIDViews(); //remove the "no data" part, or show it if we really have nothing to report
 }
 
-function getLocalHids() {
-	new Ajax.Request('php/getLocalHids.php', {
-		method: 'post',
-		parameters: {},
-		onComplete: function(transport){
-			var response = transport.responseText;
-			var localhids = response.split("<br>");
-			var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-			text += "<TR><TD class=\"hed\" WIDTH=17%>HID</TD><TD class=\"hed\" WIDTH=41%>DESCRIPTION</TD><TD class=\"hed\" WIDTH=10%>  HOST</TD><TD class=\"hed\" WIDTH=34%>ROUTE</TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
-			text += "<TABLE class=\"stats\" WIDTH=100%>";
-			for (var i = 0; i < localhids.length; i++) {
-				var data = localhids[i].split("|");
-				text += "<TR><TD WIDTH=17%>" + data[0] + "</TD><TD WIDTH=41%>" + data[1] + "</TD><TD WIDTH=10%>" + data[2] + "</TD><TD WIDTH=34%>" + data[3] + "</TD></TR>";
-			}
-			text += "</TABLE></div>";
-			document.getElementById("infoContent").innerHTML = text;
-			
-			if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-				document.getElementById("tableContainer").style.width = "97%";
-				document.getElementById("infoContentwrap").style.width = "97%";
-				text = document.getElementById("infoContent").innerHTML;
-				text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-				text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-				text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"images/imageflow/slider.png\"/></div></div></div>"
-				document.getElementById("infoContent").innerHTML = text;
-			    
-				handled = 'infoContentwrap';
-				handlerer = 'infoScrollbarHandler';
-				tracker = 'infoScrollbarTrack';
-				
-				var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-					axis: 'vertical',
-					onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-					onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
-				});
-				
-				if (window.addEventListener) {
-					document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-					document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-				}
-				
-				if (num != undefined) {
-					document.getElementById("infoContentwrap").scrollTop = prevscroll;
-					div2 = document.getElementById("infoScrollbarHandler");
-					div2.style.top = prevbarpos;
-				}
-			}
-		}
-	});
-}
 
-function getRemoteHids() {
-	new Ajax.Request('php/getRemoteHids.php', {
-		method: 'post',
-		parameters: {},
-		onComplete: function(transport){
-			var response = transport.responseText;
-			var remotehids = response.split("<br>");
-			var text = "<div id=\"tableContainer\" style=\"position:relative; overflow: hidden; width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\"><TABLE class=\"stats\" WIDTH=100%>";
-			text += "<TR><TD class=\"hed\" WIDTH=17%>HID</TD><TD class=\"hed\" WIDTH=41%>DESCRIPTION</TD><TD class=\"hed\" WIDTH=10%>  HOST</TD><TD class=\"hed\" WIDTH=34%>ROUTE</TD></TR></TABLE></div><div style=\"width: 100%; border-right: 1px solid #666666;border-left: 1px solid #666666;border-top: 1px solid #666666;\" id=\"infoContentwrap\">";
-			text += "<TABLE class=\"stats\" WIDTH=100%>";
-			for (var i = 0; i < remotehids.length; i++) {
-				var data = remotehids[i].split("|");
-				text += "<TR><TD WIDTH=17%>" + data[0] + "</TD><TD WIDTH=41%>" + data[1] + "</TD><TD WIDTH=10%>" + data[2] + "</TD><TD WIDTH=34%>" + data[3] + "</TD></TR>";
-			}
-			text += "</TABLE></div>";
-			document.getElementById("infoContent").innerHTML = text;
-			
-			if (document.getElementById("infoContentwrap").scrollHeight > 400) {
-				document.getElementById("tableContainer").style.width = "97%";
-				document.getElementById("infoContentwrap").style.width = "97%";
-				text = document.getElementById("infoContent").innerHTML;
-				text += "<div style=\"position: absolute; right:0px; top: 0px; width: 2%; height:425px\" id=\"infoScrollbar\"><IMG  id=\"infoScrollUp\" style=\"position:absolute; cursor:pointer;\" onmousedown=\"step=10;scrollDivUp('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerUp); clearTimeout(timerBar);\" onmouseup=\"clearTimeout(timerUp); clearTimeout(timerBar);\" SRC=\"images/imageflow/button_up.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-				text += "<IMG id=\"infoScrollDown\" onmousedown=\"step=10;scrollDivDown('infoContentwrap'); scrollBarUpdate ('infoContentwrap', 'infoScrollbarHandler', 'infoScrollbarTrack');\" onmouseout=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" onmouseup=\"clearTimeout(timerDown); clearTimeout(timerBar);\" style=\"position:absolute; cursor:pointer;\" SRC=\"images/imageflow/button_down.png\" WIDTH=17 HEIGHT=17 BORDER=0>";
-				text += "<div id=\"infoScrollbarTrack\"><div id=\"infoScrollbarLine\"></div><div id=\"infoScrollbarHandler\"><img src=\"images/imageflow/slider.png\"/></div></div></div>"
-				document.getElementById("infoContent").innerHTML = text;
-			    
-				handled = 'infoContentwrap';
-				handlerer = 'infoScrollbarHandler';
-				tracker = 'infoScrollbarTrack';
-				
-				var slider = new Control.Slider('infoScrollbarHandler', 'infoScrollbarTrack', {
-					axis: 'vertical',
-					onSlide: function(v) { scrollVertical(v, $('infoContentwrap'), slider);  },
-					onChange: function(v) { scrollVertical(v, $('infoContentwrap'), slider); }
-				});
-				
-				if (window.addEventListener) {
-					document.getElementById("infoContentwrap").addEventListener('DOMMouseScroll', wheel, false);
-					document.getElementById("infoContentwrap").onmousewheel = document.onmousewheel = wheel;
-				}
-				
-				if (num != undefined) {
-					document.getElementById("infoContentwrap").scrollTop = prevscroll;
-					div2 = document.getElementById("infoScrollbarHandler");
-					div2.style.top = prevbarpos;
-				}
+function showSearchResults() {
+
+	var searchWord=$('#hid-filter-input').val().trim();
+	var HIDRows=$('#hid-list-data tr');
+
+	if (searchWord.length > 0) {
+		var rows = HIDRows.length;
+		for (var i=0; i < rows; i++) {
+			var oneRow = HIDRows.eq(i);
+			if (oneRow.html().indexOf(searchWord) >= 0) {
+				oneRow.removeClass('filter-hide');
+			} else {
+				oneRow.addClass('filter-hide');
 			}
 		}
-	});
-}*/
+	} else {
+		HIDRows.removeClass('filter-hide');
+	}
+	showHideHIDViews();
+}

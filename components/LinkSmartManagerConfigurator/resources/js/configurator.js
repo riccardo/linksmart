@@ -4,256 +4,335 @@
  *
  *--------------------------------------------------------------------------*/
 
-var servletAddress = "/LinkSmartConfigurator/GetConfiguration";
-var currentConfiguration = null;
+var configurationServletAddress = "/LinkSmartConfigurator/GetConfiguration";
 var currentConfigurationData = null;
 
+function cssID2mgrID(cssID) {
+	return cssID.replace(/-/g, '.');
+}
+
+function mgrID2cssID(mgrID) {
+	return mgrID.replace(/\./g, '-');
+
+}
 
 function isNumeric(s) {
     return (s - 0) == s && s.length > 0;
 }
-/*
-//augment arrays to support indexOf property if needed (older browsers)
-if (!Array.prototype.indexOf) {
-//    Array.prototype.indexOf = function (searchElement , fromIndex ) {
-    Array.prototype.indexOf = function (searchElement) {
-        "use strict";
-        if (this === void 0 || this === null) {
-            throw new TypeError();
-        }
-        var t = Object(this);
-        var len = t.length >>> 0;
-        if (len === 0) {
-            return -1;
-        }
-        var n = 0;
-        if (arguments.length > 0) {
-            n = Number(arguments[1]);
-            if (n !== n) { // shortcut for verifying if it's NaN
-                n = 0;
-            } else if (n !== 0 && n !== window.Infinity && n !== -window.Infinity) {
-                n = (n > 0 || -1) * Math.floor(Math.abs(n));
-            }
-        }
-        if (n >= len) {
-            return -1;
-        }
-        var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
-        for (; k < len; k++) {
-            if (k in t && t[k] === searchElement) {
-                return k;
-            }
-        }
-        return -1;
-    }
-}
-*/
 
 function getConfigurations(){
-		var responseJSON;
-		var jsonResponse;
-		new Ajax.Request(servletAddress, {
-			method: 'get',
-			parameters: {
-				method: 'listConfigurations'
-			},
-			onComplete: function(transport){
-				responseJSON = transport.responseText;
+		console.log('getting configs');
+		$.ajax({
+			url: configurationServletAddress, 
+			type: 'GET',
+			data: {method: 'listConfigurations'},
+			dataType: 'json',
+			success: function(responseJSON){
 				//mockup
 				//responseJSON = '[{"configurations":["eu.linksmart.eventmanager","eu.linksmart.network.NetworkManager"]}]';
-				var jsonResponse = responseJSON.evalJSON();
-				updateLeft(jsonResponse);
+//				console.log(responseJSON);
+				updateManagerTabs(responseJSON);
 			}
 		});
 		
 }
 
-function updateLeft(configurations){
-	//Fill in configuration menu 
-	var leftHTML = "<h2>Available Configurations</h2>";
-	leftHTML += "<ul>";
-	for (var i = 0; i < configurations[0].configurations.length; i++) {
-		var jsText = "javascript:getConfigurationData('" + configurations[0].configurations[i] + "')";
-		leftHTML += "<li><a href='#' onclick='javascript:getConfigurationData(\"" + configurations[0].configurations[i] + "\");'>" + configurations[0].configurations[i] + "</a></li>";
+function updateManagerTabs(configurations){
+
+
+//delete gone tabs
+	for (var i = 0; i < $('#mgrtabs .ui-tabs-nav li').length; i++) { //as long as there are
+		var oneTab = $('#mgrtabs .ui-tabs-nav li').eq(i);
+		//console.log(oneTab);
+		var oneTabId = $(oneTab).attr('id').replace(/^li-/g, '');
+		var oneMgrId = cssID2mgrID(oneTabId);
+		if ($.inArray(oneMgrId, configurations[0].configurations) == -1) {
+			//console.log(oneMgrId);
+			//tab id is not in configurations
+			//delete that tab
+			//console.log('#li-' + oneTabId);
+			$('#li-' + oneTabId).remove();
+			i--; //because one was just removed, so the i+1th new order would be the i+2 old order
+			$('#tab-' + oneTabId).remove(); //and remove that panel
+		}
 	}
-	leftHTML += "</ul>";
-	document.getElementById("left").innerHTML = leftHTML;
+
+	var tabTemplate = '<li id="li-{href}"><a href="#tab-{href}">{label}</a></li>';
+	var mgrtabs=$('#mgrtabs');
+
+	//Fill in configuration menu
+	for (var i = 0; i < configurations[0].configurations.length; i++) {
+		var label = configurations[0].configurations[i];
+	    var cssID=mgrID2cssID(label);
+	    var newTab = $( tabTemplate.replace( /\{href\}/g, cssID ).replace( /\{label\}/g, label.replace(/^eu\.linksmart\./g, '') ) );
+
+	    //console.log(id);
+
+	    if ($('#mgrtabs .ui-tabs-nav li').filter('#li-' + cssID).length == 0) {
+		    mgrtabs.find( ".ui-tabs-nav" ).append( newTab );
+		    var tabContentHtml = "Getting configuration data for " + label + '...';
+			mgrtabs.append( '<div id="tab-' + cssID + '"><p>' + tabContentHtml + '</p></div>' );
+	    }
+	}
+
+	mgrtabs.tabs( "refresh" );
+   	$('#mgrtabs li').removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+
 }
 
+
+
+
+//call this from a before-show event in #mgrtabs.tabs()
 function getConfigurationData(configuration){
-	currentConfiguration = configuration;
-	var responseJSON;
-		var jsonResponse;
-		new Ajax.Request(servletAddress, {
-			method: 'get',
-			parameters: {
-				method: 'getConfiguration',
-				configName: configuration
-			},
-			onComplete: function(transport){
-				responseJSON = transport.responseText;
+	$.ajax({
+			url: configurationServletAddress, 
+			type: 'GET',
+			data: { method: 'getConfiguration', configName: configuration },
+			dataType: 'json',
+			success: function(responseJSON){
 				//mockup
 				//responseJSON = '[{"name":"eu.linksmart.eventmanager","parameters":[{"name":"CoreSecurityClient","value":"true"},{"name":"EventManagerDescription","value":"EventManager_AARHUS"},{"name":"NetworkManagerAddress","value":"http://localhost:8082/axis/services/NetworkManagerApplication"},{"name":"service.pid","value":"eu.linksmart.eventmanager"},{"name":"SOAPTunnelingAddress","value":"http://localhost:8082/SOAPTunneling"},{"name":"withNetworkManager","value":"true"}]}]';
-				currentConfigurationData = responseJSON.evalJSON();
-				updateRight(currentConfigurationData);
+//				console.log(responseJSON);
+				currentConfigurationData = responseJSON;
+				showConfigurationDataForm(currentConfigurationData);
 			}
 		});
 }
 
+function makeInputBox(paramName, paramValue) {
+	return $('<input/>')
+			.attr('type', 'text')
+			.addClass("text")
+			.attr('name', paramName)
+			.attr('id', mgrID2cssID(paramName) + '_form')
+			.val(paramValue);
 
-function updateRight(configuration){
-	//Fill in configuration form 
-	document.getElementById("selectedconftitle").innerHTML = "<h1>" + configuration.name + "</h1>";
-
-	var rightHTML = '<div id="optionsContainer">';
-
+}
+function showConfigurationDataForm(configuration){
+	
+	var panelID = mgrID2cssID(configuration.name);
+	
+	//Fill in configuration form
+	//$('#tab-' + panelID).html("<h1>" + configuration.name + "</h1>");
+	$('#tab-' + panelID).empty();
+	
 	var zebraDark=false;
 	for (var paramName in configuration.parameters) {
 		var paramValue = configuration.parameters[paramName];
 		if (paramName.startsWith('ParamDescription')) {
 			continue; //this is only descriptive, should not be usable/configurable.
 		} 
+
 		var labelText = configuration.parameters['ParamDescription.'+paramName+'.description'];
 		if (!labelText) {
 			labelText = paramName;
 		}
-		rightHTML += '<div class="' + (zebraDark?'postinfoeven':'postinfoodd') + ' paramform" id="' + paramName + '_form_div"><span class="errormsg" id="' + paramName + '_form_errormsg"></span><label for="' + paramName + '_form">' + labelText + '</label>';
+		var formDiv = '';
+		var formCssID=mgrID2cssID(paramName);
+		formDiv = $('<div/>')
+					.addClass((zebraDark?'postinfoeven':'postinfoodd'))
+					.addClass('paramform')
+					.attr('id',  formCssID + '_form_div')
+					.append($('<span/>').addClass('errormsg').attr('id', formCssID + '_form_errormsg'))
+					.append($('<label/>').attr('for', formCssID + '_form').text(labelText));
+		console.log(formDiv);
 		var formElement='';
+		var cssParamName = mgrID2cssID(paramName);
 		
 		switch (configuration.parameters['ParamDescription.'+paramName+'.type']) {
 			case 'choice':
+				
 				if (configuration.parameters['ParamDescription.'+paramName+'.choice0']) {
-					formElement = '<select name="' + paramName + '" id="' + paramName + '_form" >';
+					formElement = $('<div/>')
+									.attr('id', cssParamName + '_form_wrapper');
 					var n=0; //start enumerating choices from config file
 					while (configuration.parameters['ParamDescription.'+paramName+'.choice'+n]) {
 						var choiceData = configuration.parameters['ParamDescription.'+paramName+'.choice'+n].split('|');
-						formElement += '<option value="' + choiceData[0] + '" ' + (paramValue==choiceData[0]? 'selected': '')  + '>' + choiceData[1] + '</option>';
+						var option=$('<input/>')
+									.attr('type', 'radio')
+									.attr('id', cssParamName + '_form_'+n)
+									.attr('name', paramName)
+									.val(choiceData[0]);
+						if (paramValue==choiceData[0]) {
+							option.attr('checked', 'checked');
+						}
+						formElement.append(option);
+						formElement.append($('<label/>').text(choiceData[1]).attr('for', cssParamName + '_form_' + n));
 						n++;
 					}
-					formElement += '</select>';
+					formElement.buttonset();
 				} else { //has said it's choice, but has not given any choice as paramdescription
-					formElement = '<input type="text" class="text" name="' + paramName + '" id="' + paramName + '_form" value="' + paramValue + '" />';
+					formElement = makeInputBox(paramName, paramValue);
 				}
+				
 				break;
 			case 'multichoice':
+				
 				if (configuration.parameters['ParamDescription.'+paramName+'.choice0']) {
-					formElement = '<select multiple="true" name="' + paramName + '" id="' + paramName + '_form" >';
+					formElement = $('<div/>')
+									.attr('id', cssParamName + '_form_wrapper');
 					var n=0; //start enumerating choices from config file
 					while (configuration.parameters['ParamDescription.'+paramName+'.choice'+n]) {
 						var choiceData = configuration.parameters['ParamDescription.'+paramName+'.choice'+n].split('|');
-						formElement += '<option value="' + choiceData[0] + '" ' + (paramValue.indexOf(choiceData[0]) != -1 ? 'selected': '')  + '>' + choiceData[1] + '</option>';
+						var option=$('<input/>')
+									.attr('type', 'checkbox')
+									.attr('id', cssParamName + '_form_'+n)
+									.attr('name', paramName)
+									.val(choiceData[0]);
+						if (paramValue.indexOf(choiceData[0]) != -1) {
+							option.attr('checked', 'checked');
+						}
+						formElement.append(option);
+						formElement.append($('<label/>').text(choiceData[1]).attr('for', cssParamName + '_form_' + n));
 						n++;
 					}
-					formElement += '</select>';
+					formElement.buttonset();
 				} else { //has said it's choice, but has not given any choice as paramdescription
-					formElement = '<input type="text" class="text" name="' + paramName + '" id="' + paramName + '_form" value="' + paramValue + '" />';
+					formElement = makeInputBox(paramName, paramValue);
 				}
 				break;
 			case 'boolean': //select instead of checkbox, because checkbox does not get sent if unchecked, and receiver servlet then deletes the param.
-				formElement = '<select name="' + paramName + '" id="' + paramName + '_form" >';
-				formElement += '<option value="true" ' + (paramValue=='true'? 'selected': '') + '>True</option>';
-				formElement += '<option value="false" ' + (paramValue=='false'? 'selected': '') + '>False</option>';
-				formElement += '</select>';
+				
+					formElement = $('<div/>')
+									.attr('id', cssParamName + '_form_wrapper');
+					
+					var yesOption=$('<input/>')
+									.attr('type', 'radio')
+									.attr('id', cssParamName + '_form_y')
+									.attr('name', paramName )
+									.val('true');
+					if (paramValue=='true') {
+						yesOption.attr('checked', 'checked');
+					}
+					formElement.append(yesOption);
+					formElement.append($('<label/>').text('True').attr('for', cssParamName + '_form_y'));
+					
+					var noOption=$('<input/>')
+									.attr('type', 'radio')
+									.attr('id', cssParamName + '_form_n')
+									.attr('name', paramName )
+									.val('true');
+					if (paramValue=='false' || paramValue == '') {
+						noOption.attr('checked', 'checked');
+					}
+					formElement.append(noOption);
+					formElement.append($('<label/>').text('False').attr('for', cssParamName + '_form_n'));
+					formElement.buttonset();
 				break;			
 			case 'integer':
+				
 				var rangeMin = (configuration.parameters['ParamDescription.'+paramName+'.min'] ? configuration.parameters['ParamDescription.'+paramName+'.min'] : '');
 				var rangeMax = (configuration.parameters['ParamDescription.'+paramName+'.max'] ? configuration.parameters['ParamDescription.'+paramName+'.max'] : '');
-				formElement = '';
+				
+				formElement = $('<div/>')
+							.attr('id', cssParamName + '_form_wrapper');
+				var spinValidator;
+				
 				if (rangeMin != '' && rangeMax != '') {
-					formElement = '<span class="range">Range:' + rangeMin + ' - ' + rangeMax +'</span>'; 
+					formElement.append($('<label/>').attr('for', cssParamName + '_form').text('Range:' + rangeMin + ' - ' + rangeMax).addClass('range'));
 				} else if (rangeMin != '') {
-					formElement = '<span class="range">Minimum:' + rangeMin + '</span>'; 
+					formElement.append($('<label/>').attr('for', cssParamName + '_form').text('Minimum:' + rangeMin).addClass('range'));
 				} else if (rangeMax != '') {
-					formElement = '<span class="range">Maximum:' + rangeMax + '</span>'; 
-				}
-				formElement += ' <input type="text" class="text" name="' + paramName + '" id="' + paramName + '_form" value="' + paramValue + '" />';
-				break;
+					formElement.append($('<label/>').attr('for', cssParamName + '_form').text('Maximum:' + rangeMax).addClass('range'));
+				} else {
+					formElement.append($('<label/>').attr('for', cssParamName + '_form').text('Any number').addClass('range'));
+		        }
+				var spinnerBox=$('<input/>')
+								.attr('type', 'text')
+								.attr('name', paramName)
+								.attr('id', cssParamName + '_form')
+								.val(paramValue);
+			    formElement.append(spinnerBox);
+			    spinnerBox.spinner({
+		            spin: spinValidator
+		        });
+			    if (rangeMin != '') {
+			    	spinnerBox.spinner('option', 'min', rangeMin);
+			    }
+			    if (rangeMax != '') {
+			    	spinnerBox.spinner('option', 'max', rangeMax);
+			    }
+			    break;
 			case 'readonly':
-				formElement = '<input type="text" readonly="readonly" class="text" name="' + paramName + '" id="' + paramName + '_form" value="' + paramValue + '" />';
+				formElement = makeInputBox(paramName, paramValue);
+				formElement.attr('readonly', 'readonly').addClass('readonly');
 				break;
 			case 'text':
 			default:
-				formElement = (configuration.parameters['ParamDescription.'+paramName+'.ereg'] ? 
-									('<span class="range">Must match this regular expression: ^' + configuration.parameters['ParamDescription.'+paramName+'.ereg'] +'</span>') 
-									: 
-									''
-							  );
-				formElement += '<input type="text" class="text" name="' + paramName + '" id="' + paramName + '_form" value="' + paramValue + '" />';
+				formElement = $('<div/>')
+					.attr('id', cssParamName + '_form_wrapper');
+				if (configuration.parameters['ParamDescription.'+paramName+'.ereg']) {
+					formElement.append($('<label/>')
+									.addClass('range')
+									.text('Must match this regular expression: ^' + configuration.parameters['ParamDescription.'+paramName+'.ereg'])
+									.attr('for', cssParamName + '_form')
+									); 
+				}
+				formElement.append(makeInputBox(paramName, paramValue));
 		}
 		
-		rightHTML += formElement + '</div>'; 
+		formDiv.append(formElement); 
+		$('#tab-' + panelID).append(formDiv);
 		zebraDark = !zebraDark;
-	}   
-	rightHTML += "</div><center><input class='btn' onclick='submitConfiguration(\"" + configuration.name + "\")' type='button' value='Update Configuration' /></center>"; 
-	
-	document.getElementById("selectedconfcontent").innerHTML = rightHTML;
+	}
+	var submitButton = $('<button/>')
+						.text('Update Configuration')
+						.attr('id', 'configurator-submit')
+						.click(function () {
+							submitConfiguration(configuration.name);
+						});
+	$('#tab-' + panelID).append($('<div/>').addClass('submit_button_centerizer').append(submitButton));
+	$('#configurator-submit').button({
+        icons: {
+            primary: "ui-icon-disk"
+        }
+    });
+
 }
 
 function submitConfiguration(configuration){
 	
-	var inputIsOK = validateInputs(currentConfigurationData);
+	var statusAndAnswers = validateInputsAndGetAnswers(currentConfigurationData);
+	var inputIsOK = statusAndAnswers.inputIsOK;
+	var answers = statusAndAnswers.answers;
+	
 	if (!inputIsOK) {
-		alert("Please correct the values in red -- they contain forbidden or meaningless values.");
+		alert("Please correct the fields in red -- they contain forbidden or meaningless values.");
 		return false;
 	}
 	
 	var jsonText = '[{"name":"' + configuration + '","parameters": [';
-	var arrayInput = document.getElementsByTagName("input");
-	for (var i = 0; i < arrayInput.length -1; i++) { //-1 because we do not want the button to be counted
-		jsonText += '{ "name": "' + arrayInput[i].name + '","value": "' + arrayInput[i].value + '"},'
-	}
-
-	var arraySelect = document.getElementsByTagName("select");
-	for (var i = 0; i < arraySelect.length; i++) { //after modifications for type checking and interface improvement, we include also selects
-		if (arraySelect[i].multiple == true) {
-			var selectedValues = '';
-			var count = 0;
-			var options = arraySelect[i].options;
-			for (var j = 0; j < options.length; j++) {
-			    if (options[j].selected) {
-			    	selectedValues += options[j].value + '|';
-			    	count++;
-			    }
-			}
-			if (count > 1) {
-				selectedValues = selectedValues.substring(0, selectedValues.length - 1)
-			}
-			jsonText += '{ "name": "' + arraySelect[i].name + '","value": "' + selectedValues + '"},'
-		} else {
-			jsonText += '{ "name": "' + arraySelect[i].name + '","value": "' + arraySelect[i].value + '"},'
-  		}
-	}
-
-	jsonText = jsonText.substr(0,jsonText.length -1);
+	jsonText += answers
 	jsonText += ']}]'; 
 
-	new Ajax.Request(servletAddress, {
-		method: 'post',
-		parameters: {
-			method: 'postConfiguration',
-			configuration: jsonText
-		},
-		onComplete: function(transport){
+	$.ajax({
+		url: configurationServletAddress,
+		type: 'POST',
+		data: {	method: 'postConfiguration', configuration: jsonText },
+		//dataType: 'json',
+		success: function(response){
+			console.log(response);
 			alert("Configuration saved");
+			
 		}
 	});
 }
 
 
-function validateInputs(configuration) {
-	
+function validateInputsAndGetAnswers(configuration) {
 	var noErrors = true;
 	var isThisOneInputValid = true;
 	
+
+	var jsonText = '';
+	var validationResult = [];
+
 	for (var paramName in configuration.parameters) {
 		var paramValue = configuration.parameters[paramName];
 		if (paramName.startsWith('ParamDescription')) {
 			continue; //this is only descriptive, should not be usable/configurable.
 		}
-
-		//at this point we know we have a parameter
-		//get the HTML form element for it
-		var paramFormElement = document.getElementById(paramName + '_form');
 
 		switch (configuration.parameters['ParamDescription.'+paramName+'.type']) {
 			case 'choice':
@@ -265,9 +344,9 @@ function validateInputs(configuration) {
 						choices.push(choiceData[0]);
 						n++;
 					}
-					isThisOneInputValid = validate_choice(paramFormElement, choices);
+					validationResult = validateChoiceAndGetAnswer(paramName, choices);
 				} else { //has said it's choice, but has not given any choice as paramdescription. Default to text, accept all since we don't have an ereg
-					isThisOneInputValid = validate_text(paramFormElement, '.*');
+					validationResult = validateTextAndGetAnswer(paramName, '.*');
 				}
 				break;
 			case 'multichoice':
@@ -283,71 +362,84 @@ function validateInputs(configuration) {
 						choices.push(choiceData[0]);
 						n++;
 					}
-					isThisOneInputValid = validate_multichoice(paramFormElement, choices, numChoicesMin, numChoicesMax, positionalValidation);
+					validationResult = validateMultichoiceAndGetAnswer(paramName, choices, numChoicesMin, numChoicesMax, positionalValidation);
 				} else { //has said it's choice, but has not given any choice as paramdescription. Default to text, accept all since we don't have an ereg
-					isThisOneInputValid = validate_text(paramFormElement, '.*');
+					validationResult = validateTextAndGetAnswer(paramName, '.*');
 				}
 				break;
 
 			case 'boolean': //select instead of checkbox, because checkbox does not get sent if unchecked, and receiver servlet then deletes the param.
-				isThisOneInputValid = validate_boolean(paramFormElement);
+				validationResult = validateBooleanAndGetAnswer(paramName);
 				break;			
 			case 'integer':
 				var rangeMin = (configuration.parameters['ParamDescription.'+paramName+'.min'] ? configuration.parameters['ParamDescription.'+paramName+'.min'] : null);
 				var rangeMax = (configuration.parameters['ParamDescription.'+paramName+'.max'] ? configuration.parameters['ParamDescription.'+paramName+'.max'] : null);
-				isThisOneInputValid = validate_integer(paramFormElement, rangeMin, rangeMax);
+				validationResult = validateIntegerAndGetAnswer(paramName, rangeMin, rangeMax);
 				break;
 			case 'readonly':
+				validationResult = {isValid: true, answer: ''};
 				break;
 			case 'text':
 			default:
 				var ereg = (configuration.parameters['ParamDescription.'+paramName+'.ereg'] ? configuration.parameters['ParamDescription.'+paramName+'.ereg'] : '.*');
-				isThisOneInputValid = validate_text(paramFormElement, ereg);
+				validationResult = validateTextAndGetAnswer(paramName, ereg);
 		}
-		noErrors = noErrors && isThisOneInputValid;
+		
+		noErrors = noErrors && validationResult.isValid;
+		if (validationResult.answer != '') { //readonly case above
+			jsonText += validationResult.answer + ',';
+		}
 	}
+	if (jsonText.length > 0) {
+		//remove last , separator
+		jsonText = jsonText.substring(0, jsonText.length - 1)
+	}
+	return { inputIsOK: noErrors, answers: jsonText };
+}
+
+function setErrorMessageForInput(paramName, errormsg) {
+	cssID = mgrID2cssID(paramName)
+	$('#' + cssID + '_form_div').addClass('ui-state-error');
+	$('#' + cssID + '_form_errormsg').text(errormsg);
+}
+
+function clearErrorMessageforInput(paramName) {
+	cssID = mgrID2cssID(paramName)
+	$('#' + cssID + '_form_div').removeClass('ui-state-error');
+	$('#' + cssID + '_form_errormsg').text('');
+}
+
+function validateChoiceAndGetAnswer(paramName, choices) {
+	var selectedValue=$('input[name="' + paramName + '"]').filter(':checked').val();
+	var isOK = true;
 	
-	return noErrors;
-}
-
-function setErrorMessageForInput(input, errormsg) {
-	var elementWrapper = document.getElementById(input.id + '_div');
-	var elementErrorMsg = document.getElementById(input.id + '_errormsg');
-
-	elementWrapper.setAttribute('class', elementWrapper.getAttribute('class') + ' in-error');
-	elementErrorMsg.innerHTML = errormsg;
-}
-
-function clearErrorMessageforInput(input) {
-	var elementWrapper = document.getElementById(input.id + '_div');
-	var elementErrorMsg = document.getElementById(input.id + '_errormsg');
-
-	elementWrapper.setAttribute('class', elementWrapper.getAttribute('class').replace(' in-error', ''));
-	elementErrorMsg.innerHTML = '';
-}
-
-function validate_choice(input, choices) {
-	var selectedValue = input.options[input.selectedIndex].value;
-	if (choices.indexOf(selectedValue) == -1) { 
-		setErrorMessageForInput(input, 'Please choose a value from the given options');
-		return false;
+	if (choices.indexOf(selectedValue) == -1) {
+		setErrorMessageForInput(paramName, 'Please choose a value from the given options');
+		isOK = false;
 	} else {
-		clearErrorMessageforInput(input);
-		return true;
+		clearErrorMessageforInput(paramName);
+		isOK = true;
 	}
+//	jsonText += '{ "name": "' + arraySelect[i].name + '","value": "' + arraySelect[i].value + '"},'
+	var jsonText = '{ "name": "' + paramName + '","value": "' + selectedValue + '"}';
+	return {isValid: isOK, answer: jsonText};
 }
 
 
-function validate_multichoice(input, choices, minChoices, maxChoices, positionalValidatorEreg) {
+function validateMultichoiceAndGetAnswer(paramName, choices, minChoices, maxChoices, positionalValidatorEreg) {
+
+	var allValues=$('input[name="' + paramName + '"]');
 	var selectionMap = '';
+	var selectedValues = '';
 	var count = 0;
 	
-	for (i = 0; i < input.options.length; i++) {
-	    if (input.options[i].selected) {
+	for (i = 0; i < allValues.length; i++) {
+	    if (allValues.eq(i).is(":checked")) {
 	      selectionMap += 'x';
+	      selectedValues += allValues.eq(i).val() + '|';
 	      count++;
 	    } else {
-	    	selectionMap += '_'
+	      selectionMap += '_'
 	    }
 	  }
 	
@@ -366,21 +458,32 @@ function validate_multichoice(input, choices, minChoices, maxChoices, positional
 	}
 	
 	if (isOK == false) { 
-		setErrorMessageForInput(input, cumulativeErrorMessages);
-		return false;
+		setErrorMessageForInput(paramName, cumulativeErrorMessages);
 	} else {
-		clearErrorMessageforInput(input);
-		return true;
+		clearErrorMessageforInput(paramName);
 	}
+
+	if (count > 0) {
+		//remove last | separator
+		selectedValues = selectedValues.substring(0, selectedValues.length - 1)
+	}
+
+	var jsonText = '{ "name": "' + paramName + '","value": "' + selectedValues + '"}';
+	return {isValid: isOK, answer: jsonText};
 }
 
-function validate_integer(input, min, max) {
-	if (!isNumeric(input.value)) {
-		setErrorMessageForInput(input, 'Please enter a number');
+function validateIntegerAndGetAnswer(paramName, min, max) {
+
+	//	jsonText += '{ "name": "' + arrayInput[i].name + '","value": "' + arrayInput[i].value + '"},'
+
+	var value=$('input[name="' + paramName + '"]').val();
+
+	if (!isNumeric(value)) {
+		setErrorMessageForInput(paramName, 'Please enter a number');
 		return false;
 	}
 	
-	var intValue = parseInt(input.value);
+	var intValue = parseInt(value);
 	var isOK=true;
 	if (min !== null && intValue < min) { 
 			isOK = false;
@@ -390,26 +493,34 @@ function validate_integer(input, min, max) {
 	}
 
 	if (!isOK) {
-		setErrorMessageForInput(input, 'Please enter a value within the accepted range');
+		setErrorMessageForInput(paramName, 'Please enter a value within the accepted range');
 	} else {
-		clearErrorMessageforInput(input);
+		clearErrorMessageforInput(paramName);
 	}
-	
-	return isOK;
+
+	//	jsonText += '{ "name": "' + arrayInput[i].name + '","value": "' + arrayInput[i].value + '"},'
+	var jsonText = '{ "name": "' + paramName + '","value": "' + intValue + '"}';
+
+	return {isValid: isOK, answer: jsonText};
 }
 
-function validate_boolean(input) {
-	
-	return validate_choice(input, ['true', 'false']); //since it is internally implemented as list
+function validateBooleanAndGetAnswer(paramName) {
+	return validateChoiceAndGetAnswer(paramName, ['true', 'false']); //since it is internally implemented as a "radio" choice between true and false
 }
 
-function validate_text(input, ereg) {
+function validateTextAndGetAnswer(paramName, ereg) {
 	var re = new RegExp('^' + ereg + '$');
-	if (input.value.match(re)) {
-	    clearErrorMessageforInput(input);
-	    return true;
+	var value=$('input[name="' + paramName + '"]').val();
+	var isOK = true;
+	
+	if (value.match(re)) {
+	    clearErrorMessageforInput(paramName);
+	    isOK = true;
 	} else {
-		setErrorMessageForInput(input, 'Please fill in a value matching the regular expression');
-		return false;
+		setErrorMessageForInput(paramName, 'Please fill in a value matching the regular expression');
+		isOK = false;
 	}
+	
+	var jsonText = '{ "name": "' + paramName + '","value": "' + value + '"}';
+	return {isValid: isOK, answer: jsonText};
 }
