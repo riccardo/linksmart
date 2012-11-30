@@ -22,24 +22,24 @@ import eu.linksmart.security.communication.SecurityProperty;
 
 public class BackboneRouterImpl implements BackboneRouter {
 
-	
+
 
 	private Logger logger = Logger
 	.getLogger(BackboneRouterImpl.class.getName());
 	protected ComponentContext context;
-	
+
 	private Map<HID, Backbone> activeRouteMap = new HashMap<HID, Backbone>();
-	
+
 	/**
 	 * <HID, <backboneName, endpoint> >
 	 */
 	private Map<HID, List<RouteEntry> > potentialRouteMap = new ConcurrentHashMap<HID, List<RouteEntry> >();
-	
+
 	private Map<String, Backbone> availableBackbones = new ConcurrentHashMap<String, Backbone>();
 	private NetworkManagerCore nmCore;
-	
+
 	private static String BACKBONE_ROUTER = BackboneRouterImpl.class.getSimpleName();
-//	private static String ROUTING_JXTA = "JXTA";
+	//	private static String ROUTING_JXTA = "JXTA";
 	BackboneRouterConfigurator configurator;
 	Object backboneAddingLock = new Object();
 
@@ -60,50 +60,50 @@ public class BackboneRouterImpl implements BackboneRouter {
 	}
 
 	protected void bindBackbone(Backbone backbone) {
-		
+
 		if(addBackbone(backbone)){		
 			movePotentialToActiveRoutes(backbone);
 		}
-		
+
 	}
 
 	private void movePotentialToActiveRoutes(Backbone backbone) {
-		
+
 		synchronized(backboneAddingLock){
 			List<HID> movedHIDList = new ArrayList<HID>();
-			
+
 			logger.debug("Moving potential to active routes for backbone " + backbone.getName());
-			
+
 			if(!potentialRouteMap.isEmpty()){
 				Iterator<Entry<HID, List<RouteEntry> >> iter = potentialRouteMap.entrySet().iterator();
-								
+
 				while(iter.hasNext()){
 					Map.Entry<HID,List<RouteEntry> > entry = (Map.Entry<HID, List<RouteEntry>>) iter.next();
-					
+
 					List<RouteEntry> routeEntryList = entry.getValue();
-					
+
 					for(RouteEntry routeEntry : routeEntryList){
-							String backboneName = routeEntry.getBackboneName();
-							
-							if((backbone.getName()!=null) && backbone.getName().contains(backboneName)){
-								
-								HID hid = (HID) entry.getKey();
-								
-								String endpoint = routeEntry.getEndpoint();
-								
-								if(endpoint!=null){
-									backbone.addEndpoint(hid, endpoint);
-								}
-								
-								activeRouteMap.put(hid, backbone);
-								
-								movedHIDList.add(hid);
-								
+						String backboneName = routeEntry.getBackboneName();
+
+						if((backbone.getName()!=null) && backbone.getName().contains(backboneName)){
+
+							HID hid = (HID) entry.getKey();
+
+							String endpoint = routeEntry.getEndpoint();
+
+							if(endpoint!=null){
+								backbone.addEndpoint(hid, endpoint);
 							}
+
+							activeRouteMap.put(hid, backbone);
+
+							movedHIDList.add(hid);
+
 						}
-					
+					}
+
 				}
-				
+
 				//tell nmcore which hids have new securityproperties
 				if(backbone.getSecurityTypesRequired()!=null){
 					nmCore.updateSecurityProperties(movedHIDList, backbone.getSecurityTypesRequired());
@@ -111,37 +111,37 @@ public class BackboneRouterImpl implements BackboneRouter {
 						potentialRouteMap.remove(hid);
 					}
 				}
-			
+
 			}
 		}
-		
-		
+
+
 	}
-	
+
 	private void removeActiveRoutes(Backbone backbone){
-		
+
 		synchronized (backboneAddingLock) {
 			List<HID> obsoleteHIDList = new ArrayList<HID>();
-			
+
 			if(!activeRouteMap.isEmpty()){
 				logger.debug("Removing active routes reachable over unbound backbone " + backbone.getName());
-				
+
 				Iterator<Entry<HID, Backbone>> iter = activeRouteMap.entrySet().iterator();
-				
+
 				while(iter.hasNext()){
 					Map.Entry <HID, Backbone> entry = (Map.Entry<HID,Backbone>) iter.next();
-					
+
 					Backbone backboneRef = (Backbone) entry.getValue();
-					
+
 					if(backboneRef.equals(backbone)){
-						
+
 						HID hid = (HID) entry.getKey();
-												
+
 						obsoleteHIDList.add(hid);
-						
+
 					}
-					
-					
+
+
 				}
 
 				for(HID hid : obsoleteHIDList){
@@ -152,9 +152,9 @@ public class BackboneRouterImpl implements BackboneRouter {
 	}
 
 	protected void unbindBackbone(Backbone backbone) {
-		
+
 		removeActiveRoutes(backbone);
-		
+
 		availableBackbones.values().remove(backbone);
 	}
 
@@ -178,21 +178,21 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] data) {
 		Backbone b = (Backbone) activeRouteMap.get(receiverHID);
-		if (b == null && (Backbone)potentialRouteMap.get(receiverHID) != null) {
-			
+		if (b == null && receiverHID != null && potentialRouteMap.get(receiverHID) != null) {
+
 			NMResponse nmResponse = new NMResponse(NMResponse.STATUS_ERROR);
 			nmResponse.setMessage("Currently the backbone that is assigned to this HID is not available.");
-			
+
 			return nmResponse;
 		} else if (b == null) {
 			NMResponse nmResponse = new NMResponse(NMResponse.STATUS_ERROR);
 			nmResponse.setMessage("Unknown how to reach HID.");
-			
+
 			return nmResponse;
 		}
 		return b.sendDataSynch(senderHID, receiverHID, data);
 	}
-	
+
 	/**
 	 * Sends a message over the communication channel from which the Hid
 	 * came.
@@ -205,10 +205,16 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
 		Backbone b = (Backbone) activeRouteMap.get(receiverHID);
-		if (b == null) {
+		if (b == null && receiverHID != null && potentialRouteMap.get(receiverHID) != null) {
+
 			NMResponse nmResponse = new NMResponse(NMResponse.STATUS_ERROR);
 			nmResponse.setMessage("Currently the backbone that is assigned to this HID is not available.");
-			
+
+			return nmResponse;
+		} else if (b == null) {
+			NMResponse nmResponse = new NMResponse(NMResponse.STATUS_ERROR);
+			nmResponse.setMessage("Unknown how to reach HID.");
+
 			return nmResponse;
 		}
 		return b.sendDataAsynch(senderHID, receiverHID, data);
@@ -232,7 +238,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 
 		return receiveData(senderHID, receiverHID, data, originatingBackbone, true);
 	}
-	
+
 	/**
 	 * Receives a message which also specifies the communication channel used by
 	 * the sender. This will then update the list of HIDs and which backbone
@@ -310,7 +316,7 @@ public class BackboneRouterImpl implements BackboneRouter {
 	//
 	// }
 
-	
+
 	/**
 	 * This function is called when the configuration is updated from the web
 	 * page.
@@ -379,68 +385,68 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public boolean addRoute(HID hid, String backboneName) {
 		return processAddingRoute(hid, backboneName, null);
-							
+
 	}
 
 	private boolean processAddingRoute(HID hid, String backboneName, String endpoint) {
-		
-		
-		
+
+
+
 		synchronized(backboneAddingLock){
-			
+
 			if(backboneName==null || backboneName.isEmpty())
 			{
 				return false;
 			}
-			
+
 			Backbone backbone = availableBackbones.get(backboneName);
-			
+
 			if (backbone == null) {
-				
+
 				//Put hid in potential route map
-				
+
 				if(potentialRouteMap.containsKey(hid)){
 					return false;
 				}
 				else{
-					
+
 					//TODO LinkSmart Developer In future, if more than one backbone can be assigned to HID, 
 					//first check if map is available, and then add backbone and endpoint.
 					RouteEntry routeEntry = new RouteEntry(backboneName, endpoint);
-					
+
 					List<RouteEntry> routeEntryList = new ArrayList<RouteEntry>();
-					
+
 					routeEntryList.add(routeEntry);
-					
+
 					potentialRouteMap.put(hid, routeEntryList);
-					
+
 					return true;
 				}
-				
+
 			}
 			else{	
-				
+
 				//Assign a backbone to the hid route
-				
+
 				if(activeRouteMap.containsKey(hid)){
 					return false;
 				}
 				else{
-					
+
 					if(endpoint!=null){
 						if (!backbone.addEndpoint(hid, endpoint)) {
 							return false;
 						}
 					}
-					
+
 					activeRouteMap.put(hid, backbone);
-											
+
 					return true;
 				}
-				
+
 			}
 		}
-		
+
 	}
 
 	@Override 
@@ -462,26 +468,26 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public boolean addRouteToBackbone(HID hid, String backboneName,
 			String endpoint) {
-		
+
 		if(hid==null){
 			return false;
 		}
-		
+
 		if(endpoint==null || endpoint.isEmpty()){
 			return false;
 		}
-		
+
 		return processAddingRoute(hid, backboneName, endpoint);
 	}
 
 	@Override
 	public boolean removeRoute(HID hid, String backbone) {
 		synchronized (backboneAddingLock) {
-			
+
 			if(potentialRouteMap.get(hid) !=null){
 				return (potentialRouteMap.remove(hid)!=null);
 			}
-			
+
 			//if backbone is null remove all routes
 			if(backbone == null) {
 				return (activeRouteMap.remove(hid)!=null);
@@ -515,11 +521,11 @@ public class BackboneRouterImpl implements BackboneRouter {
 	 * @return whether the Backbone was added
 	 */
 	private boolean addBackbone(Backbone backbone) {
-		
+
 		if(backbone==null ){
 			return false;
 		}
-		
+
 		if (availableBackbones.containsValue(backbone)) {
 			return false;
 		}

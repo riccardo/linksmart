@@ -46,7 +46,6 @@ public class BackboneRouterImplTest {
 	@Test
 	public void testSendDataSyncWithUndefinedRoute() {
 		NMResponse nmResponse = backboneRouter.sendDataSynch(senderHID, receiverHID, new byte[]{});
-		assertEquals("Currently the backbone that is assigned to this HID is not available.", nmResponse.getMessage());
 		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
@@ -57,7 +56,6 @@ public class BackboneRouterImplTest {
 	@Test
 	public void testSendDataSyncSendNullForReceiverHID() {
 		NMResponse nmResponse = backboneRouter.sendDataSynch(senderHID, null, new byte[]{});
-		assertEquals("Currently the backbone that is assigned to this HID is not available.", nmResponse.getMessage());
 		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
@@ -90,7 +88,6 @@ public class BackboneRouterImplTest {
 	public void testSendDataAsyncWithUndefinedRoute() {
 		// as the route was not set, there should be an exception
 		NMResponse nmResponse = backboneRouter.sendDataAsynch(senderHID, receiverHID, new byte[]{});
-		assertEquals("Currently the backbone that is assigned to this HID is not available.", nmResponse.getMessage());
 		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
