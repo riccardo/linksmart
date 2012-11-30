@@ -209,8 +209,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	public boolean removeHID(HID hid) throws RemoteException {
 		Boolean hidRemoved = this.identityManager.removeHID(hid);
 		this.connectionManager.deleteHIDPolicy(hid);
-		String route = this.backboneRouter.getRoute(hid);
-		this.backboneRouter.removeRoute(hid, route);
+		this.backboneRouter.removeRoute(hid, null);
 		return hidRemoved;
 	}
 
@@ -550,12 +549,11 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				return response;
 			}
 		} catch (Exception e) {
-			LOG.warn("Could not create packet from message from HID: "
-					+ message.getSenderHID());
+			LOG.warn("Error while sending message from HID "
+					+ message.getSenderHID() + "to HID: " + message.getReceiverHID());
 			response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_ERROR);
-			response.setMessage("Could not create packet from message from HID: "
-					+ message.getSenderHID());
+			response.setMessage("Error while sending message: " + e.getMessage());
 			return response;
 		}
 

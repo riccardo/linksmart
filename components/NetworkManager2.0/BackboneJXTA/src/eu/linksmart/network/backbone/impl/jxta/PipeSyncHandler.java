@@ -434,6 +434,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			pipeTable.put(pID, new PipeInfo(outputPipe));
 		} else {
 			logger.error("Cannot create outputpipe to destination: " + pID);
+			throw new RuntimeException("Could not reach destination!");
 		}
 		return outputPipe;
 	}

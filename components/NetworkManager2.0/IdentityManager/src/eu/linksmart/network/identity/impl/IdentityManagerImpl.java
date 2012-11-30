@@ -96,7 +96,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		init();
 		LOG.info(IDENTITY_MGR + " started");
 	}
-	
+
 	protected void init() {
 		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
 		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
@@ -188,7 +188,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			hidInfos.toArray(hidInfoRet);
 			return hidInfoRet;
 		}
-		
+
 		Set<HIDInfo> matchingHids = new HashSet<HIDInfo>();
 		//first collect local HIDs that match
 		for(HIDInfo hidInfo : getLocalHIDs()) {
@@ -496,7 +496,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			//we get here if there was no key which was not found
 		}
 		/*go through the attributes*/
-		
+
 		//used to say that at least one of the searched keys was available
 		boolean atLeastOneMatch = false;
 		for(Part part : attributes) {
@@ -888,7 +888,17 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 */
 	protected HIDInfo removeRemoteHID(HID hid) {
 		hidLastUpdate.remove(hid);
-		return remoteHIDs.remove(hid);
+		HIDInfo removal = remoteHIDs.remove(hid);
+		
+		//if this check were not here this would result an infinite loop 
+		if(removal != null) {
+			try {
+				networkManagerCore.removeHID(removal.getHid());
+			} catch (RemoteException e) {
+				//local invocation
+			}
+		}
+		return removal;
 	}
 
 	/*

@@ -125,6 +125,7 @@ public interface BackboneRouter {
 	 *            The HID of which the route should be removed
 	 * @param backbone
 	 *            The name of the backbone through which the HID was reached
+	 *            If null the route is removed independent from the backbone
 	 * @return whether removing the route was successful
 	 */
 	public boolean removeRoute(HID hid, String backbone);

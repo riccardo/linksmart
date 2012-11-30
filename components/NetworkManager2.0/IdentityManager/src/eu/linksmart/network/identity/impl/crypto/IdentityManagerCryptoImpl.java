@@ -55,7 +55,7 @@ public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
 					boolean mismatch = false;
 					for(Object key : keys) {
 						Object value = certAttributes.get(key);
-						if(value != attributes.get(key)){
+						if(value != attributes.get(key) && !key.equals(HIDAttribute.CERT_REF.name())){
 							mismatch = true;
 							break;
 						}

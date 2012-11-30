@@ -178,10 +178,15 @@ public class BackboneRouterImpl implements BackboneRouter {
 	@Override
 	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] data) {
 		Backbone b = (Backbone) activeRouteMap.get(receiverHID);
-		if (b == null) {
+		if (b == null && (Backbone)potentialRouteMap.get(receiverHID) != null) {
 			
 			NMResponse nmResponse = new NMResponse(NMResponse.STATUS_ERROR);
 			nmResponse.setMessage("Currently the backbone that is assigned to this HID is not available.");
+			
+			return nmResponse;
+		} else if (b == null) {
+			NMResponse nmResponse = new NMResponse(NMResponse.STATUS_ERROR);
+			nmResponse.setMessage("Unknown how to reach HID.");
 			
 			return nmResponse;
 		}
@@ -477,9 +482,12 @@ public class BackboneRouterImpl implements BackboneRouter {
 				return (potentialRouteMap.remove(hid)!=null);
 			}
 			
+			//if backbone is null remove all routes
+			if(backbone == null) {
+				return (activeRouteMap.remove(hid)!=null);
+			}
 			if (activeRouteMap.get(hid) == null || 
-					!activeRouteMap.get(hid).getClass().getName().equals(backbone)) {
-				
+					!activeRouteMap.get(hid).getClass().getName().equals(backbone)) {				
 				return false;
 			}
 			activeRouteMap.remove(hid);
