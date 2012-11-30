@@ -34,6 +34,7 @@
 package eu.linksmart.tools;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,6 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONWriter;
 
 import eu.linksmart.network.HID;
 import eu.linksmart.network.HIDInfo;
@@ -99,57 +102,75 @@ public class GetNetworkManagerStatus extends HttpServlet {
 			if (method.equals("getNetworkManagers")) {
 				Set<HIDInfo> hids = identityManager
 						.getHIDsByDescription("NetworkManager*");
-				processHIDs(hids, response);
+				processHIDs(method, hids, response);
 			} else if (method.equals("getLocalHids")) {
 				Set<HIDInfo> hids = identityManager.getLocalHIDs();
 				LOG.debug("Size of LocalHIDs: " + hids.size());
-				processHIDs(hids, response);
+				processHIDs(method, hids, response);
 			} else if (method.equals("getRemoteHids")) {
 				Set<HIDInfo> hids = identityManager.getRemoteHIDs();
 				LOG.debug("Size of RemoteHIDs: " + hids.size());
-				processHIDs(hids, response);
+				processHIDs(method, hids, response);
 			} else if (method.equals("getNetworkManagerSearch")) {
 				Set<HIDInfo> hids = identityManager.getAllHIDs();
-				processHIDs(hids, response);
+				processHIDs(method, hids, response);
 				// TODO should be "HID entity not adapted to security issues"
 				// instead of null for remote HIDs; check with Mark?
 			}
 		}
 	}
 
-	private void processHIDs(Set<HIDInfo> hids, HttpServletResponse response) {
+	private void processHIDs(String method, Set<HIDInfo> hids, HttpServletResponse response) {
 
 		Iterator<HIDInfo> it = hids.iterator();
 
-		while (it.hasNext()) {
-			HIDInfo hidInfo = it.next();
+		StringWriter writer = new StringWriter();
+		JSONWriter jsonWriter = new JSONWriter(writer);
+		try {
+			jsonWriter.object()
+			.key("method").value(method)
+			.key("HIDs").array();
 
-			// Create the description from all Attributes
-			String description = "";
-			Part[] attr = hidInfo.getAttributes();
-			for (Part part : attr) {
-				description = description + part.getKey() + " = "
-						+ part.getValue() + ";";
-			}
-
-			// Get the Route for this HID
-			HID hid = hidInfo.getHid();
-			String route = backboneRouter.getRoute(hid);
-			String hidString = hid.toString();
-			String path = "/SOAPTunneling/0/" + hidString;
-			
-			// Here we print one row
-			try {
-				response.getWriter().write(
-						"<a href=\"" + path + "\">" + hidString + "</a> <a href=\"" + path + "?wsdl\">(wsdl)</a>|" + description + "|"
-								+ "TODO: Host" + "|" + route);
-				if (it.hasNext()) {
-					response.getWriter().write("<br>");
+			while (it.hasNext()) {
+				HIDInfo hidInfo = it.next();
+	
+				// Create the description from all Attributes
+				String description = "";
+				Part[] attr = hidInfo.getAttributes();
+				for (Part part : attr) {
+					description = description + part.getKey() + " = "
+							+ part.getValue() + ";";
 				}
-			} catch (IOException e) {
-				LOG.error("Unable to produce HTML. ", e);
-			}
+	
+				// Get the Route for this HID
+				HID hid = hidInfo.getHid();
+				String route = backboneRouter.getRoute(hid);
+				String hidString = hid.toString();
+				String path = "/SOAPTunneling/0/" + hidString;
+				
+				jsonWriter
+				.object()
+				.key("hid").value(hidString)
+				.key("path").value(path)
+				.key("wsdl").value(path + "?wsdl")
+				.key("description").value(description)
+				.key("host").value("TODO: Host")
+				.key("endpoint").value(route)
+				.endObject();
+			} //end while
+			
+			jsonWriter
+			.endArray()
+			.endObject();
 
+			response.setContentLength(writer.toString().getBytes().length);
+			response.getWriter().write(writer.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			LOG.error("Can't generate HTML");
 		}
 	}
 
