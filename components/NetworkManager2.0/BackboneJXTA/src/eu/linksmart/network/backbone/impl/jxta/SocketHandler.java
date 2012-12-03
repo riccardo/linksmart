@@ -68,13 +68,8 @@ import net.jxta.socket.JxtaSocket;
 
 import org.apache.log4j.Logger;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 
-
-//import eu.linksmart.network.identity.HIDManagerApplication;
-//import eu.linksmart.network.impl.NetworkManagerApplicationSoapBindingImpl;
-//import eu.linksmart.network.impl.NetworkManagerConfigurator;
-//import eu.linksmart.types.HID;
 
 /**
  * SocketHandler
@@ -82,10 +77,6 @@ import eu.linksmart.network.HID;
 public class SocketHandler implements PipeMsgListener  {
 	private static Logger logger = Logger.getLogger(SocketHandler.class.getName());
 	
-//	BackboneManagerApplication backboneMgr;
-//	HIDManagerApplication hidMgr;
-//	private NetworkManagerApplicationSoapBindingImpl nm;
-
 	protected JxtaServerSocket serverSocket;
 	protected LocalServer local;
 	protected JXTASocketServer socketServer;
@@ -106,9 +97,6 @@ public class SocketHandler implements PipeMsgListener  {
 	public SocketHandler(BackboneJXTAImpl bbjxta) {
 		this.bbjxta = bbjxta;
 
-//		this.nm = nm;
-//		this.backboneMgr = nm.backboneMgr;
-//		this.hidMgr = nm.hidMgr;
 		count = new Long(0);
 		bitRates = new Hashtable<Long, Long>();
 		this.localPort = Integer.valueOf((String) bbjxta.getConfiguration().get(
@@ -418,7 +406,7 @@ public class SocketHandler implements PipeMsgListener  {
 					s = k[0] + " " + "/" + id + k[1] + " " + k[2];
 				}
 				
-				HID hid = new HID(hids);
+				VirtualAddress hid = new VirtualAddress(hids);
 				
 				s = s + "\r\n";
 				byte[] b = s.getBytes();

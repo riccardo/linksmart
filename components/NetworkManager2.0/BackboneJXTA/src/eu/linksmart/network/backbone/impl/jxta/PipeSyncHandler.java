@@ -38,9 +38,9 @@
  * is synchronous. For this purpose, the PipeSyncHandler class uses a 
  * request/response protocol to establish the bidirectional communication 
  * between NMs.
- * It provides a sendData interface in order to send data from a source HID 
- * to a destine HID:
- * 	sendDataOverPipe(String sessionID, String senderHID, String receiverHID, String data)
+ * It provides a sendData interface in order to send data from a source VirtualAddress 
+ * to a destine VirtualAddress:
+ * 	sendDataOverPipe(String sessionID, String senderVirtualAddress, String receiverVirtualAddress, String data)
  * 
  * @see eu.linksmart.network.backbone.BackboneManagerApplication
  */
@@ -60,7 +60,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.jxta.document.AdvertisementFactory;
 import net.jxta.endpoint.ByteArrayMessageElement;
 import net.jxta.endpoint.Message;
-import net.jxta.endpoint.MessageElement;
 import net.jxta.endpoint.StringMessageElement;
 import net.jxta.id.ID;
 import net.jxta.id.IDFactory;
@@ -75,8 +74,8 @@ import net.jxta.protocol.PipeAdvertisement;
 
 import org.apache.log4j.Logger;
 
-import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.VirtualAddress;
 
 /**
  * PipeSyncHandler
@@ -189,16 +188,16 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 * @param sessionID
 	 *            the session ID
 	 * @param source
-	 *            the source HID
+	 *            the source VirtualAddress
 	 * @param dest
-	 *            the destination HID
+	 *            the destination VirtualAddress
 	 * @param data
 	 *            the data
 	 * @param requestID
 	 *            the index
 	 * @return the request message
 	 */
-	private Message createRequestMessage(HID source, HID dest, byte[] data, String requestID, boolean synch) {
+	private Message createRequestMessage(VirtualAddress source, VirtualAddress dest, byte[] data, String requestID, boolean synch) {
 
 		Message msg = new Message();
 		msg.addMessageElement(new ByteArrayMessageElement(
@@ -216,7 +215,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	}
 
 	/**
-	 * Sends data from a source HID to a destine HID
+	 * Sends data from a source VirtualAddress to a destine VirtualAddress
 	 * 
 	 * @param sessionID
 	 *            the session ID
@@ -301,7 +300,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		}
 
 		/**
-		 * Sends data over a pipe from a source HID to a destine HID
+		 * Sends data over a pipe from a source VirtualAddress to a destine VirtualAddress
 		 * 
 		 * @param sessionID
 		 *            the session ID
@@ -318,8 +317,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		public NMResponse sendDataOverPipe(String s, String d, byte[] data,
 				PeerID pID, boolean synch) {
 
-			HID dest = new HID(d);
-			HID source = new HID(s);
+			VirtualAddress dest = new VirtualAddress(d);
+			VirtualAddress source = new VirtualAddress(s);
 			int numRetries = 0;
 			OutputPipe outPipe = null;
 			resp = new NMResponse();
@@ -337,7 +336,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					}
 					numRetries++;
 				} catch (NullPointerException e) {
-					logger.debug("Could not find destination HID. Backing off");
+					logger.debug("Could not find destination VirtualAddress. Backing off");
 					numRetries++;
 				}
 
@@ -358,23 +357,23 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					try {
 						if(outPipe.send(message)){
 							resp.setStatus(NMResponse.STATUS_SUCCESS);
-							resp.setMessage("<Response>Success sending data to HID = "
+							resp.setMessage("<Response>Success sending data to VirtualAddress = "
 									+ dest.toString() + "</Response>");
 						}
 					} catch (IOException e) {
-						logger.error("<Response>Error sending data to HID = "
+						logger.error("<Response>Error sending data to VirtualAddress = "
 								+ dest.toString()+ "</Response>");
 						resp.setStatus(NMResponse.STATUS_ERROR);
-						resp.setMessage("Error sending data to HID = "
+						resp.setMessage("Error sending data to VirtualAddress = "
 								+ dest.toString());
 					}
 
 					return resp;
 				} else {
-					logger.error("Sender: Could not find destination HID "
+					logger.error("Sender: Could not find destination VirtualAddress "
 							+ dest.toString() + ". Please try later...");
 					resp.setStatus(NMResponse.STATUS_ERROR);
-					resp.setMessage("<Response>Could not find destination HID "
+					resp.setMessage("<Response>Could not find destination VirtualAddress "
 							+ dest.toString() + ". Please try later...</Response>");
 					return resp;
 				}
@@ -385,14 +384,14 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 
 					if(outPipe.send(message)){
 						resp.setStatus(NMResponse.STATUS_SUCCESS);
-						resp.setMessage("<Response>Success sending data to HID = "
+						resp.setMessage("<Response>Success sending data to VirtualAddress = "
 								+ dest.toString()+"</Response>");
 					}
 				} catch (IOException e) {
-					logger.error("Error sending data to HID = "
+					logger.error("Error sending data to VirtualAddress = "
 							+ dest.toString());
 					resp.setStatus(NMResponse.STATUS_ERROR);
-					resp.setMessage("<Response>Error sending data to HID = "
+					resp.setMessage("<Response>Error sending data to VirtualAddress = "
 							+ dest.toString() + "</Response>");
 				}
 
@@ -455,22 +454,22 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 * 
 	 * @param sessionID
 	 *            the session ID
-	 * @param senderHID
-	 *            the sender HID
-	 * @param receiverHID
-	 *            the receiver HID
+	 * @param senderVirtualAddress
+	 *            the sender VirtualAddress
+	 * @param receiverVirtualAddress
+	 *            the receiver VirtualAddress
 	 * @param data
 	 *            the data
 	 * @return the NMResponse
 	 * @throws java.rmi.RemoteException
 	 */
-	private NMResponse receiveData(HID senderHID, HID receiverHID,
+	private NMResponse receiveData(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
 			byte[] data, boolean synch) throws java.rmi.RemoteException {
 		if(synch) {
-			return bbjxta.receiveDataSynch(senderHID, receiverHID,
+			return bbjxta.receiveDataSynch(senderVirtualAddress, receiverVirtualAddress,
 					data);
 		} else {
-			return bbjxta.receiveDataAsynch(senderHID, receiverHID,
+			return bbjxta.receiveDataAsynch(senderVirtualAddress, receiverVirtualAddress,
 					data);
 		}
 	}
@@ -524,23 +523,23 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				logger.info("PipeSyncHandler - Receiving message.");
 				NMResponse r = new NMResponse();
 
-				HID sourceHID = new HID(source.getBytes());
-				HID destHID = new HID(dest.getBytes());
+				VirtualAddress sourceVirtualAddress = new VirtualAddress(source.getBytes());
+				VirtualAddress destVirtualAddress = new VirtualAddress(dest.getBytes());
 				
 				ByteArrayMessageElement synchBytes = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SYNCH);
 				boolean synch = new String(synchBytes.getBytes()).contentEquals(TRUE);
 				try {
-					r = receiveData(sourceHID, 
-							destHID, data.getBytes(), synch);
+					r = receiveData(sourceVirtualAddress, 
+							destVirtualAddress, data.getBytes(), synch);
 				} catch (RemoteException e) {
 					logger.error("Error calling receiveData " + e.getMessage());
 				}
 
-				logger.debug("Received data : " + data.toString() + " from HID="
-						+ sourceHID.toString() + " to HID=" + destHID.toString());
+				logger.debug("Received data : " + data.toString() + " from VirtualAddress="
+						+ sourceVirtualAddress.toString() + " to VirtualAddress=" + destVirtualAddress.toString());
 				if(synch) {
 				// reverse source and destination because we (dest) send response back to source
-				sendMessageResponse(destHID, sourceHID, r.getMessage().getBytes(), requestId);
+				sendMessageResponse(destVirtualAddress, sourceVirtualAddress, r.getMessage().getBytes(), requestId);
 				}
 
 			}else if (type.toString().equalsIgnoreCase(MESSAGE_ELEMENT_TYPE_RESPONSE)) {
@@ -563,17 +562,17 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		/**
 		 * Sends a response message
 		 * @param sessionID the session ID
-		 * @param source the source HID
-		 * @param destination the destination HID
+		 * @param source the source VirtualAddress
+		 * @param destination the destination VirtualAddress
 		 * @param data the data
 		 * @param i the index
 		 * @return boolean depending on the result
 		 */
-		private boolean sendMessageResponse(/* String sessionID, */ HID source, HID destination, 
+		private boolean sendMessageResponse(/* String sessionID, */ VirtualAddress source, VirtualAddress destination, 
 				byte[] data, String i) {
 
-			//			HID dest = new HID(destination);
-			//			HID source = new HID(sourceHID);
+			//			VirtualAddress dest = new VirtualAddress(destination);
+			//			VirtualAddress source = new VirtualAddress(sourceVirtualAddress);
 			PeerID pID = null;
 			int numRetries = 0;
 			OutputPipe outPipe = null;
@@ -588,7 +587,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					}
 					numRetries++;
 				} catch (NullPointerException e) {
-					logger.debug("Could not find destination HID. Backing off");
+					logger.debug("Could not find destination VirtualAddress. Backing off");
 					numRetries++;
 				}
 				try {
@@ -608,13 +607,13 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					try {
 						outPipe.send(message);
 					} catch (IOException e) {
-						logger.error("Error sending data to HID = " + destination.toString());
+						logger.error("Error sending data to VirtualAddress = " + destination.toString());
 					}
 
 					return true;
 				}
 				else {
-					logger.error("Resp. Could not find destination HID "
+					logger.error("Resp. Could not find destination VirtualAddress "
 							+ destination.toString() + ". Please try later...");
 					return false;
 				}
@@ -625,7 +624,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				try {
 					outPipe.send(message);
 				} catch (IOException e) {
-					logger.error("Error sending data to HID = " + destination.toString());
+					logger.error("Error sending data to VirtualAddress = " + destination.toString());
 				}
 
 				pipeTable.get(pID).setTime(System.currentTimeMillis());
@@ -638,13 +637,13 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	/**
 	 * Creates a response message
 	 * @param sessionID the session ID
-	 * @param source the source HID
-	 * @param dest the destination HID
+	 * @param source the source VirtualAddress
+	 * @param dest the destination VirtualAddress
 	 * @param data the data
 	 * @param i the index
 	 * @return the response message
 	 */
-	private Message createResponseMessage(HID source, HID dest, 
+	private Message createResponseMessage(VirtualAddress source, VirtualAddress dest, 
 			byte[] data, String i) {
 
 		Message msg = new Message();

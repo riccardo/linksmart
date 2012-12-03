@@ -35,7 +35,7 @@
  * NMadvertisment class represents a special type of advertisement created 
  * for the LinkSmart middleware where each Network Manager publishes its own 
  * information such as: name, endpoint address where to contact the Network 
- * Manager, the peerID, the description, time, and HID field. 
+ * Manager, the peerID, the description, time, and VirtualAddress field. 
  */
 
 package eu.linksmart.network.backbone.impl.jxta;
@@ -70,7 +70,7 @@ public class NMadvertisement extends Advertisement
 	private String description;
 	private String time;
 	private String date;
-	private String HID;
+	private String virtualAddress;
 
 	private final static Logger logger = Logger.getLogger(NMadvertisement.class.getName());
 	private final static String nameTag = "name";
@@ -79,14 +79,14 @@ public class NMadvertisement extends Advertisement
 	private final static String descriptionTag = "description";
 	private final static String timeTag = "time";
 	private final static String dateTag = "date";
-	private final static String HIDTag = "HID";
+	private final static String VirtualAddressTag = "VirtualAddress";
 	
 	/**
 	 * Indexable fields: Advertisement must define the indexables, in order to
 	 * properly index and retrieve these advertisements locally and on the network
 	 */
 	private final static String[] fields =
-		{idTag, nameTag, descriptionTag, HIDTag, endpointTag};
+		{idTag, nameTag, descriptionTag, VirtualAddressTag, endpointTag};
 	
 	/**
 	 * Constructor
@@ -184,13 +184,13 @@ public class NMadvertisement extends Advertisement
 	}
 	
 	/**
-	 * Sets the HID's managed
+	 * Sets the VirtualAddress's managed
 	 * 
-	 * @param HID the LinkSmartID
+	 * @param VirtualAddress the LinkSmartID
 	 * @deprecated
 	 */
-	public void setHID(String HID) {
-		this.HID = HID;
+	public void setVirtualAddress(String virtualAddress) {
+		this.virtualAddress = virtualAddress;
 	}
 	
 	/**
@@ -221,7 +221,7 @@ public class NMadvertisement extends Advertisement
 		adv.appendChild(e);
 		e = adv.createElement(dateTag, getDate().toString());
 		adv.appendChild(e);
-		e = adv.createElement(HIDTag, getHID().toString());
+		e = adv.createElement(VirtualAddressTag, getVirtualAddress().toString());
 		adv.appendChild(e);		
 		return adv;
 	}
@@ -292,8 +292,8 @@ public class NMadvertisement extends Advertisement
 	 * @return the LinkSmartID
 	 * @deprecated
 	 */	
-	public String getHID() {		
-		return HID;
+	public String getVirtualAddress() {		
+		return virtualAddress;
 	}
 		
 	/**
@@ -343,8 +343,8 @@ public class NMadvertisement extends Advertisement
 			return true;
 		}
 		
-		if (elem.getName().equals(HIDTag)) {
-			setHID(elem.getTextValue());
+		if (elem.getName().equals(VirtualAddressTag)) {
+			setVirtualAddress(elem.getTextValue());
 			return true;
 		}
 		

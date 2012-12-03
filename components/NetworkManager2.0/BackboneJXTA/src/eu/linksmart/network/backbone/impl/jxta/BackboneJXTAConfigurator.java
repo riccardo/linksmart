@@ -2,9 +2,6 @@ package eu.linksmart.network.backbone.impl.jxta;
 
 import java.util.Hashtable;
 
-import net.jxta.logging.Logging;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 
@@ -17,7 +14,6 @@ public class BackboneJXTAConfigurator extends Configurator {
 	public static String CONFIGURATION_FILE = "/resources/BBJXTA.properties";
 
 	/* Configuration Keys. */
-	// public static final String JXTA_HID = "BackboneJXTA.HID";
 	public static final String JXTA_DESCRIPTION = "BackboneJXTA.Description";
 
 	public static final String JXTA_LOGS = "BackboneJXTA.JXTALogs";

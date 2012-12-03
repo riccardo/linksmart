@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.ComponentContext;
 
 
-//import eu.linksmart.network.identity.HIDManagerApplication;
-//import eu.linksmart.network.impl.NetworkManagerApplicationSoapBindingImpl;
-
 /**
  * NetworkManagerApplication Servlet
  */

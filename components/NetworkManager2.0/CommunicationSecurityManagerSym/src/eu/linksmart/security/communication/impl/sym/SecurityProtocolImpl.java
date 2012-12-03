@@ -27,7 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.Message;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.CryptoException;
@@ -43,7 +43,7 @@ import eu.linksmart.utils.Base64;
 /**
  * Implementation of {@link SecurityProtocol} interface which
  * uses hybrid encryption based on certificates associated
- * with {@link HID}
+ * with {@link VirtualAddress}
  * @author Vinkovits
  *
  */
@@ -82,12 +82,12 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 * The client of this protocol. Client is the party 
 	 * who started the communication.
 	 */
-	private HID clientHID = null;
+	private VirtualAddress clientVirtualAddress = null;
 	/**
 	 * The server of this protocol. Server is the party 
 	 * who received the request.
 	 */
-	private HID serverHID = null;
+	private VirtualAddress serverVirtualAddress = null;
 	/**
 	 * The margin over which the calculated trust value
 	 * of the certificate has to be to be accepted (between 0 and 1).
@@ -168,13 +168,13 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 */
 	private Message lastSent = null;
 
-	public SecurityProtocolImpl(HID clientHID,
-			HID serverHID,
+	public SecurityProtocolImpl(VirtualAddress clientVirtualAddress,
+			VirtualAddress serverVirtualAddress,
 			CryptoManager cryptoMgr,
 			TrustManager trustMgr,
 			double trustThreshold){
-		this.clientHID = clientHID;
-		this.serverHID = serverHID;
+		this.clientVirtualAddress = clientVirtualAddress;
+		this.serverVirtualAddress = serverVirtualAddress;
 		this.cryptoMgr = cryptoMgr;
 		this.trustMgr = trustMgr;
 		this.trustThreshold = trustThreshold;
@@ -185,8 +185,8 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 
 	public Message startProtocol() throws CryptoException {
 		//check if certificates are available
-		String serverIdentifier = this.cryptoMgr.getCertificateReference(serverHID.toString());
-		String clientIdentifier = this.cryptoMgr.getCertificateReference(clientHID.toString());
+		String serverIdentifier = this.cryptoMgr.getCertificateReference(serverVirtualAddress.toString());
+		String clientIdentifier = this.cryptoMgr.getCertificateReference(clientVirtualAddress.toString());
 		boolean mkExists = false;
 		String master_identifier = null;
 		//if yes check if there is a master symmetric key available
@@ -215,7 +215,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		}catch(Exception e){
 			CryptoException ce = new CryptoException("Error during agreement of session keys");
 			ce.initCause(e);
-			logger.error("Error during exchange of certificates with HID: " + serverHID.toString());
+			logger.error("Error during exchange of certificates with VirtualAddress: " + serverVirtualAddress.toString());
 			resetProtocol();
 			throw ce;
 		}
@@ -250,8 +250,8 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 						}else{
 							resetProtocol();
 							throw new CryptoException(
-									"Entity is trying to agree on session keys but there is no master key for HIDs: "
-									+ clientHID.toString() + " " + serverHID.toString());
+									"Entity is trying to agree on session keys but there is no master key for services: "
+									+ clientVirtualAddress.toString() + " " + serverVirtualAddress.toString());
 						}
 					}else if(Integer.parseInt(cmd.getProperty(Command.COMMAND)) == Command.CLIENT_REQUESTS_KEY){
 						isAsymRunning = true;
@@ -409,7 +409,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		javax.xml.crypto.dsig.XMLSignature signature2 = factory.unmarshalXMLSignature(valContext);
 
 		boolean sv = signature2.getSignatureValue().validate(valContext);
-		logger.debug("Signature validation status from HID: " + msg.getSenderHID() + "is " + sv);
+		logger.debug("Signature validation status from VirtualAddress: " + msg.getSenderVirtualAddress() + "is " + sv);
 		if(!sv){
 			throw new VerificationFailureException("Signature not valid");
 		}
@@ -468,7 +468,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	/**
 	 * Creates a Message object from a prepared Command object
 	 */
-	protected static Message createMessage(String topic, HID senderHID, HID receiverHID, Command command) throws IOException{
+	protected static Message createMessage(String topic, VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, Command command) throws IOException{
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		byte[] serializedCommand = null;
 		try {
@@ -478,7 +478,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 			bos.close();
 		}
 
-		return new Message(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, senderHID, receiverHID, serializedCommand);
+		return new Message(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, senderVirtualAddress, receiverVirtualAddress, serializedCommand);
 	}
 
 	/**
@@ -519,16 +519,16 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 	 * 
 	 * @return The client of security session.
 	 */
-	protected HID getClientHID() {
-		return clientHID;
+	protected VirtualAddress getClientVirtualAddress() {
+		return clientVirtualAddress;
 	}
 
 	/**
 	 * 
 	 * @return The server of security session.
 	 */
-	protected HID getServerHID() {
-		return serverHID;
+	protected VirtualAddress getServerVirtualAddress() {
+		return serverVirtualAddress;
 	}
 
 	/**
@@ -696,16 +696,16 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		if(this.masterKeyId == null){
 			//generate master key id which is certificate references XORed
 			String clientIdentifier = cryptoMgr.getCertificateReference(
-					clientHID.toString());
+					clientVirtualAddress.toString());
 			String serverIdentifier = cryptoMgr.getCertificateReference(
-					serverHID.toString());
+					serverVirtualAddress.toString());
 			
 			if(clientIdentifier == null){
 				throw new CryptoException("Does not have own certificate");
 			}
 			if(serverIdentifier == null){
-				throw new CryptoException("Does not have certificate for HID:"
-						+ serverHID.toString());
+				throw new CryptoException("Does not have certificate for VirtualAddress:"
+						+ serverVirtualAddress.toString());
 			}
 			byte[] serverId = serverIdentifier.getBytes();
 			byte[] clientId = clientIdentifier.getBytes();

@@ -1110,16 +1110,16 @@ public class KeyManagerImpl implements KeyManager {
 
 
 
-	public boolean addCertificateForHID(String hid, String certRef) {
+	public boolean addCertificateForService(String virtualAddress, String certRef) {
 		try {
 			if (dbase.identifierExists(certRef)) {
-				if (certificateRefCache.containsKey(hid)
-						&& (getCertificateFromCache(hid) != certRef)) {
-					logger.warn("THIS WILL PROBABLY CAUSE PROBLEMS. An existing certificate reference for HID "
-							+ hid
-							+ " is requested to be overriden by a different reference. This is only okay if both HIDs belong to the same NM.");
+				if (certificateRefCache.containsKey(virtualAddress)
+						&& (getCertificateFromCache(virtualAddress) != certRef)) {
+					logger.warn("THIS WILL PROBABLY CAUSE PROBLEMS. An existing certificate reference for VirtualAddress "
+							+ virtualAddress
+							+ " is requested to be overriden by a different reference. This is only okay if both virtual addresses belong to the same NM.");
 				}
-				putCertificateToCache(hid, certRef);
+				putCertificateToCache(virtualAddress, certRef);
 				return true;
 			}
 		} catch (SQLException e) {
@@ -1129,27 +1129,27 @@ public class KeyManagerImpl implements KeyManager {
 	}
 
 	/**
-	 * Returns the certificate (i.e. public key) reference for an HID or null if
-	 * no certificate exists for that HID.
+	 * Returns the certificate (i.e. public key) reference for an VirtualAddress or null if
+	 * no certificate exists for that VirtualAddress.
 	 * 
-	 * @param receiverHID
+	 * @param receiverVirtualAddress
 	 * @return
 	 */
-	public String getCertRefByHID(String receiverHID) {
-		return getCertificateFromCache(receiverHID);
+	public String getCertRefByVirtualAddress(String receiverVirtualAddress) {
+		return getCertificateFromCache(receiverVirtualAddress);
 	}
 
 	/**
-	 * Returns the private key reference for an HID or null if for that HID no
+	 * Returns the private key reference for an VirtualAddress or null if for that VirtualAddress no
 	 * private key exists.
 	 * 
-	 * @param hid
+	 * @param virtualAddress
 	 * @return
 	 */
-	public String getPrivateKeyRefByHID(String hid) {
-		String ref = getPrivateKeyCache(hid);
+	public String getPrivateKeyRefByVirtualAddress(String virtualAddress) {
+		String ref = getPrivateKeyCache(virtualAddress);
 		if (ref == null) {
-			logger.warn(" Request for non-existent key for hid " + hid);
+			logger.warn(" Request for non-existent key for virtualAddress " + virtualAddress);
 			// Just for debugging
 			// for (String key : privateKeyRefCache.keySet()) {
 			// logger.trace("  " + key + " -> " + privateKeyRefCache.get(key));
@@ -1158,25 +1158,25 @@ public class KeyManagerImpl implements KeyManager {
 		return ref;
 	}
 
-	public boolean addPrivateKeyForHID(String hid, String privateKeyRef) {
+	public boolean addPrivateKeyForService(String virtualAddress, String privateKeyRef) {
 		try {
 			if (dbase.identifierExists(privateKeyRef)) {
-				if (privateKeyRefCache.containsKey(hid)
-						&& (getPrivateKeyCache(hid) != privateKeyRef)) {
-					logger.warn("THIS WILL PROBABLY CAUSE PROBLEMS. An existing private key reference for HID "
-							+ hid
+				if (privateKeyRefCache.containsKey(virtualAddress)
+						&& (getPrivateKeyCache(virtualAddress) != privateKeyRef)) {
+					logger.warn("THIS WILL PROBABLY CAUSE PROBLEMS. An existing private key reference for VirtualAddress "
+							+ virtualAddress
 							+ " is requested to be overriden by a different reference");
 					new Throwable().printStackTrace();
 				}
-				logger.debug("Storing private reference for HID " + hid
-						+ "  : " + privateKeyRef + " for HID " + hid);
-				putPrivateKeyToCache(hid, privateKeyRef);
+				logger.debug("Storing private reference for VirtualAddress " + virtualAddress
+						+ "  : " + privateKeyRef + " for VirtualAddress " + virtualAddress);
+				putPrivateKeyToCache(virtualAddress, privateKeyRef);
 				return true;
 			} else {
 				logger.error("Did not add private key reference "
 						+ privateKeyRef
-						+ " for HID "
-						+ hid
+						+ " for VirtualAddress "
+						+ virtualAddress
 						+ " as there is no key for that reference in the database.");
 			}
 		} catch (SQLException e) {

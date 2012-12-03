@@ -10,7 +10,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.clients.RemoteWSClientProvider;
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.security.communication.SecurityProtocol;
@@ -73,8 +73,8 @@ public class CommunicationSecurityManagerImpl implements CommunicationSecurityMa
 		this.wsProvider = null;
 	}
 	
-	public SecurityProtocol getSecurityProtocol(HID clientHID, HID serverHID) {
-		SecurityProtocol securityProtocol = new SecurityProtocolAsym(clientHID, serverHID, cryptoMgr, trustMgr, trustThreshold);
+	public SecurityProtocol getSecurityProtocol(VirtualAddress clientVirtualAddress, VirtualAddress serverVirtualAddress) {
+		SecurityProtocol securityProtocol = new SecurityProtocolAsym(clientVirtualAddress, serverVirtualAddress, cryptoMgr, trustMgr, trustThreshold);
 		return securityProtocol;
 	}
 	public void applyConfigurations(Hashtable updates) {
@@ -134,7 +134,7 @@ public class CommunicationSecurityManagerImpl implements CommunicationSecurityMa
 		return false;
 	}
 
-	public SecurityProtocol getBroadcastSecurityProtocol(HID clientHID) {
+	public SecurityProtocol getBroadcastSecurityProtocol(VirtualAddress clientVirtualAddress) {
 		throw new RuntimeException("Manager has no broadcast service");
 	}
 

@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
@@ -18,8 +18,8 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 public class BackboneRouterImplTest {
 	
 	private BackboneRouterImpl backboneRouter = new BackboneRouterImpl();
-	private HID receiverHID = new HID("354.453.455.323");
-	private HID senderHID = new HID("354.453.993.323");
+	private VirtualAddress receiverVirtualAddress = new VirtualAddress("354.453.455.323");
+	private VirtualAddress senderVirtualAddress = new VirtualAddress("354.453.993.323");
 	private NetworkManagerCore networkManagerCore;
 	/**
 	 * Test sendDataSync of BackboneRouter. Backbone and route must be predefined.
@@ -29,12 +29,12 @@ public class BackboneRouterImplTest {
 		// set up
 		Backbone backbone = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone);
-		backboneRouter.addRoute(receiverHID, backbone.getClass().getName());
-		when(backbone.sendDataSynch(eq(senderHID), eq(receiverHID),any(byte[].class))).
+		backboneRouter.addRoute(receiverVirtualAddress, backbone.getClass().getName());
+		when(backbone.sendDataSynch(eq(senderVirtualAddress), eq(receiverVirtualAddress),any(byte[].class))).
 				thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		
 		// call method to test
-		NMResponse response = backboneRouter.sendDataSynch(senderHID, receiverHID, new byte[]{});
+		NMResponse response = backboneRouter.sendDataSynch(senderVirtualAddress, receiverVirtualAddress, new byte[]{});
 		// assert that something came back
 		assertNotNull(response);
 	}
@@ -45,7 +45,7 @@ public class BackboneRouterImplTest {
 	 */
 	@Test
 	public void testSendDataSyncWithUndefinedRoute() {
-		NMResponse nmResponse = backboneRouter.sendDataSynch(senderHID, receiverHID, new byte[]{});
+		NMResponse nmResponse = backboneRouter.sendDataSynch(senderVirtualAddress, receiverVirtualAddress, new byte[]{});
 		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
@@ -54,8 +54,8 @@ public class BackboneRouterImplTest {
 	 * an according NMResponse will be sent.
 	 */
 	@Test
-	public void testSendDataSyncSendNullForReceiverHID() {
-		NMResponse nmResponse = backboneRouter.sendDataSynch(senderHID, null, new byte[]{});
+	public void testSendDataSyncSendNullForReceiverVirtualAddress() {
+		NMResponse nmResponse = backboneRouter.sendDataSynch(senderVirtualAddress, null, new byte[]{});
 		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
@@ -67,14 +67,14 @@ public class BackboneRouterImplTest {
 		// set up
 		Backbone backbone = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone);
-		backboneRouter.addRoute(receiverHID, backbone.getClass().getName());
-		when(backbone.sendDataAsynch(eq(senderHID), eq(receiverHID), any(byte[].class))).
+		backboneRouter.addRoute(receiverVirtualAddress, backbone.getClass().getName());
+		when(backbone.sendDataAsynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
 				thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		
 		// call method to test
 		NMResponse response = backboneRouter.sendDataAsynch(
-				senderHID, 
-				receiverHID, 
+				senderVirtualAddress, 
+				receiverVirtualAddress, 
 				new byte[]{});
 		// assert that something came back
 		assertNotNull(response);
@@ -87,7 +87,7 @@ public class BackboneRouterImplTest {
 	@Test
 	public void testSendDataAsyncWithUndefinedRoute() {
 		// as the route was not set, there should be an exception
-		NMResponse nmResponse = backboneRouter.sendDataAsynch(senderHID, receiverHID, new byte[]{});
+		NMResponse nmResponse = backboneRouter.sendDataAsynch(senderVirtualAddress, receiverVirtualAddress, new byte[]{});
 		assertEquals(NMResponse.STATUS_ERROR,nmResponse.getStatus());
 	}
 	
@@ -99,17 +99,17 @@ public class BackboneRouterImplTest {
 		// set up
 		Backbone backbone = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone);
-		backboneRouter.addRoute(senderHID, backbone.getClass().getName());
+		backboneRouter.addRoute(senderVirtualAddress, backbone.getClass().getName());
 		
 		backboneRouter.bindNMCore(networkManagerCore);
 		when(networkManagerCore.receiveDataSynch(
-					eq(senderHID), eq(receiverHID), any(byte[].class))).
+					eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
 				thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		
 		// call method to test
 		NMResponse response = backboneRouter.receiveDataSynch(
-				senderHID, 
-				receiverHID, 
+				senderVirtualAddress, 
+				receiverVirtualAddress, 
 				new byte[]{}, 
 				backbone);
 		// check result
@@ -129,13 +129,13 @@ public class BackboneRouterImplTest {
 		NetworkManagerCore networkManagerCore = mock(NetworkManagerCore.class);
 		backboneRouter.bindNMCore(networkManagerCore);
 		when(networkManagerCore.receiveDataSynch(
-					eq(senderHID), eq(receiverHID), any(byte[].class))).
+					eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
 				thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		
 		// call method to test
 		NMResponse response = backboneRouter.receiveDataSynch(
-				senderHID, 
-				receiverHID, 
+				senderVirtualAddress, 
+				receiverVirtualAddress, 
 				new byte[]{}, 
 				backbone);
 		// check result
@@ -155,8 +155,8 @@ public class BackboneRouterImplTest {
 		
 		// call method to test
 		NMResponse response = backboneRouter.receiveDataSynch(
-				senderHID, 
-				receiverHID, 
+				senderVirtualAddress, 
+				receiverVirtualAddress, 
 				new byte[]{}, 
 				backbone);
 		// check result
@@ -173,18 +173,18 @@ public class BackboneRouterImplTest {
 		// set up
 		Backbone backbone = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone);
-		backboneRouter.addRoute(senderHID, backbone.getClass().getName());
+		backboneRouter.addRoute(senderVirtualAddress, backbone.getClass().getName());
 		
 		NetworkManagerCore networkManagerCore = mock(NetworkManagerCore.class);
 		backboneRouter.bindNMCore(networkManagerCore);
 		when(networkManagerCore.receiveDataAsynch(
-					eq(senderHID), eq(receiverHID), any(byte[].class))).
+					eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
 				thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		
 		// call method to test
 		NMResponse response = backboneRouter.receiveDataAsynch(
-				senderHID, 
-				receiverHID, 
+				senderVirtualAddress, 
+				receiverVirtualAddress, 
 				new byte[]{}, 
 				backbone);
 		// check result
@@ -204,13 +204,13 @@ public class BackboneRouterImplTest {
 		NetworkManagerCore networkManagerCore = mock(NetworkManagerCore.class);
 		backboneRouter.bindNMCore(networkManagerCore);
 		when(networkManagerCore.receiveDataAsynch(
-					eq(senderHID), eq(receiverHID), any(byte[].class))).
+					eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
 				thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		
 		// call method to test
 		NMResponse response = backboneRouter.receiveDataAsynch(
-				senderHID, 
-				receiverHID, 
+				senderVirtualAddress, 
+				receiverVirtualAddress, 
 				new byte[]{}, 
 				backbone);
 		// check result
@@ -230,8 +230,8 @@ public class BackboneRouterImplTest {
 		
 		// call method to test
 		NMResponse response = backboneRouter.receiveDataAsynch(
-				senderHID, 
-				receiverHID, 
+				senderVirtualAddress, 
+				receiverVirtualAddress, 
 				new byte[]{}, 
 				backbone);
 		// check result
@@ -250,18 +250,18 @@ public class BackboneRouterImplTest {
 		// set up
 		Backbone backbone1 = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone1);
-		backboneRouter.addRoute(senderHID, backbone1.getClass().getName());
-		when(backbone1.broadcastData(eq(senderHID), any(byte[].class))).
+		backboneRouter.addRoute(senderVirtualAddress, backbone1.getClass().getName());
+		when(backbone1.broadcastData(eq(senderVirtualAddress), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_ERROR));
 		
 		Backbone backbone2 = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone2);
-		backboneRouter.addRoute(senderHID, backbone2.getClass().getName());
-		when(backbone2.broadcastData(eq(senderHID), any(byte[].class))).
+		backboneRouter.addRoute(senderVirtualAddress, backbone2.getClass().getName());
+		when(backbone2.broadcastData(eq(senderVirtualAddress), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		
 		// call method to test
-		NMResponse response = backboneRouter.broadcastData(senderHID, new byte[]{});
+		NMResponse response = backboneRouter.broadcastData(senderVirtualAddress, new byte[]{});
 		// check result
 		assertNotNull("Response should not be null.", response);
 		assertEquals("Status should be successful.", 
@@ -289,12 +289,12 @@ public class BackboneRouterImplTest {
 		// set up
 		Backbone backbone1 = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone1);
-		backboneRouter.addRoute(senderHID, backbone1.getClass().getName());
-		when(backbone1.broadcastData(eq(senderHID), any(byte[].class))).
+		backboneRouter.addRoute(senderVirtualAddress, backbone1.getClass().getName());
+		when(backbone1.broadcastData(eq(senderVirtualAddress), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_ERROR));
 		
 		// call method to test
-		NMResponse response = backboneRouter.broadcastData(senderHID, new byte[]{});
+		NMResponse response = backboneRouter.broadcastData(senderVirtualAddress, new byte[]{});
 		// check result
 		assertNotNull("Response should not be null.", response);
 		assertEquals("Status should not be successful.", 
@@ -317,11 +317,11 @@ public class BackboneRouterImplTest {
 		String endpoint = "endpoint";
 		Backbone backbone = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone);
-		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+		when(backbone.addEndpoint(senderVirtualAddress, endpoint)).thenReturn(true);
 		
 		// call method to test
 		boolean successful = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				backbone.getClass().getName(), 
 				endpoint);
 		// check results
@@ -330,7 +330,7 @@ public class BackboneRouterImplTest {
 	}
 	
 	/**
-	 * Tests method addRouteToBackbone. As senderHID is null, the call 
+	 * Tests method addRouteToBackbone. As senderVirtualAddress is null, the call 
 	 * should return false.
 	 */
 	@Test
@@ -361,7 +361,7 @@ public class BackboneRouterImplTest {
 		// call method to test
 		boolean successful = 
 				backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				null, 
 				endpoint);
 				
@@ -371,7 +371,7 @@ public class BackboneRouterImplTest {
 	}
 	
 	/**
-	 * Tests method addRouteToBackbone. As senderHID is null, the call 
+	 * Tests method addRouteToBackbone. As senderVirtualAddress is null, the call 
 	 * should return false.
 	 */
 	@Test
@@ -382,7 +382,7 @@ public class BackboneRouterImplTest {
 		
 		// call method to test
 		boolean successful = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				backbone.getClass().getName(), 
 				null);
 		// check results
@@ -392,7 +392,7 @@ public class BackboneRouterImplTest {
 	
 	/**
 	 * Tests method addRouteToBackbone. As there is already is an entry in the
-	 * Map 'hidBackboneMap', the call should return false.
+	 * Map 'virtualAddressBackboneMap', the call should return false.
 	 */
 	@Test
 	public void testAddRouteToBackboneTwice() {
@@ -400,15 +400,15 @@ public class BackboneRouterImplTest {
 		String endpoint = "endpoint";
 		Backbone backbone = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone);
-		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+		when(backbone.addEndpoint(senderVirtualAddress, endpoint)).thenReturn(true);
 		boolean successfulFirst = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				backbone.getClass().getName(), 
 				endpoint);
 		
 		// call method to test
 		boolean successfulSecond = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				backbone.getClass().getName(), 
 				endpoint);
 		// check results
@@ -427,12 +427,12 @@ public class BackboneRouterImplTest {
 		String endpoint = "endpoint";
 		Backbone backbone = mock(Backbone.class);
 //		backboneRouter.bindBackbone(backbone);
-		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+		when(backbone.addEndpoint(senderVirtualAddress, endpoint)).thenReturn(true);
 						
 		
 //		//Activate move
 		boolean successfulFirst = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				"BackboneSOAPImpl", 
 				endpoint);
 
@@ -449,17 +449,17 @@ public class BackboneRouterImplTest {
 	 * Tests method addRouteToBackbone. Although, no backbone is bound yet, the first route should be added as a potential route, but the second try should return false
 	 */
 	@Test
-	public void testAddingPotentialRouteWithAlreadyRegisteredHID() {
+	public void testAddingPotentialRouteWithAlreadyRegisteredService() {
 		// set up
 		String endpoint = "endpoint";
 		Backbone backbone = mock(Backbone.class);
 //		backboneRouter.bindBackbone(backbone);
-		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+		when(backbone.addEndpoint(senderVirtualAddress, endpoint)).thenReturn(true);
 						
 		
 		//Activate move
 		boolean successfulFirst = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				"BackboneSOAPImpl", 
 				endpoint);
 
@@ -467,11 +467,11 @@ public class BackboneRouterImplTest {
 				true, successfulFirst);
 		
 		boolean successfulSecond = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				"BackboneSOAPImpl", 
 				endpoint);
 
-		assertEquals("Adding the route without an available backbone with the previous HID should fail.", 
+		assertEquals("Adding the route without an available backbone with the previous VirtualAddress should fail.", 
 				false, successfulSecond);
 
 	}
@@ -487,13 +487,13 @@ public class BackboneRouterImplTest {
 		String endpoint = "endpoint";
 		Backbone backbone = mock(Backbone.class);
 		when(backbone.getName()).thenReturn("BackboneSOAPImpl");
-		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+		when(backbone.addEndpoint(senderVirtualAddress, endpoint)).thenReturn(true);
 
 		backboneRouter.bindNMCore(networkManagerCore);
 		
 		//Activate move
 		boolean successfulFirst = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				"BackboneSOAPImpl", 
 				endpoint);
 
@@ -526,13 +526,13 @@ public class BackboneRouterImplTest {
 		String endpoint = "endpoint";
 		Backbone backbone = mock(Backbone.class);
 		when(backbone.getName()).thenReturn("BackboneSOAPImpl");
-		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+		when(backbone.addEndpoint(senderVirtualAddress, endpoint)).thenReturn(true);
 
 		backboneRouter.bindNMCore(networkManagerCore);
 		
 		//Activate move
 		boolean successfulFirst = backboneRouter.addRouteToBackbone(
-				senderHID, 
+				senderVirtualAddress, 
 				"BackboneSOAPImpl", 
 				endpoint);
 
@@ -567,7 +567,7 @@ public class BackboneRouterImplTest {
 	@Test
 	public void testRemoveRouteUnsuccesful() {
 		// call method to test
-		boolean successful = backboneRouter.removeRoute(senderHID, "BackboneName");
+		boolean successful = backboneRouter.removeRoute(senderVirtualAddress, "BackboneName");
 		// check results
 		assertEquals("Remove the backbone should return false as there is no " +
 				"backbone to remove.", false, successful);
@@ -582,13 +582,13 @@ public class BackboneRouterImplTest {
 		String endpoint = "endpoint";
 		Backbone backbone = mock(Backbone.class);
 		backboneRouter.bindBackbone(backbone);
-		when(backbone.addEndpoint(senderHID, endpoint)).thenReturn(true);
+		when(backbone.addEndpoint(senderVirtualAddress, endpoint)).thenReturn(true);
 			backboneRouter.addRouteToBackbone(
-					senderHID, 
+					senderVirtualAddress, 
 					backbone.getClass().getName(), 
 					endpoint);
 		// call method to test
-		boolean successfulRemove = backboneRouter.removeRoute(senderHID, 
+		boolean successfulRemove = backboneRouter.removeRoute(senderVirtualAddress, 
 				backbone.getClass().getName());
 		// check results
 		assertEquals("Remove the backbone should return true.", 

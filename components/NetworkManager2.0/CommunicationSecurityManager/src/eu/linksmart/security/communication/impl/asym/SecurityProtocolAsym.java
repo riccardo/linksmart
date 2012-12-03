@@ -40,7 +40,7 @@ import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.Message;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.CryptoException;
@@ -56,7 +56,7 @@ import eu.linksmart.utils.Base64;
 /**
  * Implementation of {@link SecurityProtocol} interface which
  * uses hybrid encryption based on certificates associated
- * with {@link HID}
+ * with {@link VirtualAddress}
  * @author Vinkovits
  *
  */
@@ -78,11 +78,11 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	/**
 	 * The client of this protocol run meaning who started the communication
 	 */
-	private HID clientHID = null;
+	private VirtualAddress clientVirtualAddress = null;
 	/**
 	 * The server of this protocol run meaning who received the request
 	 */
-	private HID serverHID = null;
+	private VirtualAddress serverVirtualAddress = null;
 	/**
 	 * The threshold between 0 and 1 needed for a certificate to be accepted
 	 */
@@ -125,9 +125,9 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 */
 	private Message lastSent;
 
-	public SecurityProtocolAsym(HID clientHID, HID serverHID, CryptoManager cryptoMgr, TrustManager trustMgr, double trustThreshold){
-		this.clientHID = clientHID;
-		this.serverHID = serverHID;
+	public SecurityProtocolAsym(VirtualAddress clientVirtualAddress, VirtualAddress serverVirtualAddress, CryptoManager cryptoMgr, TrustManager trustMgr, double trustThreshold){
+		this.clientVirtualAddress = clientVirtualAddress;
+		this.serverVirtualAddress = serverVirtualAddress;
 		this.cryptoMgr = cryptoMgr;
 		this.trustMgr = trustMgr;
 		this.trustThreshold = trustThreshold;
@@ -139,12 +139,12 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		isStarted = true;
 
 		Command cmd = new Command(Command.CLIENT_HELLO);	
-		cmd.setProperty(Command.CLIENT, clientHID.toString());
-		cmd.setProperty(Command.SERVER, serverHID.toString());
+		cmd.setProperty(Command.CLIENT, clientVirtualAddress.toString());
+		cmd.setProperty(Command.SERVER, serverVirtualAddress.toString());
 		generatedNonce = nonceGenerator.getNextNonce();
 		cmd.setProperty(Command.CLIENT_NONCE, generatedNonce);
 		try {
-			return createMessage(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, clientHID, serverHID, cmd);
+			return createMessage(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, clientVirtualAddress, serverVirtualAddress, cmd);
 		} catch (Exception e){
 			resetProtocol();
 			//this exception cannot happen{
@@ -179,8 +179,8 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 			//get message content
 			Command command = getCommand(msg);
 			//check whether this is the correct party
-			if(!command.get(Command.CLIENT).equals(clientHID.toString()) 
-					|| !command.get(Command.SERVER).equals(serverHID.toString())){
+			if(!command.get(Command.CLIENT).equals(clientVirtualAddress.toString()) 
+					|| !command.get(Command.SERVER).equals(serverVirtualAddress.toString())){
 				resetProtocol();
 				throw new VerificationFailureException("Not appropriate sender or receiver of handshake");
 			}
@@ -218,21 +218,21 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 							logger.debug("Signature or nonce not valid, aborting");
 							resetProtocol();
 							throw new VerificationFailureException(
-									"Signature or nonce from HID: " + serverHID + " not valid!");
+									"Signature or nonce from VirtualAddress: " + serverVirtualAddress + " not valid!");
 						} 
 
 						isInitialized = true;
 						//send signature on nonce sent by server
 						Command cmd = new Command(Command.CLIENT_ACK);
-						cmd.setProperty(Command.CLIENT, clientHID.toString());
-						cmd.setProperty(Command.SERVER, serverHID.toString());
+						cmd.setProperty(Command.CLIENT, clientVirtualAddress.toString());
+						cmd.setProperty(Command.SERVER, serverVirtualAddress.toString());
 						cmd.setProperty(Command.SERVER_NONCE, command.getProperty(Command.SERVER_NONCE));
 
 						//create signature
 						ByteArrayOutputStream bos = new ByteArrayOutputStream();
 						try {
 							cmd.storeToXML(bos, null);
-							String signedCommand = cryptoMgr.sign(bos.toString(),null, clientHID.toString());
+							String signedCommand = cryptoMgr.sign(bos.toString(),null, clientVirtualAddress.toString());
 							cmd.setProperty(Command.SIGNED_PAYLOAD, signedCommand);
 							//add stored message if there is one
 							if(storedMessage != null){
@@ -248,8 +248,8 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 								}
 							}
 							lastSent = createMessage(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
-									clientHID,
-									serverHID,
+									clientVirtualAddress,
+									serverVirtualAddress,
 									cmd);
 							return lastSent;
 						} catch (IOException e) {
@@ -264,8 +264,8 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 				if(!sentKeyToClient && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_HELLO){			
 					//create nonce and create command
 					Command cmd = new Command(Command.SERVER_SEND_INFO);
-					cmd.setProperty(Command.CLIENT, clientHID.toString());
-					cmd.setProperty(Command.SERVER, serverHID.toString());
+					cmd.setProperty(Command.CLIENT, clientVirtualAddress.toString());
+					cmd.setProperty(Command.SERVER, serverVirtualAddress.toString());
 					cmd.setProperty(Command.CLIENT_NONCE, command.getProperty(Command.CLIENT_NONCE));
 					generatedNonce = nonceGenerator.getNextNonce();
 					cmd.setProperty(Command.SERVER_NONCE, generatedNonce);
@@ -276,13 +276,13 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 					String signedCommand = cryptoMgr.sign(
 							bos.toString(),
 							null,
-							serverHID.toString());
+							serverVirtualAddress.toString());
 					cmd.setProperty(Command.SIGNED_PAYLOAD, signedCommand);
 
 					sentKeyToClient = true;
 					lastSent = createMessage(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
-							serverHID,
-							clientHID,
+							serverVirtualAddress,
+							clientVirtualAddress,
 							cmd);
 					return lastSent;
 				} else if(sentKeyToClient && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_ACK) {
@@ -295,7 +295,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 						if(command.containsKey(Command.APPLICATION_MESSAGE)){
 							try{
 								String data = command.getProperty(Command.APPLICATION_MESSAGE);
-								Message message = new Message(SecurityProtocol.CIPHER_TEXT, clientHID, serverHID, data.getBytes());
+								Message message = new Message(SecurityProtocol.CIPHER_TEXT, clientVirtualAddress, serverVirtualAddress, data.getBytes());
 								message = unprotectMessage(message);
 								return message;
 							}catch(Exception e){
@@ -312,7 +312,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 					}else{
 						logger.debug("Signature or nonce not valid, aborting!");
 						resetProtocol();
-						throw new VerificationFailureException("Received not valid signature from HID: " + clientHID);
+						throw new VerificationFailureException("Received not valid signature from VirtualAddress: " + clientVirtualAddress);
 					}
 				}
 			}
@@ -321,7 +321,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	}
 
 	public Message protectMessage(Message msg) throws Exception {
-		String encryptedMessage = asymEncrypt(new String(msg.getData()), msg.getReceiverHID().toString());
+		String encryptedMessage = asymEncrypt(new String(msg.getData()), msg.getReceiverVirtualAddress().toString());
 		msg.setData(encryptedMessage.getBytes());
 		return msg;
 	}
@@ -340,7 +340,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	/**
 	 * Creates a Message object from a prepared Command object
 	 */
-	private Message createMessage(String topic, HID senderHID, HID receiverHID, Command command) throws IOException{
+	private Message createMessage(String topic, VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, Command command) throws IOException{
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		byte[] serializedCommand = null;
 		try {
@@ -350,7 +350,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 			bos.close();
 		}
 
-		return new Message(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, senderHID, receiverHID, serializedCommand);
+		return new Message(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC, senderVirtualAddress, receiverVirtualAddress, serializedCommand);
 	}
 
 	/**
@@ -372,21 +372,21 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	}
 
 	/**
-	 * Associates servers's HID with certificate in {@link CryptoManager}
+	 * Associates servers's VirtualAddress with certificate in {@link CryptoManager}
 	 * @param identifier
 	 */
 	private void saveServerPk(String identifier){
-		cryptoMgr.addCertificateForHID(serverHID.toString(), identifier);
-		logger.debug("Server KEY IDENTIFIER FROM CRYPTOMANAGER: " + identifier + " has been bound to HID: " + serverHID.toString());
+		cryptoMgr.addCertificateForService(serverVirtualAddress.toString(), identifier);
+		logger.debug("Server KEY IDENTIFIER FROM CRYPTOMANAGER: " + identifier + " has been bound to VirtualAddress: " + serverVirtualAddress.toString());
 	}
 
 	/**
-	 * Associates client's HID with certificate in {@link CryptoManager}
+	 * Associates client's VirtualAddress with certificate in {@link CryptoManager}
 	 * @param identifier
 	 */
 	public void saveClientPk(String identifier){
-		cryptoMgr.addCertificateForHID(clientHID.toString(), identifier);
-		logger.debug("CLIENT KEY IDENTIFIER FROM CRYPTOMANAGER: " + identifier + " has been bound to HID: " + clientHID.toString());
+		cryptoMgr.addCertificateForService(clientVirtualAddress.toString(), identifier);
+		logger.debug("CLIENT KEY IDENTIFIER FROM CRYPTOMANAGER: " + identifier + " has been bound to VirtualAddress: " + clientVirtualAddress.toString());
 	}
 
 	/**
@@ -506,11 +506,11 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 				// Retrieve information about the Public Key used to encrypt the
 				// DEK
 				EncryptedKey ek = encryptedDataObject.getKeyInfo().itemEncryptedKey(0);
-				String receiverHID =
+				String receiverVirtualAddress =
 					encryptedDataObject.getKeyInfo().getTextFromTextChild().trim();
 
 				// Try to retrieve the corresponding Private Key
-				PrivateKey kek = loadKeyDecryptionKey(receiverHID);
+				PrivateKey kek = loadKeyDecryptionKey(receiverVirtualAddress);
 
 				// Set the cipher to "Unwrap" mode and use the Private Key to
 				// extract the DEK
@@ -538,7 +538,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		return result;
 	}
 
-	public String asymEncrypt(String encstr, String receiverHID) throws Exception {
+	public String asymEncrypt(String encstr, String receiverVirtualAddress) throws Exception {
 		String result = "";
 		try {
 			if (encstr == null) {
@@ -562,7 +562,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 			document.appendChild(rootElement);
 
 			// Get a public key (KEK) to encrypt the symmetric key (DEK).
-			PublicKey kek = loadKeyEncryptionKey(receiverHID);
+			PublicKey kek = loadKeyEncryptionKey(receiverVirtualAddress);
 
 			// Get a key to encrypt the data (DEK)
 			Key dek = loadDataEncryptionKey();
@@ -590,7 +590,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 			EncryptedData encryptedData = xmlCipher.getEncryptedData();
 			KeyInfo keyInfo = new KeyInfo(document);
 			keyInfo.add(encryptedKey);
-			keyInfo.addText(receiverHID);
+			keyInfo.addText(receiverVirtualAddress);
 			encryptedData.setKeyInfo(keyInfo);
 			xmlCipher.doFinal(document, rootElement, true);
 
@@ -632,7 +632,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 	/**
 	 * Private keys for decryption
-	 * @param hid
+	 * @param virtualAddress
 	 * @return PrivateKey object which can be used to open mesasge
 	 * @throws NoSuchAlgorithmException
 	 * @throws CertificateException
@@ -640,8 +640,8 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 * @throws KeyStoreException
 	 * @throws UnrecoverableKeyException
 	 */
-	private PrivateKey loadKeyDecryptionKey(String hid) throws NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException, UnrecoverableKeyException {
-		String identifier = cryptoMgr.getPrivateKeyReference(hid);
+	private PrivateKey loadKeyDecryptionKey(String virtualAddress) throws NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException, UnrecoverableKeyException {
+		String identifier = cryptoMgr.getPrivateKeyReference(virtualAddress);
 		return cryptoMgr.getPrivateKeyByIdentifier(identifier);
 	}
 
@@ -661,7 +661,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 
 	/**
 	 * Load the public key of the receiver from the {@link CryptoManager}
-	 * @param receiverHID
+	 * @param receiverVirtualAddress
 	 * @return
 	 * @throws InvalidKeySpecException
 	 * @throws KeyStoreException
@@ -669,8 +669,8 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 * @throws FileNotFoundException
 	 * @throws CertificateException
 	 */
-	private PublicKey loadKeyEncryptionKey(String receiverHID) throws InvalidKeySpecException, KeyStoreException, NoSuchAlgorithmException, FileNotFoundException, CertificateException{
-		String identifier = cryptoMgr.getCertificateReference(receiverHID);
+	private PublicKey loadKeyEncryptionKey(String receiverVirtualAddress) throws InvalidKeySpecException, KeyStoreException, NoSuchAlgorithmException, FileNotFoundException, CertificateException{
+		String identifier = cryptoMgr.getCertificateReference(receiverVirtualAddress);
 		return cryptoMgr.getCertificateByIdentifier(identifier).getPublicKey();
 	}
 

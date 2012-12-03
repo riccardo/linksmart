@@ -16,7 +16,7 @@ import javax.crypto.SecretKey;
 
 import org.apache.log4j.Logger;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.Message;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.CryptoException;
@@ -72,13 +72,13 @@ public class AsymHandshake {
 	 * @throws Exception
 	 */
 	protected Message startProtocol() throws Exception {
-		HID clientHID = secProtocol.getClientHID();
-		HID serverHID = secProtocol.getServerHID();
+		VirtualAddress clientVirtualAddress = secProtocol.getClientVirtualAddress();
+		VirtualAddress serverVirtualAddress = secProtocol.getServerVirtualAddress();
 
 		//fill fields of message
 		Command cmd = new Command(Command.CLIENT_REQUESTS_KEY);	
-		cmd.setProperty(Command.CLIENT, clientHID.toString());
-		cmd.setProperty(Command.SERVER, serverHID.toString());
+		cmd.setProperty(Command.CLIENT, clientVirtualAddress.toString());
+		cmd.setProperty(Command.SERVER, serverVirtualAddress.toString());
 		//set client nonce
 		String nonce = secProtocol.getNonceGenerator().getNextNonce();
 		cmd.setProperty(Command.CLIENT_NONCE, nonce);
@@ -91,13 +91,13 @@ public class AsymHandshake {
 		String signedCommand = secProtocol.getCryptoMgr().sign(
 				bos.toString(),
 				null,
-				clientHID.toString());
+				clientVirtualAddress.toString());
 		cmd.setProperty(Command.SIGNED_PAYLOAD, signedCommand);
 
 		return SecurityProtocolImpl.createMessage(
 				CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
-				clientHID,
-				serverHID,
+				clientVirtualAddress,
+				serverVirtualAddress,
 				cmd);
 	}
 
@@ -112,14 +112,14 @@ public class AsymHandshake {
 	protected Message processMessage(Message msg) throws IOException, CryptoException, Exception{		
 		//cache actual state of security protocol to not have so many method calls
 		CryptoManager cryptoMgr = secProtocol.getCryptoMgr();
-		HID serverHID = secProtocol.getServerHID();
-		HID clientHID = secProtocol.getClientHID();
+		VirtualAddress serverVirtualAddress = secProtocol.getServerVirtualAddress();
+		VirtualAddress clientVirtualAddress = secProtocol.getClientVirtualAddress();
 
 		//get message content
 		Command command = SecurityProtocolImpl.getCommand(msg);
 		//check whether this is the correct party
-		if(!command.get(Command.CLIENT).equals(clientHID.toString()) 
-				|| !command.get(Command.SERVER).equals(serverHID.toString())) {
+		if(!command.get(Command.CLIENT).equals(clientVirtualAddress.toString()) 
+				|| !command.get(Command.SERVER).equals(serverVirtualAddress.toString())) {
 			throw new VerificationFailureException("Not appropriate sender or receiver of handshake");
 		}
 
@@ -177,16 +177,16 @@ public class AsymHandshake {
 						} else {
 							logger.debug("Encrypted headers are not the same as outer headers, aborting!");
 							throw new VerificationFailureException(
-									"Signature from HID: " + serverHID + " not matching to required fields!");
+									"Signature from VirtualAddress: " + serverVirtualAddress + " not matching to required fields!");
 						}
 					} else {
 						logger.debug("Signature not valid, aborting");
-						throw new VerificationFailureException("Signature from HID: " + serverHID + " not valid!");
+						throw new VerificationFailureException("Signature from VirtualAddress: " + serverVirtualAddress + " not valid!");
 					} 
 					//send acknowledgment to server of receiving the key
 					Command cmd = new Command(Command.CLIENT_ACK);
-					cmd.setProperty(Command.CLIENT, clientHID.toString());
-					cmd.setProperty(Command.SERVER, serverHID.toString());
+					cmd.setProperty(Command.CLIENT, clientVirtualAddress.toString());
+					cmd.setProperty(Command.SERVER, serverVirtualAddress.toString());
 					//also add protected stored message to acknowledgment
 					Message storedMessage = null;
 					if((storedMessage = secProtocol.getStoredMessage()) != null){
@@ -226,8 +226,8 @@ public class AsymHandshake {
 						setInitialized();
 						return SecurityProtocolImpl.createMessage(
 								CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
-								clientHID,
-								serverHID,
+								clientVirtualAddress,
+								serverVirtualAddress,
 								cmd);
 					} catch (IOException e) {
 						//this exception cannot happen
@@ -235,7 +235,7 @@ public class AsymHandshake {
 						return null;
 					}
 				} else {
-					logger.debug("Not appropriate message received from HID: " + serverHID.toString());
+					logger.debug("Not appropriate message received from VirtualAddress: " + serverVirtualAddress.toString());
 				}
 			}
 		} else {
@@ -251,8 +251,8 @@ public class AsymHandshake {
 					//pack key into command
 					Command cmd = new Command(Command.SERVER_SEND_KEY);
 					cmd.setProperty(Command.SYMMETRIC_KEY, key);
-					cmd.setProperty(Command.CLIENT, clientHID.toString());
-					cmd.setProperty(Command.SERVER, serverHID.toString());
+					cmd.setProperty(Command.CLIENT, clientVirtualAddress.toString());
+					cmd.setProperty(Command.SERVER, serverVirtualAddress.toString());
 					//add server nonce for session key agreement
 					String serverNonce = secProtocol.getNonceGenerator().getNextNonce();
 					symHandshake.setServerNonce(serverNonce);
@@ -266,16 +266,16 @@ public class AsymHandshake {
 
 					//encrypting and signing message
 					logger.debug("Encrypting " + bos.toString());
-					logger.debug("Encrypting for " + clientHID.toString());
+					logger.debug("Encrypting for " + clientVirtualAddress.toString());
 					String encryptedCommand;
 					try {
-						encryptedCommand = cryptoMgr.encryptAsymmetric(bos.toString(), clientHID.toString(), "");
+						encryptedCommand = cryptoMgr.encryptAsymmetric(bos.toString(), clientVirtualAddress.toString(), "");
 					} catch (Exception e) {
 						CryptoException ce = new CryptoException("Error encrypting message!");
 						ce.initCause(e);
 						throw ce;
 					}
-					String signedCommand = cryptoMgr.sign(encryptedCommand, null, serverHID.toString());
+					String signedCommand = cryptoMgr.sign(encryptedCommand, null, serverVirtualAddress.toString());
 
 					//add encrypted and remove clear text key from message
 					cmd.setProperty(Command.SIGNED_AND_ENCRYPTED_PAYLOAD, signedCommand);
@@ -286,8 +286,8 @@ public class AsymHandshake {
 					sentKeyToClient = true;
 					return SecurityProtocolImpl.createMessage(
 							CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
-							serverHID,
-							clientHID,
+							serverVirtualAddress,
+							clientVirtualAddress,
 							cmd);
 				}
 			} else if (sentKeyToClient && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_ACK) {
@@ -295,7 +295,7 @@ public class AsymHandshake {
 				//read application data out of acknowledgment
 				if(command.containsKey(Command.APPLICATION_MESSAGE)) {
 					String data = command.getProperty(Command.APPLICATION_MESSAGE);
-					Message message = new Message(SecurityProtocol.CIPHER_TEXT, secProtocol.getClientHID(), secProtocol.getServerHID(), data.getBytes());
+					Message message = new Message(SecurityProtocol.CIPHER_TEXT, secProtocol.getClientVirtualAddress(), secProtocol.getServerVirtualAddress(), data.getBytes());
 					message = secProtocol.unprotectMessage(message);
 					// open data and divide it into properties of the message and
 					// application data
@@ -314,7 +314,7 @@ public class AsymHandshake {
 
 					// create real message
 					message = new Message((String) properties.remove(Command.TOPIC),
-							message.getSenderHID(), message.getReceiverHID(), (Base64.decode((String) properties
+							message.getSenderVirtualAddress(), message.getReceiverVirtualAddress(), (Base64.decode((String) properties
 									.remove(Command.APPLICATION_MESSAGE))));
 					// go through the properties and add them to the message
 					Iterator<Object> i = properties.keySet().iterator();
@@ -337,22 +337,22 @@ public class AsymHandshake {
 	}
 
 	/**
-	 * Associates servers's HID with certificate in {@link CryptoManager}
+	 * Associates servers's VirtualAddress with certificate in {@link CryptoManager}
 	 * @param identifier
 	 */
 	private void saveServerPk(String identifier){
-		secProtocol.getCryptoMgr().addCertificateForHID(secProtocol.getServerHID().toString(), identifier);
+		secProtocol.getCryptoMgr().addCertificateForService(secProtocol.getServerVirtualAddress().toString(), identifier);
 		logger.debug("Server KEY IDENTIFIER FROM CRYPTOMANAGER: " 
-				+ identifier + " has been bound to HID: " + secProtocol.getServerHID().toString());
+				+ identifier + " has been bound to VirtualAddress: " + secProtocol.getServerVirtualAddress().toString());
 	}
 
 	/**
-	 * Associates client's HID with certificate in {@link CryptoManager}
+	 * Associates client's VirtualAddress with certificate in {@link CryptoManager}
 	 * @param identifier
 	 */
 	public void saveClientPk(String identifier){
-		secProtocol.getCryptoMgr().addCertificateForHID(secProtocol.getClientHID().toString(), identifier);
-		logger.debug("CLIENT KEY IDENTIFIER FROM CRYPTOMANAGER: " + identifier + " has been bound to HID: " + secProtocol.getClientHID().toString());
+		secProtocol.getCryptoMgr().addCertificateForService(secProtocol.getClientVirtualAddress().toString(), identifier);
+		logger.debug("CLIENT KEY IDENTIFIER FROM CRYPTOMANAGER: " + identifier + " has been bound to VirtualAddress: " + secProtocol.getClientVirtualAddress().toString());
 	}
 
 	/**

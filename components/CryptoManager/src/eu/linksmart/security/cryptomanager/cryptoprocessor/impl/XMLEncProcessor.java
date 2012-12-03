@@ -198,23 +198,23 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 				// DEK
 				EncryptedKey ek =
 					encryptedDataObject.getKeyInfo().itemEncryptedKey(0);
-				String receiverHID =
+				String receiverVirtualAddress =
 					encryptedDataObject.getKeyInfo().getTextFromTextChild()
 					.trim();
 				String algorithm_name = ek.getEncryptionMethod().getAlgorithm();
 
 				String receiverCertRef =
-					KeyManagerImpl.getInstance().getPrivateKeyRefByHID(
-							receiverHID);
+					KeyManagerImpl.getInstance().getPrivateKeyRefByVirtualAddress(
+							receiverVirtualAddress);
 
 				PrivateKey kdk;
 				if (receiverCertRef == null) {
-					logger.warn("No private key for HID "
-							+ receiverHID
-							+ " available. Trying to use the default key for decrypting the message. This is potentially insecure and happens if a non-Crypto-HID communicates.");
+					logger.warn("No private key for VirtualAddress "
+							+ receiverVirtualAddress
+							+ " available. Trying to use the default key for decrypting the message. This is potentially insecure and happens if a non-Crypto-VirtualAddress communicates.");
 					receiverCertRef = "linksmartdemo_identifier";
-					KeyManagerImpl.getInstance().addPrivateKeyForHID(
-							receiverHID, receiverCertRef);
+					KeyManagerImpl.getInstance().addPrivateKeyForService(
+							receiverVirtualAddress, receiverCertRef);
 				}
 				// FIXME Do this mapping externally in a hashmap
 				if (algorithm_name
@@ -267,12 +267,12 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 	 * <code>decrypt</code> method. <p>
 	 * @deprecated encryptAsymmetric(String, String, String, boolean) should be used instead
 	 * @param documentString String to be encrypted
-	 * @param receiverHid The HID of the receiver
+	 * @param receiverVirtualAddress The VirtualAddress of the receiver
 	 */
 	@Deprecated
-	public String encryptAsymmetric(String documentString, String receiverHid,
+	public String encryptAsymmetric(String documentString, String receiverVirtualAddress,
 			String format) throws Exception {
-		if (documentString == null || receiverHid == null || format == null)
+		if (documentString == null || receiverVirtualAddress == null || format == null)
 			throw new NullPointerException("Null parameter");
 
 		String s_encrypt = "";
@@ -293,13 +293,13 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 
 		// Get a public key (KEK) to encrypt the symmetric key (DEK).
 		String identifier =
-			KeyManagerImpl.getInstance().getCertRefByHID(receiverHid);
+			KeyManagerImpl.getInstance().getCertRefByVirtualAddress(receiverVirtualAddress);
 		if (identifier == null) {
-			logger.warn("Request to encrypt for HID "
-					+ receiverHid
-					+ " but no public key is available for this HID. Trying to continue using the default key but this is probably an error.");
+			logger.warn("Request to encrypt for VirtualAddress "
+					+ receiverVirtualAddress
+					+ " but no public key is available for this VirtualAddress. Trying to continue using the default key but this is probably an error.");
 			identifier = "linksmartdemo_identifier";
-			KeyManagerImpl.getInstance().addPrivateKeyForHID(receiverHid,
+			KeyManagerImpl.getInstance().addPrivateKeyForService(receiverVirtualAddress,
 					identifier);
 		}
 		PublicKey kek =
@@ -329,7 +329,7 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 		EncryptedData encryptedData = xmlCipher.getEncryptedData();
 		KeyInfo keyInfo = new KeyInfo(doc);
 		keyInfo.add(encryptedKey);
-		keyInfo.addText(receiverHid);
+		keyInfo.addText(receiverVirtualAddress);
 		encryptedData.setKeyInfo(keyInfo);
 		xmlCipher.doFinal(doc, root, true);
 
@@ -354,14 +354,14 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 	 * Encrypts a message so it can be decrypted by <code>decrypt</code> method of
 	 * CryptoManager.
 	 * @param documentString String to be encrypted
-	 * @param identifier Identifier of key - either receiverHID or key identifier
+	 * @param identifier Identifier of key - either receiverVirtualAddress or key identifier
 	 * @param format
-	 * @param isHID True if identifier is HID
+	 * @param isVirtualAddress True if identifier is VirtualAddress
 	 * @return
 	 * @throws Exception
 	 */
 	public String encryptAsymmetric(String documentString, String identifier,
-			String format, boolean isHID) throws Exception {
+			String format, boolean isVirtualAddress) throws Exception {
 		if (documentString == null || identifier == null || format == null)
 			throw new NullPointerException("Null parameter");
 
@@ -383,15 +383,15 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 
 		// Get a public key (KEK) to encrypt the symmetric key (DEK).
 		String certIdentifier = "";
-		if(isHID){
+		if(isVirtualAddress){
 			certIdentifier =
-				KeyManagerImpl.getInstance().getCertRefByHID(identifier);
+				KeyManagerImpl.getInstance().getCertRefByVirtualAddress(identifier);
 			if (certIdentifier == null) {
-				logger.warn("Request to encrypt for HID "
+				logger.warn("Request to encrypt for VirtualAddress "
 						+ identifier
-						+ " but no public key is available for this HID. Trying to continue using the default key but this is probably an error.");
+						+ " but no public key is available for this VirtualAddress. Trying to continue using the default key but this is probably an error.");
 				certIdentifier = "linksmartdemo_identifier";
-				KeyManagerImpl.getInstance().addPrivateKeyForHID(identifier, certIdentifier);
+				KeyManagerImpl.getInstance().addPrivateKeyForService(identifier, certIdentifier);
 			}
 		}
 		else{
@@ -511,7 +511,7 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 		return s_encrypt;
 	}
 
-	public String sign(String data, String format, String hid) {
+	public String sign(String data, String format, String service) {
 		// method to produce an xml signature
 		String s_sign = null;
 
@@ -527,12 +527,12 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 			PrivateKey privateKey = null;
 			String alias = "";
 
-			// retrieve Private Key for given HID
+			// retrieve Private Key for given VirtualAddress
 			String privateKeyRef =
-				KeyManagerImpl.getInstance().getPrivateKeyRefByHID(hid);
+				KeyManagerImpl.getInstance().getPrivateKeyRefByVirtualAddress(service);
 
 			if (privateKeyRef == null) {
-				logger.warn("No key for hid " + hid
+				logger.warn("No key for service " + service
 						+ " available. Retrieving key with alias "
 						+ PRIVATE_SIGNING_KEY_ALIAS + " from keystore");
 				if (keyCache.containsKey(ks.hashCode()
@@ -547,7 +547,7 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 					keyCache.put(ks.hashCode() + PRIVATE_SIGNING_KEY_ALIAS,
 							privateKey);
 				}
-				KeyManagerImpl.getInstance().addPrivateKeyForHID(hid,
+				KeyManagerImpl.getInstance().addPrivateKeyForService(service,
 						PRIVATE_SIGNING_KEY_ALIAS);
 			} else {
 				alias =

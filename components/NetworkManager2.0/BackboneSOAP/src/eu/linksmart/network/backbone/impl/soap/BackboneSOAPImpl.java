@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.security.communication.SecurityProperty;
@@ -32,7 +32,7 @@ public class BackboneSOAPImpl implements Backbone {
 
 	private static String BACKBONE_SOAP = BackboneSOAPImpl.class
 			.getSimpleName();
-	private Map<HID, URL> hidUrlMap;
+	private Map<VirtualAddress, URL> virtualAddressUrlMap;
 	private Logger LOG = Logger.getLogger(BackboneSOAPImpl.class.getName());
 	private static final int MAXNUMRETRIES = 15;
 	private static final long SLEEPTIME = 20;
@@ -46,7 +46,7 @@ public class BackboneSOAPImpl implements Backbone {
 	private BackboneSOAPConfigurator configurator;
 
 	protected void activate(ComponentContext context) {
-		hidUrlMap = new HashMap<HID, URL>();
+		virtualAddressUrlMap = new HashMap<VirtualAddress, URL>();
 
 		try {
 			this.configurator = new BackboneSOAPConfigurator(this, context
@@ -66,19 +66,19 @@ public class BackboneSOAPImpl implements Backbone {
 	/**
 	 * Sends a message over the specific communication channel.
 	 * 
-	 * @param senderHID
-	 *            HID of sender
-	 * @param receiverHID
-	 *            HID of receiver
+	 * @param senderVirtualAddress
+	 *            VirtualAddress of sender
+	 * @param receiverVirtualAddress
+	 *            VirtualAddress of receiver
 	 * @param rawData
 	 *            header data as String
 	 * @return SOAP response
 	 */
-	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] rawData) {
-		URL urlEndpoint = hidUrlMap.get(receiverHID);
+	public NMResponse sendDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] rawData) {
+		URL urlEndpoint = virtualAddressUrlMap.get(receiverVirtualAddress);
 		if (urlEndpoint == null) {
-			throw new IllegalArgumentException("Cannot send data to HID "
-					+ receiverHID.toString() + ", unknown endpoint");
+			throw new IllegalArgumentException("Cannot send data to VirtualAddress "
+					+ receiverVirtualAddress.toString() + ", unknown endpoint");
 		}
 		// We expect data to be a string
 		String data = new String(rawData);
@@ -102,7 +102,7 @@ public class BackboneSOAPImpl implements Backbone {
 		return resp;
 	}
 	
-	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID, byte[] rawData) {
+	public NMResponse sendDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] rawData) {
 		throw new RuntimeException("Asynchronous sending not supported by HTTP!");
 	}
 
@@ -346,35 +346,35 @@ public class BackboneSOAPImpl implements Backbone {
 	/**
 	 * Receives a message over the specific communication channel.
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
 	 * @param data
 	 * @return
 	 */
-	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data) {
+	public NMResponse receiveDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data) {
 		return null;
 	}
 	
 	/**
 	 * Receives a message over the specific communication channel.
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
 	 * @param data
 	 * @return
 	 */
-	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
+	public NMResponse receiveDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data) {
 		return null;
 	}
 
 	/**
 	 * Broadcasts a message over the specific communication channel.
 	 * 
-	 * @param senderHID
+	 * @param senderVirtualAddress
 	 * @param data
 	 * @return
 	 */
-	public NMResponse broadcastData(HID senderHID, byte[] data) {
+	public NMResponse broadcastData(VirtualAddress senderVirtualAddress, byte[] data) {
 		// throw new UnsupportedOperationException(this.getClass().getName()
 		// + " does not support broadcasting messages");
 		return null;
@@ -384,14 +384,14 @@ public class BackboneSOAPImpl implements Backbone {
 	 * Return the destination address as string that will be used for display
 	 * purposes.
 	 * 
-	 * @param hid
-	 * @return the backbone address represented by the Hid
+	 * @param virtualAddress
+	 * @return the backbone address represented by the virtual address
 	 */
-	public String getEndpoint(HID hid) {
-		if (!hidUrlMap.containsKey(hid)) {
+	public String getEndpoint(VirtualAddress virtualAddress) {
+		if (!virtualAddressUrlMap.containsKey(virtualAddress)) {
 			return null;
 		}
-		return hidUrlMap.get(hid).toString();
+		return virtualAddressUrlMap.get(virtualAddress).toString();
 	}
 
 	@Override
@@ -402,24 +402,24 @@ public class BackboneSOAPImpl implements Backbone {
 	}
 
 	@Override
-	public boolean addEndpoint(HID hid, String endpoint) {
-		if (this.hidUrlMap.containsKey(hid)) {
+	public boolean addEndpoint(VirtualAddress virtualAddress, String endpoint) {
+		if (this.virtualAddressUrlMap.containsKey(virtualAddress)) {
 			return false;
 		}
 		try {
 			URL url = new URL(endpoint);
-			this.hidUrlMap.put(hid, url);
+			this.virtualAddressUrlMap.put(virtualAddress, url);
 			return true;
 		} catch (MalformedURLException e) {
-			LOG.debug("Unable to add endpoint " + endpoint + " for HID "
-					+ hid.toString(), e);
+			LOG.debug("Unable to add endpoint " + endpoint + " for VirtualAddress "
+					+ virtualAddress.toString(), e);
 		}
 		return false;
 	}
 
 	@Override
-	public boolean removeEndpoint(HID hid) {
-		return this.hidUrlMap.remove(hid) != null;
+	public boolean removeEndpoint(VirtualAddress virtualAddress) {
+		return this.virtualAddressUrlMap.remove(virtualAddress) != null;
 	}
 
 	@Override
@@ -454,14 +454,14 @@ public class BackboneSOAPImpl implements Backbone {
 	}
 
 	@Override
-	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID) {
+	public void addEndpointForRemoteService(VirtualAddress senderVirtualAddress, VirtualAddress remoteService) {
 
-		URL endpoint = hidUrlMap.get(senderHID);
+		URL endpoint = virtualAddressUrlMap.get(senderVirtualAddress);
 
 		if (endpoint != null) {
-			hidUrlMap.put(remoteHID, endpoint);
+			virtualAddressUrlMap.put(remoteService, endpoint);
 		} else {
-			LOG.error("Network Manager endpoint of HID " + senderHID
+			LOG.error("Network Manager endpoint of VirtualAddress " + senderVirtualAddress
 					+ " cannot be found");
 		}
 

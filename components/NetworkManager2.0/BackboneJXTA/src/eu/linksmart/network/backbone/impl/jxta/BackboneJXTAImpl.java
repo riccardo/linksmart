@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.routing.BackboneRouter;
@@ -56,7 +56,7 @@ import eu.linksmart.security.communication.SecurityProperty;
  * BackboneJXTA does not know about the content of data exchanged.
  * 
  * On the other hand in order to transport important information (such as the
- * senderHID) additional information will be added to the payload sent over the
+ * senderVirtualAddress) additional information will be added to the payload sent over the
  * JXTA network. On the receiving side this information is extracted and the
  * original payload is given to the Backbone manager component which in turn is
  * responsible for further processing of the received data package.
@@ -111,9 +111,9 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	protected MulticastSocket msocket;
 
 	/**
-	 * A map of HID to JXTA Peer ID.
+	 * A map of VirtualAddress to JXTA Peer ID.
 	 */
-	protected Hashtable<HID, String> listOfRemoteEndpoints = new Hashtable<HID, String>();
+	protected Hashtable<VirtualAddress, String> listOfRemoteEndpoints = new Hashtable<VirtualAddress, String>();
 
 	protected void activate(ComponentContext context) {
 		logger.info("**** Activating JXTA backbone!");
@@ -198,25 +198,25 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		logger.info("JXTA Backbone stopped succesfully");
 	}
 	
-	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] data) {
-		return sendData(senderHID, receiverHID, data, true);
+	public NMResponse sendDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data) {
+		return sendData(senderVirtualAddress, receiverVirtualAddress, data, true);
 	}
 	
-	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID, byte[] data) {
-		return sendData(senderHID, receiverHID, data, false);
+	public NMResponse sendDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data) {
+		return sendData(senderVirtualAddress, receiverVirtualAddress, data, false);
 	}
 	
 	/**
 	 * Sends a message for one specific recipient over the JXTA communication
 	 * channel.
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
 	 * @param message
 	 */
-	private NMResponse sendData(HID senderHID, HID receiverHID, byte[] data, boolean synch) {
+	private NMResponse sendData(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data, boolean synch) {
 		//check parameters
-		if(senderHID == null || receiverHID == null)
+		if(senderVirtualAddress == null || receiverVirtualAddress == null)
 		{
 			throw new IllegalArgumentException("Parameter cannot be null or empty when sending!");
 		}	
@@ -229,10 +229,10 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			return response;
 		}
 
-		// add senderHID to data
-		logger.debug("Sending data over pipe to HID= " + receiverHID);
+		// add senderVirtualAddress to data
+		logger.debug("Sending data over pipe to VirtualAddress= " + receiverVirtualAddress);
 
-		String receiverJxtaAddress = listOfRemoteEndpoints.get(receiverHID);
+		String receiverJxtaAddress = listOfRemoteEndpoints.get(receiverVirtualAddress);
 		URI receiverJxtaURI;
 		PeerID receiverPeerID = null;
 		try {
@@ -242,7 +242,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 			logger.warn("Wrong syntax in URI " + receiverJxtaAddress, e);
 		}
 
-		response = pipeSyncHandler.sendData(senderHID.toString(), receiverHID
+		response = pipeSyncHandler.sendData(senderVirtualAddress.toString(), receiverVirtualAddress
 				.toString(), data, receiverPeerID, synch);
 
 		logger.debug("sendData Response: " + response.toString());
@@ -253,19 +253,19 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 	/**
 	 * Receives a message over the JXTA communication channel. In case of a
-	 * broadcast message the receiverHID is null (since the sender does not
+	 * broadcast message the receiverVirtualAddress is null (since the sender does not
 	 * specify who should receive this message).
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
 	 * @param message
 	 */
-	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID,
+	public NMResponse receiveDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
 			byte[] receivedData) {
 		NMResponse response = new NMResponse();
 
 		// give message to BBRouter for further processing
-		response = bbRouter.receiveDataSynch(senderHID, receiverHID, receivedData,
+		response = bbRouter.receiveDataSynch(senderVirtualAddress, receiverVirtualAddress, receivedData,
 				(Backbone) this);
 
 		logger.debug("receiveData Response: " + response.toString());
@@ -275,19 +275,19 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	
 	/**
 	 * Receives a message over the JXTA communication channel. In case of a
-	 * broadcast message the receiverHID is null (since the sender does not
+	 * broadcast message the receiverVirtualAddress is null (since the sender does not
 	 * specify who should receive this message).
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
 	 * @param message
 	 */
-	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID,
+	public NMResponse receiveDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
 			byte[] receivedData) {
 		NMResponse response = new NMResponse();
 
 		// give message to BBRouter for further processing
-		response = bbRouter.receiveDataAsynch(senderHID, receiverHID, receivedData,
+		response = bbRouter.receiveDataAsynch(senderVirtualAddress, receiverVirtualAddress, receivedData,
 				(Backbone) this);
 
 		logger.debug("receiveData Response: " + response.toString());
@@ -298,15 +298,15 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	/**
 	 * Broadcasts a message over the specific communication channel.
 	 * 
-	 * @param senderHID
+	 * @param senderVirtualAddress
 	 * @param data
 	 * @return
 	 */
-	public NMResponse broadcastData(HID senderHID, byte[] data) {
+	public NMResponse broadcastData(VirtualAddress senderVirtualAddress, byte[] data) {
 		//check parameters
-		if(senderHID == null)
+		if(senderVirtualAddress == null)
 		{
-			throw new IllegalArgumentException("SenderHID cannot be null!");
+			throw new IllegalArgumentException("senderVirtualAddress cannot be null!");
 		}	
 		NMResponse response = new NMResponse();
 		
@@ -319,11 +319,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		logger.debug("BBJXTA - broadcastData: "
 				+ BackboneJXTAUtils.ConvertByteArrayToString(data));
-		byte[] payload = BackboneJXTAUtils.AddHIDToData(senderHID, data);
+		byte[] payload = BackboneJXTAUtils.AddVirtualAddressToData(senderVirtualAddress, data);
 
-		logger.debug("BBJXTA broadcastData - senderHID: "
-				+ senderHID.toString());
-		logger.debug("BBJXTA - broadcastData with HID: "
+		logger.debug("BBJXTA broadcastData - senderVirtualAddress: "
+				+ senderVirtualAddress.toString());
+		logger.debug("BBJXTA - broadcastData with VirtualAddress: "
 				+ BackboneJXTAUtils.ConvertByteArrayToString(payload));
 
 		// send message as multicast message
@@ -344,11 +344,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * display purposes.
 	 * 
 	 * 
-	 * @param hid
-	 * @return the backbone address represented by the HID, else null.
+	 * @param virtualAddress
+	 * @return the backbone address represented by the VirtualAddress, else null.
 	 */
-	public String getEndpoint(HID hid) {
-		String remoteEndpoint = listOfRemoteEndpoints.get(hid);
+	public String getEndpoint(VirtualAddress virtualAddress) {
+		String remoteEndpoint = listOfRemoteEndpoints.get(virtualAddress);
 		return remoteEndpoint;
 	}
 
@@ -803,7 +803,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 				}
 
 				// give message to BBRouter for further processing
-				// receiverHID is null because this is a broadcast message
+				// receiverVirtualAddress is null because this is a broadcast message
 				try {
 					String msgAsString = BackboneJXTAUtils
 							.ConvertByteArrayToString(receivedData.getData())
@@ -835,8 +835,8 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 						String senderJXTAID = receivedData.getAddress()
 								.getHostName();
 
-						HID senderHID = BackboneJXTAUtils
-								.GetHIDFromData(receivedData.getData());
+						VirtualAddress senderVirtualAddress = BackboneJXTAUtils
+								.GetVirtualAddressFromData(receivedData.getData());
 
 						logger.debug("BBJXTA receive multicast message: "
 								+ BackboneJXTAUtils
@@ -845,19 +845,19 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 						logger
 								.debug("BBJXTA receive multicast message: senderJXTAID: "
 										+ senderJXTAID
-										+ " | senderHID: "
-										+ senderHID);
+										+ " | senderVirtualAddress: "
+										+ senderVirtualAddress);
 
-						// add info to table of HID-Endpoints
+						// add info to table of VirtualAddress-Endpoints
 						// TODO Mark this check is a workaround for a parsing
-						// bug (HID String can have random text)
+						// bug (VirtualAddress String can have random text)
 						// Should be removed when parsing bug is fixed
-						if (senderHID.getContextID1() == 0) {
-							listOfRemoteEndpoints.put(senderHID, senderJXTAID);
+						if (senderVirtualAddress.getContextID1() == 0) {
+							listOfRemoteEndpoints.put(senderVirtualAddress, senderJXTAID);
 						}
 
-						bbJXTA.receiveDataAsynch(senderHID, null, BackboneJXTAUtils
-								.RemoveHIDFromData(receivedData.getData()));
+						bbJXTA.receiveDataAsynch(senderVirtualAddress, null, BackboneJXTAUtils
+								.RemoveVirtualAddressFromData(receivedData.getData()));
 
 					}
 				} catch (Exception e) {
@@ -881,30 +881,30 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	}
 
 	@Override
-	public boolean addEndpoint(HID hid, String endpoint) {
-		if(endpoint == null || hid == null || endpoint.length() == 0) {
+	public boolean addEndpoint(VirtualAddress virtualAddress, String endpoint) {
+		if(endpoint == null || virtualAddress == null || endpoint.length() == 0) {
 			//do not hide error by only returning false as these can be fixed by application
 			throw new IllegalArgumentException(
 					"Cannot add null or empty endpoints!");
 		}
 		
 		try {
-			listOfRemoteEndpoints.put(hid, endpoint);
+			listOfRemoteEndpoints.put(virtualAddress, endpoint);
 			return true;
 		} catch (Exception e) {
 			logger.error("Unable to addEndpoint: " + endpoint.toString()
-					+ " for HID: " + hid, e);
+					+ " for VirtualAddress: " + virtualAddress, e);
 		}
 		return false;
 	}
 
 	@Override
-	public boolean removeEndpoint(HID hid) {
+	public boolean removeEndpoint(VirtualAddress virtualAddress) {
 		try {
-			listOfRemoteEndpoints.remove(hid);
+			listOfRemoteEndpoints.remove(virtualAddress);
 			return true;
 		} catch (Exception e) {
-			logger.error("Unable to remove endpoint for HID: " + hid, e);
+			logger.error("Unable to remove endpoint for VirtualAddress: " + virtualAddress, e);
 		}
 		return false;
 	}
@@ -941,21 +941,21 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	}
 
 	@Override
-	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID) {
+	public void addEndpointForRemoteService(VirtualAddress senderVirtualAddress, VirtualAddress remoteVirtualAddress) {
 
-		String endpoint = listOfRemoteEndpoints.get(senderHID);
+		String endpoint = listOfRemoteEndpoints.get(senderVirtualAddress);
 
 		if (endpoint != null) {
-			listOfRemoteEndpoints.put(remoteHID, endpoint);
+			listOfRemoteEndpoints.put(remoteVirtualAddress, endpoint);
 		} else {
-			logger.error("Network Manager endpoint of HID " + senderHID
+			logger.error("Network Manager endpoint of VirtualAddress " + senderVirtualAddress
 					+ " cannot be found");
 		}
 
 	}
 
-	public PeerID getPeerID(HID hid) {
-		String jxtaAddress = listOfRemoteEndpoints.get(hid);
+	public PeerID getPeerID(VirtualAddress virtualAddress) {
+		String jxtaAddress = listOfRemoteEndpoints.get(virtualAddress);
 		URI jxtaURI;
 		PeerID peerID = null;
 		try {

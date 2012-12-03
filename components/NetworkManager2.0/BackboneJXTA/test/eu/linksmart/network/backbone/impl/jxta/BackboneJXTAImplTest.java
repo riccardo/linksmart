@@ -18,7 +18,7 @@ import net.jxta.socket.JxtaMulticastSocket;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.NMResponse;
 
 /**
@@ -31,16 +31,16 @@ public class BackboneJXTAImplTest {
 	private static final String SOURCE_JXTA = "urn:jxta:uuid-59616261646162614E50472050325033B086DCAEA082434DBB2A8F9F8AAA0BAAAA";
 	private static final String DEST_JXTA = "urn:jxta:uuid-59616261646162614E50472050325033D500FF4120204D02B5AEA18115DF543503";
 
-	private HID source = null;
-	private HID destination = null;
+	private VirtualAddress source = null;
+	private VirtualAddress destination = null;
 	private BackboneJXTAImpl bjxta = null;
 	private NMResponse success = null;
 
 	@Before
 	public void setUp() throws URISyntaxException{	
 		//constants
-		source = new HID("0.0.0.0");
-		destination = new HID("1.1.1.1");
+		source = new VirtualAddress("0.0.0.0");
+		destination = new VirtualAddress("1.1.1.1");
 		URI destJxtaUri;
 		destJxtaUri = new URI(DEST_JXTA);
 		success = new NMResponse(NMResponse.STATUS_SUCCESS);
@@ -51,7 +51,7 @@ public class BackboneJXTAImplTest {
 		bjxta.pipeSyncHandler = mock(PipeSyncHandler.class);
 		bjxta.msocket = mock(MulticastSocket.class);
 		bjxta.multicastSocket = mock(JxtaMulticastSocket.class);
-		bjxta.listOfRemoteEndpoints = new Hashtable<HID, String>();
+		bjxta.listOfRemoteEndpoints = new Hashtable<VirtualAddress, String>();
 
 		//mock methods
 		when(bjxta.pipeSyncHandler

@@ -12,10 +12,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
 
-import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
-import eu.linksmart.security.communication.CryptoException;
 import eu.linksmart.security.communication.SecurityProtocol;
 import eu.linksmart.security.communication.VerificationFailureException;
 import eu.linksmart.security.communication.util.impl.BytesUtil;
@@ -70,15 +69,15 @@ public class SymHandshake {
 		//create client hello message
 		Command cmd = new Command(Command.CLIENT_HELLO);
 		cmd.setProperty(Command.CLIENT_NONCE, nonce);
-		cmd.setProperty(Command.CLIENT, secProtocol.getClientHID()
+		cmd.setProperty(Command.CLIENT, secProtocol.getClientVirtualAddress()
 				.toString());
-		cmd.setProperty(Command.SERVER, secProtocol.getServerHID()
+		cmd.setProperty(Command.SERVER, secProtocol.getServerVirtualAddress()
 				.toString());
 
 		Message message = SecurityProtocolImpl.createMessage(
 				CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
-				secProtocol.getClientHID(),
-				secProtocol.getServerHID(),
+				secProtocol.getClientVirtualAddress(),
+				secProtocol.getServerVirtualAddress(),
 				cmd);
 
 		return message;
@@ -91,14 +90,14 @@ public class SymHandshake {
 	 * @throws Exception
 	 */
 	public Message processMessage(Message msg) throws Exception {
-		HID clientHID = secProtocol.getClientHID();
-		HID serverHID = secProtocol.getServerHID();
+		VirtualAddress clientVirtualAddress = secProtocol.getClientVirtualAddress();
+		VirtualAddress serverVirtualAddress = secProtocol.getServerVirtualAddress();
 
 		//get message content
 		Command command = SecurityProtocolImpl.getCommand(msg);
 		//check whether this is the correct party
-		if(!command.get(Command.CLIENT).equals(clientHID.toString())
-				|| !command.get(Command.SERVER).equals(serverHID.toString())){
+		if(!command.get(Command.CLIENT).equals(clientVirtualAddress.toString())
+				|| !command.get(Command.SERVER).equals(serverVirtualAddress.toString())){
 			throw new VerificationFailureException("Not appropriate sender or receiver of handshake");
 		}
 
@@ -140,8 +139,8 @@ public class SymHandshake {
 						//create client ack message
 						Command response = new Command(Command.CLIENT_ACK);
 						response.setProperty(Command.CLIENT_AUTH_TOKEN, ownAuthToken);
-						response.setProperty(Command.CLIENT, clientHID.toString());
-						response.setProperty(Command.SERVER, serverHID.toString());
+						response.setProperty(Command.CLIENT, clientVirtualAddress.toString());
+						response.setProperty(Command.SERVER, serverVirtualAddress.toString());
 						secProtocol.setInitialized();
 						//also add protected stored message to acknowledgment
 						Message storedMessage = null;
@@ -152,18 +151,18 @@ public class SymHandshake {
 						}
 						return SecurityProtocolImpl.createMessage(
 								CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
-								clientHID,
-								serverHID,
+								clientVirtualAddress,
+								serverVirtualAddress,
 								response);
 					} else {
-						logger.debug("Received authentication token is not valid from HID: " + serverHID.toString());
+						logger.debug("Received authentication token is not valid from VirtualAddress: " + serverVirtualAddress.toString());
 						throw new VerificationFailureException("Authentication token not valid");
 					}
 				} catch (NoSuchAlgorithmException e) {
 					logger.error("Error getting MAC algorithm.", e);
 				}
 			} else {
-				logger.debug("Cannot interpret message from server HID: " + serverHID.toString());
+				logger.debug("Cannot interpret message from server VirtualAddress: " + serverVirtualAddress.toString());
 			}
 		} else {
 			if(!sentServerAuth && Integer.parseInt(command.getProperty("command")) == Command.CLIENT_HELLO){
@@ -192,14 +191,14 @@ public class SymHandshake {
 					Command response = new Command(Command.SERVER_SEND_AUTH);
 					response.setProperty(Command.SERVER_NONCE, serverNonce);
 					response.setProperty(Command.SERVER_AUTH_TOKEN, serverAuth);
-					response.setProperty(Command.CLIENT, clientHID.toString());
-					response.setProperty(Command.SERVER, serverHID.toString());
+					response.setProperty(Command.CLIENT, clientVirtualAddress.toString());
+					response.setProperty(Command.SERVER, serverVirtualAddress.toString());
 
 					sentServerAuth  = true;
 					return SecurityProtocolImpl.createMessage(
 							CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC,
-							serverHID,
-							clientHID,
+							serverVirtualAddress,
+							clientVirtualAddress,
 							response);
 				} catch (NoSuchAlgorithmException e) {
 					logger.error("Error getting MAC algorithm",e);
@@ -226,12 +225,12 @@ public class SymHandshake {
 					//read application data out of acknowledgment
 					if(command.containsKey(Command.APPLICATION_MESSAGE)){
 						String data = command.getProperty(Command.APPLICATION_MESSAGE);
-						Message message = new Message(SecurityProtocol.CIPHER_TEXT, secProtocol.getClientHID(), secProtocol.getServerHID(), data.getBytes());
+						Message message = new Message(SecurityProtocol.CIPHER_TEXT, secProtocol.getClientVirtualAddress(), secProtocol.getServerVirtualAddress(), data.getBytes());
 						message = secProtocol.unprotectMessage(message);
 						return message;
 					}
 				} else {
-					logger.debug("Received authentication token is not valid from HID: " + clientHID.toString());
+					logger.debug("Received authentication token is not valid from VirtualAddress: " + clientVirtualAddress.toString());
 					throw new VerificationFailureException("Authentication token not valid");
 				}
 			}
@@ -272,13 +271,13 @@ public class SymHandshake {
 	 */
 	protected void generateSessionKeys(){
 		CryptoManager cryptoMgr = secProtocol.getCryptoMgr();
-		HID clientHID = secProtocol.getClientHID();
-		HID serverHID = secProtocol.getServerHID();
+		VirtualAddress clientVirtualAddress = secProtocol.getClientVirtualAddress();
+		VirtualAddress serverVirtualAddress = secProtocol.getServerVirtualAddress();
 
 		String sessionKeyCreator = properties.getProperty(Command.CLIENT_NONCE)
 		+ properties.getProperty(Command.SERVER_NONCE)
-		+ clientHID.toString()
-		+ serverHID.toString();
+		+ clientVirtualAddress.toString()
+		+ serverVirtualAddress.toString();
 
 		try{
 		//create session keys
@@ -305,12 +304,12 @@ public class SymHandshake {
 
 		saveSessionKeys(clientEnc, serverEnc, clientMac, serverMac, null, null);
 		} catch (KeyStoreException ke){
-			logger.warn("Cannot find or load master key for HIDs: "
-					+ clientHID.toString()
-					+ "," + serverHID.toString());
+			logger.warn("Cannot find or load master key for services: "
+					+ clientVirtualAddress.toString()
+					+ "," + serverVirtualAddress.toString());
 		} catch (InvalidKeyException e) {
-			logger.error("Stored master key cannot be used for symmetric key generation for HIDs: "
-					+ clientHID.toString() + "," + serverHID.toString());
+			logger.error("Stored master key cannot be used for symmetric key generation for services: "
+					+ clientVirtualAddress.toString() + "," + serverVirtualAddress.toString());
 		} catch (NoSuchAlgorithmException e) {
 			//should not happen
 			logger.error("Cannot find HmacSHA256 algorithm in JCE");
@@ -326,8 +325,8 @@ public class SymHandshake {
 	protected String getAuthenticationToken(Mac mac){
 		byte[] authToken = mac.doFinal((properties.getProperty(Command.CLIENT_NONCE)
 				+ properties.getProperty(Command.SERVER_NONCE)
-				+ secProtocol.getClientHID().toString()
-				+ secProtocol.getServerHID().toString()
+				+ secProtocol.getClientVirtualAddress().toString()
+				+ secProtocol.getServerVirtualAddress().toString()
 				+ "authentication")
 				.getBytes());
 		return Base64.encodeBytes(authToken);

@@ -56,7 +56,6 @@ import javax.crypto.SecretKey;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.security.cryptomanager.CryptoManager;
@@ -286,16 +285,16 @@ public class CryptoManagerImpl implements CryptoManager{
 	 * generateCertificateWithAttributes(java.lang.String, java.lang.String)
 	 */
 	public String generateCertificateWithAttributes(String xmlAttributes,
-			String hid) throws SQLException, NoSuchAlgorithmException,
+			String virtualAddress) throws SQLException, NoSuchAlgorithmException,
 			IOException, KeyStoreException, CertificateException,
 			InvalidKeyException, SecurityException, SignatureException,
 			IllegalStateException, NoSuchProviderException {
 		String certRef =
 			keyManager.generateCertificateWithAttributes(xmlAttributes);
 
-		keyManager.addPrivateKeyForHID(hid, certRef);
-		keyManager.addCertificateForHID(hid, certRef);
-		logger.info("Generated certificate with attributes for HID " + hid
+		keyManager.addPrivateKeyForService(virtualAddress, certRef);
+		keyManager.addCertificateForService(virtualAddress, certRef);
+		logger.info("Generated certificate with attributes for VirtualAddress " + virtualAddress
 				+ ". Available by ref " + certRef);
 		return certRef;
 	}
@@ -425,20 +424,20 @@ public class CryptoManagerImpl implements CryptoManager{
 	 * (non-Javadoc)
 	 * 
 	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
-	 * addCertificateForHID(java.lang.String, java.lang.String)
+	 * addCertificateForService(java.lang.String, java.lang.String)
 	 */
-	public boolean addCertificateForHID(String hid, String certRef) {
-		return keyManager.addCertificateForHID(hid, certRef);
+	public boolean addCertificateForService(String virtualAddress, String certRef) {
+		return keyManager.addCertificateForService(virtualAddress, certRef);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
-	 * addPrivateKeyForHID(java.lang.String, java.lang.String)
+	 * addPrivateKeyForService(java.lang.String, java.lang.String)
 	 */
-	public boolean addPrivateKeyForHID(String hid, String certRef) {
-		return keyManager.addPrivateKeyForHID(hid, certRef);
+	public boolean addPrivateKeyForService(String virtualAddress, String certRef) {
+		return keyManager.addPrivateKeyForService(virtualAddress, certRef);
 	}
 
 	/*
@@ -447,8 +446,8 @@ public class CryptoManagerImpl implements CryptoManager{
 	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
 	 * getCertificateReference(java.lang.String)
 	 */
-	public String getCertificateReference(String hid) {
-		return keyManager.getCertRefByHID(hid);
+	public String getCertificateReference(String virtualAddress) {
+		return keyManager.getCertRefByVirtualAddress(virtualAddress);
 	}
 
 	/*
@@ -457,8 +456,8 @@ public class CryptoManagerImpl implements CryptoManager{
 	 * @see eu.linksmart.security.cryptomanager.impl.CryptoManager#
 	 * getPrivateKeyReference(java.lang.String)
 	 */
-	public String getPrivateKeyReference(String hid) {
-		return keyManager.getPrivateKeyRefByHID(hid);
+	public String getPrivateKeyReference(String virtualAddress) {
+		return keyManager.getPrivateKeyRefByVirtualAddress(virtualAddress);
 	}
 
 	/*

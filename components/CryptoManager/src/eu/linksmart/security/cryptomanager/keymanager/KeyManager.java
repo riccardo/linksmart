@@ -198,36 +198,36 @@ public interface KeyManager {
 	throws KeyStoreException;
 
 	/**
-	 * Associates an HID with a stored private key
-	 * @param hid HID to be associated to
+	 * Associates an VirtualAddress with a stored private key
+	 * @param virtualAddress VirtualAddress to be associated to
 	 * @param certRef Identifier used in store for private key
 	 * @return
 	 */
-	abstract boolean addPrivateKeyForHID(String hid, String certRef);
+	abstract boolean addPrivateKeyForService(String virtualAddress, String certRef);
 
 	/**
-	 * Associates an HID with a stored certificate
-	 * @param hid HID to be associated to
+	 * Associates an VirtualAddress with a stored certificate
+	 * @param virtualAddress VirtualAddress to be associated to
 	 * @param certRef Identifier used in store for certificate
 	 * @return
 	 */
-	abstract boolean addCertificateForHID(String hid, String certRef);
+	abstract boolean addCertificateForService(String virtualAddress, String certRef);
 
 	/**
-	 * Returns the certificate reference for an HID or null if no certificate
-	 * exists for that HID.
+	 * Returns the certificate reference for an VirtualAddress or null if no certificate
+	 * exists for that VirtualAddress.
 	 * 
-	 * @param receiverHID
+	 * @param receiverVirtualAddress
 	 * @return
 	 */
-	abstract String getCertRefByHID(String receiverHID);
+	abstract String getCertRefByVirtualAddress(String receiverVirtualAddress);
 
 	/**
-	 * Returns the identifier of the private key for this HID
-	 * @param hid
+	 * Returns the identifier of the private key for this VirtualAddress
+	 * @param virtualAddress
 	 * @return
 	 */
-	abstract String getPrivateKeyRefByHID(String hid);
+	abstract String getPrivateKeyRefByVirtualAddress(String virtualAddress);
 
 	/**
 	 * Removes an entry from local store
