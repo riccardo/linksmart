@@ -25,9 +25,9 @@ import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.BroadcastMessage;
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.ServiceAttribute;
+import eu.linksmart.network.Registration;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.MessageProcessor;
@@ -43,37 +43,37 @@ import eu.linksmart.utils.PartConverter;
 
 @SuppressWarnings("deprecation")
 public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
-	public final static String IDMANAGER_UPDATE_HID_LIST_TOPIC = "IDManagerHIDListUpdate";
+	public final static String IDMANAGER_UPDATE_SERVICE_LIST_TOPIC = "IDManagerServiceListUpdate";
 	public final static String IDMANAGER_NMADVERTISMENT_TOPIC = "NMAdvertisement";
-	public final static String IDMANAGER_HID_ATTRIBUTE_RESOLVE_REQ = "NMHIDAttributeResolveRequest";
-	public final static String IDMANAGER_HID_ATTRIBUTE_RESOLVE_RESP = "NMHIDAttributeResolveResponse";
-	public final static String HID_ATTR_RESOLVE_KEYS = "AttributeKeys";
-	public final static String HID_ATTR_RESOLVE_FILTER = "BloomFilter";
-	public final static String HID_ATTR_RESOLVE_RANDOM = "Random";
-	public final static String HID_ATTR_RESOLVE_ID = "RequestIdentifier";
+	public final static String IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_REQ = "NMServiceAttributeResolveRequest";
+	public final static String IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP = "NMServiceAttributeResolveResponse";
+	public final static String SERVICE_ATTR_RESOLVE_KEYS = "AttributeKeys";
+	public final static String SERVICE_ATTR_RESOLVE_FILTER = "BloomFilter";
+	public final static String SERVICE_ATTR_RESOLVE_RANDOM = "Random";
+	public final static String SERVICE_ATTR_RESOLVE_ID = "RequestIdentifier";
 
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
 	.getSimpleName();
 
-	protected static long HID_KEEP_ALIVE_MS = (long)(2*60*1000);
+	protected static long SERVICE_KEEP_ALIVE_MS = (long)(2*60*1000);
 
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
-	protected ConcurrentHashMap<HID, HIDInfo> localHIDs;
-	protected ConcurrentHashMap<HID, HIDInfo> remoteHIDs;
+	protected ConcurrentHashMap<VirtualAddress, Registration> localServices;
+	protected ConcurrentHashMap<VirtualAddress, Registration> remoteServices;
 
-	protected ConcurrentHashMap<HID, Long> hidLastUpdate;
+	protected ConcurrentHashMap<VirtualAddress, Long> serviceLastUpdate;
 	protected ConcurrentLinkedQueue<String> queue;
 	protected ConcurrentHashMap<String, List<Message>> resolveResponses;
 	protected ConcurrentHashMap<String, Object> locks;
 
 	protected NetworkManagerCore networkManagerCore;
 
-	/**Thread to delete not updated HIDs.*/
-	protected Thread hidClearerThread;
+	/**Thread to delete not updated Services.*/
+	protected Thread serviceClearerThread;
 
-	/** Thread that checks for updated in HIDList and sends respective broadcasts. */
-	protected Thread hidUpdaterThread;
+	/** Thread that checks for updated in ServiceList and sends respective broadcasts. */
+	protected Thread serviceUpdaterThread;
 	/** Time in milliseconds to wait between broadcasts. */
 	protected int broadcastSleepMillis = 1000;
 
@@ -85,9 +85,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	/** Flag controlling advertising thread.*/
 	private boolean advertisingThreadRunning;
 	/** Flag controlling update broadcaster thread.*/
-	private boolean hidUpdaterThreadRunning;
-	/** Flag controlling hid clearer thread.*/
-	private boolean hidClearerThreadRunning;
+	private boolean serviceUpdaterThreadRunning;
+	/** Flag controlling Service clearer thread.*/
+	private boolean serviceClearerThreadRunning;
 
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting " + IDENTITY_MGR);
@@ -96,10 +96,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	protected void init() {
-		this.localHIDs = new ConcurrentHashMap<HID, HIDInfo>();
-		this.remoteHIDs = new ConcurrentHashMap<HID, HIDInfo>();
+		this.localServices = new ConcurrentHashMap<VirtualAddress, Registration>();
+		this.remoteServices = new ConcurrentHashMap<VirtualAddress, Registration>();
 		this.queue = new ConcurrentLinkedQueue<String>();
-		this.hidLastUpdate = new ConcurrentHashMap<HID, Long>();
+		this.serviceLastUpdate = new ConcurrentHashMap<VirtualAddress, Long>();
 		this.resolveResponses = new ConcurrentHashMap<String, List<Message>>();
 		this.locks = new ConcurrentHashMap<String, Object>();
 	}
@@ -109,89 +109,89 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	@Override
-	public HIDInfo createHIDForAttributes(Part[] attributes) {
-		HID hid = createUniqueHID();
-		HIDInfo info = new HIDInfo(hid, attributes);
-		addLocalHID(hid, info);
-		LOG.debug("Created HID: " + info.toString());
+	public Registration createServiceByAttributes(Part[] attributes) {
+		VirtualAddress virtualAddress = createUniqueVirtualAddress();
+		Registration info = new Registration(virtualAddress, attributes);
+		addLocalService(virtualAddress, info);
+		LOG.debug("Created VirtualAddress: " + info.toString());
 		return info;
 	}
 
 	@Override
-	public HIDInfo createHIDForDescription(String description) {
-		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(), description)};
-		return createHIDForAttributes(attributes);
+	public Registration createServiceByDescription(String description) {
+		Part[] attributes = { new Part(ServiceAttribute.DESCRIPTION.name(), description)};
+		return createServiceByAttributes(attributes);
 	}
 
-	protected HID createUniqueHID() {
-		HID hid;
+	protected VirtualAddress createUniqueVirtualAddress() {
+		VirtualAddress virtualAddress;
 		do {
-			hid = new HID();
-		} while (existsDeviceID(hid.getDeviceID()));
-		return hid;
+			virtualAddress = new VirtualAddress();
+		} while (existsDeviceID(virtualAddress.getDeviceID()));
+		return virtualAddress;
 	}
 
 	@Override
-	public HIDInfo getHIDInfo(HID hid) {
-		HIDInfo answer = localHIDs.get(hid);
+	public Registration getServiceInfo(VirtualAddress virtualAddress) {
+		Registration answer = localServices.get(virtualAddress);
 
 		if (answer != null) {
 			return answer;
 		}
 		// else, look into the remote list
-		answer = remoteHIDs.get(hid);
+		answer = remoteServices.get(virtualAddress);
 		return answer;
 	}
 
 	/**
-	 * Returns a vector containing all the HID inside local+remote Table
+	 * Returns a vector containing all the VirtualAddress inside local+remote Table
 	 * 
-	 * @return a vector containing all the HIDs inside local + remote idTable
+	 * @return a vector containing all the Services inside local + remote idTable
 	 */
-	public Set<HIDInfo> getAllHIDs() {
-		Set<HIDInfo> union = getLocalHIDs();
-		union.addAll(getRemoteHIDs());
+	public Set<Registration> getAllServices() {
+		Set<Registration> union = getLocalServices();
+		union.addAll(getRemoteServices());
 		return union;
 	}
 
 	/**
-	 * Returns a vector containing all the local HID inside localHIDs Table
+	 * Returns a vector containing all the local VirtualAddress inside localServices Table
 	 * 
-	 * @return a vector containing all the HIDs inside idTable
+	 * @return a vector containing all the Services inside idTable
 	 */
-	public Set<HIDInfo> getLocalHIDs() {
-		return new HashSet<HIDInfo>(localHIDs.values());
+	public Set<Registration> getLocalServices() {
+		return new HashSet<Registration>(localServices.values());
 	}
 
 	/**
-	 * Returns a vector containing all the remote HID inside idTable
+	 * Returns a vector containing all the remote VirtualAddress inside idTable
 	 * 
-	 * @return a vector containing all the remote HIDs inside idTable
+	 * @return a vector containing all the remote Services inside idTable
 	 */
-	public Set<HIDInfo> getRemoteHIDs() {
-		return new HashSet<HIDInfo>(remoteHIDs.values());
+	public Set<Registration> getRemoteServices() {
+		return new HashSet<Registration>(remoteServices.values());
 	}
 
 	@Override
-	public HIDInfo[] getHIDByAttributes(
+	public Registration[] getServiceByAttributes(
 			Part[] attributes, long timeOut,
 			boolean returnFirst, boolean isStrict) {
 		//if only descriptions are searched use other method
 		if(attributes.length == 1 
 				&& attributes[0].getKey().equals(
-						HIDAttribute.DESCRIPTION.name())) {
-			Set<HIDInfo> hidInfos = getHIDsByDescription(attributes[0].getValue());
+						ServiceAttribute.DESCRIPTION.name())) {
+			Set<Registration> serviceInfos = getServicesByDescription(attributes[0].getValue());
 			//create array from set
-			HIDInfo[] hidInfoRet = new HIDInfo[hidInfos.size()];
-			hidInfos.toArray(hidInfoRet);
-			return hidInfoRet;
+			Registration[] serviceInfoRet = new Registration[serviceInfos.size()];
+			serviceInfos.toArray(serviceInfoRet);
+			return serviceInfoRet;
 		}
 
-		Set<HIDInfo> matchingHids = new HashSet<HIDInfo>();
-		//first collect local HIDs that match
-		for(HIDInfo hidInfo : getLocalHIDs()) {
+		Set<Registration> matchingServices = new HashSet<Registration>();
+		//first collect local Services that match
+		for(Registration serviceInfo : getLocalServices()) {
 			//check if all searched keys are available
-			Part[] attrs = hidInfo.getAttributes();
+			Part[] attrs = serviceInfo.getAttributes();
 			boolean foundAllKeys = true;
 			boolean attrsMatched = true;
 			//used to say that at least one of the attribute keys was found
@@ -218,27 +218,27 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			//all searched attributes were found
 			//or exited because key missed or value did not match
 			if((foundAllKeys || !isStrict) && attrsMatched && atLeastOneMatch) {
-				matchingHids.add(hidInfo);
+				matchingServices.add(serviceInfo);
 			}
 		}
 
 		//only search remotely if required
-		if(matchingHids.size() == 0 || !returnFirst) {		
-			//search remotely for HIDs
-			Set<HIDInfo> remoteHids = sendResolveAttributesMsg(
+		if(matchingServices.size() == 0 || !returnFirst) {		
+			//search remotely for Services
+			Set<Registration> remoteServices = sendResolveAttributesMsg(
 					attributes, timeOut, returnFirst, isStrict);
-			if(remoteHids != null) {
-				matchingHids.addAll(remoteHids);
+			if(remoteServices != null) {
+				matchingServices.addAll(remoteServices);
 			}
 		}
 		//create array from matches
-		HIDInfo[] hidInfos = new HIDInfo[matchingHids.size()];
-		matchingHids.toArray(hidInfos);
-		return hidInfos;
+		Registration[] serviceInfos = new Registration[matchingServices.size()];
+		matchingServices.toArray(serviceInfos);
+		return serviceInfos;
 	}
 
 	@Override
-	public Set<HIDInfo> getHIDsByDescription(String description) {
+	public Set<Registration> getServicesByDescription(String description) {
 
 		String[] toMatch;
 		boolean exactMatch = false;
@@ -254,21 +254,21 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		}
 
 		/**
-		 * algorithm: assume all HIDInfo entries in our table will match then,
+		 * algorithm: assume all Registration entries in our table will match then,
 		 * for every match string from the query (i.e. if query = ab*cd*ef then
 		 * match strings are ab, cd, and ef verify all descriptions for which we
 		 * still assume they will match if they indeed match, they survive to
 		 * next match string verification if they do not match, then at least
-		 * one criterion of the matchstring is not satisfied, hence that HIDInfo
+		 * one criterion of the matchstring is not satisfied, hence that Registration
 		 * entry will never be in the final set, so we can just remove it from
 		 * our set under consideration this should be an optimization to the
-		 * (each criterion x each HIDInfo entry) approach
+		 * (each criterion x each Registration entry) approach
 		 */
 
-		Collection<HIDInfo> allDescriptions = new HashSet<HIDInfo>();
-		allDescriptions.addAll(localHIDs.values());
-		allDescriptions.addAll(remoteHIDs.values()); // because we are searching
-		// in ALL hids, local
+		Collection<Registration> allDescriptions = new HashSet<Registration>();
+		allDescriptions.addAll(localServices.values());
+		allDescriptions.addAll(remoteServices.values()); // because we are searching
+		// in ALL Services, local
 		// and remote
 
 		String oneDescription;
@@ -277,11 +277,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			// will only be executed
 			// once, which is the
 			// desired behavior
-			for (Iterator<HIDInfo> it = allDescriptions.iterator(); it
+			for (Iterator<Registration> it = allDescriptions.iterator(); it
 			.hasNext();) {
-				HIDInfo hidInfo = it.next();
+				Registration serviceInfo = it.next();
 				try {
-					oneDescription = hidInfo.getDescription();
+					oneDescription = serviceInfo.getDescription();
 					if (oneDescription != null 
 							&& ((!exactMatch && oneDescription.contains(toMatch[i]))
 									|| (exactMatch && oneDescription.equals(toMatch[i])))) {
@@ -290,15 +290,16 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						// criteria
 						// is
 						// satisfied
-						// just pass to next round, this HIDInfo entry survives
+						// just pass to next round, this Registration entry survives
 						continue;
 					} else {
-						// this HIDInfo is already a candidate to be thrown out
+						//TODO #NM Mark check
+						// this Registration is already a candidate to be thrown out
 						// of further consideration
 						// but let's do a last check on CryptoHID just in case
 						// it matches
-						if (hidInfo.getAttributes() != null) {
-							oneDescription = hidInfo.getDescription();
+						if (serviceInfo.getAttributes() != null) {
+							oneDescription = serviceInfo.getDescription();
 							if (oneDescription != null) {
 								if ((!exactMatch && oneDescription
 										.contains(toMatch[i]))
@@ -308,14 +309,14 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 									// have
 									// a
 									// match
-									// this HIDInfo entry is saved to the next
+									// this Registration entry is saved to the next
 									// round
 									continue;
 								}
 							}
 						}
 						// this is like a common ELSE block for all above if-s
-						// the HIDInfo entry has not survived, has not matched
+						// the Registration entry has not survived, has not matched
 						// at least one of the query string match criteria
 						// so there's no need to check it in further iterations
 						// against other match criteria
@@ -323,30 +324,30 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						it.remove();
 					}
 				} catch (Exception e) {
-					LOG.error("Unable to get HID for description: "
+					LOG.error("Unable to get VirtualAddress for description: "
 							+ description, e);
 				}
 
 			}
 		}
-		return new HashSet<HIDInfo>(allDescriptions);
+		return new HashSet<Registration>(allDescriptions);
 	}
 
 	@Override
-	public HIDInfo[] getHIDsByAttributes(String query) {
+	public Registration[] getServicesByAttributes(String query) {
 		LinkedList<String> parsedQuery = AttributeQueryParser.parseQuery(query);
 		/* Parse the query. */
-		HashSet<HIDInfo> results = new HashSet<HIDInfo>();
+		HashSet<Registration> results = new HashSet<Registration>();
 
 
-		HashSet<Map.Entry<HID, HIDInfo>> allHIDs = new HashSet<Map.Entry<HID,HIDInfo>>();
-		//search in local and remote HIDs
-		allHIDs.addAll(localHIDs.entrySet());
-		allHIDs.addAll(remoteHIDs.entrySet());
-		Iterator<Map.Entry<HID, HIDInfo>> it = allHIDs.iterator();
+		HashSet<Map.Entry<VirtualAddress, Registration>> allVirtualAddresses = new HashSet<Map.Entry<VirtualAddress,Registration>>();
+		//search in local and remote Services
+		allVirtualAddresses.addAll(localServices.entrySet());
+		allVirtualAddresses.addAll(remoteServices.entrySet());
+		Iterator<Map.Entry<VirtualAddress, Registration>> it = allVirtualAddresses.iterator();
 
 		while (it.hasNext()) {
-			Map.Entry<HID, HIDInfo> entry = it.next();
+			Map.Entry<VirtualAddress, Registration> entry = it.next();
 			Part[] attr = entry.getValue().getAttributes();
 			if (attr != null) {
 				if (AttributeQueryParser.checkAttributes(attr, parsedQuery)) {
@@ -355,25 +356,25 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			}
 		}
 
-		HIDInfo[] hidInfos = new HIDInfo[results.size()];
-		results.toArray(hidInfos);
-		return hidInfos;
+		Registration[] serviceInfos = new Registration[results.size()];
+		results.toArray(serviceInfos);
+		return serviceInfos;
 	}
 
 	@Override
-	public boolean updateHIDInfo(HID hid, Properties attr) {
-		HIDInfo toUpdate = localHIDs.get(hid);
+	public boolean updateServiceInfo(VirtualAddress virtualAddress, Properties attr) {
+		Registration toUpdate = localServices.get(virtualAddress);
 		if (toUpdate != null) {
 			synchronized (queue) { // because we need to be sure that both
 				// deletion of old and insertion of new
 				// attributes are in the queue at the same
 				// time
 				toUpdate.setAttributes(PartConverter.fromProperties(attr));
-				localHIDs.replace(hid, toUpdate);
+				localServices.replace(virtualAddress, toUpdate);
 				//careful, D always before A, because the NMs that listen to this will 
-				//execute the actions in order, hence if A is after D, they will first update and then delete the just-entered HID.
-				queue.add("D;" + hid.toString());
-				queue.add("A;" + hid.toString() + ";"
+				//execute the actions in order, hence if A is after D, they will first update and then delete the just-entered VirtualAddress.
+				queue.add("D;" + virtualAddress.toString());
+				queue.add("A;" + virtualAddress.toString() + ";"
 						+ toUpdate.getDescription());
 			}
 			return true;
@@ -385,12 +386,12 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	// keep the following two methods near each other
 	// because they refer to the same format
 	/**
-	 * Looks for updates in the list of HIDs and transforms them into a
+	 * Looks for updates in the list of Services and transforms them into a
 	 * {@link BroadcastMessage}
 	 * 
 	 * @return the update
 	 */
-	protected synchronized BroadcastMessage getHIDListUpdate() {
+	protected synchronized BroadcastMessage getServiceListUpdate() {
 		String update = "";
 		while (queue.peek() != null) {
 			update = update + queue.poll() + " ";
@@ -401,7 +402,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		BroadcastMessage updateMsg = null;
 		try {
 			updateMsg = new BroadcastMessage(
-					IDMANAGER_UPDATE_HID_LIST_TOPIC, networkManagerCore.getHID(),
+					IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, networkManagerCore.getService(),
 					update.getBytes());
 		} catch (RemoteException e) {
 			// local invocation
@@ -412,15 +413,15 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	@Override
 	public Message processMessage(Message msg) {
 		try {
-			if(!msg.getSenderHID().equals(networkManagerCore.getHID())) {
-				if (msg.getTopic().contentEquals(IDMANAGER_UPDATE_HID_LIST_TOPIC)) {
+			if(!msg.getSenderVirtualAddress().equals(networkManagerCore.getService())) {
+				if (msg.getTopic().contentEquals(IDMANAGER_UPDATE_SERVICE_LIST_TOPIC)) {
 					return processNMUpdate(msg);
 				} else if (msg.getTopic().contentEquals(IDMANAGER_NMADVERTISMENT_TOPIC)) {
 					return processNMAdvertisement(msg);
-				} else if (msg.getTopic().contentEquals(IDMANAGER_HID_ATTRIBUTE_RESOLVE_REQ)) {
-					return processHIDAttributeResolveReq(msg);
-				} else if (msg.getTopic().contentEquals(IDMANAGER_HID_ATTRIBUTE_RESOLVE_RESP)) {
-					return processHIDAttributeResolveResp(msg);
+				} else if (msg.getTopic().contentEquals(IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_REQ)) {
+					return processServiceAttributeResolveReq(msg);
+				} else if (msg.getTopic().contentEquals(IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP)) {
+					return processServiceAttributeResolveResp(msg);
 				}else { // other message types should not have been passed
 					return msg;
 				}
@@ -433,17 +434,17 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	@Override
-	public boolean removeHID(HID hid) {
-		if (removeLocalHID(hid) != null || removeRemoteHID(hid) != null) {
-			LOG.debug("Removed HID: " + hid.toString());
+	public boolean removeService(VirtualAddress virtualAddress) {
+		if (removeLocalService(virtualAddress) != null || removeRemoteService(virtualAddress) != null) {
+			LOG.debug("Removed VirtualAddress: " + virtualAddress.toString());
 			return true;
 		}
 		return false;
 	}
 
-	protected Message processHIDAttributeResolveResp(Message msg) {
+	protected Message processServiceAttributeResolveResp(Message msg) {
 		//check if there is resolve waiting with this id
-		String reqId = msg.getProperty(HID_ATTR_RESOLVE_ID);
+		String reqId = msg.getProperty(SERVICE_ATTR_RESOLVE_ID);
 		//does anyone wait for this resolve id
 		if(locks.containsKey(reqId)) {
 			Object lock = locks.get(reqId);
@@ -519,10 +520,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		}
 	}
 
-	protected Message processHIDAttributeResolveReq(Message msg) {
+	protected Message processServiceAttributeResolveReq(Message msg) {
 		//open message
 		//store request id
-		long reqId = Long.parseLong(msg.getProperty(HID_ATTR_RESOLVE_ID));
+		long reqId = Long.parseLong(msg.getProperty(SERVICE_ATTR_RESOLVE_ID));
 		ByteArrayInputStream bis = new ByteArrayInputStream(msg.getData());
 		ObjectInputStream ois;
 		AttributeResolveFilter filter = null;
@@ -536,32 +537,32 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			//cannot occur
 			return null;
 		}
-		//check if requester has the rights to access hid
+		//check if requester has the rights to access service
 		//TODO
 		//check if attributes can be found in local store
-		Set<HIDInfo> localHids = getLocalHIDs();
-		Set<HIDInfo> matches = new HashSet<HIDInfo>();
-		//go through all local HIDs
-		for(HIDInfo hidInfo : localHids) {
+		Set<Registration> localServices = getLocalServices();
+		Set<Registration> matches = new HashSet<Registration>();
+		//go through all local Services
+		for(Registration serviceInfo : localServices) {
 			if(checkAttributesAgainstFilter(
 					filter,
-					hidInfo.getAttributes())) {
-				matches.add(hidInfo);
+					serviceInfo.getAttributes())) {
+				matches.add(serviceInfo);
 			}
 		}
 
-		//return message confirming HID
+		//return message confirming VirtualAddress
 		Random rand = new Random();
 		long respRandom = rand.nextLong();
 		List<AttributeResolveResponse> matchesFilterList = 
 			new ArrayList<AttributeResolveResponse>();
 		//create Bloom-filters for all matches
-		for(HIDInfo hidInfo : matches) {
+		for(Registration serviceInfo : matches) {
 			//collect queried attributes
 			String attrKeys = null;
 			List<String> attributes = new ArrayList<String>();
 			StringBuilder sb = new StringBuilder();
-			for(Part part : hidInfo.getAttributes()) {
+			for(Part part : serviceInfo.getAttributes()) {
 				//only include attributes which were searched
 				if(filter.getAttributeKeys().contains(part.getKey())) {
 					sb.append(part.getKey()+";");
@@ -578,7 +579,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			AttributeResolveFilter match = 
 				new AttributeResolveFilter(bloom, attrKeys, respRandom, filter.getIsStrictRequest());
 			//put filter of match into collection of matches
-			matchesFilterList.add(new AttributeResolveResponse(hidInfo.getHid(), match));
+			matchesFilterList.add(new AttributeResolveResponse(serviceInfo.getVirtualAddress(), match));
 		}
 
 		//create message from collected matches
@@ -595,12 +596,12 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		try {
 			Message respMsg = new Message(
-					IDMANAGER_HID_ATTRIBUTE_RESOLVE_RESP,
-					networkManagerCore.getHID(),
-					msg.getSenderHID(),
+					IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP,
+					networkManagerCore.getService(),
+					msg.getSenderVirtualAddress(),
 					serializedResp);
 			//put in request id so requester knows this is response
-			respMsg.setProperty(HID_ATTR_RESOLVE_ID, String.valueOf(reqId));
+			respMsg.setProperty(SERVICE_ATTR_RESOLVE_ID, String.valueOf(reqId));
 			return respMsg;
 		} catch(RemoteException e) {
 			//local call
@@ -608,7 +609,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		return null;
 	}
 
-	protected Set<HIDInfo> sendResolveAttributesMsg(
+	protected Set<Registration> sendResolveAttributesMsg(
 			Part[] attributes,
 			long timeout,
 			boolean returnFirst,
@@ -617,7 +618,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		//create message identifier
 		Random rand = new Random();
 		String attrReqId = String.valueOf(rand.nextLong());
-		msg.setProperty(HID_ATTR_RESOLVE_ID, attrReqId);
+		msg.setProperty(SERVICE_ATTR_RESOLVE_ID, attrReqId);
 		Object lock = new Object();
 		locks.put(attrReqId, lock);
 		boolean found = false;
@@ -644,7 +645,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		if(resolveResponses.containsKey(attrReqId)) {
 			List<Message> resps = resolveResponses.remove(attrReqId);
 			//go over each found message
-			Set<HIDInfo> foundHids = new HashSet<HIDInfo>();
+			Set<Registration> foundServices = new HashSet<Registration>();
 			for(Message resp : resps) {
 				//open message
 				List<AttributeResolveResponse> filterResponses = null;
@@ -658,11 +659,11 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					return null;
 				} catch (ClassNotFoundException e) {
 					LOG.warn(
-							"Attribute resolve response contained wrong object from HID:"
-							+ msg.getSenderHID(),e);
+							"Attribute resolve response contained wrong object from VirtualAddress:"
+							+ msg.getSenderVirtualAddress(),e);
 				}
 
-				//check all HIDs in message which possibly match
+				//check all Services in message which possibly match
 				for(AttributeResolveResponse response : filterResponses) {
 					AttributeResolveFilter filter = response.getFilter();
 					//if it was a strict request check if all searched keys are present
@@ -682,7 +683,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					}
 					//double check bloom filter
 					if(checkAttributesAgainstFilter(filter, attributes)) {
-						//only include attributes in HIDInfo which matched
+						//only include attributes in Registration which matched
 						Part[] foundAttr = 
 							new Part[filter.getAttributeKeys().split(";").length];
 						int nrAttrs = 0;
@@ -692,28 +693,28 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 								nrAttrs++;
 							}
 						}
-						foundHids.add(new HIDInfo(response.getHid(), foundAttr));
+						foundServices.add(new Registration(response.getService(), foundAttr));
 					}
 				}
 			}
-			//put found hids in remoteHID store
-			for(HIDInfo hidInfo : foundHids) {
+			//put found Services in remoteService store
+			for(Registration serviceInfo : foundServices) {
 				//descriptions are usually available before put may not
 				//have been queried - so include them
-				if(hidInfo.getDescription() == null) {
+				if(serviceInfo.getDescription() == null) {
 					//check if description was available before
-					HIDInfo HIDInfoOld = remoteHIDs.get(hidInfo.getHid());
-					if(HIDInfoOld != null) {
-						String description = HIDInfoOld.getDescription();
+					Registration serviceInfoOld = remoteServices.get(serviceInfo.getVirtualAddress());
+					if(serviceInfoOld != null) {
+						String description = serviceInfoOld.getDescription();
 						if(description != null) {
-							hidInfo.setDescription(description);
+							serviceInfo.setDescription(description);
 						}
 					}
 				}
-				addRemoteHID(hidInfo.getHid(), hidInfo);
+				addRemoteService(serviceInfo.getVirtualAddress(), serviceInfo);
 			}
-			//return found hids
-			return foundHids;
+			//return found services
+			return foundServices;
 		} else {
 			//timeout occurred so return null
 			return null;
@@ -761,8 +762,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		BroadcastMessage msg = null;
 		try {
 			msg = new BroadcastMessage(
-					IDMANAGER_HID_ATTRIBUTE_RESOLVE_REQ,
-					networkManagerCore.getHID(),
+					IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_REQ,
+					networkManagerCore.getService(),
 					serializedMsg);
 		} catch (RemoteException e) {
 			//local access
@@ -772,19 +773,19 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected Message processNMAdvertisement(Message msg) {
 		try {
-			if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
+			if (!msg.getSenderVirtualAddress().equals(networkManagerCore.getService())) {
 				//check if we already know this network manager
-				if(!getRemoteHIDs().contains(msg.getSenderHID())){
-					//if we do not know it add HIDs reachable through it
+				if(!getRemoteServices().contains(msg.getSenderVirtualAddress())){
+					//if we do not know it add services reachable through it
 					@SuppressWarnings("unchecked")
-					Set<HIDInfo> hidInfos = (Set<HIDInfo>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
-					if (hidInfos != null) {
-						Iterator<HIDInfo> i = hidInfos.iterator();
+					Set<Registration> serviceInfos = (Set<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+					if (serviceInfos != null) {
+						Iterator<Registration> i = serviceInfos.iterator();
 						while (i.hasNext()) {
-							HIDInfo oneHIDInfo = i.next();
-							addRemoteHID(oneHIDInfo.getHid(), oneHIDInfo);
-							// Add the backbone route for this remote HID
-							networkManagerCore.addRemoteHID(msg.getSenderHID(), oneHIDInfo.getHid());
+							Registration oneServiceInfo = i.next();
+							addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo);
+							// Add the backbone route for this remote VirtualAddress
+							networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(), oneServiceInfo.getVirtualAddress());
 						}
 					}
 				}
@@ -802,7 +803,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 	protected Message processNMUpdate(Message msg) {
 		try {
-			if (!msg.getSenderHID().equals(networkManagerCore.getHID())) {
+			if (!msg.getSenderVirtualAddress().equals(networkManagerCore.getService())) {
 				// this is not an echo of our own broadcast
 				// otherwise we do not need to do anything with it
 				// else it is a genuine update
@@ -810,17 +811,17 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				for (String oneUpdate : updates.split(" ")) {
 					String[] updateData = oneUpdate.split(";");
 					// at this point updateData 0 is operation type A/D, [1] is
-					// hid, [2] is description (only if operation=A)
+					// Service, [2] is description (only if operation=A)
 					if (updateData[0].equals("A")) {
-						HID newHID = new HID(updateData[1]);
-						HIDInfo newInfo = new HIDInfo(newHID, updateData[2]);
-						// Add the remoteHID to the internal map of remote HIDs
-						addRemoteHID(newHID, newInfo);
-						// Add the backbone route for this remote HID
-						networkManagerCore.addRemoteHID(msg.getSenderHID(),newHID);
+						VirtualAddress newVirtualAddress = new VirtualAddress(updateData[1]);
+						Registration newInfo = new Registration(newVirtualAddress, updateData[2]);
+						// Add the remoteService to the internal map of remote Services
+						addRemoteService(newVirtualAddress, newInfo);
+						// Add the backbone route for this remote VirtualAddress
+						networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(),newVirtualAddress);
 					} else if (updateData[0].equals("D")) {
-						HID toRemoveHID = new HID(updateData[1]);
-						removeRemoteHID(toRemoveHID);
+						VirtualAddress toRemoveVirtualAddress = new VirtualAddress(updateData[1]);
+						removeRemoteService(toRemoveVirtualAddress);
 					} else {
 						throw new IllegalArgumentException(
 								"Unexpected update type for IDManager updates: " + updateData[0]);
@@ -835,65 +836,65 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	/*
-	 * Adds a local HID to the IdTable
+	 * Adds a local VirtualAddress to the IdTable
 	 * 
-	 * @param hid The HID to be added
+	 * @param virtualAddress The VirtualAddress to be added
 	 * 
-	 * @param info the HIDInfo
+	 * @param info the Registration
 	 * 
-	 * @return The previous value associated with that HID, null otherwise
+	 * @return The previous value associated with that VirtualAddress, null otherwise
 	 */
-	protected HIDInfo addLocalHID(HID hid, HIDInfo info) {
-		if (!localHIDs.containsKey(hid)) {
-			localHIDs.put(hid, info);
-			queue.add("A;" + hid.toString() + ";" + info.getDescription());
+	protected Registration addLocalService(VirtualAddress virtualAddress, Registration info) {
+		if (!localServices.containsKey(virtualAddress)) {
+			localServices.put(virtualAddress, info);
+			queue.add("A;" + virtualAddress.toString() + ";" + info.getDescription());
 		}
-		return localHIDs.get(hid);
+		return localServices.get(virtualAddress);
 	}
 
 	/**
-	 * Adds a remote HID to the IdTable and updates 
+	 * Adds a remote VirtualAddress to the IdTable and updates 
 	 * the time stamp of last update
 	 * 
-	 * @param hid The HID to be added
+	 * @param virtualAddress The VirtualAddress to be added
 	 * 
-	 * @param info the HIDInfo
+	 * @param info the Registration
 	 * 
-	 * @return The previous value associated with that HID, null otherwise
+	 * @return The previous value associated with that VirtualAddress, null otherwise
 	 */
-	protected HIDInfo addRemoteHID(HID hid, HIDInfo info) {
-		HIDInfo prev = remoteHIDs.put(hid, info);
-		hidLastUpdate.put(hid, Calendar.getInstance().getTimeInMillis());
+	protected Registration addRemoteService(VirtualAddress virtualAddress, Registration info) {
+		Registration prev = remoteServices.put(virtualAddress, info);
+		serviceLastUpdate.put(virtualAddress, Calendar.getInstance().getTimeInMillis());
 		return prev;
 	}
 
 	/*
-	 * Removes a local HID from the IdTable
+	 * Removes a local VirtualAddress from the IdTable
 	 * 
-	 * @param hid The HID to be removed
+	 * @param virtualAddress The virtual address of the relevant service to be removed
 	 */
-	protected HIDInfo removeLocalHID(HID hid) {
-		if (localHIDs.containsKey(hid)) {
-			queue.add("D;" + hid.toString());
+	protected Registration removeLocalService(VirtualAddress virtualAddress) {
+		if (localServices.containsKey(virtualAddress)) {
+			queue.add("D;" + virtualAddress.toString());
 		}
-		return localHIDs.remove(hid);
+		return localServices.remove(virtualAddress);
 	}
 
 	/*
-	 * Removes a remote HID from the IdTable
+	 * Removes a remote VirtualAddress from the IdTable
 	 * 
-	 * @param hid The HID to be removed
+	 * @param virtualAddress The VirtualAddress to be removed
 	 * 
 	 * @return the result, null if
 	 */
-	protected HIDInfo removeRemoteHID(HID hid) {
-		hidLastUpdate.remove(hid);
-		HIDInfo removal = remoteHIDs.remove(hid);
+	protected Registration removeRemoteService(VirtualAddress virtualAddress) {
+		serviceLastUpdate.remove(virtualAddress);
+		Registration removal = remoteServices.remove(virtualAddress);
 		
 		//if this check were not here this would result an infinite loop 
 		if(removal != null) {
 			try {
-				networkManagerCore.removeHID(removal.getHid());
+				networkManagerCore.removeService(removal.getVirtualAddress());
 			} catch (RemoteException e) {
 				//local invocation
 			}
@@ -911,10 +912,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 */
 	protected boolean existsDeviceID(long deviceID) {
 		boolean is = false;
-		Enumeration<HID> hids;
-		hids = localHIDs.keys();
-		while (hids.hasMoreElements()) {
-			if (hids.nextElement().getDeviceID() == deviceID) {
+		Enumeration<VirtualAddress> virtualAddresses;
+		virtualAddresses = localServices.keys();
+		while (virtualAddresses.hasMoreElements()) {
+			if (virtualAddresses.nextElement().getDeviceID() == deviceID) {
 				is = true;
 				LOG.debug("Duplicated deviceID " + deviceID + ". ");
 				break;
@@ -924,15 +925,15 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	/*
-	 * Thread sends broadcast message if there is an update in HIDList
+	 * Thread sends broadcast message if there is an update in ServiceList
 	 */
-	protected class HIDUpdaterThread implements Runnable {
+	protected class ServiceUpdaterThread implements Runnable {
 
 		@Override
 		public void run() {
-			while (hidUpdaterThreadRunning) {
+			while (serviceUpdaterThreadRunning) {
 				if (!queue.isEmpty()) {
-					BroadcastMessage m = getHIDListUpdate();
+					BroadcastMessage m = getServiceListUpdate();
 					LOG.debug("Broadcasting Message: " + m);
 					networkManagerCore.broadcastMessage(m);
 				}
@@ -940,7 +941,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					Thread.sleep(broadcastSleepMillis);
 				} catch (InterruptedException e) {
 					LOG.info("Thread broadcasting updates stopped!", e);
-					hidUpdaterThreadRunning = false;
+					serviceUpdaterThreadRunning = false;
 					break;
 				}
 			}
@@ -949,7 +950,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	}
 
 	/*
-	 * Thread that broadcasts all localHIDs stored by this IdentityManager 
+	 * Thread that broadcasts all localServices stored by this IdentityManager 
 	 */
 	protected class AdvertisingThread implements Runnable {
 		@Override
@@ -957,26 +958,26 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			while (advertisingThreadRunning) {
 				if (networkManagerCore != null) {
 
-					//#NM refactoring put list of local HIDs into message
-					Set<HIDInfo> localHIDs = getLocalHIDs();
-					//only keep hid and description in sent data
-					Set<HIDInfo> hidsToSend = new HashSet<HIDInfo>();
-					for(HIDInfo hidInfo : localHIDs) {
-						if(hidInfo.getDescription() != null) {
-							hidsToSend.add(
-									new HIDInfo(
-											hidInfo.getHid(),
+					//#NM refactoring put list of local Services into message
+					Set<Registration> localServices = getLocalServices();
+					//only keep Service and description in sent data
+					Set<Registration> servicesToSend = new HashSet<Registration>();
+					for(Registration serviceInfo : localServices) {
+						if(serviceInfo.getDescription() != null) {
+							servicesToSend.add(
+									new Registration(
+											serviceInfo.getVirtualAddress(),
 											new Part[]{new Part(
-													HIDAttribute.DESCRIPTION.name(),
-													hidInfo.getDescription())}));
+													ServiceAttribute.DESCRIPTION.name(),
+													serviceInfo.getDescription())}));
 						}
 					}
-					byte[] localHIDbytes = null;
+					byte[] localServiceBytes = null;
 
 					try {
-						localHIDbytes = ByteArrayCodec.encodeObjectToBytes(hidsToSend);
+						localServiceBytes = ByteArrayCodec.encodeObjectToBytes(servicesToSend);
 					} catch (IOException e) {
-						LOG.error("Cannot convert local HIDs set to bytearray; " + e);
+						LOG.error("Cannot convert local Services set to bytearray; " + e);
 
 					}
 					BroadcastMessage m = null;
@@ -984,7 +985,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					try {
 						m = new BroadcastMessage(
 								IDMANAGER_NMADVERTISMENT_TOPIC, 
-								networkManagerCore.getHID(), localHIDbytes);
+								networkManagerCore.getService(), localServiceBytes);
 					} catch (RemoteException e) {
 						// local invocation
 						LOG.debug("RemoteException: " + e);
@@ -1007,13 +1008,13 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.networkManagerCore = networkManagerCore;
 
 		// Start the threads once NetworkManagerCore is available
-		this.hidClearerThread = new Thread(new HIDClearer());
-		hidClearerThread.start();
-		hidClearerThreadRunning = true;
+		this.serviceClearerThread = new Thread(new ServiceClearer());
+		serviceClearerThread.start();
+		serviceClearerThreadRunning = true;
 
-		hidUpdaterThread = new Thread(new HIDUpdaterThread());
-		hidUpdaterThread.start();
-		hidUpdaterThreadRunning = true;
+		serviceUpdaterThread = new Thread(new ServiceUpdaterThread());
+		serviceUpdaterThread.start();
+		serviceUpdaterThreadRunning = true;
 
 		advertisingThread = new Thread(new AdvertisingThread());
 		advertisingThread.start();
@@ -1023,51 +1024,51 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		((MessageDistributor)this.networkManagerCore).subscribe(
 				IDMANAGER_NMADVERTISMENT_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
+				IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_HID_ATTRIBUTE_RESOLVE_REQ, this);
+				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_REQ, this);
 		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_HID_ATTRIBUTE_RESOLVE_RESP, this);
+				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP, this);
 	}
 
 	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
 		advertisingThreadRunning = false;
-		hidUpdaterThreadRunning = false;
-		hidClearerThreadRunning = false;
+		serviceUpdaterThreadRunning = false;
+		serviceClearerThreadRunning = false;
 		this.networkManagerCore = null;
 
 		//unsubscribe to messages sent by other identity managers
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
 				IDMANAGER_NMADVERTISMENT_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
-				IDMANAGER_UPDATE_HID_LIST_TOPIC, this);
+				IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, this);
 	}
 
 	public String getIdentifier() {
 		return IDENTITY_MGR;
 	}
 
-	protected class HIDClearer implements Runnable {
+	protected class ServiceClearer implements Runnable {
 		public void run() {
 			try {
-				while(hidClearerThreadRunning) {
+				while(serviceClearerThreadRunning) {
 					Thread.sleep(advertisementSleepMillis);
 
-					List<HID> toDelete = new ArrayList<HID>();
-					//check the HIDs to be deleted
-					for(HID hid : hidLastUpdate.keySet()) {
-						if(hidLastUpdate.get(hid) + HID_KEEP_ALIVE_MS <
+					List<VirtualAddress> toDelete = new ArrayList<VirtualAddress>();
+					//check the Services to be deleted
+					for(VirtualAddress virtualAddress : serviceLastUpdate.keySet()) {
+						if(serviceLastUpdate.get(virtualAddress) + SERVICE_KEEP_ALIVE_MS <
 								Calendar.getInstance().getTimeInMillis()) {
-							toDelete.add(hid);
+							toDelete.add(virtualAddress);
 						}
 					}
-					//delete the HIDs from the local id table and last update
-					for(HID hid : toDelete) {
+					//delete the Services from the local id table and last update
+					for(VirtualAddress virtualAddress : toDelete) {
 						if(networkManagerCore != null) {
 							try {
-								LOG.debug("Removing HID " + hid.toString() + 
+								LOG.debug("Removing VirtualAddress " + virtualAddress.toString() + 
 								"as it was not updated recently.");
-								networkManagerCore.removeHID(hid);
+								networkManagerCore.removeService(virtualAddress);
 							} catch(RemoteException e) {
 								//local access
 							}
@@ -1075,8 +1076,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					}
 				}
 			} catch(InterruptedException e) {
-				LOG.error("Thread removing not advertised HIDs stopped!", e);
-				hidClearerThreadRunning = false;
+				LOG.error("Thread removing not advertised Services stopped!", e);
+				serviceClearerThreadRunning = false;
 			}
 		}
 	}

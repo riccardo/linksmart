@@ -9,8 +9,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.Registration;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.identity.impl.IdentityManagerImpl;
@@ -23,8 +23,8 @@ public class IdentityManagerImplTest {
 	private static final Part ATTR_2 = new Part("Two", "Zwei");
 	private static final long TIMEOUT = 2000;
 	private static final long TOLERANCE = 1000;
-	private static final HID NM_HID = new HID("0.0.0.0");
-	private static HIDInfo MY_HID;
+	private static final VirtualAddress NM_VIRTUAL_ADDRESS = new VirtualAddress("0.0.0.0");
+	private static Registration MY_VIRTUAL_ADDRESS;
 	
 	private IdentityManagerImpl identityMgr;
 
@@ -33,23 +33,23 @@ public class IdentityManagerImplTest {
 		//create IdMgr and store entities 
 		this.identityMgr = new IdentityManagerImpl();
 		this.identityMgr.init();
-		MY_HID = this.identityMgr.createHIDForAttributes(new Part[]{ATTR_1});
+		MY_VIRTUAL_ADDRESS = this.identityMgr.createServiceByAttributes(new Part[]{ATTR_1});
 		
 		//create NMCore mock object
 		this.identityMgr.networkManagerCore = mock(NetworkManagerCore.class);
 		when(this.identityMgr.networkManagerCore.
 				broadcastMessage(any(Message.class))).
 				thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
-			when(this.identityMgr.networkManagerCore.getHID()).thenReturn(NM_HID);
+			when(this.identityMgr.networkManagerCore.getService()).thenReturn(NM_VIRTUAL_ADDRESS);
 	}
 	
 	/**
 	 * Start discovery and look if method returns only after timeout.
 	 */
 	@Test
-	public void getHIDByAttributesTestTimeOut() {
+	public void getServiceByAttributesTestTimeOut() {
 		long startTime = Calendar.getInstance().getTimeInMillis();
-		this.identityMgr.getHIDByAttributes(
+		this.identityMgr.getServiceByAttributes(
 				new Part[]{ATTR_1},	TIMEOUT, false, false);
 		assertTrue(
 				"Method returned before timeout",
@@ -58,14 +58,14 @@ public class IdentityManagerImplTest {
 	}
 	
 	/**
-	 * Query for local hid with return first. This
+	 * Query for local virtualAddress with return first. This
 	 * results in the method returning immediately
-	 * as queried HID exists locally so no discovery is needed.
+	 * as queried VirtualAddress exists locally so no discovery is needed.
 	 */
 	@Test
-	public void getHIDByAttributesTestReturnFirst() {
+	public void getServiceByAttributesTestReturnFirst() {
 		long startTime = Calendar.getInstance().getTimeInMillis();
-		this.identityMgr.getHIDByAttributes(
+		this.identityMgr.getServiceByAttributes(
 				new Part[]{ATTR_1},	TIMEOUT, true, false);
 		assertTrue(
 				"Method did not return first results.",
@@ -73,13 +73,13 @@ public class IdentityManagerImplTest {
 	}
 	
 	/**
-	 * Query for hid which partially matches but
+	 * Query for virtualAddress which partially matches but
 	 * not fully. If query is strict entity should
 	 * not be returned.
 	 */
 	@Test
-	public void getHIDByAttributesTestIsStrict() {
-		HIDInfo[] results = this.identityMgr.getHIDByAttributes(
+	public void getServiceByAttributesTestIsStrict() {
+		Registration[] results = this.identityMgr.getServiceByAttributes(
 				new Part[]{ATTR_1, ATTR_2},	TIMEOUT, true, true);
 		assertTrue(
 				"Method returned partial match although strict query.",
@@ -87,17 +87,17 @@ public class IdentityManagerImplTest {
 	}
 	
 	/**
-	 * Query for local hid which partially matches.
+	 * Query for local virtualAddress which partially matches.
 	 * As not strict query partial match should be
 	 * returned.
 	 */
 	@Test
-	public void getHIDByAttributesTestIsNotStrict() {
-		HIDInfo[] results = this.identityMgr.getHIDByAttributes(
+	public void getServiceByAttributesTestIsNotStrict() {
+		Registration[] results = this.identityMgr.getServiceByAttributes(
 				new Part[]{ATTR_1, ATTR_2},	TIMEOUT, true, false);
 		assertTrue("Method did not return partial match.", results.length != 0);
 		assertEquals(
 				"Method did not return correct match.",
-				MY_HID, results[0]);
+				MY_VIRTUAL_ADDRESS, results[0]);
 	}
 }

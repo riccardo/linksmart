@@ -38,10 +38,10 @@ function startConfigurator() {
 function startNetworkManagerStatus() {
 	getNetworkManagerInfo();
 	setInterval("getNetworkManagerInfo()",10000);
-	getLocalHidsInfo();
-	setInterval("getLocalHidsInfo()",10000);
-	getRemoteHidsInfo();
-	setInterval("getRemoteHidsInfo()",10000);
+	getLocalServicesInfo();
+	setInterval("getLocalServicesInfo()",10000);
+	getRemoteServicesInfo();
+	setInterval("getRemoteServicesInfo()",10000);
 	
 	/*
 	 * the search is anyway done only within the HTML we already got, so this function is not needed for now
@@ -75,7 +75,7 @@ function showEventManagerSearch(event) {
 }
 */
 
-var networkManagerInfo = {NMAvailable:true, LocalAvailable: true, RemoteAvailable: true, SearchAvailable: true, NMs:[], LocalHIDs:[], RemoteHIDs:[], SearchHIDs:[]};
+var networkManagerInfo = {NMAvailable:true, LocalAvailable: true, RemoteAvailable: true, SearchAvailable: true, NMs:[], LocalServices:[], RemoteServices:[], SearchServices:[]};
 //var eventManagerInfo;
 
 var origStatusFilters;
@@ -97,17 +97,17 @@ $(document).ready(function() {
 	
 	origStatusFilters = {NM:false, Local:false, Remote:false, Filter:''};
 
-	 if($('#hid-type-nm').is(':checked')) {
+	 if($('#service-type-nm').is(':checked')) {
 		 origStatusFilters.NM = true;
 	 }
-	 if($('#hid-type-local').is(':checked')) {
+	 if($('#service-type-local').is(':checked')) {
 		 origStatusFilters.Local = true;
 	 }
-	 if($('#hid-type-remote').is(':checked')) {
+	 if($('#service-type-remote').is(':checked')) {
 		 origStatusFilters.Remote = true;
 	 }
 	 
-	 origStatusFilters.Filter = $('#hid-filter-input').val().trim();
+	 origStatusFilters.Filter = $('#service-filter-input').val().trim();
 
      $( "#reset" ).button({
          label: 'Reset',
@@ -117,64 +117,64 @@ $(document).ready(function() {
      })
      .click(function() {
 		if (origStatusFilters.NM) {
-			$('#hid-type-nm').attr('checked', 'checked');
+			$('#service-type-nm').attr('checked', 'checked');
 		} else {
-			$('#hid-type-nm').removeAttr('checked');
+			$('#service-type-nm').removeAttr('checked');
 		}
 		if (origStatusFilters.Local) {
-			$('#hid-type-local').attr('checked', 'checked');
+			$('#service-type-local').attr('checked', 'checked');
 		} else {
-			$('#hid-type-local').removeAttr('checked');
+			$('#service-type-local').removeAttr('checked');
 		}
 		if (origStatusFilters.Remote) {
-			$('#hid-type-remote').attr('checked', 'checked');
+			$('#service-type-remote').attr('checked', 'checked');
 		} else {
-			$('#hid-type-remote').removeAttr('checked');
+			$('#service-type-remote').removeAttr('checked');
 		}
 		
-		$('#hid-filter-input').val(origStatusFilters.Filter);
+		$('#service-filter-input').val(origStatusFilters.Filter);
 
-		$('#hid-types').buttonset('refresh');
+		$('#service-types').buttonset('refresh');
 		
-		showSearchResults(); //needed because the filter may have changed and rows need to be updated. this in turn calls showHideHIDViews which does the final show/hide
+		showSearchResults(); //needed because the filter may have changed and rows need to be updated. this in turn calls showHideServiceViews which does the final show/hide
      });
      
-     $( '#hid-types' ).buttonset();
-     $( '#hid-types' ).change(function() {
-    	 showHideHIDViews();
+     $( '#service-types' ).buttonset();
+     $( '#service-types' ).change(function() {
+    	 showHideServiceViews();
      });
 	
-     $('#hid-types .only').button().click(function(event){
+     $('#service-types .only').button().click(function(event){
 		var whichButton = $(this).attr('id');
 		//console.log(whichButton); 
 		switch (whichButton) {
-			case 'hid-nm-only':
-				$('#hid-type-nm').attr('checked', 'checked');
-				$('#hid-type-local').removeAttr('checked');
-				$('#hid-type-remote').removeAttr('checked');
+			case 'service-nm-only':
+				$('#service-type-nm').attr('checked', 'checked');
+				$('#service-type-local').removeAttr('checked');
+				$('#service-type-remote').removeAttr('checked');
 				break;
-			case 'hid-local-only':
-				$('#hid-type-nm').removeAttr('checked');
-				$('#hid-type-local').attr('checked', 'checked');
-				$('#hid-type-remote').removeAttr('checked');
+			case 'service-local-only':
+				$('#service-type-nm').removeAttr('checked');
+				$('#service-type-local').attr('checked', 'checked');
+				$('#service-type-remote').removeAttr('checked');
 				break;
-			case 'hid-remote-only':
-				$('#hid-type-nm').removeAttr('checked');
-				$('#hid-type-local').removeAttr('checked');
-				$('#hid-type-remote').attr('checked', 'checked');
+			case 'service-remote-only':
+				$('#service-type-nm').removeAttr('checked');
+				$('#service-type-local').removeAttr('checked');
+				$('#service-type-remote').attr('checked', 'checked');
 				break;
 		}
-	    $( "#hid-types" ).buttonset('refresh');
+	    $( "#service-types" ).buttonset('refresh');
 	    
-	    $( '#hid-types .only').addClass('ui-corner-all'); //because jQuery mistakenly removes this after click
+	    $( '#service-types .only').addClass('ui-corner-all'); //because jQuery mistakenly removes this after click
 	    
-     	$( "#hid-types" ).change(); //act a change as if user has clicked on the buttons
+     	$( "#service-types" ).change(); //act a change as if user has clicked on the buttons
 	    return false;
 	});
 
-    $('#hid-filter-input').keyup(showSearchResults);
+    $('#service-filter-input').keyup(showSearchResults);
     
-	$('#hid-list-data').empty(); //sometimes the browser keeps everything in the cache, delete before start
+	$('#service-list-data').empty(); //sometimes the browser keeps everything in the cache, delete before start
     startConfigurator();
     startNetworkManagerStatus();
 });
@@ -206,29 +206,29 @@ No data from your computer are used.</div></noscript>
 		</div>
 	</div>  
 	<div id="ui-services-nm">
-		<span id="hid-toolbar" class="ui-widget-header ui-corner-all">
+		<span id="service-toolbar" class="ui-widget-header ui-corner-all">
 		    <button id="reset">play</button>
-		    <span id="hid-types">
-		        <input type="checkbox" id="hid-type-nm" checked="checked" name="hid-types"/><label id="hid-type-nm-label" for="hid-type-nm"><span>Network Managers</span> <button class="only" id="hid-nm-only">only</button></label>
-		        <input type="checkbox" id="hid-type-local" checked="checked" name="hid-types" /><label id="hid-type-local-label" for="hid-type-local"><span>Local HIDs</span> <button class="only" id="hid-local-only">only</button></label>
-		        <input type="checkbox" id="hid-type-remote" checked="checked" name="hid-types" /><label id="hid-type-remote-label" for="hid-type-remote"><span>Remote HIDs</span> <button class="only" id="hid-remote-only">only</button></label>
+		    <span id="service-types">
+		        <input type="checkbox" id="service-type-nm" checked="checked" name="service-types"/><label id="service-type-nm-label" for="service-type-nm"><span>Network Managers</span> <button class="only" id="service-nm-only">only</button></label>
+		        <input type="checkbox" id="service-type-local" checked="checked" name="service-types" /><label id="service-type-local-label" for="service-type-local"><span>Local services</span> <button class="only" id="service-local-only">only</button></label>
+		        <input type="checkbox" id="service-type-remote" checked="checked" name="service-types" /><label id="service-type-remote-label" for="service-type-remote"><span>Remote services</span> <button class="only" id="service-remote-only">only</button></label>
 		    </span>
-	        <span id="hid-filter" class="ui-widget"><label for="hid-filter-input">Filter</label><input type="text" id="hid-filter-input" class="ui-corner-all ui-button-text" name="hid-filter"/></span>
+	        <span id="service-filter" class="ui-widget"><label for="service-filter-input">Filter</label><input type="text" id="service-filter-input" class="ui-corner-all ui-button-text" name="service-filter"/></span>
 		</span>
-	<div id="hid-list-empty">No data yet...</div>
-	<table id="hid-list-data-table">
+	<div id="service-list-empty">No data yet...</div>
+	<table id="service-list-data-table">
 	<thead>
-	<tr class="hid-table-header" id="hid-table-header">
-	<th width="20%">HID</th>
+	<tr class="service-table-header" id="service-table-header">
+	<th width="20%">Virtual Address</th>
 	<th width="30%">Description</th>
 	<th width="10%">Host</th>
 	<th width="40%">Endpoint</th>
 	</tr>
-	<tr class="hid-table-header" id="hid-table-no-data" style="display:none">
+	<tr class="service-table-header" id="service-table-no-data" style="display:none">
 	<th colspan="4">No data remain that fulfill your search and filtering criteria.</th>
 	</tr>
 	</thead>
-	<tbody id="hid-list-data"></tbody>
+	<tbody id="service-list-data"></tbody>
 	</table>
 	</div>
 </div>

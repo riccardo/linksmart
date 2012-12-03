@@ -4,50 +4,50 @@ import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 import java.util.Set;
 
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.Registration;
+import eu.linksmart.network.ServiceAttribute;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.identity.impl.IdentityManagerImpl;
 import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.utils.Part;
 import eu.linksmart.utils.PartConverter;
 
 /**
- * The CryptoHID implementation of Identity Manager.
- * The HID is bound by a certificate with specific
+ * The service implementation of Identity Manager.
+ * The VirtualAddress is bound by a certificate with specific
  * attributes.
  * @author Vinkovits
  *
  */
-public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
+public class IdentityManagerCertImpl extends IdentityManagerImpl {
 	/**
 	 * The identifier of this implementation bundle.
 	 */
-	private static String IDENTITY_MGR = IdentityManagerCryptoImpl.class
+	private static String IDENTITY_MGR = IdentityManagerCertImpl.class
 	.getSimpleName();
 	/**
-	 * CryptoHIDs are based on certificates.
+	 * Services are based on certificates.
 	 */
 	private CryptoManager cryptoManager;
 
 	/**
-	 * Overrides the IdentityManager's createHIDForAttributes and creates
+	 * Overrides the IdentityManager's createServiceByAttributes and creates
 	 * from the attributes a certificate.
 	 * If a certificate attribute is included than the identifier is checked
 	 * in the CryptoManager and if a certificate is found it is used.
-	 * @return null if there was error creating the HID TODO add appropriate exceptions
+	 * @return null if there was error creating the VirtualAddress TODO add appropriate exceptions
 	 */
-	public HIDInfo createHIDForAttributes(Part[] parts) {
+	public Registration createServiceByAttributes(Part[] parts) {
 		Properties attributes = PartConverter.toProperties(parts);
-		HID hid = createUniqueHID();
+		VirtualAddress virtualAddress = createUniqueVirtualAddress();
 		try{
-			//create XML to be placed into certificate of CryptoHID
+			//create XML to be placed into certificate of service
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			attributes.storeToXML(bos, "");
 			String xmlAttributes = bos.toString();
 			//if attributes contains certificate reference try to load it
-			if(attributes.containsKey(HIDAttribute.CERT_REF.name())) {
-				String certRef = attributes.getProperty(HIDAttribute.CERT_REF.name());
+			if(attributes.containsKey(ServiceAttribute.CERT_REF.name())) {
+				String certRef = attributes.getProperty(ServiceAttribute.CERT_REF.name());
 				Properties certAttributes = cryptoManager.getAttributesFromCertificate(certRef);
 				if (certAttributes.size() != 0) {
 					//if other attributes were also provided check if they match
@@ -55,17 +55,17 @@ public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
 					boolean mismatch = false;
 					for(Object key : keys) {
 						Object value = certAttributes.get(key);
-						if(value != attributes.get(key) && !key.equals(HIDAttribute.CERT_REF.name())){
+						if(value != attributes.get(key) && !key.equals(ServiceAttribute.CERT_REF.name())){
 							mismatch = true;
 							break;
 						}
 					}
-					//if the provided attributes don't match better not create HID
+					//if the provided attributes don't match better not create VirtualAddress
 					if(!mismatch) {
-					cryptoManager.addPrivateKeyForHID(hid.toString(), certRef);
-					cryptoManager.addCertificateForHID(hid.toString(), certRef);
+					cryptoManager.addPrivateKeyForService(virtualAddress.toString(), certRef);
+					cryptoManager.addCertificateForService(virtualAddress.toString(), certRef);
 					} else {
-						LOG.warn("Tried creating HID from certificate with wrong attributes.");
+						LOG.warn("Tried creating VirtualAddress from certificate with wrong attributes.");
 						return null;
 					}
 				} else {
@@ -73,17 +73,17 @@ public class IdentityManagerCryptoImpl extends IdentityManagerImpl {
 					return null;
 				}
 			} else {
-				// Provide the attributes and the hid to generate the certificate
+				// Provide the attributes and the service to generate the certificate
 				String certRef = cryptoManager.generateCertificateWithAttributes(
-						xmlAttributes, hid.toString());
-				attributes.put(HIDAttribute.CERT_REF.name(), certRef);
+						xmlAttributes, virtualAddress.toString());
+				attributes.put(ServiceAttribute.CERT_REF.name(), certRef);
 			}
-			HIDInfo info = new HIDInfo(hid, PartConverter.fromProperties(attributes));
-			addLocalHID(hid, info);
-			LOG.debug("Created HID: " + info.toString());
+			Registration info = new Registration(virtualAddress, PartConverter.fromProperties(attributes));
+			addLocalService(virtualAddress, info);
+			LOG.debug("Created VirtualAddress: " + info.toString());
 			return info;
 		}catch(Exception e){
-			LOG.error("Cannot create CryptoHID!",e);
+			LOG.error("Cannot create service!",e);
 			return null;
 		}
 	}

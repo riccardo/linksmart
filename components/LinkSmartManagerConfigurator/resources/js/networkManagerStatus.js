@@ -16,45 +16,45 @@ function getNetworkManagerInfo() {
 			updateNMViews('network-managers');
 		},
 		success: function(response) {
-			networkManagerInfo.NMs = response.HIDs;
+			networkManagerInfo.NMs = response.VirtualAddresses;
 			//console.log(response.HIDs);
 			updateNMViews('network-managers');
 		}
 	});
 }
 
-function getLocalHidsInfo() {
+function getLocalServicesInfo() {
 	$.ajax({
 		url: NMServletURL, 
 		type: 'GET',
-		data: {	method: 'getLocalHids'	},
+		data: {	method: 'getLocalServices'	},
 		dataType: 'json',
 		error: function(jqXHR, textStatus, errorThrown) {
 			networkManagerInfo.LocalAvailable = false;
-			networkManagerInfo.LocalHIDs = [];
-			updateNMViews('local-hids');
+			networkManagerInfo.LocalServices = [];
+			updateNMViews('local-services');
 		},
 		success: function(response) {
-			networkManagerInfo.LocalHIDs = response.HIDs;
-			updateNMViews('local-hids');
+			networkManagerInfo.LocalServices = response.VirtualAddresses;
+			updateNMViews('local-services');
 		}
 	});
 }
 
-function getRemoteHidsInfo() {	
+function getRemoteServicesInfo() {	
 	$.ajax({
 		url: NMServletURL,
 		type: 'GET',
-		data: {	method: 'getRemoteHids'	},
+		data: {	method: 'getRemoteServices'	},
 		dataType: 'json',
 		error: function(jqXHR, textStatus, errorThrown) {
 			networkManagerInfo.RemoteAvailable = false;
-			networkManagerInfo.RemoteHids = [];
-			updateNMViews('remote-hids');
+			networkManagerInfo.RemoteServices = [];
+			updateNMViews('remote-services');
 		},
 		success: function(response) {
-			networkManagerInfo.RemoteHids = response.HIDs;
-			updateNMViews('remote-hids');
+			networkManagerInfo.RemoteServices = response.VirtualAddresses;
+			updateNMViews('remote-services');
 		}
 	});
 }
@@ -87,57 +87,57 @@ function getNetworkManagerSearch() {
 
 function updateNMViews(view) {
 	if (view=='network-managers') {
-		syncHIDListToView('network-managers', networkManagerInfo.NMs);
-	} else 	if (view=='local-hids') {
-		syncHIDListToView('local-hids', networkManagerInfo.LocalHIDs);
-	} else 	if (view=='remote-hids') {
-		syncHIDListToView('remote-hids', networkManagerInfo.RemoteHIDs);
+		syncServiceListToView('network-managers', networkManagerInfo.NMs);
+	} else 	if (view=='local-services') {
+		syncServiceListToView('local-services', networkManagerInfo.LocalServices);
+	} else 	if (view=='remote-services') {
+		syncServiceListToView('remote-services', networkManagerInfo.RemoteServices);
 	} else 	if (view=='network-managers') {
-		syncHIDListToView('search-hids', networkManagerInfo.SearchHIDs);
+		syncServiceListToView('search-services', networkManagerInfo.SearchServices);
 	}
 }
 
 
-function doesNMDataHaveThisHID(NMData, HID) {
-	if (NMData.hid === HID) {
+function doesNMDataHaveThisVirtualAddress(NMData, virtualAddress) {
+	if (NMData.hid === virtualAddress) {
 		return true;
 	} else {
 		return false;
 	}
 }
 
-function syncHIDListToView(cssClass, newData) {
+function syncServiceListToView(cssClass, newData) {
 	var filter = '.' + cssClass;
 	
 	if (newData.length == 0) {
-		$('#hid-list-data tr').filter(filter).addClass('ui-state-highlight').hide('slow', function(){ $('#hid-list-data tr').filter(filter).remove(); showHideHIDViews(); });
+		$('#service-list-data tr').filter(filter).addClass('ui-state-highlight').hide('slow', function(){ $('#service-list-data tr').filter(filter).remove(); showHideServiceViews(); });
 	} else {
-		var HIDRows=$('#hid-list-data tr').filter(filter);
+		var serviceRows=$('#service-list-data tr').filter(filter);
 
-		//delete gone HIDs
-		for (var i = 0; i < HIDRows.length; i++) { //as long as there are
-			var oneHID = HIDRows.eq(i).find('.hid').text();
+		//delete gone services
+		for (var i = 0; i < serviceRows.length; i++) { //as long as there are
+			var oneService = serviceRows.eq(i).find('.service').text();
 			var foundIn = $.each(newData, function(index, value) { 
-									return doesNMDataHaveThisHID(newData[index], oneHID);
+									return doesNMDataHaveThisVirtualAddress(newData[index], oneService);
 								});
 			if (foundIn.length == 0) {
 				//not found anywhere, this HID should be removed
-				var thisRow = HIDRows.eq(i);
+				var thisRow = serviceRows.eq(i);
 				thisRow.addClass('ui-state-highlight').hide('slow', function(){ thisRow.remove();});
 				i--; //because one was just removed, so the i+1th new order would be the i+2 old order
 			}
 		}
 
-		//at this point all that remains are the known and still-active HIDs
-		var knownHIDs = HIDRows.find('.hid');
+		//at this point all that remains are the known and still-active services
+		var knownServices = serviceRows.find('.service');
 
-		//now insert new HIDs
-		var rowTemplate = '<tr class="' + cssClass + '"><td class="hid">{hid}<span class="hid-extras"><a class="hid-path" href="{path}">link</a> <a class="hid-wsdl" href="{wsdl}">wsdl</a></span></td><td class="description">{description}</td><td class"host">{host}</td><td class="endpoint">{endpoint}</td></tr>';
-		var HIDTable = $('#hid-list-data');
+		//now insert new services
+		var rowTemplate = '<tr class="' + cssClass + '"><td class="service">{service}<span class="service-extras"><a class="service-path" href="{path}">link</a> <a class="service-wsdl" href="{wsdl}">wsdl</a></span></td><td class="description">{description}</td><td class"host">{host}</td><td class="endpoint">{endpoint}</td></tr>';
+		var serviceTable = $('#service-list-data');
 		for (var i = 0; i < newData.length; i++) {
-			var foundIn = $.each(knownHIDs, function(index, value) { 
+			var foundIn = $.each(knownServices, function(index, value) { 
 					//console.log(value);
-					if ($(value).html().trim() == newData[i].hid.trim()) {
+					if ($(value).html().trim() == newData[i].virtualAddress.trim()) {
 						return true;
 					} else {
 						return false;
@@ -145,37 +145,37 @@ function syncHIDListToView(cssClass, newData) {
 			});
 
 			if (foundIn.length == 0) { //i.e. not known
-			    var newRow = $(	 rowTemplate.replace( /\{hid\}/g, newData[i].hid )
+			    var newRow = $(	 rowTemplate.replace( /\{service\}/g, newData[i].virtualAddress )
 			    							.replace( /\{description\}/g, newData[i].description )
 			    							.replace( /\{host\}/g, newData[i].host )
 			    							.replace( /\{endpoint\}/g, newData[i].endpoint)
 			    							.replace(/\{path\}/g, newData[i].path)
 			    							.replace (/\{wsdl\}/g, newData[i].wsdl) );
 
-			    var searchWord=$('#hid-filter-input').val().trim();
+			    var searchWord=$('#service-filter-input').val().trim();
 			    if (searchWord.length > 0) {
 					if (newRow.html().indexOf(searchWord) == -1) { //this new row does not have the search word we're currently searching, mark it to be hidden
 						newRow.addClass('filter-hide');
 					}
 				}
-			    HIDTable.append( newRow );
+			    serviceTable.append( newRow );
 		    }
 		}
 	}
 	
-	showHideHIDViews(); //remove the "no data" part, or show it if we really have nothing to report
+	showHideServiceViews(); //remove the "no data" part, or show it if we really have nothing to report
 }
 
 
 function showSearchResults() {
 
-	var searchWord=$('#hid-filter-input').val().trim();
-	var HIDRows=$('#hid-list-data tr');
+	var searchWord=$('#service-filter-input').val().trim();
+	var serviceRows=$('#service-list-data tr');
 
 	if (searchWord.length > 0) {
-		var rows = HIDRows.length;
+		var rows = serviceRows.length;
 		for (var i=0; i < rows; i++) {
-			var oneRow = HIDRows.eq(i);
+			var oneRow = serviceRows.eq(i);
 			if (oneRow.html().indexOf(searchWord) >= 0) {
 				oneRow.removeClass('filter-hide');
 			} else {
@@ -183,55 +183,55 @@ function showSearchResults() {
 			}
 		}
 	} else {
-		HIDRows.removeClass('filter-hide');
+		serviceRows.removeClass('filter-hide');
 	}
-	showHideHIDViews();
+	showHideServiceViews();
 }
 
-function showHideHIDViews() {
+function showHideServiceViews() {
 
-	if ($('#hid-list-data tr').length > 0) {
-		$('#hid-list-empty').hide();
-		$('#hid-list-data-table').show();
+	if ($('#service-list-data tr').length > 0) {
+		$('#service-list-empty').hide();
+		$('#service-list-data-table').show();
 	} else {
-		$('#hid-list-empty').show();
-		$('#hid-list-data-table').hide();
+		$('#service-list-empty').show();
+		$('#service-list-data-table').hide();
 	}
 
 	var stillVisible=jQuery();
 	
-	if ( $( '#hid-type-nm' ).is(':checked') ) {
-		$('#hid-list-data .network-managers').filter('.filter-hide').hide('slow');
-		$('#hid-list-data .network-managers').not('.filter-hide').show('slow');
-		stillVisible = stillVisible.add($('#hid-list-data .network-managers').not('.filter-hide'));
+	if ( $( '#service-type-nm' ).is(':checked') ) {
+		$('#service-list-data .network-managers').filter('.filter-hide').hide('slow');
+		$('#service-list-data .network-managers').not('.filter-hide').show('slow');
+		stillVisible = stillVisible.add($('#service-list-data .network-managers').not('.filter-hide'));
 	 } else {
-		$('#hid-list-data .network-managers').hide('slow');
+		$('#service-list-data .network-managers').hide('slow');
 	 }
 
-	 if ( $( '#hid-type-local' ).is(':checked') ) {
-		$('#hid-list-data .local-hids').filter('.filter-hide').hide('slow');
-		$('#hid-list-data .local-hids').not('.filter-hide').show('slow');
-		stillVisible = stillVisible.add($('#hid-list-data .local-hids').not('.filter-hide'));
+	 if ( $( '#service-type-local' ).is(':checked') ) {
+		$('#service-list-data .local-services').filter('.filter-hide').hide('slow');
+		$('#service-list-data .local-services').not('.filter-hide').show('slow');
+		stillVisible = stillVisible.add($('#service-list-data .local-services').not('.filter-hide'));
 	 } else {
- 		$('#hid-list-data .local-hids').hide('slow');
+ 		$('#service-list-data .local-services').hide('slow');
    	 }
 
-	 if ( $( '#hid-type-remote' ).is(':checked') ) {
-		$('#hid-list-data .remote-hids').filter('filter-hide').hide('slow');
-		$('#hid-list-data .remote-hids').not('filter-hide').show('slow');
-		stillVisible = stillVisible.add($('#hid-list-data .remote-hids').not('.filter-hide'));
+	 if ( $( '#service-type-remote' ).is(':checked') ) {
+		$('#service-list-data .remote-services').filter('filter-hide').hide('slow');
+		$('#service-list-data .remote-services').not('filter-hide').show('slow');
+		stillVisible = stillVisible.add($('#service-list-data .remote-services').not('.filter-hide'));
 	 } else {
- 		$('#hid-list-data .remote-hids').hide('slow');
+ 		$('#service-list-data .remote-services').hide('slow');
    	 }
 	 
 	 if (stillVisible.length > 0) {
 		 //there are at least some rows after filtering; make sure table header is shown and the "no data in this view" is not
-		 $('#hid-table-header').show();
-		 $('#hid-table-no-data').hide();
+		 $('#service-table-header').show();
+		 $('#service-table-no-data').hide();
 	 } else {
 		 //there are no rows after filtering; make sure table header is hidden and the "no data in this view" is shown
-		 $('#hid-table-header').hide();
-		 $('#hid-table-no-data').show();
+		 $('#service-table-header').hide();
+		 $('#service-table-no-data').show();
 	 }
 	 
 	 //console.log(stillVisible);

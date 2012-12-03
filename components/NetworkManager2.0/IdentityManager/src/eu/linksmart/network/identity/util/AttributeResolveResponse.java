@@ -2,25 +2,25 @@ package eu.linksmart.network.identity.util;
 
 import java.io.Serializable;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 
 /**
- * Class containing hid and AttributeResponseFilter pairs.
+ * Class containing virtualAddress and AttributeResponseFilter pairs.
  * @author Vinkovits
  *
  */
 public class AttributeResolveResponse implements Serializable {
 	private static final long serialVersionUID = 1L;
-	HID hid;
+	VirtualAddress virtualAddress;
 	AttributeResolveFilter filter;
 
-	public AttributeResolveResponse(HID hid, AttributeResolveFilter filter) {
-		this.hid = hid;
+	public AttributeResolveResponse(VirtualAddress virtualAddress, AttributeResolveFilter filter) {
+		this.virtualAddress = virtualAddress;
 		this.filter = filter;
 	}
 
-	public HID getHid() {
-		return this.hid;
+	public VirtualAddress getService() {
+		return this.virtualAddress;
 	}
 
 	public AttributeResolveFilter getFilter() {

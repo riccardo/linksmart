@@ -38,11 +38,7 @@
 package eu.linksmart.configurator;
 
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.rmi.RemoteException;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 
@@ -55,11 +51,6 @@ import org.osgi.service.http.NamespaceException;
 import eu.linksmart.configurator.impl.ConfiguratorImpl;
 import eu.linksmart.configurator.webconf.GetConfigurationServlet;
 import eu.linksmart.configurator.webconf.LinkSmartStatus;
-import eu.linksmart.network.CryptoHIDResult;
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.networkmanager.NetworkManager;
-
 
 /**
  * Activator class

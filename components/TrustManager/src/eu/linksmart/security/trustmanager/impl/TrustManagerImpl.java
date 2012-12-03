@@ -33,13 +33,11 @@
 
 package eu.linksmart.security.trustmanager.impl;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
@@ -48,9 +46,8 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.clients.RemoteWSClientProvider;
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.Registration;
+import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.security.trustmanager.TrustManager;
 import eu.linksmart.security.trustmanager.TrustManagerConfiguration;
@@ -88,11 +85,11 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 	private BundleContext context;
 	private boolean activated=false;
 	private ServiceRegistration trustModelConfigService = null;
-	private HIDInfo trustManagerHID = null;
+	private Registration trustManagerVirtualAddress = null;
 	private boolean nmOsgi = false;
 	private NetworkManager nm = null;
 	private RemoteWSClientProvider clientProvider;
-	private boolean createdHID;
+	private boolean createdService;
 	private String nmAddress = null;
 
 	@Override
@@ -191,20 +188,20 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 			setCurrentTrustModel(trustModelValue);
 		}
 		if (updates.containsKey(TrustManagerConfigurator.PID)) {
-			removeTrustManagerHID();
-			createHIDForTrustManager(true);
-			createdHID = true;
+			removeTrustManagerService();
+			createServiceForTrustManager(true);
+			createdService = true;
 		}
 		if (updates.containsKey(TrustManagerConfigurator.USE_NETWORK_MANAGER) || updates.containsKey(TrustManagerConfigurator.NETWORK_MANAGER_ADDRESS)) {
 			boolean useNetworkManager = Boolean.parseBoolean((String) updates.get(TrustManagerConfigurator.USE_NETWORK_MANAGER));
 			if (useNetworkManager == true) {
-				if (createdHID == false){
-					createHIDForTrustManager(false);
-					createdHID = true;
+				if (createdService == false){
+					createServiceForTrustManager(false);
+					createdService = true;
 				}
 			} else {
-				removeTrustManagerHID();
-				createdHID = false;
+				removeTrustManagerService();
+				createdService = false;
 			}
 		}
 		// else is handled by OSGI ConfigAdmin
@@ -229,16 +226,16 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		LOG.debug("RemoteWSClientProvider bound in TrustManager");
 		this.clientProvider = clientProvider;
 		if (activated) {
-			createHIDForTrustManager(false);
+			createServiceForTrustManager(false);
 		}
 	}
 
 	protected void unbindWSProvider(RemoteWSClientProvider clientProvider) {
-		removeTrustManagerHID();
+		removeTrustManagerService();
 		this.clientProvider = null;
 		if(!nmOsgi){
-			removeTrustManagerHID();
-			createdHID = false;
+			removeTrustManagerService();
+			createdService = false;
 			this.nm= null;
 		}
 		LOG.debug("RemoteWSClientProvider unbound from TrustManager");
@@ -248,14 +245,14 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		this.nm = netManager;
 		nmOsgi = true;
 		if (activated) {
-			createHIDForTrustManager(false);
+			createServiceForTrustManager(false);
 		}
 	}
 
 	protected void unbindNetworkManager (NetworkManager nm) {
 		if (activated) {
-			removeTrustManagerHID();
-			createdHID = false;
+			removeTrustManagerService();
+			createdService = false;
 		}
 		this.nm = null;
 		nmOsgi = false;
@@ -277,7 +274,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		configurator = new TrustManagerConfigurator(this, context);
 		configurator.registerConfiguration();
 
-		createHIDForTrustManager(false);
+		createServiceForTrustManager(false);
 
 		this.activated = true;
 		LOG.debug("TrustManager activated");		
@@ -288,8 +285,8 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		LOG.debug("TrustManager deactivated");
 	}
 
-	private void createHIDForTrustManager(boolean renewCert) {
-		if (trustManagerHID != null) return; //Only do this once
+	private void createServiceForTrustManager(boolean renewCert) {
+		if (trustManagerVirtualAddress != null) return; //Only do this once
 		boolean withNetworkManager = Boolean.parseBoolean(configurator.get(TrustManagerConfigurator.USE_NETWORK_MANAGER));
 		LOG.debug("TrustManager with NetworkManagerCore: "+ withNetworkManager);
 		if(withNetworkManager) {
@@ -320,47 +317,47 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 				}
 			}
 			if(nm != null) {
-				//use nm reference to create hid
+				//use nm reference to create service
 				try {
 					//trustmanager has no certificate yet or needs new then create it
 					if (configurator.get(TrustManagerConfigurator.CERTIFICATE_REF)==null || renewCert == true) {
-						this.trustManagerHID = createCertificate();
+						this.trustManagerVirtualAddress = createCertificate();
 					} else {
-						this.trustManagerHID = (nm.createHID(
+						this.trustManagerVirtualAddress = (nm.registerService(
 								new Part[]{
 										new Part(
-												HIDAttribute.CERT_REF.name(),
+												ServiceAttribute.CERT_REF.name(),
 												configurator.get(TrustManagerConfigurator.CERTIFICATE_REF))
 										}, 
 								"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH,
 								BACKBONE_SOAP));
-						if (this.trustManagerHID == null) {
+						if (this.trustManagerVirtualAddress == null) {
 							//Certificate ref is not valid...
-							this.trustManagerHID = createCertificate();
+							this.trustManagerVirtualAddress = createCertificate();
 						}
 					}
-					LOG.info("TrustManager HID: " + trustManagerHID);
+					LOG.info("TrustManager VirtualAddress: " + trustManagerVirtualAddress);
 				} catch (Exception e) {
-					LOG.error("Error while creating HID for TM: " + e.getMessage(), e);
+					LOG.error("Error while creating VirtualAddress for TM: " + e.getMessage(), e);
 				}
 			}
 		}
 	}
 
-	private void removeTrustManagerHID() {
-		if (trustManagerHID== null) return; //Only do this once
+	private void removeTrustManagerService() {
+		if (trustManagerVirtualAddress== null) return; //Only do this once
 
 		if(nm != null){
 			try {
-				nm.removeHID(trustManagerHID.getHid());
+				nm.removeService(trustManagerVirtualAddress.getVirtualAddress());
 			} catch (Exception e) {
 				LOG.error(e);
 			}
-			trustManagerHID = null;
+			trustManagerVirtualAddress = null;
 		}
 	}
 
-	private HIDInfo createCertificate() throws IOException{
+	private Registration createCertificate() throws IOException{
 		String pid = configurator.get(TrustManagerConfigurator.PID);
 		//if no PID set use local IP as identifier
 		if ((pid == null)||(pid.equals(""))) {
@@ -368,22 +365,22 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		}
 		
 		Part[] tmAttr = new Part[]{
-			new Part(HIDAttribute.PID.name(), pid),
-			new Part(HIDAttribute.DESCRIPTION.name(), "TrustManager"),
-			new Part(HIDAttribute.SID.name(), pid)
+			new Part(ServiceAttribute.PID.name(), pid),
+			new Part(ServiceAttribute.DESCRIPTION.name(), "TrustManager"),
+			new Part(ServiceAttribute.SID.name(), pid)
 		};
 		
-		HIDInfo hidInfo = nm.createHID(tmAttr,
+		Registration serviceInfo = nm.registerService(tmAttr,
 				"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH,
 				BACKBONE_SOAP);
-		Part[] attributes = hidInfo.getAttributes();
+		Part[] attributes = serviceInfo.getAttributes();
 		for (Part attr : attributes) {
-			if(attr.getKey().contentEquals(HIDAttribute.CERT_REF.name())){
+			if(attr.getKey().contentEquals(ServiceAttribute.CERT_REF.name())){
 				configurator.setConfiguration(
 						TrustManagerConfigurator.CERTIFICATE_REF, attr.getValue());
 			}
 		}		
-		return hidInfo;
+		return serviceInfo;
 	}
 
 	public Class getTrustModelConfigurator(){

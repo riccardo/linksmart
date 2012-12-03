@@ -102,19 +102,8 @@ public interface SecurityLibrary {
 	 * See constants <code>SecurityLibrary.CONF_*</code> for possible value.
 	 * @return
 	 */
-
 	public boolean isValidCoreMacMessage(String message);
-	/**
-	 * Protect messages for Inside Sec communication (Network Manager ->
-	 * Network manager) (encryption and signing), uses signingID and receiverID
-	 * to access the keys in keystore, returns the protected message with
-	 * XMLEnc/Sign, exception thrown on error.
-	 * 
-	 * @param plainData
-	 * @param signingID
-	 * @param receiverHID
-	 * @return
-	 */
+	
 
 	/**
 	 * Checks whether the provided cookie is fresh.

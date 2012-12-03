@@ -105,38 +105,38 @@ width: 98%;
 .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { clear: left; width: 100%; border-bottom: 1px #D3D3D3 !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; padding-bottom: 0; padding-right: 1px; border-right-width: 1px;}
 .ui-tabs-vertical .ui-tabs-panel { padding: 0em; float: right; width: 73%; margin-top: -5px; /*same as .paramform margin top*/}   
 
-#hid-toolbar {
+#service-toolbar {
     padding: 10px 4px;
 }
 
-#hid-filter {
+#service-filter {
     color: #555555;
     font-weight: normal;
 }
 
-#hid-filter label {
+#service-filter label {
     padding: 0.4em 0.3em 0.4em 1.3em;
 }
 
 
 
-#hid-types .only .ui-button-text {
+#service-types .only .ui-button-text {
 	padding: 0.1em 0.2em;
 }
 
 /*because of the "only" button, the buttonset becomes higher/thicker, so we change the paddings below to 0.55/0.65em to match reset and filter to the same height */
-#hid-filter-input {
+#service-filter-input {
 	border: 1px solid #D3D3D3;
     padding: 0.4em 1em;
 }
 
-#hid-toolbar #reset .ui-button-text {
+#service-toolbar #reset .ui-button-text {
 padding-top: 0.55em;
 padding-bottom:0.58em;
 
 }
 /*
-#hid-types > .ui-state-active > span.ui-button-text {
+#service-types > .ui-state-active > span.ui-button-text {
 text-decoration:underline;
 }
 */
@@ -144,37 +144,37 @@ text-decoration:underline;
 .network-managers {
 background:#ffe;
 }
-#hid-type-nm-label.ui-state-active .ui-button-text > span {
+#service-type-nm-label.ui-state-active .ui-button-text > span {
 border-bottom: 2px solid yellow;
 }
 
-.local-hids {
+.local-services {
 background:#efe;
 }
-#hid-type-local-label.ui-state-active .ui-button-text > span {
+#service-type-local-label.ui-state-active .ui-button-text > span {
 border-bottom: 2px solid green;
 }
 
-.remote-hids {
+.remote-services {
 background:#eef;
 }
-#hid-type-remote-label.ui-state-active .ui-button-text > span {
+#service-type-remote-label.ui-state-active .ui-button-text > span {
 border-bottom: 2px solid blue;
 }
 
-.search-hids {
+.search-services {
 background:eee;
 }
 
 
-#hid-list-data-table {
+#service-list-data-table {
 width:100%;
 border-collapse:collapse;
 table-layout: fixed;/* http://stackoverflow.com/a/6667942/953520 */
 }
 
 
-#hid-list-data-table td {
+#service-list-data-table td {
 	/* http://perishablepress.com/wrapping-content/ */
   word-wrap: break-word;
   text-wrap: unrestricted;
@@ -188,7 +188,7 @@ table-layout: fixed;/* http://stackoverflow.com/a/6667942/953520 */
 	word-wrap: break-word;      /* IE 5+ */
 }
 
-#hid-table-header th, #hid-list-data-table td {
+#service-table-header th, #service-list-data-table td {
 text-align:left;
 padding-left: 2px;
 border-left: 1px solid #ccc;
@@ -196,7 +196,7 @@ border-right: 1px solid #ccc;
 border-bottom: 1px solid #ccc;
 }
 
-#hid-table-header th {
+#service-table-header th {
 padding: 30px 0 10px 2px;
 text-indent: 5px;
 border-left: none;
@@ -204,7 +204,7 @@ border-right:none;
 }
 
 
-#hid-table-no-data th {
+#service-table-no-data th {
 text-align:left;
 border: 0px none;
 border-bottom: 0px none;
@@ -212,24 +212,24 @@ padding: 30px 0 10px 2px;
 text-indent: 5px;
 }
 /*
-.hid-extras:before {
+.service-extras:before {
 	content: '(';
 }
-.hid-extras:after {
+.service-extras:after {
 	content: ')';
 }
 */
-.hid-extras {
+.service-extras {
 		margin-right: 15px;
 		font-size: smaller;
 		display: block;
 		float:left;
 		margin-left: 5px;
 }
-.hid-extras .hid-path {
+.service-extras .service-path {
 	margin-right: 10px;
 }
 
-#hid-list-empty {
+#service-list-empty {
 	margin-top: 30px;
 }
