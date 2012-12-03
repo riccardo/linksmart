@@ -11,24 +11,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.Registration;
+import eu.linksmart.network.ServiceAttribute;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.connection.NOPConnection;
 import eu.linksmart.network.identity.IdentityManager;
-import eu.linksmart.network.networkmanager.core.impl.NetworkManagerCoreImpl;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.utils.Part;
 
@@ -38,8 +35,8 @@ import eu.linksmart.utils.Part;
 public class NetworkManagerCoreImplTest {
 	
 	private NetworkManagerCoreImpl nmCoreImpl;
-	private HID senderHID;
-	private HID receiverHID;
+	private VirtualAddress senderVirtualAddress;
+	private VirtualAddress receiverVirtualAddress;
 	private String topic;
 	byte [] data;
 
@@ -49,29 +46,29 @@ public class NetworkManagerCoreImplTest {
 	 */
 	@Before
 	public void setUp(){
-		senderHID = new HID("354.453.455.323");
-		receiverHID = new HID("354.453.993.323");
+		senderVirtualAddress = new VirtualAddress("354.453.455.323");
+		receiverVirtualAddress = new VirtualAddress("354.453.993.323");
 		topic = "test";
 		data = "LinkSmart rocks".getBytes();
 		nmCoreImpl = new NetworkManagerCoreImpl();
-		nmCoreImpl.myHID = new HID("124.3235.346234.3456");
+		nmCoreImpl.myVirtualAddress = new VirtualAddress("124.3235.346234.3456");
 		
 		// Mocked classes
 		nmCoreImpl.backboneRouter = mock(BackboneRouter.class);
 		nmCoreImpl.identityManager = mock(IdentityManager.class);
 
 		// Mocked methods
-		when(nmCoreImpl.backboneRouter.broadcastData(any(HID.class), any(byte[].class))).
+		when(nmCoreImpl.backboneRouter.broadcastData(any(VirtualAddress.class), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
-		when(nmCoreImpl.backboneRouter.sendDataSynch(eq(nmCoreImpl.myHID), eq(receiverHID), any(byte[].class))).
+		when(nmCoreImpl.backboneRouter.sendDataSynch(eq(nmCoreImpl.myVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
-		when(nmCoreImpl.identityManager.getHIDInfo(receiverHID)).
-			thenReturn(new HIDInfo(receiverHID, new Part[]{}));
-		when(nmCoreImpl.backboneRouter.sendDataSynch(eq(senderHID), eq(receiverHID), any(byte[].class))).
+		when(nmCoreImpl.identityManager.getServiceInfo(receiverVirtualAddress)).
+			thenReturn(new Registration(receiverVirtualAddress, new Part[]{}));
+		when(nmCoreImpl.backboneRouter.sendDataSynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
-		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(HID.class), eq(receiverHID), any(byte[].class))).
+		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(VirtualAddress.class), eq(receiverVirtualAddress), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
-		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(HID.class), eq(senderHID), any(byte[].class))).
+		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(VirtualAddress.class), eq(senderVirtualAddress), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 	}
 
@@ -81,7 +78,7 @@ public class NetworkManagerCoreImplTest {
 	@Test
 	public void testBroadcastMessage() {
 		byte [] data = "LinkSmart rocks".getBytes();
-		Message message = new Message(topic, senderHID, receiverHID, data);
+		Message message = new Message(topic, senderVirtualAddress, receiverVirtualAddress, data);
 		
 		NMResponse response = nmCoreImpl.broadcastMessage(message);
 		
@@ -95,12 +92,12 @@ public class NetworkManagerCoreImplTest {
 	@Test
 	public void testSendMessageSync() {
 		byte [] data = "LinkSmart rocks".getBytes();
-		Message message = new Message(topic, senderHID, receiverHID, data);
+		Message message = new Message(topic, senderVirtualAddress, receiverVirtualAddress, data);
 		
 		NMResponse response = nmCoreImpl.sendMessage(message, true);
 		
 		verify(nmCoreImpl.backboneRouter).
-			sendDataSynch(eq(senderHID), eq(receiverHID), any(byte[].class));
+			sendDataSynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class));
 		assertNotNull("Response should not be null", response);
 	}
 
@@ -110,18 +107,18 @@ public class NetworkManagerCoreImplTest {
 	@Test
 	public void testSendMessageAsync() {
 		byte [] data = "LinkSmart rocks".getBytes();
-		Message message = new Message(topic, senderHID, receiverHID, data);
+		Message message = new Message(topic, senderVirtualAddress, receiverVirtualAddress, data);
 		
 		NMResponse response = nmCoreImpl.sendMessage(message, false);
 		
 		verify(nmCoreImpl.backboneRouter).
-			sendDataAsynch(eq(senderHID), eq(receiverHID), any(byte[].class));
+			sendDataAsynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class));
 		assertNotNull("Response should not be null", response);
 	}
 	
 	/**
-	 * Tests receiveDataSync else-case, which occurs if neither the receiverHID 
-	 * is null, nor does the identity manager contain the receiverHIDInfo object.
+	 * Tests receiveDataSync else-case, which occurs if neither the receiverVirtualAddress 
+	 * is null, nor does the identity manager contain the receiver registration object.
 	 */
 	@Test
 	public void  testReceiveDataSync() {
@@ -135,7 +132,7 @@ public class NetworkManagerCoreImplTest {
 		
 		
 		// Call the method in test
-		NMResponse response = nmCoreImpl.receiveDataSynch(senderHID, receiverHID, rawData);
+		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, receiverVirtualAddress, rawData);
 		
 		// Check if the response is as expected
 		assertEquals("The response was not successful.",  
@@ -147,11 +144,11 @@ public class NetworkManagerCoreImplTest {
 	 */
 	@Test
 	public void  testReceiveDataSyncUnsuccessful() {
-		HIDInfo receiverHIDInfo = new HIDInfo(receiverHID, new Part[]{});
-		Set<HIDInfo> infos = new HashSet<HIDInfo>();
-		infos.add(receiverHIDInfo);
+		Registration receiverRegistration = new Registration(receiverVirtualAddress, new Part[]{});
+		Set<Registration> infos = new HashSet<Registration>();
+		infos.add(receiverRegistration);
 		
-		when(nmCoreImpl.identityManager.getLocalHIDs()).
+		when(nmCoreImpl.identityManager.getLocalServices()).
 			thenReturn(infos);
 		
 		byte rawData[] = null;
@@ -163,7 +160,7 @@ public class NetworkManagerCoreImplTest {
 		}
 		
 		// Call the method in test
-		NMResponse response = nmCoreImpl.receiveDataSynch(senderHID, receiverHID, rawData);
+		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, receiverVirtualAddress, rawData);
 		
 		// Check if the response is as expected
 		assertEquals("The request should not be successful.",  
@@ -181,10 +178,10 @@ public class NetworkManagerCoreImplTest {
 		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
 		Connection connection = mock(Connection.class);
 		try {
-			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderHID))).
+			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress))).
 				thenReturn(connection);
-			when(connection.processData(eq(senderHID), any(HID.class), any(byte[].class))).
-				thenReturn(new Message(topic, senderHID, null, data));
+			when(connection.processData(eq(senderVirtualAddress), any(VirtualAddress.class), any(byte[].class))).
+				thenReturn(new Message(topic, senderVirtualAddress, null, data));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception occured " +e);
@@ -199,7 +196,7 @@ public class NetworkManagerCoreImplTest {
 		}
 		
 		// Call the method in test
-		NMResponse response = nmCoreImpl.receiveDataSynch(senderHID, null, rawData);
+		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, null, rawData);
 		
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
@@ -208,7 +205,7 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests receiveDataSync with broadcasting message as there is no receiver HID
+	 * Tests receiveDataSync with broadcasting message as there is no receiver VirtualAddress
 	 */
 	@Test
 	public void  testReceiveDataSyncBroadcast() {
@@ -223,7 +220,7 @@ public class NetworkManagerCoreImplTest {
 		}
 		
 		// Call the method in test
-		NMResponse response = nmCoreImpl.receiveDataSynch(senderHID, null, rawData);
+		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, null, rawData);
 		
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
@@ -231,7 +228,7 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests receiveData with broadcasting message as there is no receiver HID
+	 * Tests receiveData with broadcasting message as there is no receiver VirtualAddress
 	 */
 	@Test
 	public void  testReceiveDataAsyncBroadcast() {
@@ -246,7 +243,7 @@ public class NetworkManagerCoreImplTest {
 		}
 		
 		// Call the method in test
-		NMResponse response = nmCoreImpl.receiveDataAsynch(senderHID, null, rawData);
+		NMResponse response = nmCoreImpl.receiveDataAsynch(senderVirtualAddress, null, rawData);
 		
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
@@ -254,7 +251,7 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests receiveData with broadcasting message as there is no receiver HID
+	 * Tests receiveData with broadcasting message as there is no receiver VirtualAddress
 	 * and with an empty return message
 	 */
 	@Test
@@ -270,7 +267,7 @@ public class NetworkManagerCoreImplTest {
 		}
 		
 		// Call the method in test
-		NMResponse response = nmCoreImpl.receiveDataAsynch(senderHID, null, rawData);
+		NMResponse response = nmCoreImpl.receiveDataAsynch(senderVirtualAddress, null, rawData);
 		
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
@@ -278,8 +275,8 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests receiveDataSync else-case, which occurs if neither the receiverHID 
-	 * is null, nor does the identity manager contain the receiverHIDInfo object.
+	 * Tests receiveDataSync else-case, which occurs if neither the receiverVirtualAddress 
+	 * is null, nor does the identity manager contain the receiverRegistration object.
 	 */
 	@Test
 	public void  testReceiveDataAsync() {
@@ -291,7 +288,7 @@ public class NetworkManagerCoreImplTest {
 			fail("Exception occurred: " + e);
 		}
 		// Call the method in test
-		NMResponse response = nmCoreImpl.receiveDataAsynch(senderHID, receiverHID, rawData);
+		NMResponse response = nmCoreImpl.receiveDataAsynch(senderVirtualAddress, receiverVirtualAddress, rawData);
 			
 		// Check if the response is as expected
 		assertEquals("The response was not successful.",  
@@ -308,10 +305,10 @@ public class NetworkManagerCoreImplTest {
 		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
 		Connection connection = mock(Connection.class);
 		try {
-			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderHID))).
+			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress))).
 				thenReturn(connection);
-			when(connection.processData(eq(senderHID), any(HID.class), any(byte[].class))).
-				thenReturn(new Message(topic, senderHID, null, data));
+			when(connection.processData(eq(senderVirtualAddress), any(VirtualAddress.class), any(byte[].class))).
+				thenReturn(new Message(topic, senderVirtualAddress, null, data));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception occured " +e);
@@ -326,7 +323,7 @@ public class NetworkManagerCoreImplTest {
 		}
 		
 		// Call the method in test
-		NMResponse response = nmCoreImpl.receiveDataSynch(senderHID, null, rawData);
+		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, null, rawData);
 		
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
@@ -335,90 +332,90 @@ public class NetworkManagerCoreImplTest {
 	}
 
 	/**
-	 * Tests that if addRemoteHID. the right backboneRouter-method is called
+	 * Tests that if addRemoteVirtualAddress. the right backboneRouter-method is called
 	 */
 	@Test
-	public void  testAddRemoteHID() {
-		HID remoteHID = new HID("354.453.111.323");
+	public void  testAddRemoteVirtualAddress() {
+		VirtualAddress remoteVirtualAddress = new VirtualAddress("354.453.111.323");
 		
-		nmCoreImpl.addRemoteHID(senderHID, remoteHID);
+		nmCoreImpl.addRemoteVirtualAddress(senderVirtualAddress, remoteVirtualAddress);
 		
-		verify(nmCoreImpl.backboneRouter).addRouteForRemoteHID(senderHID, remoteHID);
+		verify(nmCoreImpl.backboneRouter).addRouteForRemoteService(senderVirtualAddress, remoteVirtualAddress);
 	}
 	
 	/**
-	 * Tests getHIDByDescription
+	 * Tests getServiceByDescription
 	 */
 	@Test
-	public void testGetHIDByDescription() {
+	public void testGetServiceByDescription() {
 		String description = "description";
 		String query = ("(DESCRIPTION==description)");
 		
-		HIDInfo[] foundHIDInfos = nmCoreImpl.getHIDByDescription(description);
-		verify(nmCoreImpl.identityManager).getHIDByAttributes(new Part[]{
-				new Part(HIDAttribute.DESCRIPTION.name(), description)},
-				IdentityManager.HID_RESOLVE_TIMEOUT,
+		Registration[] foundServiceInfos = nmCoreImpl.getServiceByDescription(description);
+		verify(nmCoreImpl.identityManager).getServiceByAttributes(new Part[]{
+				new Part(ServiceAttribute.DESCRIPTION.name(), description)},
+				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false,
 				false);
 	}
 	
 	/**
-	 * Tests getHIDByPID
+	 * Tests getServiceByPID
 	 */
 	@Test
-	public void testGetHIDByPID() {
+	public void testGetServiceByPID() {
 		String PID = "Unique PID";
 		String query = ("(PID==Unique PID)");
-		HIDInfo[] infos = new HIDInfo[1];
-		infos[0] = new HIDInfo(new HID(), new Part[0]);
-		when(nmCoreImpl.identityManager.getHIDByAttributes(
-				new Part[]{new Part(HIDAttribute.PID.name(), PID)},
-				IdentityManager.HID_RESOLVE_TIMEOUT,
+		Registration[] infos = new Registration[1];
+		infos[0] = new Registration(new VirtualAddress(), new Part[0]);
+		when(nmCoreImpl.identityManager.getServiceByAttributes(
+				new Part[]{new Part(ServiceAttribute.PID.name(), PID)},
+				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false,
 				false)).thenReturn(infos);
 		
-		HIDInfo foundHIDInfo = nmCoreImpl.getHIDByPID(PID);
-		assertEquals(infos[0].getHid(), foundHIDInfo.getHid());
+		Registration foundServiceInfo = nmCoreImpl.getServiceByPID(PID);
+		assertEquals(infos[0].getVirtualAddress(), foundServiceInfo.getVirtualAddress());
 	}
 	
 	/**
-	 * Tests if there are more than one HIDInfo returned for getHIDByPID
+	 * Tests if there are more than one Registration returned for getServiceByPID
 	 */
 	@Test
-	public void testGetHIDByPIDWithExceptionSeveralHIDInfos() {
+	public void testGetServiceByPIDWithExceptionSeveralRegistrations() {
 		String PID = "Unique PID";
 		String query = ("(PID==Unique PID)");
 		
-		// Return more than one HID so that an exception is thrown
-		HIDInfo[] infos = new HIDInfo[2];
-		infos[0] = new HIDInfo(new HID(), new Part[0]);
-		infos[1] = new HIDInfo(new HID(), new Part[0]);
-		when(nmCoreImpl.identityManager.getHIDByAttributes(
-				new Part[]{new Part(HIDAttribute.PID.name(), PID)},
-				IdentityManager.HID_RESOLVE_TIMEOUT,
+		// Return more than one VirtualAddress so that an exception is thrown
+		Registration[] infos = new Registration[2];
+		infos[0] = new Registration(new VirtualAddress(), new Part[0]);
+		infos[1] = new Registration(new VirtualAddress(), new Part[0]);
+		when(nmCoreImpl.identityManager.getServiceByAttributes(
+				new Part[]{new Part(ServiceAttribute.PID.name(), PID)},
+				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false,
 				false)).thenReturn(infos);
 		
 		try {
-			nmCoreImpl.getHIDByPID(PID);
+			nmCoreImpl.getServiceByPID(PID);
 			// if we get here, there was no exception
-			fail("There should be an exception because more than one HID was " +
-					"returned which is not allowed for getHIDbyPID.");
+			fail("There should be an exception because more than one VirtualAddress was " +
+					"returned which is not allowed for getServiceByPID.");
 		} catch(RuntimeException e){
 			// Check if an exception with the right message was thrown
-			assertEquals("More than one hid found to passed PID", e.getMessage());
+			assertEquals("More than one Service found to passed PID", e.getMessage());
 		}
 	}
 	
 	/**
-	 * Tests if there was no PID given for getHIDByPID
+	 * Tests if there was no PID given for getServiceByPID
 	 */
 	@Test
-	public void testGetHIDByPIDWithExceptionNoPID() {
+	public void testGetServiceByPIDWithExceptionNoPID() {
 		String PID = "";
 		
 		try {
-			nmCoreImpl.getHIDByPID(PID);
+			nmCoreImpl.getServiceByPID(PID);
 			// if we get here, there was no exception
 			fail("There should be an exception because no PID was given.");
 		} catch(RuntimeException e){
@@ -426,31 +423,31 @@ public class NetworkManagerCoreImplTest {
 			assertEquals("PID not specificed", e.getMessage());
 		}
 		// Checks that method was not called
-		verify(nmCoreImpl.identityManager, times(0)).getHIDsByAttributes(any(String.class));
+		verify(nmCoreImpl.identityManager, times(0)).getServicesByAttributes(any(String.class));
 	}
 	
 	/**
-	 * Tests createHID and checks if a HIDInfo object is returned.
+	 * Tests registerService and checks if a Registration object is returned.
 	 */
 	@Test
-	public void testCreateHID() {
+	public void testRegisterService() {
 		String endpoint = "for test not important";
 		Part[] attributes = new Part[] { 
 				new Part("DESCRIPTION", "description"), 
 				new Part("PID", "Unique PID")};
 		String backboneName = "backbone1";
-		when(nmCoreImpl.identityManager.getHIDByAttributes(
+		when(nmCoreImpl.identityManager.getServiceByAttributes(
 				new Part[]{attributes[1]},
-				IdentityManager.HID_RESOLVE_TIMEOUT,
-				false, false)).thenReturn(new HIDInfo[0]);
-		when(nmCoreImpl.identityManager.createHIDForAttributes(attributes)).
-			thenReturn(new HIDInfo(new HID(), attributes));
+				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
+				false, false)).thenReturn(new Registration[0]);
+		when(nmCoreImpl.identityManager.createServiceByAttributes(attributes)).
+			thenReturn(new Registration(new VirtualAddress(), attributes));
 		
 		try {
 			// call the method in test
-			HIDInfo hid = nmCoreImpl.createHID(attributes, endpoint, backboneName);
+			Registration registration = nmCoreImpl.registerService(attributes, endpoint, backboneName);
 			// check that something was returned
-			assertNotNull(hid);
+			assertNotNull(registration);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			fail("Exception occured " + e);
@@ -458,30 +455,30 @@ public class NetworkManagerCoreImplTest {
 	}
 	
 	/**
-	 * Tests createHID, throws exception because PID already exists for another HID
+	 * Tests registerService, throws exception because PID already exists for another VirtualAddress
 	 */
 	@Test
-	public void testCreateHIDWithException() {
+	public void testRegisterServiceWithException() {
 		String endpoint = "for test not important";
 		String backboneName = "backbone1";
 		Part[] attributes = new Part[] { 
 				new Part("DESCRIPTION", "description"), 
 				new Part("PID", "Unique PID")};
 		
-		HIDInfo hidInfo = new HIDInfo(new HID(), attributes);
-		HIDInfo[] returnedHIDInfos = new HIDInfo[1];
-		returnedHIDInfos[0] = hidInfo;
+		Registration registration = new Registration(new VirtualAddress(), attributes);
+		Registration[] returnedRegistrations = new Registration[1];
+		returnedRegistrations[0] = registration;
 		
 		// "returning" that PID already exists
-		when(nmCoreImpl.identityManager.getHIDByAttributes(
+		when(nmCoreImpl.identityManager.getServiceByAttributes(
 				new Part[]{attributes[1]},
-				IdentityManager.HID_RESOLVE_TIMEOUT,
+				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false, false)).
-			thenReturn(returnedHIDInfos);
+			thenReturn(returnedRegistrations);
 		
 		try {
 			// call the method under test
-			nmCoreImpl.createHID(attributes, endpoint, backboneName);
+			nmCoreImpl.registerService(attributes, endpoint, backboneName);
 			// Should not reach this point
 			fail("An exception should have occured saying that the PID is already in use.");
 		} catch (RemoteException e) {
@@ -501,20 +498,20 @@ public class NetworkManagerCoreImplTest {
 	 * @throws Exception
 	 */
 	private byte[] getData() throws Exception {
-		Message message = new Message(topic, senderHID, receiverHID, data);
-		return new NOPConnection(senderHID, receiverHID).processMessage(message);
+		Message message = new Message(topic, senderVirtualAddress, receiverVirtualAddress, data);
+		return new NOPConnection(senderVirtualAddress, receiverVirtualAddress).processMessage(message);
 	}
 
 	private void mockForSucessfulReceiveData() {
 		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
 		Connection connection = mock(Connection.class);
 		try {
-			when(nmCoreImpl.connectionManager.getConnection(any(HID.class), any(HID.class))).
+			when(nmCoreImpl.connectionManager.getConnection(any(VirtualAddress.class), any(VirtualAddress.class))).
 				thenReturn(connection);
-			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderHID))).
+			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress))).
 				thenReturn(connection);
-			when(connection.processData(eq(senderHID), any(HID.class), any(byte[].class))).
-				thenReturn(new Message(topic, senderHID, senderHID, data));
+			when(connection.processData(eq(senderVirtualAddress), any(VirtualAddress.class), any(byte[].class))).
+				thenReturn(new Message(topic, senderVirtualAddress, senderVirtualAddress, data));
 			when(connection.processMessage(any(Message.class))).
 				thenReturn(data);
 		} catch (Exception e) {
