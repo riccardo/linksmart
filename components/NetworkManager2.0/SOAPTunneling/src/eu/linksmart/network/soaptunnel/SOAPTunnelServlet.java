@@ -35,10 +35,7 @@ package eu.linksmart.network.soaptunnel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.rmi.AccessException;
 import java.util.Enumeration;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServlet;
@@ -48,8 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import eu.linksmart.network.HID;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 
 /**
@@ -87,12 +84,12 @@ public class SOAPTunnelServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 	throws IOException {
 
-		// split path - path contains HIDs and maybe "wsdl" separated by "/"
+		// split path - path contains virtual addresses and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		String parts[] = path.split("/", 5);
-		// extract HIDs from path
-		HID sHid = (parts[1].contentEquals("0")) ? nmCore.getHID() : new HID(parts[1]);
-		HID rHid = new HID(parts[2]);
+		// extract virtual addresses from path
+		VirtualAddress sVirtualAddress = (parts[1].contentEquals("0")) ? nmCore.getService() : new VirtualAddress(parts[1]);
+		VirtualAddress rVirtualAddress = new VirtualAddress(parts[2]);
 
 		// build parameter string
 		StringBuilder queryBuilder = new StringBuilder();
@@ -128,7 +125,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 		requestBuilder.append(buildHeaders(request));
 
 		// send request to NetworkManagerCore
-		sendRequest(sHid, rHid, requestBuilder.toString(), response);
+		sendRequest(sVirtualAddress, rVirtualAddress, requestBuilder.toString(), response);
 
 	}
 
@@ -145,15 +142,15 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 	throws IOException {
-		// split path - path contains HIDs and maybe "wsdl" separated by "/"
+		// split path - path contains virtual addresses and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		StringTokenizer token = new StringTokenizer(path, "/");
 		if (token.countTokens() > 2) {
 			StringBuilder requestBuilder = new StringBuilder();
-			String sHID = token.nextToken();
-			HID senderHID = (sHID.contentEquals("0")) ? nmCore.getHID() : new HID(sHID);
-			HID receiverHID = new HID(token.nextToken());
-			// sessionID = new HID(token.nextToken());
+			String sVirtualAddress = token.nextToken();
+			VirtualAddress senderVirtualAddress = (sVirtualAddress.contentEquals("0")) ? nmCore.getService() : new VirtualAddress(sVirtualAddress);
+			VirtualAddress receiverVirtualAddress = new VirtualAddress(token.nextToken());
+			// sessionID = new VirtualAddress(token.nextToken());
 
 			// append headers and blank line for end of headers
 			requestBuilder.append(buildHeaders(request));
@@ -172,7 +169,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 			// send request to NetworkManagerCore
 			logger.debug("Sending soap request through tunnel");
-			sendRequest(senderHID, receiverHID, requestBuilder.toString(), response);
+			sendRequest(senderVirtualAddress, receiverVirtualAddress, requestBuilder.toString(), response);
 		}
 	}
 
@@ -196,15 +193,15 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 	/**
 	 * Sends a request via NetworkManagerCore and adds the response to the HttpServletResponse
-	 * @param senderHid the sender HID
-	 * @param receiverHid the receiver HID
+	 * @param senderVirtualAddress the sender VirtualAddress
+	 * @param receiverVirtualAddress the receiver VirtualAddress
 	 * @param requestString the request message, as a String
 	 * @param response the servlet response to add the response message to
 	 * @throws IOException
 	 */
-	private void sendRequest(HID senderHid, HID receiverHid, String requestString,
+	private void sendRequest(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, String requestString,
 			HttpServletResponse response) throws IOException {
-		NMResponse r = this.nmCore.sendData(senderHid, receiverHid, requestString.getBytes(), true);
+		NMResponse r = this.nmCore.sendData(senderVirtualAddress, receiverVirtualAddress, requestString.getBytes(), true);
 		if(r.getStatus() != NMResponse.STATUS_SUCCESS) {
 			throw new IOException(r.getMessage());
 		}
