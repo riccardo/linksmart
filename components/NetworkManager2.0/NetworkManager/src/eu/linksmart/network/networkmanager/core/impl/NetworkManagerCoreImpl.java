@@ -1,7 +1,5 @@
 package eu.linksmart.network.networkmanager.core.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,13 +12,13 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 
 import eu.linksmart.network.ErrorMessage;
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.HIDInfo;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.MessageProcessor;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.Registration;
+import eu.linksmart.network.ServiceAttribute;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.identity.IdentityManager;
@@ -29,9 +27,7 @@ import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.tools.GetNetworkManagerStatus;
-import eu.linksmart.tools.NetworkManagerApplicationStatus;
 import eu.linksmart.utils.Part;
-import eu.linksmart.utils.PartConverter;
 
 /*
  * Core implementation of NetworkManagerCore Interface
@@ -43,8 +39,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	protected BackboneRouter backboneRouter;
 	/** The used connection manager **/
 	protected ConnectionManager connectionManager = new ConnectionManager();
-	/** The HID of this NetworkManager and IdentityManager **/
-	protected HID myHID;
+	/** The VirtualAddress of this NetworkManager and IdentityManager **/
+	protected VirtualAddress myVirtualAddress;
 
 	protected String myDescription;
 
@@ -56,9 +52,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		+ NETWORK_MGR_CORE;
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
-	/** The name of the class implementing CryptoHID **/
-	private static String CRYPTO_HID_IMPLEMENTATION = "IdentityManagerCryptoImpl";
-	private static String BACKBONE_SOAP = "BackboneSOAPImpl";
 	private static String NETWORK_MGR_ENDPOINT = "http://localhost:8082/axis/services/NetworkManager";
 
 	/**
@@ -116,7 +109,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	}
 
 	/**
-	 * Initializes the component, i.e. creates own HID, and registers the NM
+	 * Initializes the component, i.e. creates own VirtualAddress, and registers the NM
 	 * status servlets.
 	 * 
 	 * @param context
@@ -127,32 +120,30 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
 		.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
-		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
+		Part[] attributes = { new Part(ServiceAttribute.DESCRIPTION.name(),
 				this.myDescription) };
 
-		// Create a local HID with SOAP Backbone for NetworkManager
+		// Create a local VirtualAddress with SOAP Backbone for NetworkManager
 		// TODO Make the Backbone a constant or enum somewhere. find another way
-		// to tell the BackboneRouter that my local network manager's HID has
+		// to tell the BackboneRouter that my local network manager's VirtualAddress has
 		// BackboneSOAPImpl.
 		try {
-			this.myHID = createHID(attributes, NETWORK_MGR_ENDPOINT,
+			this.myVirtualAddress = registerService(attributes, NETWORK_MGR_ENDPOINT,
 			"eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl")
-			.getHid();
+			.getVirtualAddress();
 		} catch (RemoteException e) {
 			LOG.error(
 					"PANIC - RemoteException thrown on local access of own method",
 					e);
 		}
-		connectionManager.setOwnerHID(myHID);
+		connectionManager.setOwnerVirtualAddress(myVirtualAddress);
 
 		// Init Servlets
 		// TODO implement servlet registration with HttpService in Declarative
 		// Services style
 		HttpService http = (HttpService) context.locateService("HttpService");
 		try {
-			http.registerServlet("/NetworkManagerStatus",
-					new NetworkManagerApplicationStatus(context, this,
-							identityManager, backboneRouter), null, null);
+			
 			http.registerServlet("/GetNetworkManagerStatus",
 					new GetNetworkManagerStatus(this, identityManager,
 							backboneRouter), null, null);
@@ -163,90 +154,90 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	}
 
 	@Override
-	public HID getHID() {
-		return this.myHID;
+	public VirtualAddress getService() {
+		return this.myVirtualAddress;
 	}
 
 	@Override
-	public HIDInfo createHID(Part[] attributes, String endpoint,
+	public Registration registerService(Part[] attributes, String endpoint,
 			String backboneName) throws RemoteException {
 
 		// PID should be unique, if the PID is already used, throw exception
 		for (Part attribute : attributes) {
 			if (attribute.getKey().equalsIgnoreCase("PID")) {
-				HIDInfo hidInfo = getHIDByPID(attribute.getValue());
-				if (hidInfo != null) {
+				Registration serviceInfo = getServiceByPID(attribute.getValue());
+				if (serviceInfo != null) {
 					throw new IllegalArgumentException(
 					"PID already in use. Please choose a different one.");
 				}
 			}
 		}
 
-		HIDInfo newHID = this.identityManager
-		.createHIDForAttributes(attributes);
-		if(newHID != null) {
+		Registration newRegistration = this.identityManager
+		.createServiceByAttributes(attributes);
+		if(newRegistration != null) {
 			List<SecurityProperty> properties = this.backboneRouter
 			.getBackboneSecurityProperties(backboneName);
 			if(properties != null) {
-				// register HID with backbone policies in connection manager
-				this.connectionManager.registerHIDPolicy(newHID.getHid(), properties);
+				// register VirtualAddress with backbone policies in connection manager
+				this.connectionManager.registerServicePolicy(newRegistration.getVirtualAddress(), properties);
 			}
 			// add route to selected backbone
-			this.backboneRouter.addRouteToBackbone(newHID.getHid(), backboneName,
+			this.backboneRouter.addRouteToBackbone(newRegistration.getVirtualAddress(), backboneName,
 					endpoint);
 		}
-		return newHID;
+		return newRegistration;
 	}
 
 	@Override
-	public NMResponse sendData(HID sender, HID receiver, byte[] data,
+	public NMResponse sendData(VirtualAddress sender, VirtualAddress receiver, byte[] data,
 			boolean synch) throws RemoteException {
 		return this.sendMessage(new Message(Message.TOPIC_APPLICATION, sender,
 				receiver, data), synch);
 	}
 
 	@Override
-	public boolean removeHID(HID hid) throws RemoteException {
-		Boolean hidRemoved = this.identityManager.removeHID(hid);
-		this.connectionManager.deleteHIDPolicy(hid);
-		this.backboneRouter.removeRoute(hid, null);
-		return hidRemoved;
+	public boolean removeService(VirtualAddress virtualAddress) throws RemoteException {
+		Boolean virtualAddressRemoved = this.identityManager.removeService(virtualAddress);
+		this.connectionManager.deleteServicePolicy(virtualAddress);
+		this.backboneRouter.removeRoute(virtualAddress, null);
+		return virtualAddressRemoved;
 	}
 
 	@Override
-	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID,
+	public NMResponse receiveDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
 			byte[] data) {
 		// open message only if it is for local entity or is broadcast
-		HIDInfo receiverHIDInfo = null;
-		if (receiverHID != null) {
-			receiverHIDInfo = identityManager.getHIDInfo(receiverHID);
+		Registration receiverRegistrationInfo = null;
+		if (receiverVirtualAddress != null) {
+			receiverRegistrationInfo = identityManager.getServiceInfo(receiverVirtualAddress);
 		}
-		if (receiverHID == null
-				|| (receiverHIDInfo != null && identityManager.getLocalHIDs()
-						.contains(receiverHIDInfo))) {
-			// get connection belonging to HIDs
+		if (receiverVirtualAddress == null
+				|| (receiverRegistrationInfo != null && identityManager.getLocalServices()
+						.contains(receiverRegistrationInfo))) {
+			// get connection belonging to services
 			Connection conn;
 			try {
-				if (receiverHID == null) {
+				if (receiverVirtualAddress == null) {
 					// broadcast message
-					conn = connectionManager.getBroadcastConnection(senderHID);
+					conn = connectionManager.getBroadcastConnection(senderVirtualAddress);
 				} else {
-					// to get proper connection use my HID
-					conn = connectionManager.getConnection(myHID, senderHID);
+					// to get proper connection use my VirtualAddress
+					conn = connectionManager.getConnection(myVirtualAddress, senderVirtualAddress);
 				}
 			} catch (Exception e) {
 				LOG.warn(
-						"Error getting connection for HIDs: "
-						+ senderHID.toString() + " " + myHID.toString(),
+						"Error getting connection for services: "
+						+ senderVirtualAddress.toString() + " " + myVirtualAddress.toString(),
 						e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
-				response.setMessage("Error getting connection for HIDs: "
-						+ senderHID.toString() + " " + myHID.toString());
+				response.setMessage("Error getting connection for services: "
+						+ senderVirtualAddress.toString() + " " + myVirtualAddress.toString());
 				return response;
 			}
 
-			Message msg = conn.processData(senderHID, receiverHID, data);
+			Message msg = conn.processData(senderVirtualAddress, receiverVirtualAddress, data);
 			String topic = msg.getTopic();
 			// go through MsgObservers for additional processing
 			List<MessageProcessor> observers = msgObservers.get(topic);
@@ -264,10 +255,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			if (msg != null && msg.getData() != null
 					&& msg.getData().length != 0) {
 				/*
-				 * check if message is not intended for host HID, if yes and it
+				 * check if message is not intended for host VirtualAddress, if yes and it
 				 * has not been processed drop it
 				 */
-				if (msg.getReceiverHID() == null) {
+				if (msg.getReceiverVirtualAddress() == null) {
 					LOG.warn("Received a message which has not been processed");
 					NMResponse response = new NMResponse();
 					response.setStatus(NMResponse.STATUS_ERROR);
@@ -275,16 +266,16 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					return response;
 				} else {
 					// if this is not the response first forward it
-					if (!msg.getReceiverHID().equals(senderHID)) {
+					if (!msg.getReceiverVirtualAddress().equals(senderVirtualAddress)) {
 						// forward over sendMessage method of this and return
 						// response
 						// here the response message should include a message
 						// object
-						msg = sendMessageSynch(msg, this.myHID,
-								msg.getReceiverHID()).getMessageObject();
+						msg = sendMessageSynch(msg, this.myVirtualAddress,
+								msg.getReceiverVirtualAddress()).getMessageObject();
 					}
 					NMResponse nmresp = new NMResponse();
-					if (msg != null && msg.getReceiverHID().equals(senderHID)) {
+					if (msg != null && msg.getReceiverVirtualAddress().equals(senderVirtualAddress)) {
 						// create response with connection and etc
 						nmresp.setStatus(NMResponse.STATUS_SUCCESS);
 						try {
@@ -307,44 +298,44 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				return response;
 			}
 		} else {
-			return backboneRouter.sendDataSynch(senderHID, receiverHID, data);
+			return backboneRouter.sendDataSynch(senderVirtualAddress, receiverVirtualAddress, data);
 		}
 	}
 
 	@Override
-	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID,
+	public NMResponse receiveDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
 			byte[] data) {
 		// open message only if it is for local entity or is broadcast
-		HIDInfo receiverHIDInfo = null;
-		if (receiverHID != null) {
-			receiverHIDInfo = identityManager.getHIDInfo(receiverHID);
+		Registration receiverRegistrationInfo = null;
+		if (receiverVirtualAddress != null) {
+			receiverRegistrationInfo = identityManager.getServiceInfo(receiverVirtualAddress);
 		}
-		if (receiverHID == null
-				|| (receiverHIDInfo != null && identityManager.getLocalHIDs()
-						.contains(receiverHIDInfo))) {
-			// get connection belonging to HIDs
+		if (receiverVirtualAddress == null
+				|| (receiverRegistrationInfo != null && identityManager.getLocalServices()
+						.contains(receiverRegistrationInfo))) {
+			// get connection belonging to services
 			Connection conn;
 			try {
-				if (receiverHID == null) {
+				if (receiverVirtualAddress == null) {
 					// broadcast message
-					conn = connectionManager.getBroadcastConnection(senderHID);
+					conn = connectionManager.getBroadcastConnection(senderVirtualAddress);
 				} else {
-					conn = connectionManager.getConnection(receiverHID,
-							senderHID);
+					conn = connectionManager.getConnection(receiverVirtualAddress,
+							senderVirtualAddress);
 				}
 			} catch (Exception e) {
 				LOG.warn(
-						"Error getting connection for HIDs: "
-						+ senderHID.toString() + " "
-						+ receiverHID.toString(), e);
+						"Error getting connection for services: "
+						+ senderVirtualAddress.toString() + " "
+						+ receiverVirtualAddress.toString(), e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
-				response.setMessage("Error getting connection for HIDs: "
-						+ senderHID.toString() + " " + receiverHID.toString());
+				response.setMessage("Error getting connection for services: "
+						+ senderVirtualAddress.toString() + " " + receiverVirtualAddress.toString());
 				return response;
 			}
 
-			Message msg = conn.processData(senderHID, receiverHID, data);
+			Message msg = conn.processData(senderVirtualAddress, receiverVirtualAddress, data);
 			String topic = msg.getTopic();
 			// go through MsgObservers for additional processing
 			List<MessageProcessor> observers = msgObservers.get(topic);
@@ -362,10 +353,11 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			if (msg != null && msg.getData() != null
 					&& msg.getData().length != 0) {
 				/*
-				 * check if message is not intended for host HID, if yes and it
+				 * check if message is not intended for host VirtualAddress, if yes and it
 				 * has not been processed drop it
 				 */
-				if (msg.getReceiverHID() == null) {
+				if (msg.getReceiverVirtualAddress() == null) {
+					//TODO #NM Mark remove or fix
 					// || msg.getReceiverHID().equals(this.myHID)) {
 					LOG.warn("Received a message which has not been processed");
 					NMResponse response = new NMResponse();
@@ -377,14 +369,14 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				 * send message over sendMessage method of this and return
 				 * response of it
 				 */
-				return sendMessageAsynch(msg, this.myHID, msg.getReceiverHID());
+				return sendMessageAsynch(msg, this.myVirtualAddress, msg.getReceiverVirtualAddress());
 			} else {
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_SUCCESS);
 				return response;
 			}
 		} else {
-			return backboneRouter.sendDataAsynch(senderHID, receiverHID, data);
+			return backboneRouter.sendDataAsynch(senderVirtualAddress, receiverVirtualAddress, data);
 		}
 	}
 
@@ -398,9 +390,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		this.myDescription = description;
 
 		Properties attributes = new Properties();
-		attributes.setProperty(HIDAttribute.DESCRIPTION.name(), description);
+		attributes.setProperty(ServiceAttribute.DESCRIPTION.name(), description);
 
-		this.identityManager.updateHIDInfo(this.myHID, attributes);
+		this.identityManager.updateServiceInfo(this.myVirtualAddress, attributes);
 
 	}
 
@@ -432,34 +424,34 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 	@Override
 	public NMResponse broadcastMessage(Message message) {
-		HID senderHID = message.getSenderHID();
+		VirtualAddress senderVirtualAddress = message.getSenderVirtualAddress();
 		byte[] data;
 		try {
-			data = this.connectionManager.getBroadcastConnection(senderHID)
+			data = this.connectionManager.getBroadcastConnection(senderVirtualAddress)
 			.processMessage(message);
 		} catch (Exception e) {
-			LOG.warn("Could not create packet from message from HID: "
-					+ message.getSenderHID(), e);
+			LOG.warn("Could not create packet from message from VirtualAddress: "
+					+ message.getSenderVirtualAddress(), e);
 			NMResponse response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_ERROR);
-			response.setMessage("Could not create packet from message from HID: "
-					+ message.getSenderHID());
+			response.setMessage("Could not create packet from message from VirtualAddress: "
+					+ message.getSenderVirtualAddress());
 			return response;
 		}
 		NMResponse response = this.backboneRouter
-		.broadcastData(senderHID, data);
+		.broadcastData(senderVirtualAddress, data);
 
 		return response;
 	}
 
 	@Override
 	public NMResponse sendMessage(Message message, boolean synch) {
-		HID senderHID = message.getSenderHID();
-		HID receiverHID = message.getReceiverHID();
+		VirtualAddress senderVirtualAddress = message.getSenderVirtualAddress();
+		VirtualAddress receiverVirtualAddress = message.getReceiverVirtualAddress();
 		if (synch)
-			return sendMessageSynch(message, senderHID, receiverHID);
+			return sendMessageSynch(message, senderVirtualAddress, receiverVirtualAddress);
 		else
-			return sendMessageAsynch(message, senderHID, receiverHID);
+			return sendMessageAsynch(message, senderVirtualAddress, receiverVirtualAddress);
 	}
 
 	/**
@@ -469,30 +461,30 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	 * 
 	 * @param message
 	 *            Message to send
-	 * @param senderHID
+	 * @param senderVirtualAddress
 	 *            Sender endpoint of connection to open
-	 * @param receiverHID
+	 * @param receiverVirtualAddress
 	 *            Receiver endpoint of connection to open
 	 * @return
 	 */
-	private NMResponse sendMessageAsynch(Message message, HID senderHID,
-			HID receiverHID) {
+	private NMResponse sendMessageAsynch(Message message, VirtualAddress senderVirtualAddress,
+			VirtualAddress receiverVirtualAddress) {
 		byte[] data = null;
 		try {
 			Connection connection = this.connectionManager.getConnection(
-					receiverHID, senderHID);
+					receiverVirtualAddress, senderVirtualAddress);
 			data = connection.processMessage(message);
 		} catch (Exception e) {
-			LOG.warn("Could not create packet from message from HID: "
-					+ message.getSenderHID());
+			LOG.warn("Could not create packet from message from VirtualAddress: "
+					+ message.getSenderVirtualAddress());
 			NMResponse response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_ERROR);
-			response.setMessage("Could not create packet from message from HID: "
-					+ message.getSenderHID());
+			response.setMessage("Could not create packet from message from VirtualAddress: "
+					+ message.getSenderVirtualAddress());
 			return response;
 		}
-		NMResponse response = this.backboneRouter.sendDataAsynch(senderHID,
-				receiverHID, data);
+		NMResponse response = this.backboneRouter.sendDataAsynch(senderVirtualAddress,
+				receiverVirtualAddress, data);
 
 		return response;
 	}
@@ -504,42 +496,42 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	 * 
 	 * @param message
 	 *            Message to send
-	 * @param senderHID
+	 * @param senderVirtualAddress
 	 *            Sender endpoint of connection to open
-	 * @param receiverHID
+	 * @param receiverVirtualAddress
 	 *            Receiver endpoint of connection to open
 	 * @return
 	 */
-	private NMResponse sendMessageSynch(Message message, HID senderHID,
-			HID receiverHID) {
+	private NMResponse sendMessageSynch(Message message, VirtualAddress senderVirtualAddress,
+			VirtualAddress receiverVirtualAddress) {
 		byte[] data = null;
 		NMResponse response = new NMResponse();
 		Message tempMessage = message;
 
 		try {
 			Connection connection = this.connectionManager.getConnection(
-					receiverHID, senderHID);
+					receiverVirtualAddress, senderVirtualAddress);
 
 			// process outgoing message
 			data = connection.processMessage(tempMessage);
-			response = this.backboneRouter.sendDataSynch(senderHID,
-					receiverHID, data);
+			response = this.backboneRouter.sendDataSynch(senderVirtualAddress,
+					receiverVirtualAddress, data);
 			if(response.getStatus() == NMResponse.STATUS_SUCCESS) {
 				// process response message with logical endpoints in connection
 				// with physical endpoints
-				tempMessage = connection.processData(message.getReceiverHID(),
-						message.getSenderHID(), response.getMessage().getBytes());
+				tempMessage = connection.processData(message.getReceiverVirtualAddress(),
+						message.getSenderVirtualAddress(), response.getMessage().getBytes());
 				// repeat sending and receiving until security protocol is over
 				while (tempMessage != null
 						&& tempMessage
 						.getTopic()
 						.contentEquals(
 								CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
-					response = this.backboneRouter.sendDataSynch(senderHID,
-							receiverHID, connection.processMessage(tempMessage));
+					response = this.backboneRouter.sendDataSynch(senderVirtualAddress,
+							receiverVirtualAddress, connection.processMessage(tempMessage));
 					if(response.getStatus() == NMResponse.STATUS_SUCCESS) {
-						tempMessage = connection.processData(message.getReceiverHID(),
-								message.getSenderHID(), response.getMessage()
+						tempMessage = connection.processData(message.getReceiverVirtualAddress(),
+								message.getSenderVirtualAddress(), response.getMessage()
 								.getBytes());
 					} else {
 						return response;
@@ -549,8 +541,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				return response;
 			}
 		} catch (Exception e) {
-			LOG.warn("Error while sending message from HID "
-					+ message.getSenderHID() + "to HID: " + message.getReceiverHID());
+			LOG.warn("Error while sending message from VirtualAddress "
+					+ message.getSenderVirtualAddress() + "to VirtualAddress: " + message.getReceiverVirtualAddress());
 			response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_ERROR);
 			response.setMessage("Error while sending message: " + e.getMessage());
@@ -576,102 +568,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		this.connectionManager.setConnectionTimeout(timeout);
 	}
 
-	/**
-	 * Operation to create an crypto HID providing the persistent attributes for
-	 * this HID and the endpoint of the service behind it (for service
-	 * invocation). The crypto HID is the enhanced version of HIDs, that allow
-	 * to store persistent information on them (through certificates) and
-	 * doesn't propagate the information stored on it. In order to exchange the
-	 * stored information, the Session Domain Protocol is used. It returns a
-	 * certificate reference that point to the certificate generated. The next
-	 * time the HID needs to be created, using the same attributes, the
-	 * certificate reference can be used.
-	 * 
-	 * @param xmlAttributes
-	 *            The attributes (persistent) associated with this HID. This
-	 *            attributes are stored inside the certificate and follow the
-	 *            Java {@link java.util.Properties} xml schema.
-	 * @param endpoint
-	 *            The endpoint of the service (if there is a service behind).
-	 * @return A {@link eu.linksmart.network.ws.CrypyoHIDResult} containing
-	 *         {@link String} representation of the HID and the certificate
-	 *         reference (UUID) Null if no CryptoHID implementation referenced
-	 */
-	@Override
-	public HIDInfo createCryptoHID(String xmlAttributes, String endpoint) {
-		/*
-		 * as the method is implementation specific we have to check whether the
-		 * appropriate implementation class is referenced
-		 */
-
-		if (!identityManager.getIdentifier().contentEquals(
-				CRYPTO_HID_IMPLEMENTATION)) {
-			return null;
-		}
-		HID hid = null;
-		Properties attributes = new Properties();
-		try {
-			attributes.loadFromXML(new ByteArrayInputStream(xmlAttributes
-					.getBytes()));
-		} catch (IOException e) {
-			LOG.error("Cannot parse attributes!", e);
-			return null;
-		}
-		Part[] newAttributes = PartConverter.fromProperties(attributes);
-		hid = identityManager.createHIDForAttributes(newAttributes).getHid();
-
-		// add it to backbonesoap as this method is deprecated anyway
-		List<SecurityProperty> properties = this.backboneRouter
-		.getBackboneSecurityProperties(BACKBONE_SOAP);
-		if(properties != null) {
-			// register HID with backbone policies in connection manager
-			this.connectionManager.registerHIDPolicy(hid, properties);
-		}
-		// add route to selected backbone
-		this.backboneRouter.addRouteToBackbone(hid, BACKBONE_SOAP, endpoint);
-
-		return identityManager.getHIDInfo(hid);
-	}
-
-	/**
-	 * Operation to create an crypto HID providing a certificate reference (from
-	 * a previously created cryptoHID) and an endpoint The crypto HID is the
-	 * enhanced version of HIDs, that allow to store persistent information on
-	 * them (through certificates)
-	 * 
-	 * @param certRef
-	 *            The certificate reference from a previously generated
-	 *            cryptoHID.
-	 * @param endpoint
-	 *            The endpoint of the service (if there is a service behind).
-	 * @return The {@link String} representation of the HID.
-	 */
-	@Override
-	public HIDInfo createCryptoHIDFromReference(String certRef, String endpoint) {
-		/*
-		 * as the method is implementation specific we have to check whether the
-		 * appropriate implementation class is referenced
-		 */
-		if (!identityManager.getIdentifier().contentEquals(
-				CRYPTO_HID_IMPLEMENTATION)) {
-			return null;
-		}
-		Part[] attributes = { new Part(HIDAttribute.CERT_REF.name(), certRef) };
-		HID hid = identityManager.createHIDForAttributes(attributes).getHid();
-
-		// add it to backbonesoap as this method is deprecated anyway
-		List<SecurityProperty> properties = this.backboneRouter
-		.getBackboneSecurityProperties(BACKBONE_SOAP);
-		if(properties != null) {
-			// register HID with backbone policies in connection manager
-			this.connectionManager.registerHIDPolicy(hid, properties);
-		}
-		// add route to selected backbone
-		this.backboneRouter.addRouteToBackbone(hid, BACKBONE_SOAP, endpoint);
-
-		return identityManager.getHIDInfo(hid);
-	}
-
 	@Override
 	public String[] getAvailableBackbones() {
 		List<String> backbones = this.backboneRouter.getAvailableBackbones();
@@ -680,64 +576,64 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	}
 
 	@Override
-	public void addRemoteHID(HID senderHID, HID remoteHID) {
-		this.backboneRouter.addRouteForRemoteHID(senderHID, remoteHID);
+	public void addRemoteVirtualAddress(VirtualAddress senderVirtualAddress, VirtualAddress remoteVirtualAddress) {
+		this.backboneRouter.addRouteForRemoteService(senderVirtualAddress, remoteVirtualAddress);
 	}
 
 	@Override
-	public HIDInfo[] getHIDByDescription(String description) {
+	public Registration[] getServiceByDescription(String description) {
 
-		Part part_description = new Part(HIDAttribute.DESCRIPTION.name(),
+		Part part_description = new Part(ServiceAttribute.DESCRIPTION.name(),
 				description);
 
-		return getHIDByAttributes(new Part[] { part_description });
+		return getServiceByAttributes(new Part[] { part_description });
 	}
 
 	@Override
-	public HIDInfo getHIDByPID(String PID) throws IllegalArgumentException {
+	public Registration getServiceByPID(String PID) throws IllegalArgumentException {
 		if (PID == null || PID.length() == 0) {
 			throw new IllegalArgumentException("PID not specificed");
 		}
 
-		Part part_description = new Part(HIDAttribute.PID.name(), PID);
+		Part part_description = new Part(ServiceAttribute.PID.name(), PID);
 
-		HIDInfo[] hids = getHIDByAttributes(new Part[] { part_description });
+		Registration[] registrations = getServiceByAttributes(new Part[] { part_description });
 
-		if (hids.length > 1) {
-			throw new RuntimeException("More than one hid found to passed PID");
-		} else if (hids.length == 1) {
-			return hids[0];
+		if (registrations.length > 1) {
+			throw new RuntimeException("More than one service registration found to passed PID");
+		} else if (registrations.length == 1) {
+			return registrations[0];
 		} else
 			return null;
 	}
 
 	@Override
-	public HIDInfo[] getHIDByAttributes(Part[] attributes) {
-		return identityManager.getHIDByAttributes(
+	public Registration[] getServiceByAttributes(Part[] attributes) {
+		return identityManager.getServiceByAttributes(
 				attributes,
-				IdentityManager.HID_RESOLVE_TIMEOUT,
+				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false,
 				false);
 	}
 
 	@Override
-	public HIDInfo[] getHIDByQuery(String query) {
-		return identityManager.getHIDsByAttributes(query);
+	public Registration[] getServiceByQuery(String query) {
+		return identityManager.getServicesByAttributes(query);
 	}
 
 	@Override
-	public HIDInfo[] getHIDByAttributes(Part[] attributes, long timeOut,
+	public Registration[] getServiceByAttributes(Part[] attributes, long timeOut,
 			boolean returnFirst, boolean isStrictRequest) {
-		return identityManager.getHIDByAttributes(
+		return identityManager.getServiceByAttributes(
 				attributes, timeOut, returnFirst, isStrictRequest);
 	}
 
 	@Override
-	public void updateSecurityProperties(List<HID> hidsToUpdate,
+	public void updateSecurityProperties(List<VirtualAddress> virtualAddressesToUpdate,
 			List<SecurityProperty> properties) {
-		for(HID hid : hidsToUpdate) {
-			// register HID with backbone policies in connection manager
-			this.connectionManager.registerHIDPolicy(hid, properties);
+		for(VirtualAddress virtualAddress : virtualAddressesToUpdate) {
+			// register VirtualAddress with backbone policies in connection manager
+			this.connectionManager.registerServicePolicy(virtualAddress, properties);
 		}
 
 	}

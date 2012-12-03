@@ -9,14 +9,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.SecurityProperty;
 
 /**
- * Manages and creates connections between two HIDs.
+ * Manages and creates connections between two services.
  * @author Vinkovits
  *
  */
@@ -38,10 +37,10 @@ public class ConnectionManager {
 	 */
 	private Timer timer = null;
 	/**
-	 * Required properties stored by HID. These {@link SecurityProperty} have to
-	 * be provided by {@link Connection} between these HIDs.
+	 * Required properties stored by VirtualAddress. These {@link SecurityProperty} have to
+	 * be provided by {@link Connection} between these services.
 	 */
-	private HashMap<HID, List<SecurityProperty>> hidPolicies = new HashMap<HID, List<SecurityProperty>>();
+	private HashMap<VirtualAddress, List<SecurityProperty>> servicePolicies = new HashMap<VirtualAddress, List<SecurityProperty>>();
 	/**
 	 * List of available managers to use for connection protection.
 	 */
@@ -53,7 +52,7 @@ public class ConnectionManager {
 	 */
 	private Object policyModificationLock = new Object();
 
-	private HID nmHID = null;;
+	private VirtualAddress nmVirtualAddress = null;;
 
 
 	public ConnectionManager(){
@@ -71,19 +70,19 @@ public class ConnectionManager {
 	}
 
 	/**
-	 * Saves this HID to always use a specific configuration.
+	 * Saves this VirtualAddress to always use a specific configuration.
 	 * This includes for example type of security to use.
-	 * @param regulatedHID 
+	 * @param regulatedVirtualAddress 
 	 */
-	public void registerHIDPolicy(HID regulatedHID, List<SecurityProperty> properties){
+	public void registerServicePolicy(VirtualAddress regulatedVirtualAddress, List<SecurityProperty> properties){
 		synchronized(policyModificationLock){
-			/*remove all connections which have this hid*/
+			/*remove all connections which have this virtual address*/
 			List<Connection> toRemove = new ArrayList<Connection>();
 			//find the relevant connections
 			for(Connection con : connections) {
-				if(con.getServerHID().equals(regulatedHID) 
+				if(con.getServerVirtualAddress().equals(regulatedVirtualAddress) 
 						|| (!(con instanceof BroadcastConnection) 
-								&& con.getServerHID().equals(regulatedHID))) {
+								&& con.getServerVirtualAddress().equals(regulatedVirtualAddress))) {
 					toRemove.add(con);
 				}
 			}
@@ -94,43 +93,43 @@ public class ConnectionManager {
 				}
 			}
 			//add new policy
-			this.hidPolicies.put(regulatedHID, properties);
+			this.servicePolicies.put(regulatedVirtualAddress, properties);
 		}
 	}
 
 	/**
-	 * Removes the HID's policy. After this call the HID
+	 * Removes the VirtualAddress's policy. After this call the VirtualAddress
 	 * will always be handled with the default settings.
-	 * @param regulatedHID
+	 * @param regulatedVirtualAddress
 	 */
-	public void deleteHIDPolicy(HID regulatedHID){
-		this.hidPolicies.remove(regulatedHID);
+	public void deleteServicePolicy(VirtualAddress regulatedVirtualAddress){
+		this.servicePolicies.remove(regulatedVirtualAddress);
 	}
 
 	/**
 	 * Returns {@link Connection} object associated to two entities.
 	 * Creates new if there exists none yet.
-	 * @param receiverHID physical endpoint of connection
-	 * @param senderHID physical endpoint of connection
+	 * @param receiverVirtualAddress physical endpoint of connection
+	 * @param senderVirtualAddress physical endpoint of connection
 	 * @return Connection to use for processing of communication
-	 * @throws Exception If there are policies for an HID but no CommunicationSecurityManager
+	 * @throws Exception If there are policies for an VirtualAddress but no CommunicationSecurityManager
 	 */
-	public synchronized Connection getConnection(HID receiverHID, HID senderHID) throws Exception{
+	public synchronized Connection getConnection(VirtualAddress receiverVirtualAddress, VirtualAddress senderVirtualAddress) throws Exception{
 		Calendar cal = Calendar.getInstance();
-		//find connection belonging to these HIDs
+		//find connection belonging to these services
 		for(Connection c : connections){
 			if(!(c instanceof BroadcastConnection) &&
-					((c.getClientHID().equals(receiverHID) && c.getServerHID().equals(senderHID))
-							|| (c.getClientHID().equals(senderHID) && c.getServerHID().equals(receiverHID)))){
+					((c.getClientVirtualAddress().equals(receiverVirtualAddress) && c.getServerVirtualAddress().equals(senderVirtualAddress))
+							|| (c.getClientVirtualAddress().equals(senderVirtualAddress) && c.getServerVirtualAddress().equals(receiverVirtualAddress)))){
 				//set last use date of connection
 				timeouts.put(c, cal.getTime());
 				return c;
 			}
 		}
 
-		if(receiverHID.equals(senderHID)){
+		if(receiverVirtualAddress.equals(senderVirtualAddress)){
 			//add nopconnection to list as this is a reflection message
-			Connection conn = new NOPConnection(senderHID, receiverHID);
+			Connection conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
 			connections.add(conn);
 			timeouts.put(conn, cal.getTime());
 		}
@@ -140,13 +139,13 @@ public class ConnectionManager {
 			//there was no connection found so create new connection
 			//policies only apply for connections between this NM and other entity
 			List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
-			if(receiverHID.equals(nmHID) || senderHID.equals(nmHID)) {
-				//get hid of remote entity
-				HID remoteHID = nmHID.equals(receiverHID)? senderHID : receiverHID;
-				//check if there are policies for the HID
-				if(this.hidPolicies.containsKey(remoteHID)){
+			if(receiverVirtualAddress.equals(nmVirtualAddress) || senderVirtualAddress.equals(nmVirtualAddress)) {
+				//get virtual address of remote entity
+				VirtualAddress remoteVirtualAddress = nmVirtualAddress.equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
+				//check if there are policies for the VirtualAddress
+				if(this.servicePolicies.containsKey(remoteVirtualAddress)){
 					//add policies to requirement list
-					policies = hidPolicies.get(remoteHID);
+					policies = servicePolicies.get(remoteVirtualAddress);
 				}
 
 				//check if requirements are not colliding
@@ -155,7 +154,7 @@ public class ConnectionManager {
 				boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
 				//if there are more requirements and noEnc or noSec is included it must be colliding
 				if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
-					throw new Exception("Colliding policies for HIDs");
+					throw new Exception("Colliding policies for services");
 				}
 			}
 
@@ -163,9 +162,9 @@ public class ConnectionManager {
 			//check if an active connection or a dummy connectin is needed
 			Connection conn = null;
 			if(policies.contains(SecurityProperty.NoEncoding)) {
-				conn = new NOPConnection(senderHID, receiverHID);
+				conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
 			} else {
-				conn = new Connection(senderHID, receiverHID);
+				conn = new Connection(senderVirtualAddress, receiverVirtualAddress);
 			}
 
 			boolean foundComSecMgr = false;
@@ -195,15 +194,15 @@ public class ConnectionManager {
 	/**
 	 * Returns the {@Connection} which does general processing for
 	 * broadcast messages.
-	 * @param senderHID Sender of the message
+	 * @param senderVirtualAddress Sender of the message
 	 * @return Connection to be used for getting the contents of the received data
-	 * @throws Exception If there are policies for an HID but no CommunicationSecurityManager
+	 * @throws Exception If there are policies for an VirtualAddress but no CommunicationSecurityManager
 	 */
-	public synchronized Connection getBroadcastConnection(HID senderHID) throws Exception {
+	public synchronized Connection getBroadcastConnection(VirtualAddress senderVirtualAddress) throws Exception {
 		Calendar cal = Calendar.getInstance();
-		//find connection belonging to this HID
+		//find connection belonging to this VirtualAddress
 		for(Connection c : connections){
-			if(c.getServerHID().equals(senderHID) && c instanceof BroadcastConnection) {
+			if(c.getServerVirtualAddress().equals(senderVirtualAddress) && c instanceof BroadcastConnection) {
 				//set last use date of connection
 				timeouts.put(c, cal.getTime());
 				return c;
@@ -214,15 +213,15 @@ public class ConnectionManager {
 
 		//there was no connection found so create new connection	
 		List<SecurityProperty> policies = null;
-		if(!senderHID.equals(nmHID)) {
-			policies = this.hidPolicies.get(senderHID);
+		if(!senderVirtualAddress.equals(nmVirtualAddress)) {
+			policies = this.servicePolicies.get(senderVirtualAddress);
 		}
 		//check if an active connection or a dummy connection is needed
 		BroadcastConnection conn = null;
 		if(policies != null && policies.contains(SecurityProperty.NoEncoding)) {
-			conn = new NOPBroadcastConnection(senderHID);
+			conn = new NOPBroadcastConnection(senderVirtualAddress);
 		} else {
-			conn = new BroadcastConnection(senderHID);
+			conn = new BroadcastConnection(senderVirtualAddress);
 		}
 
 		boolean foundComSecMgr = false;
@@ -261,8 +260,8 @@ public class ConnectionManager {
 		timer.schedule(new ConnectionClearer(), 0, timeoutMinutes * 60 * 1000 / 2);
 	}
 
-	public void setOwnerHID(HID hid) {
-		nmHID  = hid;
+	public void setOwnerVirtualAddress(VirtualAddress virtualAddress) {
+		nmVirtualAddress  = virtualAddress;
 	}
 
 	/**

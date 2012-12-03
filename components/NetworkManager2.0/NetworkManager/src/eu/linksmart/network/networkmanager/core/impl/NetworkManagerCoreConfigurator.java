@@ -97,14 +97,6 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 					(String)updates.get(NetworkManagerCoreConfigurator.CONNECTION_TIMEOUT)));
 		}
 		
-//				TODO #NM Mark & Amro check certificate issue
-//				|| (updates.containsKey(NetworkManagerCoreConfigurator.CERTIFICATE_REF)
-//					&& updates.get(NetworkManagerCoreConfigurator.CERTIFICATE_REF).equals(""))) {
-//			
-//			hidManager.setJXTAID(peerID, myHID, (String) networkManagerCoreImpl.getConfiguration().get(
-//				NetworkManagerCoreConfigurator.NM_DESCRIPTION), "http://localhost:" 
-//					+ OSGI_SERVICE_HTTP_PORT + servicePath,
-//					myIP, OSGI_SERVICE_HTTP_PORT, true);
 	}
 
 }

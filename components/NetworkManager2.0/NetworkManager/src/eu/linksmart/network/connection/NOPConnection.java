@@ -1,6 +1,6 @@
 package eu.linksmart.network.connection;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.Message;
 
 /**
@@ -10,16 +10,16 @@ import eu.linksmart.network.Message;
  */
 public class NOPConnection extends Connection {
 
-	public NOPConnection(HID clientHID, HID serverHID) {
-		super(clientHID, serverHID);
+	public NOPConnection(VirtualAddress clientVirtualAddress, VirtualAddress serverVirtualAddress) {
+		super(clientVirtualAddress, serverVirtualAddress);
 	}
 	
 	public byte[] processMessage(Message msg) throws Exception{
 		return msg.getData();
 	}
 	
-	public Message processData(HID senderHID, HID receiverHID, byte[] data){
-		return new Message(Message.TOPIC_APPLICATION, senderHID, receiverHID, data);
+	public Message processData(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data){
+		return new Message(Message.TOPIC_APPLICATION, senderVirtualAddress, receiverVirtualAddress, data);
 	}
 
 }

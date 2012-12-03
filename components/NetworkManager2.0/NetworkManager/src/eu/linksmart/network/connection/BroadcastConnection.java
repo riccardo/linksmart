@@ -1,19 +1,18 @@
 package eu.linksmart.network.connection;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.SecurityProtocol;
 
 public class BroadcastConnection extends Connection {
 
-	private Map<HID, SecurityProtocol> broadcastSecProtocols = new ConcurrentHashMap<HID, SecurityProtocol>();
+	private Map<VirtualAddress, SecurityProtocol> broadcastSecProtocols = new ConcurrentHashMap<VirtualAddress, SecurityProtocol>();
 
-	public BroadcastConnection(HID serverHID) {
-		super(serverHID);
+	public BroadcastConnection(VirtualAddress serverVirtualAddress) {
+		super(serverVirtualAddress);
 	}
 
 	protected void setCommunicationSecMgr(
@@ -26,15 +25,15 @@ public class BroadcastConnection extends Connection {
 	}
 
 	@Override
-	protected SecurityProtocol getSecurityProtocol(HID senderHID,
-			HID receiverHID) {
+	protected SecurityProtocol getSecurityProtocol(VirtualAddress senderVirtualAddress,
+			VirtualAddress receiverVirtualAddress) {
 		if(comSecMgr != null) {
-			//in broadcast connection receiverHID will always be null
-			if(broadcastSecProtocols.containsKey(senderHID)) {
-				return broadcastSecProtocols.get(senderHID);
+			//in broadcast connection receiverVirtualAddress will always be null
+			if(broadcastSecProtocols.containsKey(senderVirtualAddress)) {
+				return broadcastSecProtocols.get(senderVirtualAddress);
 			} else {
-				SecurityProtocol secProt = comSecMgr.getBroadcastSecurityProtocol(senderHID);
-				broadcastSecProtocols.put(senderHID, secProt);
+				SecurityProtocol secProt = comSecMgr.getBroadcastSecurityProtocol(senderVirtualAddress);
+				broadcastSecProtocols.put(senderVirtualAddress, secProt);
 				return secProt;
 			}
 		} else {

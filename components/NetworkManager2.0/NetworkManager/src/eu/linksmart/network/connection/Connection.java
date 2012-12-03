@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 
 import eu.linksmart.network.ErrorMessage;
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.Message;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.CryptoException;
@@ -21,7 +21,7 @@ import eu.linksmart.security.communication.VerificationFailureException;
 import eu.linksmart.utils.Base64;
 
 /**
- * Holds properties and objects relevant for a connection between two HIDs.
+ * Holds properties and objects relevant for a connection between two services.
  * 
  * @author Vinkovits
  * 
@@ -44,40 +44,40 @@ public class Connection {
 	/**
 	 * {@link SecurityProtocol} used to protect and unprotect messages
 	 */
-	protected Map<HIDTuple, SecurityProtocol> securityProtocols = new ConcurrentHashMap<Connection.HIDTuple, SecurityProtocol>();
+	protected Map<VirtualAddressTuple, SecurityProtocol> securityProtocols = new ConcurrentHashMap<Connection.VirtualAddressTuple, SecurityProtocol>();
 	/**
 	 * The initiator of this communication
 	 */
-	private HID clientHID = null;
+	private VirtualAddress clientVirtualAddress = null;
 	/**
 	 * The called entity of this communication
 	 */
-	private HID serverHID = null;
+	private VirtualAddress serverVirtualAddress = null;
 	protected CommunicationSecurityManager comSecMgr;
 
-	protected Connection(HID serverHID) {
-		if (serverHID == null) {
+	protected Connection(VirtualAddress serverVirtualAddress) {
+		if (serverVirtualAddress == null) {
 			throw new IllegalArgumentException(
 			"Cannot set null for required fields.");
 		}
-		this.serverHID = serverHID;
+		this.serverVirtualAddress = serverVirtualAddress;
 	}
 
-	public Connection(HID clientHID, HID serverHID) {
-		if (clientHID == null || serverHID == null) {
+	public Connection(VirtualAddress clientVirtualAddress, VirtualAddress serverVirtualAddress) {
+		if (clientVirtualAddress == null || serverVirtualAddress == null) {
 			throw new IllegalArgumentException(
 			"Cannot set null for required fields.");
 		}
-		this.clientHID = clientHID;
-		this.serverHID = serverHID;
+		this.clientVirtualAddress = clientVirtualAddress;
+		this.serverVirtualAddress = serverVirtualAddress;
 	}
 
-	public HID getClientHID() {
-		return clientHID;
+	public VirtualAddress getClientVirtualAddress() {
+		return clientVirtualAddress;
 	}
 
-	public HID getServerHID() {
-		return serverHID;
+	public VirtualAddress getServerVirtualAddress() {
+		return serverVirtualAddress;
 	}
 
 	/**
@@ -94,36 +94,36 @@ public class Connection {
 
 	/**
 	 * Creates a Message object for received data.
-	 * @param senderHID logical endpoint of message
-	 * @param receiverHID logical endpoint of message
+	 * @param senderVirtualAddress logical endpoint of message
+	 * @param receiverVirtualAddress logical endpoint of message
 	 * @param data
 	 *            Data received over network
 	 * @return Message object for further processing
 	 */
-	public Message processData(HID senderHID, HID receiverHID, byte[] data) {
-		SecurityProtocol securityProtocol = getSecurityProtocol(senderHID, receiverHID);
+	public Message processData(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data) {
+		SecurityProtocol securityProtocol = getSecurityProtocol(senderVirtualAddress, receiverVirtualAddress);
 		Message message = null;
 		//check if application data has to be unprotected
 		if (securityProtocol != null && securityProtocol.isInitialized()) {
 			// if protocol is initialized than open message with it
 			try {
-				message = unserializeMessage(data, false, senderHID, receiverHID);
+				message = unserializeMessage(data, false, senderVirtualAddress, receiverVirtualAddress);
 				message = securityProtocol.unprotectMessage(message);
 				//use data field of message to reconstruct original message
 				if(!message.getTopic().
 						equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
-					message = unserializeMessage(message.getData(), true, senderHID, receiverHID);
+					message = unserializeMessage(message.getData(), true, senderVirtualAddress, receiverVirtualAddress);
 				}
 			} catch (Exception e) {
-				logger.debug("Cannot unprotect message from HID: "
-						+ senderHID.toString());
+				logger.debug("Cannot unprotect message from VirtualAddress: "
+						+ senderVirtualAddress.toString());
 				message = new ErrorMessage(ErrorMessage.ERROR,
-						message.getSenderHID(), 
-						message.getReceiverHID(), 
+						message.getSenderVirtualAddress(), 
+						message.getReceiverVirtualAddress(), 
 						e.getMessage().getBytes());
 			}
 		} else { 
-			message = unserializeMessage(data, true, senderHID, receiverHID);
+			message = unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress);
 			if (securityProtocol != null
 					&& !securityProtocol.isInitialized()) {
 				// if protocol not initialized then pass it for processing			
@@ -133,20 +133,20 @@ public class Connection {
 				} catch (CryptoException e) {
 					logger.error("Error during cryptographic operation", e);
 					message = new ErrorMessage(ErrorMessage.ERROR,
-							message.getSenderHID(), 
-							message.getReceiverHID(), 
+							message.getSenderVirtualAddress(), 
+							message.getReceiverVirtualAddress(), 
 							e.getMessage().getBytes());
 				} catch (VerificationFailureException e) {
 					logger.error("Error during cryptographic operation", e);
 					message = new ErrorMessage(ErrorMessage.ERROR,
-							message.getSenderHID(), 
-							message.getReceiverHID(), 
+							message.getSenderVirtualAddress(), 
+							message.getReceiverVirtualAddress(), 
 							e.getMessage().getBytes());
 				} catch (IOException e) {
 					logger.error("Error during cryptographic operation", e);
 					message = new ErrorMessage(ErrorMessage.ERROR,
-							message.getSenderHID(), 
-							message.getReceiverHID(), 
+							message.getSenderVirtualAddress(), 
+							message.getReceiverVirtualAddress(), 
 							e.getMessage().getBytes());
 				}
 			}
@@ -155,20 +155,20 @@ public class Connection {
 	}
 
 	/**
-	 * Gets the {@link SecurityProtocol} object assigned to provided HIDs from
+	 * Gets the {@link SecurityProtocol} object assigned to provided services from
 	 * the HashMap. If no object is stored a new one is created.
-	 * @param senderHID
-	 * @param receiverHID
-	 * @return Object assigned to this HIDs
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
+	 * @return SecurityProtocol assigned to this service
 	 */
-	protected SecurityProtocol getSecurityProtocol(HID senderHID, HID receiverHID) {
+	protected SecurityProtocol getSecurityProtocol(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress) {
 		if(comSecMgr != null) {
-			HIDTuple hidTuple = new HIDTuple(senderHID, receiverHID);
-			if(securityProtocols.containsKey(hidTuple)) {
-				return securityProtocols.get(hidTuple);
+			VirtualAddressTuple virtualAddressTuple = new VirtualAddressTuple(senderVirtualAddress, receiverVirtualAddress);
+			if(securityProtocols.containsKey(virtualAddressTuple)) {
+				return securityProtocols.get(virtualAddressTuple);
 			} else {
-				SecurityProtocol secProt = comSecMgr.getSecurityProtocol(senderHID, receiverHID);
-				securityProtocols.put(hidTuple, secProt);
+				SecurityProtocol secProt = comSecMgr.getSecurityProtocol(senderVirtualAddress, receiverVirtualAddress);
+				securityProtocols.put(virtualAddressTuple, secProt);
 				return secProt;
 			}
 		} else {
@@ -186,7 +186,7 @@ public class Connection {
 	 *             When message cannot be processed for sending
 	 */
 	public byte[] processMessage(Message msg) throws Exception {
-		SecurityProtocol securityProtocol = getSecurityProtocol(msg.getSenderHID(), msg.getReceiverHID());
+		SecurityProtocol securityProtocol = getSecurityProtocol(msg.getSenderVirtualAddress(), msg.getReceiverVirtualAddress());
 		if (securityProtocol != null && !securityProtocol.isInitialized()) {
 			// set the message to be sent by security protocol
 			msg = securityProtocol.processMessage(msg);
@@ -256,11 +256,11 @@ public class Connection {
 	 * Creates message from received byte stream.
 	 * @param serializedMsg Stream to read from
 	 * @param includeProps Fill properties fields of msg
-	 * @param senderHID
-	 * @param receiverHID
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
 	 * @return
 	 */
-	private Message unserializeMessage(byte[] serializedMsg, boolean includeProps, HID senderHID, HID receiverHID) {
+	private Message unserializeMessage(byte[] serializedMsg, boolean includeProps, VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress) {
 		// open data and divide it into properties of the message and
 		// application data
 		Properties properties = new Properties();
@@ -271,17 +271,17 @@ public class Connection {
 					"Unable to load properties from XML data. Data is not valid XML: "
 					+ new String(serializedMsg), e);
 			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
-					senderHID, receiverHID, e.getMessage().getBytes());
+					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());
 		} catch (IOException e) {
 			logger.error("Unable to load properties from XML data: "
 					+ new String(serializedMsg), e);
 			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
-					senderHID, receiverHID, e.getMessage().getBytes());
+					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());
 		}
 
 		// create real message
 		Message message = new Message((String) properties.remove(TOPIC),
-				senderHID, receiverHID, (Base64.decode((String) properties
+				senderVirtualAddress, receiverVirtualAddress, (Base64.decode((String) properties
 						.remove(APPLICATION_DATA))));
 		if(includeProps) {
 			// go through the properties and add them to the message
@@ -294,28 +294,28 @@ public class Connection {
 		return message;
 	}
 
-	class HIDTuple {
-		private HID hid1 = null;
-		private HID hid2 = null;
+	class VirtualAddressTuple {
+		private VirtualAddress virtualAddress1 = null;
+		private VirtualAddress virtualAddress2 = null;
 
-		public HIDTuple(HID one, HID two) {
-			hid1 = one;
-			hid2 = two;
+		public VirtualAddressTuple(VirtualAddress one, VirtualAddress two) {
+			virtualAddress1 = one;
+			virtualAddress2 = two;
 		}
 
-		public HID getHID1() {
-			return hid1;
+		public VirtualAddress getVirtualAddress1() {
+			return virtualAddress1;
 		}
 
-		public HID getHID2() {
-			return hid2;
+		public VirtualAddress getVirtualAddress2() {
+			return virtualAddress2;
 		}
 
 		@Override
 		public boolean equals(Object o)  {
-			HIDTuple tuple = (HIDTuple)o;
-			if((tuple.getHID1().equals(hid1) && tuple.getHID2().equals(hid2))
-					|| (tuple.getHID1().equals(hid2) && tuple.getHID2().equals(hid1))) {
+			VirtualAddressTuple tuple = (VirtualAddressTuple)o;
+			if((tuple.getVirtualAddress1().equals(virtualAddress1) && tuple.getVirtualAddress2().equals(virtualAddress2))
+					|| (tuple.getVirtualAddress1().equals(virtualAddress2) && tuple.getVirtualAddress2().equals(virtualAddress1))) {
 				return true;
 			} else {
 				return false;
@@ -324,10 +324,10 @@ public class Connection {
 
 		@Override
 		public int hashCode() {
-			int hid1Hash = hid1.hashCode();
-			int hid2Hash = hid2.hashCode();
-			//returned hash must be indifferent for tuples with same two HIDs
-			return hid1Hash & hid2Hash;
+			int virtualAddress1Hash = virtualAddress1.hashCode();
+			int virtualAddress2Hash = virtualAddress2.hashCode();
+			//returned hash must be indifferent for tuples with same two addresses
+			return virtualAddress1Hash & virtualAddress2Hash;
 		}
 	}
 }

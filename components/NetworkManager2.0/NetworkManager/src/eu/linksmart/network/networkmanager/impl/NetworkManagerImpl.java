@@ -4,8 +4,8 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.Registration;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
@@ -32,35 +32,25 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public NMResponse sendData(HID sender, HID receiver, byte[] data, boolean synch)
+		public NMResponse sendData(VirtualAddress sender, VirtualAddress receiver, byte[] data, boolean synch)
 				throws RemoteException {
 			return this.core.sendData(sender, receiver, data, synch);
 		}
 
 		@Override
-		public HID getHID() throws RemoteException {
-			return this.core.getHID();
+		public VirtualAddress getService() throws RemoteException {
+			return this.core.getService();
 		}
 
 		@Override
-		public boolean removeHID(HID hid) throws RemoteException {
-			return this.core.removeHID(hid);
+		public boolean removeService(VirtualAddress virtualAddress) throws RemoteException {
+			return this.core.removeService(virtualAddress);
 		}
 
 		@Override
-		public HIDInfo createHID(Part[] attributes, String endpoint, String backboneName)
+		public Registration registerService(Part[] attributes, String endpoint, String backboneName)
 				throws RemoteException {
-			return this.core.createHID(attributes, endpoint, backboneName);
-		}
-
-		@Override
-		public HIDInfo createCryptoHID(String xmlAttributes, String endpoint) throws RemoteException {
-			return this.core.createCryptoHID(xmlAttributes, endpoint);
-		}
-
-		@Override
-		public HIDInfo createCryptoHIDFromReference(String certRef, String endpoint) throws RemoteException {
-			return this.core.createCryptoHIDFromReference(certRef, endpoint);
+			return this.core.registerService(attributes, endpoint, backboneName);
 		}
 
 		@Override
@@ -69,29 +59,29 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public HIDInfo[] getHIDByAttributes(Part[] attributes) {
-			return this.core.getHIDByAttributes(attributes);
+		public Registration[] getServiceByAttributes(Part[] attributes) {
+			return this.core.getServiceByAttributes(attributes);
 		}
 
 		@Override
-		public HIDInfo getHIDByPID(String PID) throws IllegalArgumentException {
-			return this.core.getHIDByPID(PID);
+		public Registration getServiceByPID(String PID) throws IllegalArgumentException {
+			return this.core.getServiceByPID(PID);
 		}
 
 		@Override
-		public HIDInfo[] getHIDByDescription(String description) {
-			return this.core.getHIDByDescription(description);
+		public Registration[] getServiceByDescription(String description) {
+			return this.core.getServiceByDescription(description);
 		}
 
 		@Override
-		public HIDInfo[] getHIDByQuery(String query) {
-			return this.core.getHIDByQuery(query);
+		public Registration[] getServiceByQuery(String query) {
+			return this.core.getServiceByQuery(query);
 		}
 
 		@Override
-		public HIDInfo[] getHIDByAttributes(Part[] attributes, long timeOut,
+		public Registration[] getServiceByAttributes(Part[] attributes, long timeOut,
 				boolean returnFirst, boolean isStrictRequest) {
-			return this.core.getHIDByAttributes(
+			return this.core.getServiceByAttributes(
 					attributes, timeOut, returnFirst, isStrictRequest);
 		}
 }

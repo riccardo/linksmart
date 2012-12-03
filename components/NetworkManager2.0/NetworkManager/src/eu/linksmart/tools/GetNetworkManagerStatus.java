@@ -35,7 +35,6 @@ package eu.linksmart.tools;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -48,8 +47,8 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONWriter;
 
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.Registration;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
@@ -100,57 +99,57 @@ public class GetNetworkManagerStatus extends HttpServlet {
 		if (params.containsKey("method")) {
 			String method = params.get("method")[0];
 			if (method.equals("getNetworkManagers")) {
-				Set<HIDInfo> hids = identityManager
-						.getHIDsByDescription("NetworkManager*");
-				processHIDs(method, hids, response);
-			} else if (method.equals("getLocalHids")) {
-				Set<HIDInfo> hids = identityManager.getLocalHIDs();
-				LOG.debug("Size of LocalHIDs: " + hids.size());
-				processHIDs(method, hids, response);
-			} else if (method.equals("getRemoteHids")) {
-				Set<HIDInfo> hids = identityManager.getRemoteHIDs();
-				LOG.debug("Size of RemoteHIDs: " + hids.size());
-				processHIDs(method, hids, response);
+				Set<Registration> registrations = identityManager
+						.getServicesByDescription("NetworkManager*");
+				processServices(method, registrations, response);
+			} else if (method.equals("getLocalServices")) {
+				Set<Registration> registrations = identityManager.getLocalServices();
+				LOG.debug("Size of LocalServices: " + registrations.size());
+				processServices(method, registrations, response);
+			} else if (method.equals("getRemoteServices")) {
+				Set<Registration> registrations = identityManager.getRemoteServices();
+				LOG.debug("Size of RemoteServices: " + registrations.size());
+				processServices(method, registrations, response);
 			} else if (method.equals("getNetworkManagerSearch")) {
-				Set<HIDInfo> hids = identityManager.getAllHIDs();
-				processHIDs(method, hids, response);
-				// TODO should be "HID entity not adapted to security issues"
-				// instead of null for remote HIDs; check with Mark?
+				Set<Registration> registrations = identityManager.getAllServices();
+				processServices(method, registrations, response);
+				// TODO #NM should be "VirtualAddress entity not adapted to security issues"
+				// instead of null for remote services; check with Mark?
 			}
 		}
 	}
 
-	private void processHIDs(String method, Set<HIDInfo> hids, HttpServletResponse response) {
+	private void processServices(String method, Set<Registration> registrations, HttpServletResponse response) {
 
-		Iterator<HIDInfo> it = hids.iterator();
+		Iterator<Registration> it = registrations.iterator();
 
 		StringWriter writer = new StringWriter();
 		JSONWriter jsonWriter = new JSONWriter(writer);
 		try {
 			jsonWriter.object()
 			.key("method").value(method)
-			.key("HIDs").array();
+			.key("VirtualAddresses").array();
 
 			while (it.hasNext()) {
-				HIDInfo hidInfo = it.next();
+				Registration serviceInfo = it.next();
 	
 				// Create the description from all Attributes
 				String description = "";
-				Part[] attr = hidInfo.getAttributes();
+				Part[] attr = serviceInfo.getAttributes();
 				for (Part part : attr) {
 					description = description + part.getKey() + " = "
 							+ part.getValue() + ";";
 				}
 	
-				// Get the Route for this HID
-				HID hid = hidInfo.getHid();
-				String route = backboneRouter.getRoute(hid);
-				String hidString = hid.toString();
-				String path = "/SOAPTunneling/0/" + hidString;
+				// Get the Route for this VirtualAddress
+				VirtualAddress virtualAddress = serviceInfo.getVirtualAddress();
+				String route = backboneRouter.getRoute(virtualAddress);
+				String virtualAddressString = virtualAddress.toString();
+				String path = "/SOAPTunneling/0/" + virtualAddressString;
 				
 				jsonWriter
 				.object()
-				.key("hid").value(hidString)
+				.key("virtualAddress").value(virtualAddressString)
 				.key("path").value(path)
 				.key("wsdl").value(path + "?wsdl")
 				.key("description").value(description)
