@@ -2,16 +2,16 @@ package eu.linksmart.network.service.registry;
 
 import java.net.URL;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 
 public interface ServiceRegistry {
 	
-	public boolean registerService(HID hid, URL url);
+	public boolean registerService(VirtualAddress virtualAddress, URL url);
 	
-	public boolean removeService(HID hid);
+	public boolean removeService(VirtualAddress virtualAddress);
 	
-	public boolean updateServiceHID(URL url);
+	public boolean updateServiceVirtualAddress(URL url);
 	
-	public URL getServiceURL(HID hid);
+	public URL getServiceURL(VirtualAddress virtualAddress);
 
 }

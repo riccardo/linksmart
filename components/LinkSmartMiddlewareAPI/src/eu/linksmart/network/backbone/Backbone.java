@@ -4,7 +4,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.security.communication.SecurityProperty;
@@ -17,79 +17,79 @@ public interface Backbone {
 	/**
 	 * Sends a message over the specific communication channel and blocks until response comes.
 	 * 
-	 * @param senderHID HID of the sender
-	 * @param receiverHID HID of the receiver
+	 * @param senderVirtualAddress VirtualAddress of the sender
+	 * @param receiverVirtualAddress VirtualAddress of the receiver
 	 * @param data data to be sent
 	 * @return Response of the receiver
 	 */
-	public NMResponse sendDataSynch(HID senderHID, HID receiverHID, byte[] data);
+	public NMResponse sendDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data);
 
 	/**
 	 * Sends a message over the specific communication channel and immediately returns.
 	 * 
-	 * @param senderHID HID of the sender
-	 * @param receiverHID HID of the receiver
+	 * @param senderVirtualAddress VirtualAddress of the sender
+	 * @param receiverVirtualAddress VirtualAddress of the receiver
 	 * @param data data to be sent
 	 * @return Response of the receiver
 	 */
-	public NMResponse sendDataAsynch(HID senderHID, HID receiverHID, byte[] data);
+	public NMResponse sendDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data);
 	
 	/**
 	 * Receives a message over the specific communication channel.
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
 	 * @param data
 	 * @return includes response to message
 	 */
-	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte[] data);
+	public NMResponse receiveDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data);
 	
 	/**
 	 * Receives a message over the specific communication channel.
 	 * 
-	 * @param senderHID
-	 * @param receiverHID
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
 	 * @param data
 	 * @return includes status of sending attempt
 	 */
-	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte[] data);
+	public NMResponse receiveDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data);
 
 	/**
 	 * Broadcasts a message over the specific communication channel.
 	 * 
-	 * @param senderHID
+	 * @param senderVirtualAddress
 	 * @param data
 	 * @return
 	 */
-	public NMResponse broadcastData(HID senderHID, byte[] data);
+	public NMResponse broadcastData(VirtualAddress senderVirtualAddress, byte[] data);
 
 	/**
 	 * Return the destination address as string that will be used for display
 	 * purposes.
 	 * 
-	 * @param hid
-	 * @return the backbone address represented by the Hid
+	 * @param virtualAddress
+	 * @return the backbone address represented by the virtual address
 	 */
-	public String getEndpoint(HID hid);
+	public String getEndpoint(VirtualAddress virtualAddress);
 
 	/**
 	 * Adds a new endpoint to the backbone.
 	 * 
-	 * @param hid
-	 *            the HID that represents the endpoint
+	 * @param virtualAddress
+	 *            the VirtualAddress that represents the endpoint
 	 * @param endpoint
 	 *            the endpoint to be reached, in a format that is specific to
 	 *            the Backbone implementation, as a String
 	 * @return whether adding the endpoint was successful
 	 */
-	public boolean addEndpoint(HID hid, String endpoint);
+	public boolean addEndpoint(VirtualAddress virtualAddress, String endpoint);
 
 	/**
 	 * Removes an endpoint from the backbone
-	 * @param hid the HID of which the endpoint should be removed
+	 * @param virtualAddress the VirtualAddress of which the endpoint should be removed
 	 * @return whether the endpoint was removed
 	 */
-	public boolean removeEndpoint(HID hid);
+	public boolean removeEndpoint(VirtualAddress virtualAddress);
 	
 	/**
 	 * used to apply configurations from the web page 
@@ -114,10 +114,10 @@ public interface Backbone {
 	
 	/**
 	 * 
-	 * @param senderHID the HID of the network manager.
-	 * @param remoteHID the HID of the service that is connected to the remote network manager.
-	 * set the endpoint of remote HIDs that are sent during the backbone advertisement.
-	 * this is needed since the HIDs are packed in the message of the advertisement.
+	 * @param senderVirtualAddress the VirtualAddress of the network manager.
+	 * @param remoteVirtualAddress the VirtualAddress of the service that is connected to the remote network manager.
+	 * set the endpoint of remote services that are sent during the backbone advertisement.
+	 * this is needed since the virtual addresses are packed in the message of the advertisement.
 	 */
-	public void addEndpointForRemoteHID(HID senderHID, HID remoteHID);
+	public void addEndpointForRemoteService(VirtualAddress senderVirtualAddress, VirtualAddress remoteVirtualAddress);
 }

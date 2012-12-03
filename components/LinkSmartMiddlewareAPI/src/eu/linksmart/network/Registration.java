@@ -32,7 +32,7 @@
  */
 
 /**
- * HIDInfo class stores all the information about an LinkSmart ID
+ * Registration class stores all the information about an LinkSmart ID
  */
 
 package eu.linksmart.network;
@@ -42,49 +42,49 @@ import java.io.Serializable;
 import eu.linksmart.utils.Part;
 
 /**
- * Class to store information about HIDs
+ * Class to store information about services
  */
-public class HIDInfo implements Serializable {
+public class Registration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private HID hid;
+	private VirtualAddress virtualAddress;
 	private Part[] attributes;
-	private String hidAsString;
+	private String virtualAddressAsString;
 
 	/**
-	 * Create an HIDInfo object with the given HID and Description.
+	 * Create an Registration object with the given VirtualAddress and Description.
 	 * 
-	 * @param hid
+	 * @param virtualAddress
 	 * @param description
 	 */
-	public HIDInfo(HID hid, String description) {
-		this.hid = hid;
-		this.hidAsString = hid.toString();
-		Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
+	public Registration(VirtualAddress virtualAddress, String description) {
+		this.virtualAddress = virtualAddress;
+		this.virtualAddressAsString = virtualAddress.toString();
+		Part[] attributes = { new Part(ServiceAttribute.DESCRIPTION.name(),
 				description) };
 		this.attributes = attributes;
 	}
 
 	/**
-	 * Create an HIDInfo object with the given HID and Attributes. Attributes
-	 * should be key-values pairs with the key of type {@link HIDAttribute}
+	 * Create an Registration object with the given VirtualAddress and Attributes. Attributes
+	 * should be key-values pairs with the key of type {@link ServiceAttribute}
 	 * 
-	 * @param hid
+	 * @param virtualAddress
 	 * @param attributes
 	 */
-	public HIDInfo(HID hid, Part[] attributes) {
-		this.hid = hid;
-		this.hidAsString = hid.toString();
+	public Registration(VirtualAddress virtualAddress, Part[] attributes) {
+		this.virtualAddress = virtualAddress;
+		this.virtualAddressAsString = virtualAddress.toString();
 		this.attributes = attributes;
 	}
 
 	/**
-	 * Prints the the HIDInfo like this: hid:description
+	 * Prints the the Registration like this: virtualAddress:description
 	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(hid).append(": ");
+		sb.append(virtualAddress).append(": ");
 		for (Part attribute : attributes) {
 			sb.append(attribute.getValue()).append(";");
 		}
@@ -92,7 +92,7 @@ public class HIDInfo implements Serializable {
 	}
 
 	/**
-	 * Return the attribute {@link HIDAttribute} DESCRIPTION for this HIDInfo.
+	 * Return the attribute {@link ServiceAttribute} DESCRIPTION for this Registration.
 	 * 
 	 * @return the description, or null if no description exists
 	 */
@@ -102,7 +102,7 @@ public class HIDInfo implements Serializable {
 			return null;
 		}
 		for (Part attribute : this.attributes) {
-			if (attribute.getKey().equals(HIDAttribute.DESCRIPTION.name())) {
+			if (attribute.getKey().equals(ServiceAttribute.DESCRIPTION.name())) {
 				return attribute.getValue();
 			}
 		}
@@ -110,19 +110,19 @@ public class HIDInfo implements Serializable {
 	}
 
 	/**
-	 * Sets the {@link HIDAttribute} description for this HIDInfo
+	 * Sets the {@link ServiceAttribute} description for this Registration
 	 * 
 	 * @param description
 	 *            the description to set
 	 */
 	@Deprecated public void setDescription(String description) {
 		if (this.attributes == null) {
-			Part[] attributes = { new Part(HIDAttribute.DESCRIPTION.name(),
+			Part[] attributes = { new Part(ServiceAttribute.DESCRIPTION.name(),
 					description) };
 			this.attributes = attributes;
 		} else {
 			for (Part attribute : attributes) {
-				if (attribute.getKey().equals(HIDAttribute.DESCRIPTION.name())) {
+				if (attribute.getKey().equals(ServiceAttribute.DESCRIPTION.name())) {
 					attribute.setValue(description);
 					return;
 				}
@@ -132,7 +132,7 @@ public class HIDInfo implements Serializable {
 			System.arraycopy(this.attributes, 0, attributes, 0,
 					this.attributes.length);
 			attributes[this.attributes.length] = new Part(
-					HIDAttribute.DESCRIPTION.name(), description);
+					ServiceAttribute.DESCRIPTION.name(), description);
 			this.attributes = attributes;
 		}
 	}
@@ -156,34 +156,34 @@ public class HIDInfo implements Serializable {
 	 */
 	public void setAttributes(Part[] attr) {
 		this.attributes = attr;
-//		if (attr.containsKey(HIDAttribute.DESCRIPTION.name())) {
-//			setDescription(attr.getProperty(HIDAttribute.DESCRIPTION.name()));
+//		if (attr.containsKey(ServiceAttribute.DESCRIPTION.name())) {
+//			setDescription(attr.getProperty(ServiceAttribute.DESCRIPTION.name()));
 //		}
 	}
 
-	public HID getHid() {
-		return hid;
+	public VirtualAddress getVirtualAddress() {
+		return virtualAddress;
 	}
 	
-	public void setHid(HID hid) {
-		this.hid = hid;
-		setHidAsString();
+	public void setVirtualAddress(VirtualAddress virtualAddress) {
+		this.virtualAddress = virtualAddress;
+		setVirtualAddressAsString();
 	}
 	
-	public String getHidAsString() {
-		return hidAsString;
+	public String getVirtualAddressAsString() {
+		return virtualAddressAsString;
 	}
 	
-	public void setHidAsString() {
-		hidAsString = hid.toString();
+	public void setVirtualAddressAsString() {
+		virtualAddressAsString = virtualAddress.toString();
 	}
 
     private java.lang.Object __equalsCalc = null;
     /* Adapted from AXIS-generated code
      */
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof HIDInfo)) return false;
-        HIDInfo other = (HIDInfo) obj;
+        if (!(obj instanceof Registration)) return false;
+        Registration other = (Registration) obj;
         if (this == obj) return true;
         if (__equalsCalc != null) {
             return (__equalsCalc == obj);
@@ -191,9 +191,9 @@ public class HIDInfo implements Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.hid==null && other.getHid()==null) || 
-             (this.hid!=null &&
-              this.hid.equals(other.getHid()))) &&
+            ((this.virtualAddress==null && other.getVirtualAddress()==null) || 
+             (this.virtualAddress!=null &&
+              this.virtualAddress.equals(other.getVirtualAddress()))) &&
             ((this.attributes==null && other.getAttributes()==null) || 
              (this.attributes!=null &&
               java.util.Arrays.equals(this.attributes, other.getAttributes())));
@@ -208,8 +208,8 @@ public class HIDInfo implements Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getHid() != null) {
-            _hashCode += getHid().hashCode();
+        if (getVirtualAddress() != null) {
+            _hashCode += getVirtualAddress().hashCode();
         }
         if (getAttributes() != null) {
             for (int i=0;

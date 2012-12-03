@@ -112,16 +112,16 @@ public interface CryptoManager {
 
 	/**
 	 * Generates a new public/private key pair (i.e. a certificate and the corresponding private key) and writes attributes into the
-	 * certificate. The certificate is then assigned to the given HID so it can be used for encrypting messages from this HID.
+	 * certificate. The certificate is then assigned to the given VirtualAddress so it can be used for encrypting messages from this VirtualAddress.
 	 * This is the same as calling<br>
 	 * <code> 
 	 * String certRef = cryptoManager.generateCertificateWithAttributes(xmlAttributes);
-	 * cryptoManager.setCertificateReference(certRef, hid);
+	 * cryptoManager.setCertificateReference(certRef, virtualAddress);
 	 * </code>
 	 * 
 	 * @return Returns an identifier for this key pair.
 	 */
-	public String generateCertificateWithAttributes(String xmlAttributes, String hid) throws SQLException, NoSuchAlgorithmException, IOException,
+	public String generateCertificateWithAttributes(String xmlAttributes, String virtualAddress) throws SQLException, NoSuchAlgorithmException, IOException,
 			KeyStoreException, CertificateException, InvalidKeyException, SecurityException, SignatureException, IllegalStateException,
 			NoSuchProviderException;
 
@@ -252,37 +252,37 @@ public interface CryptoManager {
 	public Vector<String> getSupportedFormats();
 
 	/**
-	 * Assigns a HID to an already existing certificate.
+	 * Assigns a VirtualAddress to an already existing certificate.
 	 * 
-	 * @param hid
+	 * @param virtualAddress
 	 * @param certRef
 	 * @return true, if mapping has been created successfully. False otherwise (e.g., if certRef was invalid or does not exist).
 	 * @throws SQLException 
 	 */
-	public boolean addCertificateForHID(String hid, String certRef);
+	public boolean addCertificateForService(String virtualAddress, String certRef);
 	
 	/**
-	 * Assigns private key to HID
+	 * Assigns private key to VirtualAddress
 	 * 
-	 * @param hid
+	 * @param virtualAddress
 	 * @param certRef
 	 * @return False if certificate reference does not exist
 	 */
-	public boolean addPrivateKeyForHID(String hid, String certRef);
+	public boolean addPrivateKeyForService(String virtualAddress, String certRef);
 
 	/**
-	 * Returns certificate identifier for HID
-	 * @param hid
+	 * Returns certificate identifier for VirtualAddress
+	 * @param virtualAddress
 	 * @return Identifier under which certificate is stored in keystore
 	 */
-	public String getCertificateReference(String hid);
+	public String getCertificateReference(String virtualAddress);
 
 	/**
-	 * Returns private key identifier for hid
-	 * @param hid
+	 * Returns private key identifier for service
+	 * @param virtualAddress
 	 * @return Identifier under which private key is stored in keystore
 	 */
-	public String getPrivateKeyReference(String hid);
+	public String getPrivateKeyReference(String virtualAddress);
 	
 	/**
 	 * Get key size for algorithm on security level

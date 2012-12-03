@@ -3,102 +3,102 @@ package eu.linksmart.network.identity;
 import java.util.Properties;
 import java.util.Set;
 
-import eu.linksmart.network.HID;
-import eu.linksmart.network.HIDAttribute;
-import eu.linksmart.network.HIDInfo;
+import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.ServiceAttribute;
+import eu.linksmart.network.Registration;
 import eu.linksmart.utils.Part;
 
 /**
- * The IdentityManager is responsible for creating and storing {@link HID}.
+ * The IdentityManager is responsible for creating and storing {@link VirtualAddress}.
  * 
  * 
  */
 public interface IdentityManager {
-	public static long HID_RESOLVE_TIMEOUT = 30000;
+	public static long SERVICE_RESOLVE_TIMEOUT = 30000;
 	
 	
 	/**
-	 * Creates a local {@link HID} with the given attributes and stores it. It
+	 * Creates a local {@link VirtualAddress} with the given attributes and stores it. It
 	 * creates a random deviceID. The result will be 0.0.0.randomDeviceId.
-	 * Attributes should be one of {@link HIDAttribute}.
+	 * Attributes should be one of {@link ServiceAttribute}.
 	 * 
 	 * @param attributes
-	 *            Attributes describing the HID. E.g. description.
-	 * @return the {@link HID} that has been created.
+	 *            Attributes describing the VirtualAddress. E.g. description.
+	 * @return the {@link VirtualAddress} that has been created.
 	 */
-	public HIDInfo createHIDForAttributes(Part[] attributes);
+	public Registration createServiceByAttributes(Part[] attributes);
 
 	/**
-	 * Creates a local {@link HID} without any context and stores. It creates a
+	 * Creates a local {@link VirtualAddress} without any context and stores. It creates a
 	 * random deviceID. The result will be 0.0.0.randomDeviceId.
 	 * 
-	 * @deprecated The more general createHIDForAttributes should be used with 
+	 * @deprecated The more general createServiceByAttributes should be used with 
 	 * a description attribute
 	 * @param description
 	 *            the description
-	 * @return the HID created
+	 * @return the VirtualAddress created
 	 */
 	@Deprecated
-	public HIDInfo createHIDForDescription(String description);
+	public Registration createServiceByDescription(String description);
 
 	/**
-	 * Updates the attributes of the given {@link HID}.
+	 * Updates the attributes of the given {@link VirtualAddress}.
 	 * 
-	 * @param hid
-	 *            The HID for which the attributes should be changed.
+	 * @param virtualAddress
+	 *            The VirtualAddress for which the attributes should be changed.
 	 * @param attributes
 	 *            New attributes that will replace the old ones.
 	 * @return true, if successful
 	 */
-	public boolean updateHIDInfo(HID hid, Properties attributes);
+	public boolean updateServiceInfo(VirtualAddress virtualAddress, Properties attributes);
 
 	/**
-	 * Returns the {@link HIDInfo} for a given {@link HID}.
+	 * Returns the {@link Registration} for a given {@link VirtualAddress}.
 	 * 
-	 * @return the {@link HIDInfo}
+	 * @return the {@link Registration}
 	 */
-	public HIDInfo getHIDInfo(HID hid);
+	public Registration getServiceInfo(VirtualAddress virtualAddress);
 
 	/**
-	 * Returns all local and remote {@link HIDInfo}s that are stored by this
+	 * Returns all local and remote {@link Registration}s that are stored by this
 	 * IdentityManager.
 	 * 
-	 * @return all {@link HIDInfo}s
+	 * @return all {@link Registration}s
 	 */
-	public Set<HIDInfo> getAllHIDs();
+	public Set<Registration> getAllServices();
 
 	/**
-	 * Returns all local {@link HIDInfo}s that are currently stored by this
-	 * IdentityManager. Local are all {@link HIDInfo}s that are registered at
+	 * Returns all local {@link Registration}s that are currently stored by this
+	 * IdentityManager. Local are all {@link Registration}s that are registered at
 	 * the associated NetworkManager.
 	 * 
-	 * @return all local {@link HIDInfo}s.
+	 * @return all local {@link Registration}s.
 	 */
-	public Set<HIDInfo> getLocalHIDs();
+	public Set<Registration> getLocalServices();
 
 	/**
-	 * Returns all remote {@link HIDInfo}s that are currently stored by this
-	 * IdentityManager. Remote are all {@link HIDInfo}s that are registered at
+	 * Returns all remote {@link Registration}s that are currently stored by this
+	 * IdentityManager. Remote are all {@link Registration}s that are registered at
 	 * remote NetworkManagers.
 	 * 
-	 * @return all remote {@link HIDInfo}s.
+	 * @return all remote {@link Registration}s.
 	 */
-	public Set<HIDInfo> getRemoteHIDs();
+	public Set<Registration> getRemoteServices();
 
 	/**
-	 * Return all {@link HIDInfo}s that match the given description. Wildcards
+	 * Return all {@link Registration}s that match the given description. Wildcards
 	 * can be used. TODO Explain the use of wildcards
 	 * 
-	 * @deprecated The more general getHIDsByAttributes method should be used
+	 * @deprecated The more general getServicesByAttributes method should be used
 	 * with a description attribute
 	 * @param description
 	 * @return
 	 */
 	@Deprecated
-	public Set<HIDInfo> getHIDsByDescription(String description);
+	public Set<Registration> getServicesByDescription(String description);
 
 	/**
-	 * Returns all locally available {@link HIDInfo}s
+	 * Returns all locally available {@link Registration}s
 	 * that match the given query. TODO Explian the
 	 * query language
 	 * 
@@ -106,16 +106,16 @@ public interface IdentityManager {
 	 * @param maxNum
 	 * @return
 	 */
-	public HIDInfo[] getHIDsByAttributes(String query);
+	public Registration[] getServicesByAttributes(String query);
 
 	/**
-	 * Removes the given {@link HID} from the internal HID-store. Does nothing
-	 * if the hid is not stored by this IdentityManager
+	 * Removes the given {@link VirtualAddress} from the internal VirtualAddress-store. Does nothing
+	 * if the virtual address is not stored by this IdentityManager
 	 * 
-	 * @param hid
-	 * @return true, if {@link HID} has been removed successfully.
+	 * @param virtualAddress
+	 * @return true, if {@link VirtualAddress} has been removed successfully.
 	 */
-	public boolean removeHID(HID hid);
+	public boolean removeService(VirtualAddress virtualAddress);
 	
 	/**
 	 * Returns the implementation name of this IdentityManager bundle.
@@ -124,7 +124,7 @@ public interface IdentityManager {
 	public String getIdentifier();
 	
 	/**
-	 * Method to exactly control gathering of HIDs. 
+	 * Method to exactly control gathering of services. 
 	 * @param attributes The attributes the service should have
 	 * @param timeOut Time to wait for discovery responses
 	 * @param returnFirst If true method returns at first found service
@@ -133,6 +133,6 @@ public interface IdentityManager {
 	 * false - attribute types which a service does not have are ignored
 	 * @return
 	 */
-	HIDInfo[] getHIDByAttributes(Part[] attributes, long timeOut,
+	Registration[] getServiceByAttributes(Part[] attributes, long timeOut,
 			boolean returnFirst, boolean isStrict);
 }

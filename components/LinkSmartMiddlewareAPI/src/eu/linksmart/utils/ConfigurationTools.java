@@ -57,7 +57,7 @@ public class ConfigurationTools {
 
 		// We have detected that the configuration has changed.
 		// We will see what are the changes in order to identify if we need to 
-		// change some of manager data, such as hid or description.
+		// change some of manager data, such as virtual address or description.
 		Hashtable updates = new Hashtable();
 		if (newConfig == null) {
 			return updates;

@@ -1,9 +1,9 @@
 package eu.linksmart.network;
 
 /**
- * Attributes describing an HID. 
+ * Attributes describing an VirtualAddress. 
  *
  */
-public enum HIDAttribute {
+public enum ServiceAttribute {
 	PID, SID, DESCRIPTION, CERT_REF
 }

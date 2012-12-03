@@ -11,8 +11,8 @@ public class ErrorMessage extends Message {
 	 */
 	public final static String ERROR = "ERROR";
 	
-	public ErrorMessage(String topic, HID senderHID, HID receiverHID,
+	public ErrorMessage(String topic, VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
 			byte[] data) {
-		super(topic, senderHID, receiverHID, data);
+		super(topic, senderVirtualAddress, receiverVirtualAddress, data);
 	}
 }

@@ -2,7 +2,7 @@ package eu.linksmart.security.communication;
 
 import java.util.List;
 
-import eu.linksmart.network.HID;
+import eu.linksmart.network.VirtualAddress;
 
 /**
  * Returns implementation specific security protocol.
@@ -17,11 +17,11 @@ public interface CommunicationSecurityManager {
 	 * Provides a specific {@link SecurityProtocol} object
 	 * for protecting a connection between to entities.
 	 * 
-	 * @param clientHID The HID which started the communication
-	 * @param serverHID The HID whose service is used
+	 * @param clientVirtualAddress The VirtualAddress which started the communication
+	 * @param serverVirtualAddress The VirtualAddress whose service is used
 	 * @return Object to use to protect messages belonging to one connection
 	 */
-	SecurityProtocol getSecurityProtocol(HID clientHID, HID serverHID);
+	SecurityProtocol getSecurityProtocol(VirtualAddress clientVirtualAddress, VirtualAddress serverVirtualAddress);
 
 	/**
 	 * Provides whether this security protocol implementation
@@ -42,8 +42,8 @@ public interface CommunicationSecurityManager {
 	 * Provides a specific {@link SecurityProtocol} object
 	 * for protecting a broadcast connection.
 	 * 
-	 * @param clientHID The HID which started the communication
+	 * @param clientVirtualAddress The VirtualAddress which started the communication
 	 * @return Object to use to protect messages belonging to one connection
 	 */
-	SecurityProtocol getBroadcastSecurityProtocol(HID clientHID);
+	SecurityProtocol getBroadcastSecurityProtocol(VirtualAddress clientVirtualAddress);
 }

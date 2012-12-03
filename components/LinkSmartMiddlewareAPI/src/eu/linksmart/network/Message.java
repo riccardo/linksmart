@@ -19,8 +19,8 @@ public class Message {
 	private Properties properties = new Properties();
 	private String topic = null;
 	private byte[] data = null;
-	private HID senderHID = null;
-	private HID receiverHID = null;
+	private VirtualAddress senderVirtualAddress = null;
+	private VirtualAddress receiverVirtualAddress = null;
 	
 	public final static String TOPIC_APPLICATION = "eu.linksmart.application";
 	
@@ -28,17 +28,17 @@ public class Message {
 	/**
 	 * 
 	 * @param topic the topic of this message
-	 * @param senderHID HID of the sender of this message
-	 * @param receiverHID HID of the receiver of this message. Can be null e.g. in the case of a {@link BroadcastMessage}
+	 * @param senderVirtualAddress VirtualAddress of the sender of this message
+	 * @param receiverVirtualAddress VirtualAddress of the receiver of this message. Can be null e.g. in the case of a {@link BroadcastMessage}
 	 * @param data payload of the message. TODO Marco-2012-02-02: Can payload be empty? Like for advertisements
 	 */
-	public Message(String topic, HID senderHID, HID receiverHID, byte[] data) {
-		if (StringUtils.isEmpty(topic) || senderHID == null || data == null)
+	public Message(String topic, VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data) {
+		if (StringUtils.isEmpty(topic) || senderVirtualAddress == null || data == null)
 			throw new IllegalArgumentException(
 					"Message cannot have null for required fields");
 		this.topic = topic;
-		this.senderHID = senderHID;
-		this.receiverHID = receiverHID;
+		this.senderVirtualAddress = senderVirtualAddress;
+		this.receiverVirtualAddress = receiverVirtualAddress;
 		this.data = data;
 	}
 
@@ -86,12 +86,12 @@ public class Message {
 		return this.topic;
 	}
 
-	public HID getSenderHID() {
-		return senderHID;
+	public VirtualAddress getSenderVirtualAddress() {
+		return senderVirtualAddress;
 	}
 
-	public HID getReceiverHID() {
-		return receiverHID;
+	public VirtualAddress getReceiverVirtualAddress() {
+		return receiverVirtualAddress;
 	}
 
 	public byte[] getData() {
@@ -105,7 +105,7 @@ public class Message {
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Topic: ").append(getTopic()).append(", Sender: ").append(
-				getSenderHID()).append(", Receiver: ").append(getReceiverHID())
+				getSenderVirtualAddress()).append(", Receiver: ").append(getReceiverVirtualAddress())
 				.append(", Data: ").append(new String(data));
 		return sb.toString();
 	}

@@ -38,11 +38,11 @@ import java.util.Random;
 import java.io.Serializable;
 
 /**
- * Class to store HID information. An HID consists of three context ids and a
+ * Class to store VirtualAddress information. An VirtualAddress consists of three context ids and a
  * device ID. It looks like this: contextID-3.contextID-2.contextID-1.deviceID.
  * An example is 0.0.0.8248725583067352822.
  */
-public class HID implements Serializable {
+public class VirtualAddress implements Serializable {
 
 	private long deviceID = 0;
 	private long contextID1 = 0;
@@ -51,35 +51,35 @@ public class HID implements Serializable {
 	private int level;
 
 	/**
-	 * The length of a HID in binary format, as number of bytes
+	 * The length of a VirtualAddress in binary format, as number of bytes
 	 */
-	public static final int HID_BYTE_LENGTH = 32;
+	public static final int VIRTUAL_ADDRESS_BYTE_LENGTH = 32;
 
 	Random rnd = new Random();
 
 	/**
-	 * HID constructor. Creates an HID from an HID in String representation
+	 * VirtualAddress constructor. Creates an VirtualAddress from an VirtualAddress in String representation
 	 * 
-	 * @param strHID
-	 *            The String representation of the HID to be created
+	 * @param strVirtualAddress
+	 *            The String representation of the VirtualAddress to be created
 	 */
-	public HID(String strHID) {
-		String[] vectorHID = null;
+	public VirtualAddress(String strVirtualAddress) {
+		String[] vectorVirtualAddress = null;
 		int level = 0;
-		vectorHID = strHID.split("\\.");
+		vectorVirtualAddress = strVirtualAddress.split("\\.");
 		long context;
 		try {
-			for (int i = 0; i < vectorHID.length & i < 4; i++) {
-				context = Long.parseLong(vectorHID[i]);
+			for (int i = 0; i < vectorVirtualAddress.length & i < 4; i++) {
+				context = Long.parseLong(vectorVirtualAddress[i]);
 				if (context != 0) {
 					level = 3 - i;
 					break;
 				}
 			}
-			this.deviceID = Long.parseLong(vectorHID[3]);
-			this.contextID1 = Long.parseLong(vectorHID[2]);
-			this.contextID2 = Long.parseLong(vectorHID[1]);
-			this.contextID3 = Long.parseLong(vectorHID[0]);
+			this.deviceID = Long.parseLong(vectorVirtualAddress[3]);
+			this.contextID1 = Long.parseLong(vectorVirtualAddress[2]);
+			this.contextID2 = Long.parseLong(vectorVirtualAddress[1]);
+			this.contextID3 = Long.parseLong(vectorVirtualAddress[0]);
 			this.level = level;
 		} catch (Exception e) {
 			this.deviceID = 0;
@@ -91,40 +91,39 @@ public class HID implements Serializable {
 	}
 
 	/**
-	 * HID constructor. Creates an HID with a random deviceID and level = 0
+	 * VirtualAddress constructor. Creates an VirtualAddress with a random deviceID and level = 0
 	 * 
-	 * @param hidMgr
-	 *            the HIDManager
+	 * 
 	 */
-	public HID() {
+	public VirtualAddress() {
 		this.deviceID = Math.abs(rnd.nextLong());
 	}
 
 	/**
-	 * HID constructor. Creates an HID from an existing HID
+	 * VirtualAddress constructor. Creates an VirtualAddress from an existing VirtualAddress
 	 * 
-	 * @param oldHID
-	 *            The existing HID
+	 * @param oldVirtualAddress
+	 *            The existing VirtualAddress
 	 */
-	public HID(HID oldHID) {
-		this.deviceID = oldHID.deviceID;
-		this.contextID1 = oldHID.contextID1;
-		this.contextID2 = oldHID.contextID2;
-		this.contextID3 = oldHID.contextID3;
-		this.level = oldHID.level;
+	public VirtualAddress(VirtualAddress oldVirtualAddress) {
+		this.deviceID = oldVirtualAddress.deviceID;
+		this.contextID1 = oldVirtualAddress.contextID1;
+		this.contextID2 = oldVirtualAddress.contextID2;
+		this.contextID3 = oldVirtualAddress.contextID3;
+		this.level = oldVirtualAddress.level;
 	}
 
 	/**
-	 * HID constructor. Constructs the HID from the given binary representation.
+	 * VirtualAddress constructor. Constructs the VirtualAddress from the given binary representation.
 	 * 
 	 * @param data
-	 *            the HID values, as a 32-byte array, as results from toBytes()
+	 *            the VirtualAddress values, as a 32-byte array, as results from toBytes()
 	 */
-	public HID(byte[] data) {
-		if (data.length != HID_BYTE_LENGTH) {
-			throw new IllegalArgumentException("HID data must be 32 bytes long");
+	public VirtualAddress(byte[] data) {
+		if (data.length != VIRTUAL_ADDRESS_BYTE_LENGTH) {
+			throw new IllegalArgumentException("VirtualAddress data must be 32 bytes long");
 		}
-		ByteBuffer buffer = ByteBuffer.allocate(HID_BYTE_LENGTH);
+		ByteBuffer buffer = ByteBuffer.allocate(VIRTUAL_ADDRESS_BYTE_LENGTH);
 		buffer.put(data);
 		buffer.position(0);
 		this.contextID3 = buffer.getLong();
@@ -134,7 +133,7 @@ public class HID implements Serializable {
 	}
 
 	/**
-	 * Sets the deviceID of the current HID
+	 * Sets the deviceID of the current VirtualAddress
 	 * 
 	 * @param deviceID
 	 *            The DeviceID to be assigned
@@ -144,7 +143,7 @@ public class HID implements Serializable {
 	}
 
 	/**
-	 * Sets the level of the current HID
+	 * Sets the level of the current VirtualAddress
 	 * 
 	 * @param level
 	 *            The level to be assigned
@@ -158,7 +157,7 @@ public class HID implements Serializable {
 	/**
 	 * Gets the level assigned
 	 * 
-	 * @return The level of this HID
+	 * @return The level of this VirtualAddress
 	 */
 	public int getLevel() {
 		return level;
@@ -167,7 +166,7 @@ public class HID implements Serializable {
 	/**
 	 * Gets the deviceID assigned
 	 * 
-	 * @return The deviceID of this HID
+	 * @return The deviceID of this VirtualAddress
 	 */
 	public long getDeviceID() {
 		return deviceID;
@@ -176,7 +175,7 @@ public class HID implements Serializable {
 	/**
 	 * Gets the contextID1 assigned
 	 * 
-	 * @return The contextID1 of this HID
+	 * @return The contextID1 of this VirtualAddress
 	 */
 	public long getContextID1() {
 		return contextID1;
@@ -185,7 +184,7 @@ public class HID implements Serializable {
 	/**
 	 * Gets the contextID2 assigned
 	 * 
-	 * @return The contextID2 of this HID
+	 * @return The contextID2 of this VirtualAddress
 	 */
 	public long getContextID2() {
 		return contextID2;
@@ -194,7 +193,7 @@ public class HID implements Serializable {
 	/**
 	 * Gets the contextID3 assigned
 	 * 
-	 * @return The contextID3 of this HID
+	 * @return The contextID3 of this VirtualAddress
 	 */
 	public long getContextID3() {
 		return contextID3;
@@ -203,16 +202,16 @@ public class HID implements Serializable {
 	/**
 	 * Gets the level assigned
 	 * 
-	 * @return The number of nested contexts (level) of this HID
+	 * @return The number of nested contexts (level) of this VirtualAddress
 	 */
 	public int level() {
 		return level;
 	}
 
 	/**
-	 * Returns the string representation of the HID
+	 * Returns the string representation of the VirtualAddress
 	 * 
-	 * @return The string representation of the HID
+	 * @return The string representation of the VirtualAddress
 	 */
 	public String toString() {
 		return String.valueOf(contextID3) + "." + String.valueOf(contextID2)
@@ -266,11 +265,11 @@ public class HID implements Serializable {
 			return true;
 		}
 
-		if (!(obj instanceof HID)) {
+		if (!(obj instanceof VirtualAddress)) {
 			return false;
 		}
 
-		HID o = (HID) obj;
+		VirtualAddress o = (VirtualAddress) obj;
 		return (o.deviceID == deviceID) && (o.contextID1 == contextID1)
 				&& (o.contextID2 == contextID2) && (o.contextID3 == contextID3)
 				&& (o.level == level);
@@ -301,13 +300,13 @@ public class HID implements Serializable {
 	}
 
 	/**
-	 * Gets the HID in a binary representation: * Bytes 0..7 contextID3 * Bytes
+	 * Gets the VirtualAddress in a binary representation: * Bytes 0..7 contextID3 * Bytes
 	 * 8..15 contextID2 * Bytes 16..23 contextID1 * Bytes 24..31 deviceID
 	 * 
-	 * @return the binary representation of the HID, as a byte[HID_BYTE_LENGTH]
+	 * @return the binary representation of the VirtualAddress, as a byte[VIRTUAL_ADDRESS_BYTE_LENGTH]
 	 */
 	public byte[] getBytes() {
-		ByteBuffer buffer = ByteBuffer.allocate(HID_BYTE_LENGTH);
+		ByteBuffer buffer = ByteBuffer.allocate(VIRTUAL_ADDRESS_BYTE_LENGTH);
 		buffer.putLong(contextID3);
 		buffer.putLong(contextID2);
 		buffer.putLong(contextID1);

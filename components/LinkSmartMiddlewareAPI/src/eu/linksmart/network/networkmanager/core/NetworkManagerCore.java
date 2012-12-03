@@ -1,11 +1,11 @@
 package eu.linksmart.network.networkmanager.core;
 
-import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.List;
 
-import eu.linksmart.network.HID;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.security.communication.SecurityProperty;
 
@@ -16,7 +16,7 @@ public interface NetworkManagerCore extends NetworkManager {
 
 	/**
 	 * Broadcast a message to all other known LinkSmart nodes.
-	 * @param message the Message to broadcast; receiver HID will be ignored.
+	 * @param message the Message to broadcast; receiver VirtualAddress will be ignored.
 	 * @return 
 	 * @throws RemoteException
 	 */
@@ -36,29 +36,29 @@ public interface NetworkManagerCore extends NetworkManager {
 	 * Receive data from one LinkSmart node to another node synchronously.
 	 * @return Includes the response to the message
 	 */
-	public NMResponse receiveDataSynch(HID senderHID, HID receiverHID, byte [] data);
+	public NMResponse receiveDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte [] data);
 	
 	/**
 	 * Receive data from one LinkSmart node to another node asynchronously.
 	 * @return Includes only status of delivery attempt
 	 */
-	public NMResponse receiveDataAsynch(HID senderHID, HID receiverHID, byte [] data);
+	public NMResponse receiveDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte [] data);
 
 	
 	/**
-	 * Adds an HID of a remote service.  
+	 * Adds an VirtualAddress of a remote service.  
 	 * 
-	 * @param senderHID the HID of the sender. Usually a remote NetworkManager
-	 * @param remoteHID the HID of a remote service.
+	 * @param senderVirtualAddress the VirtualAddress of the sender. Usually a remote NetworkManager
+	 * @param remoteVirtualAddress the VirtualAddress of a remote service.
 	 */
-	public void addRemoteHID(HID senderHID, HID remoteHID);
+	public void addRemoteVirtualAddress(VirtualAddress senderVirtualAddress, VirtualAddress remoteVirtualAddress);
 
 	/**
-	 * Informs if the security properties of any HID changed
+	 * Informs if the security properties of any VirtualAddress changed
 	 * because of change in the Backbone.
-	 * @param hidsToUpdate
+	 * @param virtualAddressesToUpdate
 	 * @param properties
 	 */
-	public void updateSecurityProperties(List<HID> hidsToUpdate, List<SecurityProperty> properties);
+	public void updateSecurityProperties(List<VirtualAddress> virtualAddressesToUpdate, List<SecurityProperty> properties);
 	
 }
