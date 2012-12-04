@@ -403,7 +403,7 @@ public class NetworkManagerCoreImplTest {
 					"returned which is not allowed for getServiceByPID.");
 		} catch(RuntimeException e){
 			// Check if an exception with the right message was thrown
-			assertEquals("More than one Service found to passed PID", e.getMessage());
+			assertEquals("More than one service registration found to passed PID", e.getMessage());
 		}
 	}
 	
