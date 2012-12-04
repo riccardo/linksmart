@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="TrustManager"  immediate="true">
    <implementation class="eu.linksmart.security.trustmanager.impl.TrustManagerImpl"/>
-   <property name="SOAP.service.name" type="String" value="TrustManager"/>
+   
+   <property name="service.exported.interfaces" value="*"/>
+   <property name="service.exported.configs" value="org.apache.cxf.ws"/>
+   <property name="org.apache.cxf.ws.address" value="http://localhost:9090/cxf/services/TrustManager"/>
    <reference bind="bindWSProvider" cardinality="0..1" interface="eu.linksmart.clients.RemoteWSClientProvider" name="RemoteWSClientProvider" policy="static" unbind="unbindWSProvider"/>
    <service>
       <provide interface="eu.linksmart.security.trustmanager.TrustManager"/>
