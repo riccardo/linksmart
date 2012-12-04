@@ -52,7 +52,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		+ NETWORK_MGR_CORE;
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
-	private static String NETWORK_MGR_ENDPOINT = "http://localhost:8082/axis/services/NetworkManager";
+	private static String NETWORK_MGR_ENDPOINT = "http://localhost:9090/cxf/services/NetworkManager";
 
 	/**
 	 * logger
@@ -173,8 +173,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			}
 		}
 
-		Registration newRegistration = this.identityManager
-		.createServiceByAttributes(attributes);
+		Registration newRegistration = this.identityManager.createServiceByAttributes(attributes);
 		if(newRegistration != null) {
 			List<SecurityProperty> properties = this.backboneRouter
 			.getBackboneSecurityProperties(backboneName);
