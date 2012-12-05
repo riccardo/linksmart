@@ -39,11 +39,16 @@ public class NetworkManagerFacaceImpl implements NetworkManagerFacade {
 	}
 
 	@Override
-	public String createHIDForServiceID(String serviceID) throws RemoteException {
-		String hid = networkManager.createHIDwDesc(serviceID,
-				AXIS_SERVICES_PATH + serviceID);
+	public String createHIDForService(String serviceName, String wsInterfaceName) throws RemoteException {
+		String hid = networkManager.createHIDwDesc(serviceName,
+				AXIS_SERVICES_PATH + wsInterfaceName);
 		return hid;
 
+	}
+
+	@Override
+	public void deregisterService(String hid) throws RemoteException {
+		networkManager.removeHID(hid);
 	}
 
 }
