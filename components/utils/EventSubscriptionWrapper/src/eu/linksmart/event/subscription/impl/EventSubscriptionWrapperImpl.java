@@ -156,7 +156,6 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 	
 	@Override
 	public void unsubscribeAllTopics(String serviceID) {
-		// TODO Auto-generated method stub
 		EventManagerPort eventManager = eventManagers.get(serviceID);
 		String subscriberHID = subscriberHIDs.get(serviceID);
 		try {
@@ -168,7 +167,6 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 
 	@Override
 	public void unsubscribeTopic(String serviceID, String topic) {
-		// TODO Auto-generated method stub
 		EventManagerPort eventManager = eventManagers.get(serviceID);
 		String subscriberHID = subscriberHIDs.get(serviceID);
 		try {
