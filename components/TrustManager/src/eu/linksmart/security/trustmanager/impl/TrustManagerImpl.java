@@ -75,11 +75,11 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 	public final static String CONFIGFOLDERPATH = "TrustManager/configuration";
 	public final static String TRUSTMANAGERFOLDERPATH = "TrustManager";
 	public final static String TRUSTMANAGER_RESOURCE_FOLDERPATH = TRUSTMANAGERFOLDERPATH + "/resources/";
-	public static final String TRUST_MANAGER_PATH = "/axis/services/TrustManager";
-	public static final String NETWORK_MANAGER_PATH = "/axis/services/NetworkManagerApplication"; 
+	public static final String TRUST_MANAGER_PATH = "/cxf/services/TrustManager";
+	//public static final String NETWORK_MANAGER_PATH = "/cxf/services/NetworkManagerApplication"; 
 	//can be any string from the config.xml class name
 	public final static String CURRENT_TRUST_MODEL = "NullTrustModel";
-	private static String BACKBONE_SOAP = "BackboneSOAPImpl";
+	private static String BACKBONE_SOAP = "eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl";
 
 	private TrustManagerConfigurator configurator;
 	private BundleContext context;
@@ -329,7 +329,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 												ServiceAttribute.CERT_REF.name(),
 												configurator.get(TrustManagerConfigurator.CERTIFICATE_REF))
 										}, 
-								"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH,
+								"http://localhost:9090"+ TRUST_MANAGER_PATH,
 								BACKBONE_SOAP));
 						if (this.trustManagerVirtualAddress == null) {
 							//Certificate ref is not valid...
@@ -371,8 +371,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		};
 		
 		Registration serviceInfo = nm.registerService(tmAttr,
-				"http://localhost:"+System.getProperty("org.osgi.service.http.port")+ TRUST_MANAGER_PATH,
-				BACKBONE_SOAP);
+				"http://localhost:9090" + TRUST_MANAGER_PATH, BACKBONE_SOAP);
 		Part[] attributes = serviceInfo.getAttributes();
 		for (Part attr : attributes) {
 			if(attr.getKey().contentEquals(ServiceAttribute.CERT_REF.name())){
