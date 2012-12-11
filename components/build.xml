@@ -55,9 +55,9 @@
 	<target name="make-java" depends="make-dirs" description="Build components">
 		<!--<ant dir="Log4j" target="make" />-->
 		<ant dir="LinkSmartMiddlewareAPI" target="make" />
-        <ant dir="LinkSmartWSProvider" target="make" />
 		<!-- <ant dir="LinkSmartMiddlewareClients" target="make" /> -->
         <ant dir="LinkSmartManagerConfigurator" target="make" />
+		<!-- <ant dir="LinkSmartWSProvider" target="make" /> -->
 		
         <ant dir="NetworkManager2.0/CommunicationSecurityManager" target="make" />
 		<ant dir="NetworkManager2.0/NetworkManager" target="make" />
@@ -67,7 +67,7 @@
         <!-- <ant dir="NetworkManager2.0/BackboneWS" target="make" /> -->
         
         <ant dir="CryptoManager" target="make" />
-        <!-- <ant dir="TrustManager" target="make" /> -->
+        <ant dir="TrustManager" target="make" />
         
         <!-- <ant dir="EventManager" target="make" /> --> 
 	</target>
