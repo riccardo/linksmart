@@ -14,7 +14,7 @@
 		<dependency org="org.junit" name="com.springsource.org.junit" rev="4.8.1" />
 		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi.services" rev="3.2.100" />
-		<dependency org="org.apache.servicemix" name="org.apache.servicemix.bundles.xmlsec" rev="1.4.4_2" />
+		<dependency org="org.apache.servicemix.bundles" name="org.apache.servicemix.bundles.xmlsec" rev="1.4.5_1" />
 		<dependency org="org.apache.xalan" name="com.springsource.org.apache.xalan" rev="2.7.1" />
 		<dependency org="eu.linksmart" name="eu.linksmart.middlewareapi" rev="2.0.0"  />
 	</dependencies>
