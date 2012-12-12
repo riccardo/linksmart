@@ -118,7 +118,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private Hashtable<Integer, PipeSender> requestIdPipeSenderTable;
 	Integer i = 0;
 
-	private int MAXTIMERESPONSE = 200000;
+	private int MAXTIMERESPONSE = 60000;
 
 	private BackboneJXTAImpl bbjxta;
 
@@ -201,7 +201,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 
 		Message msg = new Message();
 		msg.addMessageElement(new ByteArrayMessageElement(
-		MESSAGE_ELEMENT_NAME_SYNCH, null, (synch)?TRUE.getBytes():FALSE.getBytes(), null));
+				MESSAGE_ELEMENT_NAME_SYNCH, null, (synch)?TRUE.getBytes():FALSE.getBytes(), null));
 		msg.addMessageElement(new ByteArrayMessageElement(
 				MESSAGE_ELEMENT_NAME_DATA, null, data, null));
 		msg.addMessageElement(new ByteArrayMessageElement(
@@ -255,6 +255,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	public class PipeSender {
 		private NMResponse resp;
 		private Integer requestID;
+		private boolean responseReceived = false;
 
 		/**
 		 * Constructor
@@ -273,10 +274,12 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		 *            the data to send
 		 */
 		public void notification(byte[] data) {
+			responseReceived = true;
 			// TODO: Does data also include a status? Then, resp.setStatus()
 			// must also be called
+
+			logger.debug("Received response in " + requestID);
 			resp.setMessage(new String(data));
-			// resp.setSessionID(sessionId);
 			synchronized (requestID) {
 				requestID.notify();
 			}
@@ -295,7 +298,10 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					e.printStackTrace();
 				}
 			}
-			logger.debug("Received response in " + requestID);
+			if(!responseReceived) {
+				resp = new NMResponse(NMResponse.STATUS_ERROR);
+				resp.setMessage("Request timed out.");
+			}
 			return resp;
 		}
 
@@ -525,7 +531,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 
 				VirtualAddress sourceVirtualAddress = new VirtualAddress(source.getBytes());
 				VirtualAddress destVirtualAddress = new VirtualAddress(dest.getBytes());
-				
+
 				ByteArrayMessageElement synchBytes = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SYNCH);
 				boolean synch = new String(synchBytes.getBytes()).contentEquals(TRUE);
 				try {
@@ -538,8 +544,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				logger.debug("Received data : " + data.toString() + " from VirtualAddress="
 						+ sourceVirtualAddress.toString() + " to VirtualAddress=" + destVirtualAddress.toString());
 				if(synch) {
-				// reverse source and destination because we (dest) send response back to source
-				sendMessageResponse(destVirtualAddress, sourceVirtualAddress, r.getMessage().getBytes(), requestId);
+					// reverse source and destination because we (dest) send response back to source
+					sendMessageResponse(destVirtualAddress, sourceVirtualAddress, r.getMessage().getBytes(), requestId);
 				}
 
 			}else if (type.toString().equalsIgnoreCase(MESSAGE_ELEMENT_TYPE_RESPONSE)) {
