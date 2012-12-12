@@ -62,8 +62,9 @@ public class IdentityManagerCertImpl extends IdentityManagerImpl {
 					}
 					//if the provided attributes don't match better not create VirtualAddress
 					if(!mismatch) {
-					cryptoManager.addPrivateKeyForService(virtualAddress.toString(), certRef);
-					cryptoManager.addCertificateForService(virtualAddress.toString(), certRef);
+						attributes = certAttributes;
+						cryptoManager.addPrivateKeyForService(virtualAddress.toString(), certRef);
+						cryptoManager.addCertificateForService(virtualAddress.toString(), certRef);
 					} else {
 						LOG.warn("Tried creating VirtualAddress from certificate with wrong attributes.");
 						return null;
@@ -95,7 +96,7 @@ public class IdentityManagerCertImpl extends IdentityManagerImpl {
 	protected void unbindCryptoManager(CryptoManager cryptoManager) {
 		this.cryptoManager = null;
 	}
-	
+
 	public String getIdentifier() {
 		return IDENTITY_MGR;
 	}
