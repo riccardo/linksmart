@@ -5,7 +5,7 @@
 function getEventManagerInfo() {
 	eventManagerInfo = '{"available":"yes", "subscriptions":[]}'.evalJSON();
 	
-	new Ajax.Request('http://localhost:8082/GetEventManagerSubscriptions', {
+	new Ajax.Request('/GetEventManagerSubscriptions', {
 		method: 'get',
 		parameters: {},
 		onComplete: function(transport){

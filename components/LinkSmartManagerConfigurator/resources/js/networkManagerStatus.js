@@ -2,7 +2,7 @@
  * @author Adrian
  */
 
-var NMServletURL = 'http://localhost:8082/GetNetworkManagerStatus';
+var NMServletURL = '/GetNetworkManagerStatus';
 
 function getNetworkManagerInfo() {
 	$.ajax({
