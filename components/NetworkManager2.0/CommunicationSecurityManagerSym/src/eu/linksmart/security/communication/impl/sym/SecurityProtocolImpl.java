@@ -207,9 +207,11 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 			if(serverIdentifier != null && !serverIdentifier.isEmpty() && mkExists){
 				isAsymRunning = false;
 				symHandshake.setMasterKeyIdentifier(master_identifier);
+				logger.debug("Started symmetric handshake protocol.");
 				return this.symHandshake.startProtocol();
 			} else {
 				isAsymRunning = true;
+				logger.debug("Started asymmetric handshake protocol.");
 				return this.asymHandshake.startProtocol();
 			}
 		}catch(Exception e){

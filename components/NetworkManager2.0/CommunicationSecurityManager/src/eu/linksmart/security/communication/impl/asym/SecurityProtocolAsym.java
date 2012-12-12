@@ -135,6 +135,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	}
 
 	public Message startProtocol() throws CryptoException {
+		logger.debug("Starting asymmetric handshake.");
 		isClient = true;
 		isStarted = true;
 
