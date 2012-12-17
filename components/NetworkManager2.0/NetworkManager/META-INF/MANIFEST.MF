@@ -25,4 +25,4 @@ Import-Package: eu.linksmart.network;version="1.0.0",
  org.osgi.service.cm;version="1.2.1",
  org.osgi.service.component;version="1.1.0",
  org.osgi.service.http
-Service-Component: OSGI-INF/DS_NetworkManager.xml, OSGi-INF/DS_NetworkManagerCore.xml
+Service-Component: OSGI-INF/DS_NetworkManager.xml, OSGI-INF/DS_NetworkManagerCore.xml
