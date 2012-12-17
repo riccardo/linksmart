@@ -83,7 +83,6 @@
 			<fileset dir="${build.dir}" />
 			<fileset dir="${basedir}" includes="OSGI-INF/*" />
 			<fileset dir="${basedir}" includes="resources/**" />
-			<fileset dir="${basedir}" includes="NM.properties,seeds.txt" />
 		</jar>
 	</target>
 
