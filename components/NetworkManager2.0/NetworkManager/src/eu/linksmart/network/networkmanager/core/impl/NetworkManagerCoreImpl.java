@@ -69,16 +69,16 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	 */
 	protected void activate(ComponentContext context) {
 
-		LOG.debug(STARTING_MESSAGE);
+		LOG.info(STARTING_MESSAGE);
 
 		init(context);
 
-		LOG.debug(STARTED_MESSAGE);
+		LOG.info(STARTED_MESSAGE);
 
 	}
 
 	protected void deactivate(ComponentContext context) {
-		System.out.println(NETWORK_MGR_CORE + "stopped");
+		LOG.info(NETWORK_MGR_CORE + "stopped");
 	}
 
 	protected void bindCommunicationSecurityManager(
