@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: BackboneWS
-Bundle-SymbolicName: BackboneWS
-Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: eu.linksmart.network.backbone.ws
+Bundle-Version: 1.0.0
 Import-Package: eu.linksmart.network;version="1.0.0",
  eu.linksmart.network.backbone,
  org.osgi.service.component
