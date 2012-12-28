@@ -136,8 +136,9 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 		try {
 			String servicePackage = className.substring(0, className.lastIndexOf("."));
 			String serviceName = className.substring(className.lastIndexOf(".") + 1);
-			Class l = Class.forName(servicePackage + ".client."
-				+ serviceName + "ServiceLocator");
+			Class l = Class.forName(servicePackage + 
+					".client." + 
+					serviceName + "Locator");
 			Object service = null;
 
 			if (coreSecurityConfig) {
@@ -152,11 +153,11 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 			Remote remote; 
 			if (endpoint != null) {
 				URL url = new URL(endpoint);
-				Method method = l.getMethod("get" + serviceName, URL.class);
+				Method method = l.getMethod("get" + serviceName+"Port", URL.class);
 				remote = (Remote) method.invoke(service, url);
 			}
 			else {
-				Method method = l.getMethod("get" + serviceName, null);
+				Method method = l.getMethod("get" + serviceName+"Port", null);
 				remote = (Remote) method.invoke(service, new Object[0]);
 			}
 			return remote;
