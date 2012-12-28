@@ -58,8 +58,9 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * wait default timeout to discover a remote set of registrations.
 	 * @param attributes The attributes the service is supposed to have
 	 * @return The services in Registration objects
+	 * @throws RemoteException 
 	 */
-	public Registration[] getServiceByAttributes(Part[] attributes);
+	public Registration[] getServiceByAttributes(Part[] attributes) throws RemoteException;
 	
 	/**
 	 * Method to exactly control gathering of services. 
@@ -80,15 +81,17 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * @param PID The persistent identifier of the service.
 	 * @return 	The Registration object, 
 	 * 			<code>null</code> if no VirtualAddress exists for the given PID.
+	 * @throws RemoteException 
 	 */
-	public Registration getServiceByPID (String PID) throws IllegalArgumentException;
+	public Registration getServiceByPID (String PID) throws IllegalArgumentException, RemoteException;
 	
 	/**
 	 * Gets the Registration for the available service(s) with the description.
 	 * @param description The relevant service description.
 	 * @return The Registration objects.
+	 * @throws RemoteException 
 	 */
-	public Registration [] getServiceByDescription(String description);
+	public Registration [] getServiceByDescription(String description) throws RemoteException;
 	
 	/**
 	 * Gets the VirtualAddress for the locally available services for the passed query.
@@ -97,6 +100,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * This method should only be used by advanced developers.
 	 * @param query The formulated query.
 	 * @return The Registration objects.
+	 * @throws RemoteException 
 	 */
-	public Registration [] getServiceByQuery(String query);
+	public Registration [] getServiceByQuery(String query) throws RemoteException;
 }

@@ -59,22 +59,22 @@ import eu.linksmart.utils.Part;
 		}
 
 		@Override
-		public Registration[] getServiceByAttributes(Part[] attributes) {
+		public Registration[] getServiceByAttributes(Part[] attributes) throws RemoteException {
 			return this.core.getServiceByAttributes(attributes);
 		}
 
 		@Override
-		public Registration getServiceByPID(String PID) throws IllegalArgumentException {
+		public Registration getServiceByPID(String PID) throws IllegalArgumentException, RemoteException {
 			return this.core.getServiceByPID(PID);
 		}
 
 		@Override
-		public Registration[] getServiceByDescription(String description) {
+		public Registration[] getServiceByDescription(String description) throws RemoteException {
 			return this.core.getServiceByDescription(description);
 		}
 
 		@Override
-		public Registration[] getServiceByQuery(String query) {
+		public Registration[] getServiceByQuery(String query) throws RemoteException {
 			return this.core.getServiceByQuery(query);
 		}
 
