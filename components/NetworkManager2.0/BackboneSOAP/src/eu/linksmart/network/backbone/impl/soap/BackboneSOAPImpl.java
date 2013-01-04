@@ -229,7 +229,7 @@ public class BackboneSOAPImpl implements Backbone {
 	 */
 	private NMResponse getResponse(URL urlEndpoint, NMResponse resp, String dataproc) {
 		try {
-			// Create Socket to local axis service
+			// Create Socket to local web service
 			Socket clientSocket = new Socket();
 			clientSocket.connect(new InetSocketAddress(urlEndpoint.getHost(), urlEndpoint
 					.getPort()), TIMEOUT);
