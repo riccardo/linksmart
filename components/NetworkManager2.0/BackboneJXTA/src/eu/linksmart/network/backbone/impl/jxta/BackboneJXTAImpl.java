@@ -323,8 +323,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		logger.debug("BBJXTA broadcastData - senderVirtualAddress: "
 				+ senderVirtualAddress.toString());
-		logger.debug("BBJXTA - broadcastData with VirtualAddress: "
-				+ BackboneJXTAUtils.ConvertByteArrayToString(payload));
 
 		// send message as multicast message
 		synchronized (msocket) {
