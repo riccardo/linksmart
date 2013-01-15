@@ -4,12 +4,8 @@ Bundle-Name: LinkSmart WS Provider
 Bundle-SymbolicName: eu.linksmart.wsprovider
 Bundle-Version: 2.0.0
 Bundle-Vendor: LinkSmart
-Service-Component: OSGi-INF/component.xml
 Bundle-ClassPath: .,
- lib/axis.jar,
- lib/bcprov-jdk14.jar,
- lib/bcprov-jdk15-138.jar,
- lib/bcprov-jdk16-138.jar
+ lib/axis.jar
 DynamicImport-Package: * 
 Import-Package: org.apache.commons.logging,
  org.apache.cxf;version="2.5.2",
