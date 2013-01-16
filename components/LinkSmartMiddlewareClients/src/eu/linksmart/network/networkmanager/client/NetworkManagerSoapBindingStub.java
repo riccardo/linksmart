@@ -7,10 +7,7 @@
 
 package eu.linksmart.network.networkmanager.client;
 
-import eu.linksmart.network.Registration;
-import eu.linksmart.utils.Part;
-
-public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub implements eu.linksmart.network.networkmanager.NetworkManager {
+public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub implements eu.linksmart.network.networkmanager.client.NetworkManagerPortType {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
     private java.util.Vector cachedSerFactories = new java.util.Vector();
@@ -697,12 +694,5 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
   throw axisFaultException;
 }
     }
-
-	@Override
-	public Registration[] getServiceByAttributes(Part[] attributes,
-			long timeOut, boolean returnFirst, boolean isStrictRequest) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

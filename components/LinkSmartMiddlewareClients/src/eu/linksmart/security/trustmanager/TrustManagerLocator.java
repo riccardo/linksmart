@@ -1,60 +1,59 @@
 /**
- * NetworkManagerLocator.java
+ * TrustManagerLocator.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
  */
 
-package eu.linksmart.network.networkmanager.client;
+package eu.linksmart.security.trustmanager;
 
+public class TrustManagerLocator extends org.apache.axis.client.Service implements eu.linksmart.security.trustmanager.TrustManager {
 
-public class NetworkManagerLocator extends org.apache.axis.client.Service implements eu.linksmart.network.networkmanager.client.NetworkManager {
-
-    public NetworkManagerLocator() {
+    public TrustManagerLocator() {
     }
 
 
-    public NetworkManagerLocator(org.apache.axis.EngineConfiguration config) {
+    public TrustManagerLocator(org.apache.axis.EngineConfiguration config) {
         super(config);
     }
 
-    public NetworkManagerLocator(java.lang.String wsdlLoc, javax.xml.namespace.QName sName) throws javax.xml.rpc.ServiceException {
+    public TrustManagerLocator(java.lang.String wsdlLoc, javax.xml.namespace.QName sName) throws javax.xml.rpc.ServiceException {
         super(wsdlLoc, sName);
     }
 
-    // Use to get a proxy class for NetworkManagerPort
-    private java.lang.String NetworkManagerPort_address = "http://localhost:9090/cxf/services/NetworkManager";
+    // Use to get a proxy class for TrustManagerPort
+    private java.lang.String TrustManagerPort_address = "http://localhost:9090/cxf/services/TrustManager";
 
-    public java.lang.String getNetworkManagerPortAddress() {
-        return NetworkManagerPort_address;
+    public java.lang.String getTrustManagerPortAddress() {
+        return TrustManagerPort_address;
     }
 
     // The WSDD service name defaults to the port name.
-    private java.lang.String NetworkManagerPortWSDDServiceName = "NetworkManagerPort";
+    private java.lang.String TrustManagerPortWSDDServiceName = "TrustManagerPort";
 
-    public java.lang.String getNetworkManagerPortWSDDServiceName() {
-        return NetworkManagerPortWSDDServiceName;
+    public java.lang.String getTrustManagerPortWSDDServiceName() {
+        return TrustManagerPortWSDDServiceName;
     }
 
-    public void setNetworkManagerPortWSDDServiceName(java.lang.String name) {
-        NetworkManagerPortWSDDServiceName = name;
+    public void setTrustManagerPortWSDDServiceName(java.lang.String name) {
+        TrustManagerPortWSDDServiceName = name;
     }
 
-    public eu.linksmart.network.networkmanager.client.NetworkManagerPortType getNetworkManagerPort() throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.security.trustmanager.TrustManagerPortType getTrustManagerPort() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
-            endpoint = new java.net.URL(NetworkManagerPort_address);
+            endpoint = new java.net.URL(TrustManagerPort_address);
         }
         catch (java.net.MalformedURLException e) {
             throw new javax.xml.rpc.ServiceException(e);
         }
-        return getNetworkManagerPort(endpoint);
+        return getTrustManagerPort(endpoint);
     }
 
-    public eu.linksmart.network.networkmanager.client.NetworkManagerPortType getNetworkManagerPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.security.trustmanager.TrustManagerPortType getTrustManagerPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
-            eu.linksmart.network.networkmanager.client.NetworkManagerSoapBindingStub _stub = new eu.linksmart.network.networkmanager.client.NetworkManagerSoapBindingStub(portAddress, this);
-            _stub.setPortName(getNetworkManagerPortWSDDServiceName());
+            eu.linksmart.security.trustmanager.TrustManagerSoapBindingStub _stub = new eu.linksmart.security.trustmanager.TrustManagerSoapBindingStub(portAddress, this);
+            _stub.setPortName(getTrustManagerPortWSDDServiceName());
             return _stub;
         }
         catch (org.apache.axis.AxisFault e) {
@@ -62,8 +61,8 @@ public class NetworkManagerLocator extends org.apache.axis.client.Service implem
         }
     }
 
-    public void setNetworkManagerPortEndpointAddress(java.lang.String address) {
-        NetworkManagerPort_address = address;
+    public void setTrustManagerPortEndpointAddress(java.lang.String address) {
+        TrustManagerPort_address = address;
     }
 
     /**
@@ -73,9 +72,9 @@ public class NetworkManagerLocator extends org.apache.axis.client.Service implem
      */
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
-            if (eu.linksmart.network.networkmanager.client.NetworkManagerPortType.class.isAssignableFrom(serviceEndpointInterface)) {
-                eu.linksmart.network.networkmanager.client.NetworkManagerSoapBindingStub _stub = new eu.linksmart.network.networkmanager.client.NetworkManagerSoapBindingStub(new java.net.URL(NetworkManagerPort_address), this);
-                _stub.setPortName(getNetworkManagerPortWSDDServiceName());
+            if (eu.linksmart.security.trustmanager.TrustManagerPortType.class.isAssignableFrom(serviceEndpointInterface)) {
+                eu.linksmart.security.trustmanager.TrustManagerSoapBindingStub _stub = new eu.linksmart.security.trustmanager.TrustManagerSoapBindingStub(new java.net.URL(TrustManagerPort_address), this);
+                _stub.setPortName(getTrustManagerPortWSDDServiceName());
                 return _stub;
             }
         }
@@ -95,8 +94,8 @@ public class NetworkManagerLocator extends org.apache.axis.client.Service implem
             return getPort(serviceEndpointInterface);
         }
         java.lang.String inputPortName = portName.getLocalPart();
-        if ("NetworkManagerPort".equals(inputPortName)) {
-            return getNetworkManagerPort();
+        if ("TrustManagerPort".equals(inputPortName)) {
+            return getTrustManagerPort();
         }
         else  {
             java.rmi.Remote _stub = getPort(serviceEndpointInterface);
@@ -106,7 +105,7 @@ public class NetworkManagerLocator extends org.apache.axis.client.Service implem
     }
 
     public javax.xml.namespace.QName getServiceName() {
-        return new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "NetworkManager");
+        return new javax.xml.namespace.QName("http://trustmanager.security.linksmart.eu/", "TrustManager");
     }
 
     private java.util.HashSet ports = null;
@@ -114,7 +113,7 @@ public class NetworkManagerLocator extends org.apache.axis.client.Service implem
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "NetworkManagerPort"));
+            ports.add(new javax.xml.namespace.QName("http://trustmanager.security.linksmart.eu/", "TrustManagerPort"));
         }
         return ports.iterator();
     }
@@ -124,8 +123,8 @@ public class NetworkManagerLocator extends org.apache.axis.client.Service implem
     */
     public void setEndpointAddress(java.lang.String portName, java.lang.String address) throws javax.xml.rpc.ServiceException {
         
-if ("NetworkManagerPort".equals(portName)) {
-            setNetworkManagerPortEndpointAddress(address);
+if ("TrustManagerPort".equals(portName)) {
+            setTrustManagerPortEndpointAddress(address);
         }
         else 
 { // Unknown Port Name

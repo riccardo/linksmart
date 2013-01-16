@@ -12,7 +12,7 @@
 	<property name="wsdl" value="http://localhost:8082/axis/services/NetworkManager?wsdl" />
 	
 	<!-- properties -->
-	<property name="moduleName" value="LinkSmartMiddlewareClients" />
+	<property name="moduleName" value="eu.linksmart.middlewareclients" />
 	<property name="revision" value="2.0.0" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />

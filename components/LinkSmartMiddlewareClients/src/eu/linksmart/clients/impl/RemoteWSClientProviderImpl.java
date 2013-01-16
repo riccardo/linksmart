@@ -65,7 +65,7 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 	 */
 	private static final String LINK_SMART_MIDDLEWARE_CLIENTS_FILE_PATH = 
 		"/com/eu/linksmart/clients/impl/LinkSmartMiddlewareClients";
-	
+
 	/**
 	 * Shows a info message when activate
 	 * 
@@ -90,26 +90,26 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 	 * @return an array with the list of available manager clients
 	 */
 	public String[] getManagerClients() {
-		
+
 		ArrayList<String> managers = new ArrayList<String>();
 
 		InputStream stream = this.getClass().getResourceAsStream(
-			LINK_SMART_MIDDLEWARE_CLIENTS_FILE_PATH);
+				LINK_SMART_MIDDLEWARE_CLIENTS_FILE_PATH);
 		InputStreamReader reader = new InputStreamReader(stream);
 		BufferedReader entrada = new BufferedReader(reader);
-        
+
 		String client;
-        try {
+		try {
 			while((client = entrada.readLine()) != null)
-			   managers.add(client);
+				managers.add(client);
 		} catch (IOException e) {
 			return (String[]) managers.toArray();
 		}
-		
+
 		String[] aux = new String[]{}; 
 		return managers.toArray(aux);
 	}
-	
+
 	/**
 	 * This method retrieves the client stubs for a LinkSmart Java Manager. 
 	 * Providing a className for the service desired, this method returns a 
@@ -130,26 +130,21 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 	 * @return {@link java.rmi.Remote} containing the client stubs for 
 	 * the required service
 	 */
-	public Object getRemoteWSClient(String className, String endpoint,
-			boolean coreSecurityConfig) throws Exception {
-		
+	public Object getRemoteWSClient(String className, String endpoint) throws Exception {
+
 		try {
+			//get locator object
 			String servicePackage = className.substring(0, className.lastIndexOf("."));
 			String serviceName = className.substring(className.lastIndexOf(".") + 1);
-			Class l = Class.forName(servicePackage + 
-					".client." + 
+			Class l = Class.forName(servicePackage + ".client." +
 					serviceName + "Locator");
 			Object service = null;
 
-			if (coreSecurityConfig) {
-				Constructor cons = l.getConstructor(EngineConfiguration.class);
-				service = cons.newInstance(getEngineConfiguration());
-			}
-			else {
-				Constructor cons = l.getConstructor();
-				service = cons.newInstance();
-			}
-			
+
+			Constructor cons = l.getConstructor();
+			service = cons.newInstance();
+
+			//get port type from locator 
 			Remote remote; 
 			if (endpoint != null) {
 				URL url = new URL(endpoint);
@@ -160,7 +155,24 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 				Method method = l.getMethod("get" + serviceName+"Port", null);
 				remote = (Remote) method.invoke(service, new Object[0]);
 			}
-			return remote;
+			//get encapsulation object and pass it port type
+			Class encClass = Class.forName(servicePackage + 
+					".client." + 
+					serviceName + "Encapsulation");
+
+			//get the porttype inteface
+			Class[] interfaces = remote.getClass().getInterfaces();
+			Class portIntf = null;
+			for(Class intf : interfaces) {
+				if (intf.getName().contains("PortType")) {
+					portIntf = intf;
+					break;
+				}
+			}
+
+			Constructor consEnc = encClass.getConstructor(portIntf);
+			Object enc = consEnc.newInstance(remote);
+			return enc;
 		} catch (ClassNotFoundException e) {
 			throw e;
 		} catch (SecurityException e) {
@@ -188,9 +200,9 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 	public static void main(String[] args) {
 		(new RemoteWSClientProviderImpl()).getEngineConfiguration();
 	}
-	
-	
-	
+
+
+
 	/**
 	 * @return an engine configuration
 	 */
@@ -199,7 +211,7 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 		String configString = "<deployment xmlns=\"http://xml.apache.org/axis/wsdd/\" "
 			+ "xmlns:java=\"http://xml.apache.org/axis/wsdd/providers/java\">\n"
 			+ "<globalConfiguration>\n"
-	 		+ "<requestFlow>\n"
+			+ "<requestFlow>\n"
 			+ "<handler name=\"URLMapper\" "
 			+ "type=\"java:org.apache.axis.handlers.http.URLMapper\" />\n"
 			+ "<handler "
@@ -221,9 +233,9 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 			+ "<transport name=\"java\" "
 			+ "pivot=\"java:org.apache.axis.transport.java.JavaSender\" />\n"
 			+ "</deployment>\n";
-		
+
 		config = new org.apache.axis.configuration.XMLStringProvider(
-			configString.toString());
+				configString.toString());
 		return config;
 	}
 
