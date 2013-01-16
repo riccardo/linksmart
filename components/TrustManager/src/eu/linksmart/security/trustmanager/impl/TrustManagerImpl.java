@@ -303,7 +303,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 								try {
 									this.nm = (NetworkManager)clientProvider.
 									getRemoteWSClient(NetworkManager.class.getName(), 
-											(String)configurator.get(TrustManagerConfigurator.NETWORK_MANAGER_ADDRESS), false);
+											(String)configurator.get(TrustManagerConfigurator.NETWORK_MANAGER_ADDRESS));
 								} catch (Exception e1) {
 									LOG.error("Error while creating client to NetworkManagerCore: " + e1.getMessage(), e1);
 								}

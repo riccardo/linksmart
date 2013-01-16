@@ -66,7 +66,6 @@ public interface RemoteWSClientProvider {
 	 * @return {@link java.rmi.Remote} containing the client stubs for 
 	 * the required service
 	 */
-	public Object getRemoteWSClient(String className, String endpoint, 
-		boolean coreSecurityConfig) throws Exception; 
+	public Object getRemoteWSClient(String className, String endpoint) throws Exception; 
 	
 }

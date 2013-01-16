@@ -71,10 +71,11 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * true - only services will be discovered which possess all attributes <br/>
 	 * false - attribute types which a service does not have are ignored
 	 * @return Even if returnFirst is set true more registration of services may be available
+	 * @throws RemoteException 
 	 */
 	public Registration[] getServiceByAttributes(
 			Part[] attributes,long timeOut,
-			boolean returnFirst, boolean isStrictRequest);
+			boolean returnFirst, boolean isStrictRequest) throws RemoteException;
 	
 	/**
 	 * Gets the VirtualAddress for the available service with the passed PID.

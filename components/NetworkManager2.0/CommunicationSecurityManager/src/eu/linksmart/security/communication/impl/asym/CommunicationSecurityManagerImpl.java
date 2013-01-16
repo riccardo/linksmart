@@ -122,7 +122,7 @@ public class CommunicationSecurityManagerImpl implements CommunicationSecurityMa
 				//get trustmanager service over url
 				try {
 					this.trustMgr = (TrustManager)this.wsProvider.getRemoteWSClient(TrustManager.class.getName(), 
-							url, false);
+							url);
 				} catch (Exception e) {
 					logger.error("Error getting TrustManager service over URL.");
 				}

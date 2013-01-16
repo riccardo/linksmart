@@ -80,7 +80,7 @@ import eu.linksmart.utils.Part;
 
 		@Override
 		public Registration[] getServiceByAttributes(Part[] attributes, long timeOut,
-				boolean returnFirst, boolean isStrictRequest) {
+				boolean returnFirst, boolean isStrictRequest) throws RemoteException {
 			return this.core.getServiceByAttributes(
 					attributes, timeOut, returnFirst, isStrictRequest);
 		}
