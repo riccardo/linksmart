@@ -2,9 +2,10 @@ package eu.linksmart.network.networkmanager.client;
 
 import java.rmi.RemoteException;
 
-import eu.linksmart.network.NMResponse;
-import eu.linksmart.network.Registration;
-import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.client.Registration;
+import eu.linksmart.network.client.converter.NMResponseConverter;
+import eu.linksmart.network.client.converter.RegistrationConverter;
+import eu.linksmart.network.client.converter.VirtualAddressConverter;
 import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.utils.Part;
 
@@ -17,26 +18,34 @@ public class NetworkManagerEncapsulation implements NetworkManager {
 	}
 	
 	@Override
-	public NMResponse sendData(VirtualAddress sender, VirtualAddress receiver,
+	public eu.linksmart.network.NMResponse sendData(
+			eu.linksmart.network.VirtualAddress sender,
+			eu.linksmart.network.VirtualAddress receiver,
 			byte[] data, boolean synch) throws RemoteException {
-		return nmPortType.sendData(sender, receiver, data, synch);
+		eu.linksmart.network.client.NMResponse response = 
+			nmPortType.sendData(
+					VirtualAddressConverter.toClient(sender),
+					VirtualAddressConverter.toClient(receiver), data, synch);
+		return NMResponseConverter.toApi(response);
 	}
 
 	@Override
-	public VirtualAddress getService() throws RemoteException {
-		return nmPortType.getService();
+	public eu.linksmart.network.VirtualAddress getService() throws RemoteException {
+		return VirtualAddressConverter.toApi(nmPortType.getService());
 	}
 
 	@Override
-	public Registration registerService(Part[] attributes, String endpoint,
+	public eu.linksmart.network.Registration registerService(Part[] attributes, String endpoint,
 			String backboneName) throws RemoteException {
-		return nmPortType.registerService(attributes, endpoint, backboneName);
+		return RegistrationConverter.toApi(
+				nmPortType.registerService(attributes, endpoint, backboneName));
 	}
 
 	@Override
-	public boolean removeService(VirtualAddress virtualAddress)
+	public boolean removeService(eu.linksmart.network.VirtualAddress virtualAddress)
 			throws RemoteException {
-		return nmPortType.removeService(virtualAddress);
+		return nmPortType.removeService(
+				VirtualAddressConverter.toClient(virtualAddress));
 	}
 
 	@Override
@@ -45,32 +54,64 @@ public class NetworkManagerEncapsulation implements NetworkManager {
 	}
 
 	@Override
-	public Registration[] getServiceByAttributes(Part[] attributes)
+	public eu.linksmart.network.Registration[] getServiceByAttributes(Part[] attributes)
 			throws RemoteException {
-		return nmPortType.getServiceByAttributes(attributes);
+		Registration[] regs = nmPortType.getServiceByAttributes(attributes);
+		eu.linksmart.network.Registration[] regsApi = new eu.linksmart.network.Registration[regs.length];
+		
+		for(int i=0; i<regs.length; i++) {
+			regsApi[i] = RegistrationConverter.toApi(regs[i]);
+		}
+		
+		return regsApi;
 	}
 
 	@Override
-	public Registration[] getServiceByAttributes(Part[] attributes,
-			long timeOut, boolean returnFirst, boolean isStrictRequest) throws RemoteException {
-		return nmPortType.getServiceByAttributes1(attributes, timeOut, returnFirst, isStrictRequest);
+	public eu.linksmart.network.Registration[] getServiceByAttributes(Part[] attributes,
+			long timeOut, boolean returnFirst, boolean isStrictRequest) throws RemoteException {		
+		Registration[] regs = nmPortType.getServiceByAttributes1(
+				attributes, timeOut, returnFirst, isStrictRequest);
+		eu.linksmart.network.Registration[] regsApi = 
+			new eu.linksmart.network.Registration[regs.length];
+		
+		for(int i=0; i<regs.length; i++) {
+			regsApi[i] = RegistrationConverter.toApi(regs[i]);
+		}
+		
+		return regsApi;
 	}
 
 	@Override
-	public Registration getServiceByPID(String PID)
+	public eu.linksmart.network.Registration getServiceByPID(String PID)
 			throws IllegalArgumentException, RemoteException {
-		return nmPortType.getServiceByPID(PID);
+		return RegistrationConverter.toApi(nmPortType.getServiceByPID(PID));
 	}
 
 	@Override
-	public Registration[] getServiceByDescription(String description)
+	public eu.linksmart.network.Registration[] getServiceByDescription(String description)
 			throws RemoteException {
-		return nmPortType.getServiceByDescription(description);
+		Registration[] regs = nmPortType.getServiceByDescription(description);
+		eu.linksmart.network.Registration[] regsApi = 
+			new eu.linksmart.network.Registration[regs.length];
+		
+		for(int i=0; i<regs.length; i++) {
+			regsApi[i] = RegistrationConverter.toApi(regs[i]);
+		}
+		
+		return regsApi;
 	}
 
 	@Override
-	public Registration[] getServiceByQuery(String query)
+	public eu.linksmart.network.Registration[] getServiceByQuery(String query)
 			throws RemoteException {
-		return nmPortType.getServiceByQuery(query);
+		Registration[] regs = nmPortType.getServiceByQuery(query);
+		eu.linksmart.network.Registration[] regsApi = 
+			new eu.linksmart.network.Registration[regs.length];
+		
+		for(int i=0; i<regs.length; i++) {
+			regsApi[i] = RegistrationConverter.toApi(regs[i]);
+		}
+		
+		return regsApi;
 	}
 }

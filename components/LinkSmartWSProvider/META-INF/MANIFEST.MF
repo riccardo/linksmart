@@ -4,8 +4,7 @@ Bundle-Name: LinkSmart WS Provider
 Bundle-SymbolicName: eu.linksmart.wsprovider
 Bundle-Version: 2.0.0
 Bundle-Vendor: LinkSmart
-Bundle-ClassPath: .,
- lib/axis.jar
+Bundle-ClassPath: .
 DynamicImport-Package: * 
 Import-Package: org.apache.commons.logging,
  org.apache.cxf;version="2.5.2",

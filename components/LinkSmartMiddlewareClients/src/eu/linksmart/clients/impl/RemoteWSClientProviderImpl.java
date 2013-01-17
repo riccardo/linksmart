@@ -50,6 +50,7 @@ import java.rmi.Remote;
 import java.util.ArrayList;
 
 import org.apache.axis.EngineConfiguration;
+import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.clients.RemoteWSClientProvider;
@@ -60,6 +61,11 @@ import eu.linksmart.clients.RemoteWSClientProvider;
  */
 public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 
+	/**
+	 * logger
+	 */
+	Logger LOG = Logger.getLogger(RemoteWSClientProvider.class.getName());
+	
 	/**
 	 * Path to store the clients relative to project root
 	 */
@@ -72,7 +78,7 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 	 * @param context the bundle's execution context
 	 */
 	protected void activate(ComponentContext context) {
-		System.out.println("Remote Client WS Activated");
+		LOG.info("Remote Client WS Activated");
 	}
 
 	/**
@@ -81,7 +87,7 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 	 * @param context the bundle's execution context
 	 */
 	protected void deactivate(ComponentContext context) {
-		System.out.println("Remote Client WS Deactivated");
+		LOG.info("Remote Client WS Deactivated");
 	}
 
 	/**

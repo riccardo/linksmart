@@ -25,7 +25,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("removeService");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg0"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://network.linksmart.eu", "VirtualAddress"), eu.linksmart.network.VirtualAddress.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg0"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://network.linksmart.eu", "VirtualAddress"), eu.linksmart.network.client.VirtualAddress.class, false, false);
         param.setOmittable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
@@ -50,7 +50,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         param.setNillable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration"));
-        oper.setReturnClass(eu.linksmart.network.Registration.class);
+        oper.setReturnClass(eu.linksmart.network.client.Registration.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "return"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -58,10 +58,10 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("sendData");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg0"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://network.linksmart.eu", "VirtualAddress"), eu.linksmart.network.VirtualAddress.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg0"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://network.linksmart.eu", "VirtualAddress"), eu.linksmart.network.client.VirtualAddress.class, false, false);
         param.setOmittable(true);
         oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg1"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://network.linksmart.eu", "VirtualAddress"), eu.linksmart.network.VirtualAddress.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg1"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://network.linksmart.eu", "VirtualAddress"), eu.linksmart.network.client.VirtualAddress.class, false, false);
         param.setOmittable(true);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg2"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "base64Binary"), byte[].class, false, false);
@@ -70,7 +70,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg3"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://network.linksmart.eu", "NMResponse"));
-        oper.setReturnClass(eu.linksmart.network.NMResponse.class);
+        oper.setReturnClass(eu.linksmart.network.client.NMResponse.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "return"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -94,7 +94,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         param.setNillable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://network.linksmart.eu", "ArrayOfRegistration"));
-        oper.setReturnClass(eu.linksmart.network.Registration[].class);
+        oper.setReturnClass(eu.linksmart.network.client.Registration[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "return"));
         param = oper.getReturnParamDesc();
         param.setItemQName(new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration"));
@@ -115,7 +115,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "arg3"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://network.linksmart.eu", "ArrayOfRegistration"));
-        oper.setReturnClass(eu.linksmart.network.Registration[].class);
+        oper.setReturnClass(eu.linksmart.network.client.Registration[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "return"));
         param = oper.getReturnParamDesc();
         param.setItemQName(new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration"));
@@ -126,7 +126,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getService");
         oper.setReturnType(new javax.xml.namespace.QName("http://network.linksmart.eu", "VirtualAddress"));
-        oper.setReturnClass(eu.linksmart.network.VirtualAddress.class);
+        oper.setReturnClass(eu.linksmart.network.client.VirtualAddress.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "return"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -139,7 +139,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         param.setNillable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration"));
-        oper.setReturnClass(eu.linksmart.network.Registration.class);
+        oper.setReturnClass(eu.linksmart.network.client.Registration.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "return"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -158,7 +158,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         param.setNillable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://network.linksmart.eu", "ArrayOfRegistration"));
-        oper.setReturnClass(eu.linksmart.network.Registration[].class);
+        oper.setReturnClass(eu.linksmart.network.client.Registration[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "return"));
         param = oper.getReturnParamDesc();
         param.setItemQName(new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration"));
@@ -173,7 +173,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         param.setNillable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://network.linksmart.eu", "ArrayOfRegistration"));
-        oper.setReturnClass(eu.linksmart.network.Registration[].class);
+        oper.setReturnClass(eu.linksmart.network.client.Registration[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://networkmanager.network.linksmart.eu/", "return"));
         param = oper.getReturnParamDesc();
         param.setItemQName(new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration"));
@@ -221,7 +221,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 
             qName = new javax.xml.namespace.QName("http://network.linksmart.eu", "ArrayOfRegistration");
             cachedSerQNames.add(qName);
-            cls = eu.linksmart.network.Registration[].class;
+            cls = eu.linksmart.network.client.Registration[].class;
             cachedSerClasses.add(cls);
             qName = new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration");
             qName2 = new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration");
@@ -230,28 +230,28 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 
             qName = new javax.xml.namespace.QName("http://network.linksmart.eu", "Message");
             cachedSerQNames.add(qName);
-            cls = eu.linksmart.network.Message.class;
+            cls = eu.linksmart.network.client.Message.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://network.linksmart.eu", "NMResponse");
             cachedSerQNames.add(qName);
-            cls = eu.linksmart.network.NMResponse.class;
+            cls = eu.linksmart.network.client.NMResponse.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://network.linksmart.eu", "Registration");
             cachedSerQNames.add(qName);
-            cls = eu.linksmart.network.Registration.class;
+            cls = eu.linksmart.network.client.Registration.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://network.linksmart.eu", "VirtualAddress");
             cachedSerQNames.add(qName);
-            cls = eu.linksmart.network.VirtualAddress.class;
+            cls = eu.linksmart.network.client.VirtualAddress.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -347,7 +347,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         }
     }
 
-    public boolean removeService(eu.linksmart.network.VirtualAddress arg0) throws java.rmi.RemoteException {
+    public boolean removeService(eu.linksmart.network.client.VirtualAddress arg0) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -381,7 +381,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public eu.linksmart.network.Registration registerService(eu.linksmart.utils.Part[] arg0, java.lang.String arg1, java.lang.String arg2) throws java.rmi.RemoteException {
+    public eu.linksmart.network.client.Registration registerService(eu.linksmart.utils.Part[] arg0, java.lang.String arg1, java.lang.String arg2) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -405,9 +405,9 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (eu.linksmart.network.Registration) _resp;
+                return (eu.linksmart.network.client.Registration) _resp;
             } catch (java.lang.Exception _exception) {
-                return (eu.linksmart.network.Registration) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.Registration.class);
+                return (eu.linksmart.network.client.Registration) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.client.Registration.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -415,7 +415,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public eu.linksmart.network.NMResponse sendData(eu.linksmart.network.VirtualAddress arg0, eu.linksmart.network.VirtualAddress arg1, byte[] arg2, boolean arg3) throws java.rmi.RemoteException {
+    public eu.linksmart.network.client.NMResponse sendData(eu.linksmart.network.client.VirtualAddress arg0, eu.linksmart.network.client.VirtualAddress arg1, byte[] arg2, boolean arg3) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -439,9 +439,9 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (eu.linksmart.network.NMResponse) _resp;
+                return (eu.linksmart.network.client.NMResponse) _resp;
             } catch (java.lang.Exception _exception) {
-                return (eu.linksmart.network.NMResponse) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.NMResponse.class);
+                return (eu.linksmart.network.client.NMResponse) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.client.NMResponse.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -483,7 +483,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public eu.linksmart.network.Registration[] getServiceByAttributes(eu.linksmart.utils.Part[] arg0) throws java.rmi.RemoteException {
+    public eu.linksmart.network.client.Registration[] getServiceByAttributes(eu.linksmart.utils.Part[] arg0) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -507,9 +507,9 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (eu.linksmart.network.Registration[]) _resp;
+                return (eu.linksmart.network.client.Registration[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (eu.linksmart.network.Registration[]) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.Registration[].class);
+                return (eu.linksmart.network.client.Registration[]) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.client.Registration[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -517,7 +517,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public eu.linksmart.network.Registration[] getServiceByAttributes1(eu.linksmart.utils.Part[] arg0, long arg1, boolean arg2, boolean arg3) throws java.rmi.RemoteException {
+    public eu.linksmart.network.client.Registration[] getServiceByAttributes1(eu.linksmart.utils.Part[] arg0, long arg1, boolean arg2, boolean arg3) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -541,9 +541,9 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (eu.linksmart.network.Registration[]) _resp;
+                return (eu.linksmart.network.client.Registration[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (eu.linksmart.network.Registration[]) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.Registration[].class);
+                return (eu.linksmart.network.client.Registration[]) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.client.Registration[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -551,7 +551,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public eu.linksmart.network.VirtualAddress getService() throws java.rmi.RemoteException {
+    public eu.linksmart.network.client.VirtualAddress getService() throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -575,9 +575,9 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (eu.linksmart.network.VirtualAddress) _resp;
+                return (eu.linksmart.network.client.VirtualAddress) _resp;
             } catch (java.lang.Exception _exception) {
-                return (eu.linksmart.network.VirtualAddress) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.VirtualAddress.class);
+                return (eu.linksmart.network.client.VirtualAddress) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.client.VirtualAddress.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -585,7 +585,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public eu.linksmart.network.Registration getServiceByPID(java.lang.String arg0) throws java.rmi.RemoteException, java.lang.IllegalArgumentException {
+    public eu.linksmart.network.client.Registration getServiceByPID(java.lang.String arg0) throws java.rmi.RemoteException, java.lang.IllegalArgumentException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -609,9 +609,9 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (eu.linksmart.network.Registration) _resp;
+                return (eu.linksmart.network.client.Registration) _resp;
             } catch (java.lang.Exception _exception) {
-                return (eu.linksmart.network.Registration) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.Registration.class);
+                return (eu.linksmart.network.client.Registration) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.client.Registration.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -627,7 +627,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public eu.linksmart.network.Registration[] getServiceByDescription(java.lang.String arg0) throws java.rmi.RemoteException {
+    public eu.linksmart.network.client.Registration[] getServiceByDescription(java.lang.String arg0) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -651,9 +651,9 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (eu.linksmart.network.Registration[]) _resp;
+                return (eu.linksmart.network.client.Registration[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (eu.linksmart.network.Registration[]) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.Registration[].class);
+                return (eu.linksmart.network.client.Registration[]) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.client.Registration[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -661,7 +661,7 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
 }
     }
 
-    public eu.linksmart.network.Registration[] getServiceByQuery(java.lang.String arg0) throws java.rmi.RemoteException {
+    public eu.linksmart.network.client.Registration[] getServiceByQuery(java.lang.String arg0) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -685,9 +685,9 @@ public class NetworkManagerSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (eu.linksmart.network.Registration[]) _resp;
+                return (eu.linksmart.network.client.Registration[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (eu.linksmart.network.Registration[]) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.Registration[].class);
+                return (eu.linksmart.network.client.Registration[]) org.apache.axis.utils.JavaUtils.convert(_resp, eu.linksmart.network.client.Registration[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
