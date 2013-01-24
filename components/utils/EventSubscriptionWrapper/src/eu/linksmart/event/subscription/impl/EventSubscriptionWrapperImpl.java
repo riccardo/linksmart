@@ -36,7 +36,7 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 	private Map<String, EventManagerPort> eventManagers;
 	// Subscriber Service ID <-> HID
 	private Map<String, String> subscriberHIDs;
-	//Topic -> Service HID
+	//Topic -> Service HI
 	private Map<String, String> topicIDs;
 	
 	private LinkedList<String> queuedTopicToSubscribe = new LinkedList<String>();
@@ -88,8 +88,9 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 				EventManagerPort eventManager = it.next();
 				for (String topic : subscribedTopics) {
 					try {
-						String subscriberHID = subscriberHIDs.get(topicIDs.get(topic));
-						boolean success = eventManager.unsubscribeWithHID(topic, subscriberHID);
+//						String subscriberHID = subscriberHIDs.get(topicIDs.get(topic));
+//						boolean success = eventManager.unsubscribeWithHID(topic, subscriberHID);
+						boolean success = eventManager.unsubscribeWithDescription(topic, topicIDs.get(topic));
 						LOG.info("Successfully deregistered topic from EventManager. "
 								+ success);
 					} catch (RemoteException e) {
@@ -157,11 +158,12 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 	@Override
 	public void unsubscribeAllTopics(String serviceID) {
 		EventManagerPort eventManager = eventManagers.get(serviceID);
-		String subscriberHID = subscriberHIDs.get(serviceID);
+//		String subscriberHID = subscriberHIDs.get(serviceID);
 		try {
-			eventManager.clearSubscriptionsWithHID(subscriberHID);
+//			eventManager.clearSubscriptionsWithHID(subscriberHID);
+			eventManager.clearSubscriptionsWithDescription(serviceID);
 		} catch (RemoteException e) {
-			LOG.error("Unable to unsubscribeAllTopics from HID: " + subscriberHID, e);
+			LOG.error("Unable to unsubscribeAllTopics from ID: " + serviceID, e);
 		}
 	}
 
@@ -202,22 +204,24 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 					String topic = queuedTopicToSubscribe.getFirst();
 					String serviceID = topicIDs.get(topic);
 					EventManagerPort eventManager = eventManagers.get(serviceID);
-					String subscriberHID = subscriberHIDs.get(serviceID);
+//					String subscriberHID = subscriberHIDs.get(serviceID);
 					
-					if (eventManager != null && subscriberHID != null) {
+//					if (eventManager != null && subscriberHID != null) {
+					if (eventManager != null && serviceID != null) {
 						try {
 							LOG.info("*********** Now trying to subscribe with TOPIC: "
 									+ topic);
 							// try to subscribe topics in queue, if succeed
 							// move the topic to subscribedTopic, if failed
 							// re-queue the topic
-							if (eventManager.subscribeWithHID(topic, subscriberHID,	0)) {
+//							if (eventManager.subscribeWithHID(topic, subscriberHID,	0)) {
+							if (eventManager.subscribeWithDescription(topic, serviceID, 0)) {
 								queuedTopicToSubscribe.removeFirst();
 								subscribedTopics.add(topic);
 								LOG.info("*************** Successfully subscribed to topic: "
 										+ topic
-										+ "(with HID: "
-										+ subscriberHID + ")");
+										+ "(with Description: "
+										+ serviceID + ")");
 							} else {
 								LOG.warn("Unable to subscribe to topic: "
 										+ topic + ". Trying again.");
