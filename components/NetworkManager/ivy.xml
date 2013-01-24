@@ -22,8 +22,8 @@
 		<dependency org="javax.wsdl" name="com.springsource.javax.wsdl" rev="1.6.1" />
 		<dependency org="javax.xml.rpc" name="com.springsource.javax.xml.rpc"	rev="1.1.0" />
 		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.discovery" rev="0.4.0"/>
-		<dependency org="LinkSmartMiddlewareAPI" name="LinkSmartMiddlewareAPI" 	rev="1.2.0"/>
-		<dependency org="LinkSmartMiddlewareClients" name="LinkSmartMiddlewareClients" rev="1.2.0"/>
+		<dependency org="LinkSmartMiddlewareAPI" name="LinkSmartMiddlewareAPI" 	rev="1.3.0"/>
+		<dependency org="LinkSmartMiddlewareClients" name="LinkSmartMiddlewareClients" rev="1.3.0"/>
 		
 		<!-- Runtime Bundles -->
 		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.cm" rev="1.0.100.200911161659" />
