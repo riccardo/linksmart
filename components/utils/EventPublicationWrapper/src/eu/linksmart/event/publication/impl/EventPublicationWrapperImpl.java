@@ -21,8 +21,18 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 	private LinkSmartRemoteServiceStore remoteServiceStore;
 	private EventManagerLocatorThread locatorThread;
 	
+	private class EventManager {
+		public EventManagerPort eventManagerPort = null;
+		public String eventManagerPID = null;
+		
+		public EventManager(EventManagerPort eventManagerPort, String eventManagerPID) {
+			this.eventManagerPort = eventManagerPort;
+			this.eventManagerPID = eventManagerPID;
+		}
+	}
+	
 	//Map<ServiceID,EventManager>
-	private Map<String, EventManagerPort> eventManagers;
+	private Map<String, EventManager> eventManagers;
 	
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting "
@@ -33,7 +43,7 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 				.locateService(LinkSmartRemoteServiceStore.class
 						.getSimpleName());
 				
-		eventManagers = new HashMap<String, EventManagerPort>();
+		eventManagers = new HashMap<String, EventManager>();
 		
 		LOG.info("Started "
 				+ context.getBundleContext().getBundle().getSymbolicName());
@@ -54,9 +64,8 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 	@Override
 	public boolean publishEvent(String serviceID, String topic, Part[] valueParts)
 			throws RemoteException {
-		//Get event manager for service ID
-		if (getEventManager(serviceID) == null) {
-			LOG.warn("Unable to publish Sensor Reading: Topic=" + topic);
+		if (!isEventManagerLocated(serviceID)) {
+			LOG.warn("Unable to publish Sensor Reading. Event Manager not found: Topic=" + topic);
 			return false;
 		}
 		
@@ -68,7 +77,17 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 		
 		LOG.debug("Trying to publish sensor event: Topic=" + topic);
 		
-		return getEventManager(serviceID).publish(topic, timestampedParts);
+		try {
+			getEventManager(serviceID).eventManagerPort.publish(topic, timestampedParts);
+			return true;
+		}
+		catch (RemoteException ex) {
+			//if Event Manager disappears, start new search for that Event Manager
+			String eventManagerPID = eventManagers.get(serviceID).eventManagerPID;
+			eventManagers.remove(serviceID);
+			findEventManager(serviceID, eventManagerPID);
+			throw ex;
+		}
 	}
 
 	@Override
@@ -80,7 +99,7 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 		myLocatorThread.start();
 	}
 	
-	protected EventManagerPort getEventManager(String serviceID) {
+	protected EventManager getEventManager(String serviceID) {
 		return this.eventManagers.get(serviceID);
 	}
 	
@@ -107,12 +126,16 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 			while (eventManagers.get(serviceID) == null && !shouldStop) {
 				try {
 					//try to locate EventManager
-					EventManagerPort eventManager = (EventManagerPort) remoteServiceStore
+					EventManagerPort eventManagerPort = (EventManagerPort) remoteServiceStore
 							.getRemoteHydraServiceByDescription(
 									eventManagerDescription,
 									EventManagerPort.class.getName());
-					//if EventManager was found, save it with associated service ID
-					eventManagers.put(serviceID, eventManager);
+					if (eventManagerPort != null) {
+						//if EventManager was found, save it with associated service ID
+						EventManager eventManager = new EventManager(eventManagerPort, eventManagerDescription);
+						eventManagers.put(serviceID, eventManager);
+						shouldStop = true;
+					}
 				} catch (Exception e) {
 					LOG.error("Cannot find EventManager for description "
 							+ eventManagerDescription + ". Trying again");
