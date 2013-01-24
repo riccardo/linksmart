@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LinkSmart Middleware Clients
 Bundle-SymbolicName: LinkSmartMiddlewareClients
-Bundle-Version: 1.2.0
+Bundle-Version: 1.3.0
 Import-Package: eu.linksmart.aom,
  eu.linksmart.clients,
  eu.linksmart.dac,
@@ -85,9 +85,9 @@ Import-Package: eu.linksmart.aom,
  org.osgi.service.component
 Service-Component: OSGI-INF/component.xml
 Export-Package: eu.linksmart.aom.client,
- eu.linksmart.clients.impl;version="1.2.0",
+ eu.linksmart.clients.impl;version="1.3.0",
  eu.linksmart.dac.client,
- eu.linksmart.eventmanager.client;version="1.2.0",
+ eu.linksmart.eventmanager.client;version="1.3.0",
  eu.linksmart.network.client,
  eu.linksmart.policy.pdp.client,
  eu.linksmart.policy.pep.client,
