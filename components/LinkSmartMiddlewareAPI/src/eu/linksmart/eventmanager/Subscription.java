@@ -14,6 +14,8 @@ public class Subscription  implements java.io.Serializable {
 
     private java.lang.String endpoint;
 
+    private java.lang.String description;
+
     private int priority;
 
     private eu.linksmart.eventmanager.Part[] parts;
@@ -29,6 +31,7 @@ public class Subscription  implements java.io.Serializable {
            java.lang.String topic,
            java.lang.String HID,
            java.lang.String endpoint,
+           java.lang.String description,
            int priority,
            eu.linksmart.eventmanager.Part[] parts,
            int numberOfRetries,
@@ -36,6 +39,7 @@ public class Subscription  implements java.io.Serializable {
            this.topic = topic;
            this.HID = HID;
            this.endpoint = endpoint;
+           this.description = description;
            this.priority = priority;
            this.parts = parts;
            this.numberOfRetries = numberOfRetries;
@@ -100,6 +104,26 @@ public class Subscription  implements java.io.Serializable {
      */
     public void setEndpoint(java.lang.String endpoint) {
         this.endpoint = endpoint;
+    }
+
+
+    /**
+     * Gets the description value for this Subscription.
+     * 
+     * @return description
+     */
+    public java.lang.String getDescription() {
+        return description;
+    }
+
+
+    /**
+     * Sets the description value for this Subscription.
+     * 
+     * @param description
+     */
+    public void setDescription(java.lang.String description) {
+        this.description = description;
     }
 
 
@@ -211,6 +235,9 @@ public class Subscription  implements java.io.Serializable {
             ((this.endpoint==null && other.getEndpoint()==null) || 
              (this.endpoint!=null &&
               this.endpoint.equals(other.getEndpoint()))) &&
+            ((this.description==null && other.getDescription()==null) || 
+             (this.description!=null &&
+              this.description.equals(other.getDescription()))) &&
             this.priority == other.getPriority() &&
             ((this.parts==null && other.getParts()==null) || 
              (this.parts!=null &&
@@ -238,6 +265,9 @@ public class Subscription  implements java.io.Serializable {
         }
         if (getEndpoint() != null) {
             _hashCode += getEndpoint().hashCode();
+        }
+        if (getDescription() != null) {
+            _hashCode += getDescription().hashCode();
         }
         _hashCode += getPriority();
         if (getParts() != null) {
