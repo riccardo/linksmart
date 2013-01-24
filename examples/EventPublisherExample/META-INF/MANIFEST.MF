@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: EventPublisherExample
 Bundle-SymbolicName: EventPublisherExample
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.3.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: eu.linksmart.event.publication,
- eu.linksmart.eventmanager;version="1.2.0",
+Import-Package: eu.linksmart.event.publication;version="1.3.0",
+ eu.linksmart.eventmanager;version="1.3.0",
  eu.linksmart.network;version="1.0.0",
  org.apache.log4j,
  org.osgi.framework;version="1.5.0",
  org.osgi.service.component
 Service-Component: OSGI-INF/DS_EventPublisherExample.xml
-Export-Package: eu.linksmart.event.example.publisher
+Export-Package: eu.linksmart.event.example.publisher;version="1.3.0"

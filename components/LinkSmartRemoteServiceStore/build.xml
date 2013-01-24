@@ -15,7 +15,7 @@
 	<!-- properties -->
 
 	<property name="moduleName" value="LinkSmartRemoteServiceStore" />
-	<property name="revision" value="1.2.0" />
+	<property name="revision" value="1.3.0" />
 
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="test.dir" value="${basedir}/test" />
