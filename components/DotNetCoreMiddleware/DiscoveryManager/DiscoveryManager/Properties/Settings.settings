@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DiscoveryManager.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DiscoveryManager_NetworkManager_NetworkManagerApplicationService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:8082/axis/services/NetworkManagerApplication</Value>
+    </Setting>
+    <Setting Name="DiscoveryManager_AppDevMgr_ApplicationDeviceManager" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://212.214.80.155:8080/ApplicationDeviceManager</Value>
+    </Setting>
+    <Setting Name="PlugWiseServerAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:8081/</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

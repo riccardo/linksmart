@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<energyprofile>
+  <name>Disco Ball</name>
+  <id>1</id>
+  <device>1</device>
+  <energyclassification>
+    <system>SIS</system>
+    <value>B</value>
+  </energyclassification>
+
+  <energyconsumption>
+    
+    <effect>
+      <mode name="running">
+        <max>80</max>
+        <average>50</average>
+        <start></start>
+        <shutdown></shutdown>
+      </mode>
+      <mode name="standby">
+        <max>10</max>
+        <average>5</average>
+        <start></start>
+        <shutdown></shutdown>
+      </mode>
+    </effect>
+  </energyconsumption>
+
+  <energygeneration>
+    <effect>
+    <mode name="running">
+      <max>5</max>
+      <average>3</average>
+      <start></start>
+      <shutdown></shutdown>
+    </mode>
+    <mode name="standby">
+      <max>0</max>
+      <average>0</average>
+      <start></start>
+      <shutdown></shutdown>
+    </mode>
+    </effect>
+  </energygeneration>
+
+  <operation>
+    <minimumruntime unit="seconds">0</minimumruntime>
+  </operation>
+  <lifetime>
+    <expected unit="seconds">1000000</expected>
+    <startcost unit="seconds">1000</startcost>
+    <shutdowncost unit="seconds">100</shutdowncost>
+  </lifetime>
+
+
+</energyprofile>

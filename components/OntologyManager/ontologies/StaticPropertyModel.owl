@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2006-2010 Technical University of Kosice
+                          the HYDRA consortium, EU project IST-2005-034891
+  
+  This file is part of LinkSmart.
+  
+  LinkSmart is free software: you can redistribute it and/or modify
+  it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
+  version 3 as published by the Free Software Foundation.
+  
+  LinkSmart is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+  
+  You should have received a copy of the GNU Lesser General Public
+  License along with LinkSmart.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://localhost/ontologies/StaticPropertyModel.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://localhost/ontologies/StaticPropertyModel.owl">
+  <owl:Ontology rdf:about=""/>
+  <rdfs:Class rdf:ID="SingleValueFormFieldProperty">
+    <rdfs:subClassOf>
+      <rdfs:Class rdf:ID="FormFieldProperty"/>
+    </rdfs:subClassOf>
+  </rdfs:Class>
+  <rdfs:Class rdf:ID="MultiValueFormFieldProperty">
+    <rdfs:subClassOf>
+      <rdfs:Class rdf:about="#FormFieldProperty"/>
+    </rdfs:subClassOf>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="#FormFieldProperty">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </rdfs:Class>
+  <owl:Class rdf:ID="FormProperty">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:Class>
+  <owl:Class rdf:ID="SingleValueAnnotationProperty">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="AnnotationProperty"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="StaticTaxonomy">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+  </owl:Class>
+  <owl:Class rdf:ID="MultiValueFormProperty">
+    <rdfs:subClassOf rdf:resource="#FormProperty"/>
+  </owl:Class>
+  <owl:Class rdf:ID="MultiValueAnnotationProperty">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#AnnotationProperty"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#AnnotationProperty">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:Class>
+  <owl:Class rdf:ID="SingleValueFormProperty">
+    <rdfs:subClassOf rdf:resource="#FormProperty"/>
+  </owl:Class>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

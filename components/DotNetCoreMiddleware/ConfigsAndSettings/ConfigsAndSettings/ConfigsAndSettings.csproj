@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B7B08964-7891-4CCC-BACC-5F7B35F150C5}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ConfigsAndSettings</RootNamespace>
+    <AssemblyName>ConfigsAndSettings</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <Content Include="EnergyPolicies\bedroomlight.xml" />
+    <Content Include="EnergyPolicies\discoball.xml" />
+    <Content Include="EnergyPolicies\FuglesangFan.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="EnergyPolicies\FuglesangLight.xml" />
+    <Content Include="EnergyPolicies\hallLight.xml" />
+    <Content Include="EnergyPolicies\kitchenlight.xml" />
+    <Content Include="EnergyPolicies\livingroomambientlight.xml" />
+    <Content Include="EnergyPolicies\livingroomblind.xml" />
+    <Content Include="EnergyPolicies\livingroomcanopy.xml" />
+    <Content Include="EnergyPolicies\livingroomlight.xml" />
+    <Content Include="EnergyPolicies\PetersLight.xml" />
+    <Content Include="EnergyPolicies\PetersLight2.xml" />
+    <Content Include="EnergyPolicies\polarizedwindow.xml" />
+    <Content Include="EnergyPolicies\studyroomlight.xml" />
+    <Content Include="EnergyPolicies\terracecanopy.xml" />
+    <Content Include="EnergyPolicies\terracelight.xml" />
+    <Content Include="EnergyPolicies\train.xml" />
+    <Content Include="EnergyPolicies\windowbox.xml" />
+    <Content Include="EnergyProfiles\bedroomlight.xml" />
+    <Content Include="EnergyProfiles\discoball.xml" />
+    <Content Include="EnergyProfiles\FuglesangFan.xml" />
+    <Content Include="EnergyProfiles\FuglesangLight.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="EnergyProfiles\hallLight.xml" />
+    <Content Include="EnergyProfiles\kitchenlight.xml" />
+    <Content Include="EnergyProfiles\livingroomambientlight.xml" />
+    <Content Include="EnergyProfiles\livingroomblind.xml" />
+    <Content Include="EnergyProfiles\livingroomcanopy.xml" />
+    <Content Include="EnergyProfiles\livingroomlight.xml" />
+    <Content Include="EnergyProfiles\PetersLight.xml" />
+    <Content Include="EnergyProfiles\PetersLight2.xml" />
+    <Content Include="EnergyProfiles\polarizedwindow.xml" />
+    <Content Include="EnergyProfiles\studyroomlight.xml" />
+    <Content Include="EnergyProfiles\terracecanopy.xml" />
+    <Content Include="EnergyProfiles\terracelight.xml" />
+    <Content Include="EnergyProfiles\Train.xml" />
+    <Content Include="EnergyProfiles\windowbox.xml" />
+    <Content Include="EventProfiles\basicphone.xml" />
+    <Content Include="EventProfiles\peterslight.xml" />
+    <Content Include="EventProfiles\peterslight2.xml" />
+    <Content Include="EventProfiles\thermometer.xml" />
+    <Content Include="SemanticDevices\weatherstation.xml" />
+    <Content Include="Xml\remotews.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XSL\applicationbindings.xsl">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="XSL\BT_RF_Transform.xsl" />
+    <Content Include="XSL\IoT_deviceXML2App.xsl">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="XSL\IoT_scpd2wsdl.xsl" />
+    <Content Include="XSL\resolveDevices_Transform.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+</Project>

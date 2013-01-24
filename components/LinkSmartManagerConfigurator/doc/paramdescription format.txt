@@ -1,0 +1,46 @@
+To describe parameters within a properties file, for use by ConfigurationAdmin, just add the following descriptors for each property in the same file as the property.
+E.g. in TM.properties (Trust manager) we have 
+
+TrustManager.trustModel=NullTrustModel
+
+The property name is "TrustManager.trustModel", the default value is "NullTrustModel"
+
+
+To describe such properties, just add the following descriptors, replacing PARAMNAME with the appropriate parameter name
+
+ParamDescription.PARAMNAME.description -- user-readable text shown on configuration page. Use to describe parameter and/or to give hints.
+ParamDescription.PARAMNAME.type -- type of parameter := boolean, integer, text, choice, readonly
+
+if boolean: nothing more needed
+if integer: add 
+ParamDescription.PARAMNAME.min
+ParamDescription.PARAMNAME.max
+for range validation (validation not implemented yet)
+
+if text: add
+ParamDescription.PARAMNAME.ereg -- regular expresion to test string
+
+if choice: add
+ParamDescription.PARAMNAME.choice0 = CHOICEVALUE|Human-readable description
+ParamDescription.PARAMNAME.choice1 = CHOICEVALUE|Human-readable description
+etc until all choices have been enumerated.
+
+to just display something, without making it configurable, set its type to readonly
+ParamDescription.PARAMNAME.type=readonly
+
+paramdescription.***.description=Lalala this is a description of so and so
+paramdescription.***.type=choice
+paramdescription.***.choice1=lala|The lala choice
+paramdescription.***.choice2=lala|The second lala choice
+
+paramdescription.***.description=Lalala this is a description of so and so
+paramdescription.***.type=boolean
+
+paramdescription.***.description=Lalala this is a description of so and so
+paramdescription.***.type=text
+paramdescription.***.ereg=x?dr
+
+paramdescription.***.description=Lalala this is a description of so and so
+paramdescription.***.type=integer
+paramdescription.***.min=0
+paramdescription.***.max=1000

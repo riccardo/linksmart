@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns="http://localhost/ontologies/Event.owl#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:property="http://localhost/ontologies/StaticPropertyModel.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:unit="http://localhost/ontologies/Unit.owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://localhost/ontologies/Event.owl">
+  <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="http://localhost/ontologies/Unit.owl"/>
+    <owl:imports rdf:resource="http://localhost/ontologies/StaticPropertyModel.owl"/>
+  </owl:Ontology>
+  <owl:Class rdf:ID="MotionDetected">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Motion"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Controller">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Event"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="StateChange">
+    <rdfs:subClassOf rdf:resource="#Event"/>
+  </owl:Class>
+  <owl:Class rdf:ID="MotionDetectorAlarm">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Motion"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="EventKey"/>
+  <owl:Class rdf:ID="Temperature">
+    <rdfs:subClassOf rdf:resource="#Event"/>
+  </owl:Class>
+  <owl:Class rdf:ID="KeyReleased">
+    <rdfs:subClassOf rdf:resource="#Controller"/>
+  </owl:Class>
+  <owl:Class rdf:ID="TemperatureAlarm">
+    <rdfs:subClassOf rdf:resource="#Temperature"/>
+  </owl:Class>
+  <owl:Class rdf:ID="KeyPushed">
+    <rdfs:subClassOf rdf:resource="#Controller"/>
+  </owl:Class>
+  <owl:Class rdf:about="#Motion">
+    <rdfs:subClassOf rdf:resource="#Event"/>
+  </owl:Class>
+  <owl:Class rdf:ID="MetaInformation"/>
+  <owl:ObjectProperty rdf:ID="hasMetaInformation">
+    <rdfs:range rdf:resource="#MetaInformation"/>
+    <rdfs:domain rdf:resource="#Event"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="frequency">
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#UnitValue"/>
+    <rdfs:domain rdf:resource="#MetaInformation"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="hasKey">
+    <rdfs:domain rdf:resource="#Event"/>
+    <rdfs:range rdf:resource="#EventKey"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:ID="trigger">
+    <rdfs:domain rdf:resource="#MetaInformation"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="minValue">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EventKey"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="relatedStateVariable">
+    <rdfs:domain rdf:resource="#EventKey"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="description">
+    <rdfs:domain rdf:resource="#MetaInformation"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="keyName">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EventKey"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="dataType">
+    <rdfs:domain rdf:resource="#EventKey"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="maxValue">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="#EventKey"/>
+  </owl:DatatypeProperty>
+  <property:SingleValueAnnotationProperty rdf:ID="valueUnit">
+    <rdfs:domain rdf:resource="#EventKey"/>
+    <rdfs:range rdf:resource="http://localhost/ontologies/Unit.owl#Unit"/>
+  </property:SingleValueAnnotationProperty>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

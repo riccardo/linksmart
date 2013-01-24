@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<ivy-module version="2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	<info organisation="CryptoManager" module="CryptoManager" />
+	<publications>
+		<artifact name="CryptoManager" type="jar" />
+	</publications>
+	<dependencies>
+		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.16" />
+		<dependency org="org.apache.servicemix" name="org.apache.servicemix.bundles.xmlsec" rev="1.4.4_2" />
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.lang" rev="2.4.0" />
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.logging" rev="1.1.1" transitive="false"/>
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.collections" rev="3.2.1" />
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.configuration" rev="1.5.0"/>
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.beanutils" rev="1.8.0" />
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.codec" rev="1.3.0" />
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.digester" rev="1.8.1" />
+		<dependency org="org.apache.commons" name="com.springsource.org.apache.commons.jxpath" rev="1.2.0" />
+		<dependency org="org.jdom" name="com.springsource.org.jdom" rev="1.0.0" />
+		<dependency org="javax.servlet" name="com.springsource.javax.servlet.jsp" rev="2.1.0" />
+		<dependency org="javax.el" name="com.springsource.javax.el" rev="1.0.0" />
+		<dependency org="org.apache.derby" name="com.springsource.org.apache.derby" rev="10.5.1000001.764942" />
+		<dependency org="org.apache.derby" name="com.springsource.org.apache.derby.client" rev="10.5.1000001.764942" />
+		<dependency org="javax.transaction" name="com.springsource.javax.transaction" rev="1.1.0" />
+		<dependency org="org.apache.xalan" name="com.springsource.org.apache.xalan" rev="2.7.1" />
+		<dependency org="org.apache.xalan" name="com.springsource.org.apache.xml.serializer" rev="2.7.1" />
+		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi.services" rev="3.2.100" />
+		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi"	rev="3.6.2" />
+		<dependency org="LinkSmartMiddlewareAPI" name="LinkSmartMiddlewareAPI"	rev="1.2.0"/>
+	</dependencies>
+</ivy-module>

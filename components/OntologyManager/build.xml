@@ -1,0 +1,141 @@
+<!--
+Local build file for the LinkSmart Ontology Manager
+-->
+<project name="OntologyManager" default="make-local" xmlns:ivy="antlib:org.apache.ivy.ant">
+	<target name="fail">
+		<fail message="please use the root ant build file" />
+	</target>
+
+	<property name="moduleName" value="OntologyManager" />
+	<property name="revision" value="1.0.0" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="test.dir" value="${basedir}/test" />
+	<property name="test.build.dir" value="${rootBuildDir}/${moduleName}/test" />
+	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
+	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="dist.dir" value="${rootDistributionDir}" />
+	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
+
+	<!-- set paths -->
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${targetPlatform.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
+	</path>
+
+	<path id="test-classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${targetPlatform.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
+		<pathelement path="${test.build.dir}" />
+	</path>
+
+	<target name="make" depends="jar">
+		<echo message="Compiling source from ${basedir} to ${build.dir} and then distribute to ${dist.dir}" />
+		<copy todir="${dist.dir}/ontologies">
+			<fileset dir="${basedir}/ontologies" includes="*.owl" />
+		</copy>
+	</target>
+
+	<!-- Local versions of targets, setting properties so it may be called from this directory -->
+	<target name="local">
+		<property name="antlib.dir" value="${basedir}/../../antlibs" />
+
+		<path id="antlib.path">
+			<fileset dir="${antlib.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="antlib.path" />
+	</target>
+
+	<target name="make-local" depends="local">
+		<antcall target="make" />
+	</target>
+
+	<target name="test-local" depends="local">
+		<antcall target="test" />
+	</target>
+
+	<target name="doc-local" depends="local">
+		<antcall target="doc" />
+	</target>
+
+	<!-- Local versions -->
+
+	<target name="resolve">
+		<echo message="Setting up build environment" />
+		<ivy:resolve transitive="true" />
+		<ivy:retrieve transitive="true" type="jar" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="jars" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="bundle" pattern="${targetPlatform}/[artifact]-[revision].[ext]" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" includeEmptyDirs="true" failonerror="false" />
+	</target>
+
+	<target name="build" depends="resolve">
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" classpathref="classpath">
+			<src path="${src.dir}" />
+			<src path="${test.dir}" />
+		</javac>
+	</target>
+
+	<target name="jar" depends="build">
+		<echo message="Packaging" />
+		<mkdir dir="${dist.dir}" />
+		<jar jarfile="${dist.dir}/${moduleName}-${revision}.jar" manifest="${basedir}/META-INF/MANIFEST.MF">
+			<fileset dir="${src.dir}" />
+			<fileset dir="${build.dir}" />
+			<fileset dir="${basedir}">
+				<patternset>
+					<include name="lib/org.openrdf.sesame-2.3.1.jar" />
+					<include name="lib/slf4j-api-1.5.10.jar" />
+					<include name="lib/slf4j-jdk14-1.5.10.jar" />
+				</patternset>
+			</fileset>
+			<fileset dir="${basedir}" includes="OSGi-INF/" />
+			<fileset dir="${basedir}" includes="resources/**,LICENSE*,NOTICE*" />
+		</jar>
+	</target>
+
+	<target name="doc" depends="build">
+		<javadoc packagenames="com.eu.hydra.aom.*" sourcepath="src" destdir="${dist.dir}/api" author="true" version="true" use="true" classpathref="classpath" windowtitle="Ontology Manager API">
+			<doctitle>
+				<![CDATA[<h1>Ontology Manager</h1>]]>
+			</doctitle>
+			<bottom>
+				<![CDATA[<i>Copyright &#169; 2010 the LinkSmart Project.</i>]]>
+			</bottom>
+			<link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
+		</javadoc>
+	</target>
+
+	<target name="test" depends="make">
+		<mkdir dir="${rootBuildDir}/../test" />
+		<mkdir dir="${rootBuildDir}/../test/resources" />
+		<copy todir="${rootBuildDir}/../test/resources">
+			<fileset dir="${test.dir}/resources" />
+		</copy>
+		<junit fork="yes" haltonfailure="yes">
+			<classpath>
+				<path refid="test-classpath" />
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<batchtest fork="yes">
+				<fileset dir="${test.dir}">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<delete dir="${rootBuildDir}/../test" includeEmptyDirs="true" failonerror="false" />
+	</target>
+</project>

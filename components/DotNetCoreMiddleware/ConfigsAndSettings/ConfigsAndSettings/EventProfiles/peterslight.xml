@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<EventList>
+	<!-- each event is the instance of event topics classification -->
+	<Event>
+		<EventTopic>TemperatureChange</EventTopic>
+		<EventKeyList>
+			<EventKey>
+				<name>HID</name>
+				<dataType>String</dataType>
+			</EventKey>
+			<EventKey>
+				<name>TimeStamp</name>
+				<dataType>Long</dataType>
+			</EventKey>
+			<EventKey>
+				<name>TemperatureValue</name>
+				<dataType>Integer</dataType>
+				<!-- related state var should be defined for the 
+				     keys handling the value -->
+				<RelatedStateVariable>Temperature</RelatedStateVariable>
+				<!-- allowed val range is used only for number types -->
+				<allowedValueRange>
+					<max>50</max>
+					<min>-30</min>
+				</allowedValueRange>
+				<!-- unit have to be linked to the QoS model -->
+				<unit>Celsius</unit>
+			</EventKey>
+		</EventKeyList>
+		<MetaInformation>
+			<Frequency>0</Frequency>
+			<EventTrigger>TemperatureChange</EventTrigger>
+			<Description>Reports change on temperature</Description>
+		</MetaInformation>
+	</Event>
+		<Event>
+		<EventTopic>TemperatureAlarm</EventTopic>
+		<EventKeyList>
+			<EventKey>
+				<name>HID</name>
+				<dataType>String</dataType>
+			</EventKey>
+			<EventKey>
+				<name>TimeStamp</name>
+				<dataType>Long</dataType>
+			</EventKey>
+			<EventKey>
+				<name>ErrorCode</name>
+				<dataType>String</dataType>
+				<RelatedStateVariable>Temperature</RelatedStateVariable>
+				<allowedValueRange>
+					<max>50</max>
+					<min>-30</min>
+				</allowedValueRange>
+				<!-- unit have to be linked to the QoS model -->
+				<unit>Fahrenheit</unit>
+			</EventKey>
+		</EventKeyList>
+		<MetaInformation>
+			<Frequency>0</Frequency>
+			<EventTrigger>Temperature greater 50 || Temperature less -30 </EventTrigger>
+			<Description>Reports a malfunction of the device</Description>
+		</MetaInformation>
+	</Event>
+	<Event>
+		<EventTopic>TemperaturePeriodicValue</EventTopic>
+		<EventKeyList>
+			<EventKey>
+				<name>HID</name>
+				<dataType>String</dataType>
+			</EventKey>
+			<EventKey>
+				<name>TimeStamp</name>
+				<dataType>Long</dataType>
+			</EventKey>
+			<EventKey>
+				<name>TemperatureValue</name>
+				<dataType>Integer</dataType>
+				<RelatedStateVariable>Temperature</RelatedStateVariable>
+				<allowedValueRange>
+					<max>50</max>
+					<min>-30</min>
+				</allowedValueRange>
+				<unit>Celsius</unit>
+			</EventKey>
+		</EventKeyList>
+		<MetaInformation>
+			<Frequency>
+				<value>10</value>
+				<datatype>10</datatype>
+				<unit>Seconds</unit>
+			</Frequency>
+			<EventTrigger></EventTrigger>
+			<Description>Periodic temperature report</Description>
+		</MetaInformation>
+	</Event>
+</EventList>
+	

@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="IoT.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="IoTSmartControlPoint_OntologyManager_ApplicationOntologyManagerService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://127.0.0.1:8082/axis/services/ApplicationOntologyManagerServiceOSGi</Value>
+    </Setting>
+    <Setting Name="discovertransform" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\IoTwwwroot\IoTdevices\resolveDevices_Transform.xsl</Value>
+    </Setting>
+    <Setting Name="IoTSmartControlPoint_BluetoothDiscoveryManagerWS_DiscoveryManagerWS" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://212.214.80.151:8080/BluetoothDiscoveryWS</Value>
+    </Setting>
+    <Setting Name="IoTSmartControlPoint_ApplicationDeviceManager_ApplicationDeviceManager" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://212.214.80.161:8080/ApplicationDeviceManager</Value>
+    </Setting>
+    <Setting Name="usexslfordiscovery" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="HydraSmartControlPoint_ApplicationDeviceManager_ApplicationDeviceManager" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://212.214.80.161:8080/ApplicationDeviceManager</Value>
+    </Setting>
+    <Setting Name="HydraSmartControlPoint_BluetoothDiscoveryManagerWS_DiscoveryManagerWS" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://212.214.80.151:8080/BluetoothDiscoveryWS</Value>
+    </Setting>
+    <Setting Name="HydraSmartControlPoint_OntologyManager_ApplicationOntologyManagerService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://127.0.0.1:8082/axis/services/ApplicationOntologyManagerServiceOSGi</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

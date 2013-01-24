@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="false" name="LinkSmartRemoteServiceStore">
+   <implementation class="eu.linksmart.remote.service.store.impl.LinkSmartRemoteServiceStoreImpl"/>
+   <property name="SOAP.service.name" type="String" value="LinkSmartRemoteServiceStore"/>
+   <!-- On purpose no methods will be provided.-->
+   <property name="SOAP.service.methods" type="String" value=""/>
+   <service>
+      <provide interface="eu.linksmart.remote.service.store.LinkSmartRemoteServiceStore"/>
+   </service>
+   <reference cardinality="1..1" interface="eu.linksmart.network.NetworkManagerApplication" name="NetworkManagerApplication" policy="static"/>
+   <reference cardinality="1..1" interface="eu.linksmart.clients.RemoteWSClientProvider" name="RemoteWSClientProvider" policy="static"/>
+</scr:component>

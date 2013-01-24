@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="lib" path="lib/jmock-junit4-2.5.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NetworkManager"/>
+	<classpathentry kind="lib" path="lib/jxta.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="CryptoManager">
+   <implementation class="eu.linksmart.security.cryptomanager.impl.CryptoManagerImpl"/>
+   <service>
+      <provide interface="eu.linksmart.security.cryptomanager.CryptoManager"/>
+   </service>
+    <property name="service.remote.registration" type="String" value="true"/>
+    <reference bind="configurationBind" cardinality="0..1" interface="eu.linksmart.utils.Configurator" name="Configurator" policy="dynamic" unbind="configurationUnbind"/>
+    <!--<property name="SOAP.service.name" type="String" value="CryptoManager"/>-->
+</scr:component>

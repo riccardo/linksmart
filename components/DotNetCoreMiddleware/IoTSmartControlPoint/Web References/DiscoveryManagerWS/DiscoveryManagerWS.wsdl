@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="http://tempuri.org/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" name="DiscoveryManagerWS" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://212.214.80.151:8080/BluetoothDiscoveryWS?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://212.214.80.151:8080/BluetoothDiscoveryWS?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IIoTDiscoveryManagerWSService_ResolveDevice_InputMessage">
+    <wsdl:part name="parameters" element="tns:ResolveDevice" />
+  </wsdl:message>
+  <wsdl:message name="IIoTDiscoveryManagerWSService_ResolveDevice_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ResolveDeviceResponse" />
+  </wsdl:message>
+  <wsdl:message name="IIoTDiscoveryManagerWSService_DiscoverDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:DiscoverDevices" />
+  </wsdl:message>
+  <wsdl:message name="IIoTDiscoveryManagerWSService_DiscoverDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DiscoverDevicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IIoTDiscoveryManagerWSService_StartDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:StartDevices" />
+  </wsdl:message>
+  <wsdl:message name="IIoTDiscoveryManagerWSService_StartDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StartDevicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IIoTDiscoveryManagerWSService_StopDevices_InputMessage">
+    <wsdl:part name="parameters" element="tns:StopDevices" />
+  </wsdl:message>
+  <wsdl:message name="IIoTDiscoveryManagerWSService_StopDevices_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StopDevicesResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IIoTDiscoveryManagerWSService">
+    <wsdl:operation name="ResolveDevice">
+      <wsdl:input wsaw:Action="http://tempuri.org/IIoTDiscoveryManagerWSService/ResolveDevice" message="tns:IIoTDiscoveryManagerWSService_ResolveDevice_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IIoTDiscoveryManagerWSService/ResolveDeviceResponse" message="tns:IIoTDiscoveryManagerWSService_ResolveDevice_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DiscoverDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IIoTDiscoveryManagerWSService/DiscoverDevices" message="tns:IIoTDiscoveryManagerWSService_DiscoverDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IIoTDiscoveryManagerWSService/DiscoverDevicesResponse" message="tns:IIoTDiscoveryManagerWSService_DiscoverDevices_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StartDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IIoTDiscoveryManagerWSService/StartDevices" message="tns:IIoTDiscoveryManagerWSService_StartDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IIoTDiscoveryManagerWSService/StartDevicesResponse" message="tns:IIoTDiscoveryManagerWSService_StartDevices_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StopDevices">
+      <wsdl:input wsaw:Action="http://tempuri.org/IIoTDiscoveryManagerWSService/StopDevices" message="tns:IIoTDiscoveryManagerWSService_StopDevices_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IIoTDiscoveryManagerWSService/StopDevicesResponse" message="tns:IIoTDiscoveryManagerWSService_StopDevices_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IIoTDiscoveryManagerWSService" type="tns:IIoTDiscoveryManagerWSService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ResolveDevice">
+      <soap:operation soapAction="http://tempuri.org/IIoTDiscoveryManagerWSService/ResolveDevice" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DiscoverDevices">
+      <soap:operation soapAction="http://tempuri.org/IIoTDiscoveryManagerWSService/DiscoverDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StartDevices">
+      <soap:operation soapAction="http://tempuri.org/IIoTDiscoveryManagerWSService/StartDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StopDevices">
+      <soap:operation soapAction="http://tempuri.org/IIoTDiscoveryManagerWSService/StopDevices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DiscoveryManagerWS">
+    <wsdl:port name="BasicHttpBinding_IIoTDiscoveryManagerWSService" binding="tns:BasicHttpBinding_IIoTDiscoveryManagerWSService">
+      <soap:address location="http://212.214.80.151:8080/BluetoothDiscoveryWS" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

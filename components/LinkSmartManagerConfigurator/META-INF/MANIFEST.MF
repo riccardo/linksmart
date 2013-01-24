@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: LinkSmartManagerConfigurator
+Bundle-SymbolicName: LinkSmartManagerConfigurator
+Bundle-Version: 1.0.0
+Service-Component: OSGI-INF/*.xml
+Import-Package: eu.linksmart.network,
+ javax.servlet;version="[2.4.0,2.5.0]",
+ javax.servlet.http;version="[2.4.0,2.5.0]",
+ org.apache.log4j,
+ org.eclipse.osgi.framework.console;version="1.0.0";resolution:=optional,
+ org.osgi.framework;version="1.3.0",
+ org.osgi.service.cm;version="1.2.0",
+ org.osgi.service.component;version="1.0.0",
+ org.osgi.service.http
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

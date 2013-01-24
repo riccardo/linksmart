@@ -1,0 +1,10 @@
+eu.linksmart.dac.ApplicationDeviceManager
+eu.linksmart.eventmanager.EventManagerPort
+eu.linksmart.network.NetworkManagerApplication
+eu.linksmart.qos.QoSManager
+eu.linksmart.caf.cm.ContextManager
+eu.linksmart.caf.daqc.DataAcquisitionComponent
+eu.linksmart.aom.ApplicationOntologyManager
+eu.linksmart.policy.pdp.PolicyDecisionPoint
+eu.linksmart.policy.pdp.PdpAdminService
+eu.linksmart.policy.pep.PepCache

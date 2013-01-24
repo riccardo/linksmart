@@ -1,0 +1,16 @@
+<result>
+	<device pid="pid1">
+		<deviceProperties>
+			<property name="">
+				<value></value>
+			</property>
+		</deviceProperties>
+		<service serviceOperation="op">
+			<serviceProperties>
+				<property name="">
+					<value></value>
+				</property>
+			</serviceProperties>
+		</service>
+	</device>
+</result>
