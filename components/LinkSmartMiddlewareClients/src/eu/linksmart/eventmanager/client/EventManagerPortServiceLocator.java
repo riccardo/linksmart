@@ -7,22 +7,22 @@
 
 package eu.linksmart.eventmanager.client;
 
-public class EventManagerImplementationLocator extends org.apache.axis.client.Service implements eu.linksmart.eventmanager.client.EventManagerImplementation {
+public class EventManagerPortServiceLocator extends org.apache.axis.client.Service implements eu.linksmart.eventmanager.client.EventManagerPortService {
 
-    public EventManagerImplementationLocator() {
+    public EventManagerPortServiceLocator() {
     }
 
 
-    public EventManagerImplementationLocator(org.apache.axis.EngineConfiguration config) {
+    public EventManagerPortServiceLocator(org.apache.axis.EngineConfiguration config) {
         super(config);
     }
 
-    public EventManagerImplementationLocator(java.lang.String wsdlLoc, javax.xml.namespace.QName sName) throws javax.xml.rpc.ServiceException {
+    public EventManagerPortServiceLocator(java.lang.String wsdlLoc, javax.xml.namespace.QName sName) throws javax.xml.rpc.ServiceException {
         super(wsdlLoc, sName);
     }
 
     // Use to get a proxy class for BasicHttpBinding_EventManagerPort
-    private java.lang.String BasicHttpBinding_EventManagerPort_address = "http://129.26.160.243:8124/Service";
+    private java.lang.String BasicHttpBinding_EventManagerPort_address = "http://localhost:8124/Service";
 
     public java.lang.String getBasicHttpBinding_EventManagerPortAddress() {
         return BasicHttpBinding_EventManagerPort_address;
@@ -39,7 +39,7 @@ public class EventManagerImplementationLocator extends org.apache.axis.client.Se
         BasicHttpBinding_EventManagerPortWSDDServiceName = name;
     }
 
-    public eu.linksmart.eventmanager.EventManagerPort getBasicHttpBinding_EventManagerPort() throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.eventmanager.EventManagerPort getEventManagerPort() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
             endpoint = new java.net.URL(BasicHttpBinding_EventManagerPort_address);
@@ -47,10 +47,10 @@ public class EventManagerImplementationLocator extends org.apache.axis.client.Se
         catch (java.net.MalformedURLException e) {
             throw new javax.xml.rpc.ServiceException(e);
         }
-        return getBasicHttpBinding_EventManagerPort(endpoint);
+        return getEventManagerPort(endpoint);
     }
 
-    public eu.linksmart.eventmanager.EventManagerPort getBasicHttpBinding_EventManagerPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.eventmanager.EventManagerPort getEventManagerPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
             eu.linksmart.eventmanager.client.BasicHttpBinding_EventManagerPortStub _stub = new eu.linksmart.eventmanager.client.BasicHttpBinding_EventManagerPortStub(portAddress, this);
             _stub.setPortName(getBasicHttpBinding_EventManagerPortWSDDServiceName());
@@ -95,7 +95,7 @@ public class EventManagerImplementationLocator extends org.apache.axis.client.Se
         }
         java.lang.String inputPortName = portName.getLocalPart();
         if ("BasicHttpBinding_EventManagerPort".equals(inputPortName)) {
-            return getBasicHttpBinding_EventManagerPort();
+            return getEventManagerPort();
         }
         else  {
             java.rmi.Remote _stub = getPort(serviceEndpointInterface);

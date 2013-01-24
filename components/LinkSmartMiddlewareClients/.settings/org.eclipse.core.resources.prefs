@@ -1,7 +1,7 @@
 eclipse.preferences.version=1
 encoding//src/eu/linksmart/eventmanager/client/BasicHttpBinding_EventManagerPortStub.java=UTF-8
-encoding//src/eu/linksmart/eventmanager/client/EventManagerImplementation.java=UTF-8
-encoding//src/eu/linksmart/eventmanager/client/EventManagerImplementationLocator.java=UTF-8
+encoding//src/eu/linksmart/eventmanager/client/EventManagerPortService.java=UTF-8
+encoding//src/eu/linksmart/eventmanager/client/EventManagerPortServiceLocator.java=UTF-8
 encoding//src/eu/linksmart/security/trustmanager/client/TrustManagerService.java=UTF-8
 encoding//src/eu/linksmart/security/trustmanager/client/TrustManagerServiceLocator.java=UTF-8
 encoding//src/eu/linksmart/security/trustmanager/client/TrustManagerSoapBindingStub.java=UTF-8

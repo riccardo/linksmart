@@ -72,7 +72,7 @@ public class LinkSmartRemoteServiceStoreImpl implements
 					}
 				} else {
 
-					LOG.debug("Service with pid " + serviceDescription
+					LOG.warn("Service with pid " + serviceDescription
 							+ " not found.");
 				}
 
