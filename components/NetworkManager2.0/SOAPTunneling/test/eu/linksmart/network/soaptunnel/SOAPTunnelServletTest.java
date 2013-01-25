@@ -1,5 +1,6 @@
 package eu.linksmart.network.soaptunnel;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -20,12 +21,18 @@ public class SOAPTunnelServletTest {
 	}
 	
 	@Test
-	public void testDoGet(){
+	public void testDoCheckIfValidURLInRequest(){
 		
 		String url = "http://localhost:8082/SOAPTunneling/0/0.0.0.6986094776732394497";
+		String url2 = "http://localhost:8082/SOAPTunneling/0/0.0.0.6986094776732394497/holaAmigo";
+		String url3 = "http://localhost:8082/SOAPTunneling/0";
+		String url4 = "kaputto";
 		
-		 
-		assertTrue(soapTunnelServlet.checkIfValidRequest(url));
+		assertTrue(soapTunnelServlet.checkIfValidURLInRequest(url));
+		assertTrue(soapTunnelServlet.checkIfValidURLInRequest(url2));
+		assertTrue(soapTunnelServlet.checkIfValidURLInRequest(url3));
+		assertFalse(soapTunnelServlet.checkIfValidURLInRequest(url4));
+		
 	}
 	
 }

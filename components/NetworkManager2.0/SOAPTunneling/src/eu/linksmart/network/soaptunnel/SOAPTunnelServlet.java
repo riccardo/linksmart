@@ -75,7 +75,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 * @param request
 	 * @return
 	 */
-	public boolean checkIfValidRequest(String path){
+	public boolean checkIfValidURLInRequest(String path){
 		
 		String parts[] = path.split("/", 6);
 
