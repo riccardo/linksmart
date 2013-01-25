@@ -69,6 +69,29 @@ public class SOAPTunnelServlet extends HttpServlet {
 	public SOAPTunnelServlet(NetworkManagerCore nmCore) {
 		this.nmCore = nmCore;
 	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public boolean checkIfValidRequest(String path){
+		
+		String parts[] = path.split("/", 6);
+
+		if ((parts.length > 3 && parts[3].equals("wsdl")) 
+				|| (parts.length == 6 && parts[5].equals("wsdl"))) {
+			return true;
+		} else {
+			//if attributes were passed with the url add them
+			if (parts.length > 3) {
+				return true;
+			}
+			
+		}
+		
+		return false;	
+	}
 
 	/**
 	 * Performs the HTTP GET operation
