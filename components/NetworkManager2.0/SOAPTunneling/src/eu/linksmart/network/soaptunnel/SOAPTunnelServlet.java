@@ -86,23 +86,26 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 		// split path - path contains virtual addresses and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
-		String parts[] = path.split("/", 5);
+		String parts[] = path.split("/", 6);
 		// extract virtual addresses from path
 		VirtualAddress sVirtualAddress = (parts[1].contentEquals("0")) ? nmCore.getService() : new VirtualAddress(parts[1]);
 		VirtualAddress rVirtualAddress = new VirtualAddress(parts[2]);
 
 		// build parameter string
 		StringBuilder queryBuilder = new StringBuilder();
-		if (parts.length > 3 && parts[3].equals("wsdl")) {
+		//parts[5] is checked for compatibility e.g. ../hola/0/wsdl
+		if ((parts.length > 3 && parts[3].equals("wsdl")) 
+				|| (parts.length == 6 && parts[5].equals("wsdl"))) {
 			queryBuilder.append("wsdl");
 		} else {
+			//if attributes were passed with the url add them
 			if (parts.length > 3) {
 				queryBuilder.append(parts[3]);
 			}
 			String originalQuery = request.getQueryString();
 			if (originalQuery != null) {
 				if (queryBuilder.length() > 0) {
-					queryBuilder.append("&");
+					queryBuilder.append("?");
 				}
 				queryBuilder.append(originalQuery);
 			}
@@ -145,7 +148,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 		// split path - path contains virtual addresses and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		StringTokenizer token = new StringTokenizer(path, "/");
-		if (token.countTokens() > 2) {
+		if (token.countTokens() >= 2) {
 			StringBuilder requestBuilder = new StringBuilder();
 			String sVirtualAddress = token.nextToken();
 			VirtualAddress senderVirtualAddress = (sVirtualAddress.contentEquals("0")) ? nmCore.getService() : new VirtualAddress(sVirtualAddress);
