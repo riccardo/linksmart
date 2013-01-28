@@ -65,7 +65,6 @@
 		<ant dir="NetworkManager2.0/BackboneRouter" target="make" />
         <ant dir="NetworkManager2.0/BackboneJXTA" target="make" />
         <ant dir="NetworkManager2.0/BackboneSOAP" target="make" />
-        <!-- <ant dir="NetworkManager2.0/BackboneWS" target="make" /> -->
         <ant dir="NetworkManager2.0/SOAPTunneling" target="make" />
         <ant dir="CryptoManager" target="make" />
         <ant dir="TrustManager" target="make" />
