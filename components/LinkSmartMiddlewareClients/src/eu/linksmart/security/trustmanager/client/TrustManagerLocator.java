@@ -5,9 +5,9 @@
  * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
  */
 
-package eu.linksmart.security.trustmanager;
+package eu.linksmart.security.trustmanager.client;
 
-public class TrustManagerLocator extends org.apache.axis.client.Service implements eu.linksmart.security.trustmanager.TrustManager {
+public class TrustManagerLocator extends org.apache.axis.client.Service implements eu.linksmart.security.trustmanager.client.TrustManager {
 
     public TrustManagerLocator() {
     }
@@ -39,7 +39,7 @@ public class TrustManagerLocator extends org.apache.axis.client.Service implemen
         TrustManagerPortWSDDServiceName = name;
     }
 
-    public eu.linksmart.security.trustmanager.TrustManagerPortType getTrustManagerPort() throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.security.trustmanager.client.TrustManagerPortType getTrustManagerPort() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
             endpoint = new java.net.URL(TrustManagerPort_address);
@@ -50,9 +50,9 @@ public class TrustManagerLocator extends org.apache.axis.client.Service implemen
         return getTrustManagerPort(endpoint);
     }
 
-    public eu.linksmart.security.trustmanager.TrustManagerPortType getTrustManagerPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public eu.linksmart.security.trustmanager.client.TrustManagerPortType getTrustManagerPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
-            eu.linksmart.security.trustmanager.TrustManagerSoapBindingStub _stub = new eu.linksmart.security.trustmanager.TrustManagerSoapBindingStub(portAddress, this);
+            eu.linksmart.security.trustmanager.client.TrustManagerSoapBindingStub _stub = new eu.linksmart.security.trustmanager.client.TrustManagerSoapBindingStub(portAddress, this);
             _stub.setPortName(getTrustManagerPortWSDDServiceName());
             return _stub;
         }
@@ -72,8 +72,8 @@ public class TrustManagerLocator extends org.apache.axis.client.Service implemen
      */
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
-            if (eu.linksmart.security.trustmanager.TrustManagerPortType.class.isAssignableFrom(serviceEndpointInterface)) {
-                eu.linksmart.security.trustmanager.TrustManagerSoapBindingStub _stub = new eu.linksmart.security.trustmanager.TrustManagerSoapBindingStub(new java.net.URL(TrustManagerPort_address), this);
+            if (eu.linksmart.security.trustmanager.client.TrustManagerPortType.class.isAssignableFrom(serviceEndpointInterface)) {
+                eu.linksmart.security.trustmanager.client.TrustManagerSoapBindingStub _stub = new eu.linksmart.security.trustmanager.client.TrustManagerSoapBindingStub(new java.net.URL(TrustManagerPort_address), this);
                 _stub.setPortName(getTrustManagerPortWSDDServiceName());
                 return _stub;
             }

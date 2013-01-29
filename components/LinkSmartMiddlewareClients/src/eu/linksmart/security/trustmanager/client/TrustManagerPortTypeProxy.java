@@ -1,8 +1,8 @@
-package eu.linksmart.security.trustmanager;
+package eu.linksmart.security.trustmanager.client;
 
-public class TrustManagerPortTypeProxy implements eu.linksmart.security.trustmanager.TrustManagerPortType {
+public class TrustManagerPortTypeProxy implements eu.linksmart.security.trustmanager.client.TrustManagerPortType {
   private String _endpoint = null;
-  private eu.linksmart.security.trustmanager.TrustManagerPortType trustManagerPortType = null;
+  private eu.linksmart.security.trustmanager.client.TrustManagerPortType trustManagerPortType = null;
   
   public TrustManagerPortTypeProxy() {
     _initTrustManagerPortTypeProxy();
@@ -15,7 +15,7 @@ public class TrustManagerPortTypeProxy implements eu.linksmart.security.trustman
   
   private void _initTrustManagerPortTypeProxy() {
     try {
-      trustManagerPortType = (new eu.linksmart.security.trustmanager.TrustManagerLocator()).getTrustManagerPort();
+      trustManagerPortType = (new eu.linksmart.security.trustmanager.client.TrustManagerLocator()).getTrustManagerPort();
       if (trustManagerPortType != null) {
         if (_endpoint != null)
           ((javax.xml.rpc.Stub)trustManagerPortType)._setProperty("javax.xml.rpc.service.endpoint.address", _endpoint);
@@ -38,7 +38,7 @@ public class TrustManagerPortTypeProxy implements eu.linksmart.security.trustman
     
   }
   
-  public eu.linksmart.security.trustmanager.TrustManagerPortType getTrustManagerPortType() {
+  public eu.linksmart.security.trustmanager.client.TrustManagerPortType getTrustManagerPortType() {
     if (trustManagerPortType == null)
       _initTrustManagerPortTypeProxy();
     return trustManagerPortType;
