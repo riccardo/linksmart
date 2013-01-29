@@ -58,14 +58,14 @@
         <ant dir="LinkSmartManagerConfigurator" target="make" />
 		<ant dir="LinkSmartMiddlewareClients" target="make" />
 		<ant dir="LinkSmartWSProvider" target="make" />
-        <ant dir="NetworkManager2.0/CommunicationSecurityManager" target="make" />
-        <ant dir="NetworkManager2.0/CommunicationSecurityManagerSym" target="make" />
-		<ant dir="NetworkManager2.0/NetworkManager" target="make" />
-		<ant dir="NetworkManager2.0/IdentityManager" target="make" />
-		<ant dir="NetworkManager2.0/BackboneRouter" target="make" />
-        <ant dir="NetworkManager2.0/BackboneJXTA" target="make" />
-        <ant dir="NetworkManager2.0/BackboneSOAP" target="make" />
-        <ant dir="NetworkManager2.0/SOAPTunneling" target="make" />
+        <ant dir="NetworkManager/CommunicationSecurityManager" target="make" />
+        <ant dir="NetworkManager/CommunicationSecurityManagerSym" target="make" />
+		<ant dir="NetworkManager/NetworkManager" target="make" />
+		<ant dir="NetworkManager/IdentityManager" target="make" />
+		<ant dir="NetworkManager/BackboneRouter" target="make" />
+        <ant dir="NetworkManager/BackboneJXTA" target="make" />
+        <ant dir="NetworkManager/BackboneSOAP" target="make" />
+        <ant dir="NetworkManager/SOAPTunneling" target="make" />
         <ant dir="CryptoManager" target="make" />
         <ant dir="TrustManager" target="make" />
 	</target>
