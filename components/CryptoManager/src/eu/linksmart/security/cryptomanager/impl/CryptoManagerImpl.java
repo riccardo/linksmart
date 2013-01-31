@@ -79,7 +79,7 @@ public class CryptoManagerImpl implements CryptoManager{
 	final static public String CONFIGFOLDERPATH = 
 		"linksmart" + SEPARATOR + "eu.linksmart.security.cryptomanager" + SEPARATOR + "configuration";
 	final static public String RESOURCEFOLDERPATH = 
-		"linksmart" + SEPARATOR + "eu.linksmart.security.cryptomanager" + SEPARATOR + "configuration";
+		"linksmart" + SEPARATOR + "eu.linksmart.security.cryptomanager" + SEPARATOR + "resources";
 
 	private static BundleContext context;
 	private CryptoMessageFormatProcessor cryptoProcessor;
@@ -114,7 +114,7 @@ public class CryptoManagerImpl implements CryptoManager{
 		HashFilesExtract.put(RESOURCEFOLDERPATH + SEPARATOR + "delete_cryptomanager_db.sql",
 		"resources/delete_cryptomanager_db.sql");
 		HashFilesExtract
-		.put(RESOURCEFOLDERPATH + SEPARATOR + "keystore.bks", "resources" + SEPARATOR + "keystore.bks");
+		.put(RESOURCEFOLDERPATH + SEPARATOR + "keystore.bks", "resources/keystore.bks");
 		try {
 			JarUtil.createDirectory(CONFIGFOLDERPATH);
 			JarUtil.createDirectory(RESOURCEFOLDERPATH);

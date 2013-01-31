@@ -162,7 +162,7 @@ public class KeyManagerImpl implements KeyManager {
 			Thread.currentThread().setContextClassLoader(oldLoader);
 
 			File f =
-				new File(CryptoManagerImpl.RESOURCEFOLDERPATH + "/"
+				new File(CryptoManagerImpl.RESOURCEFOLDERPATH + System.getProperty("file.separator")
 						+ Configuration.getInstance().getKeyStoreFile());
 			if (f.exists()) {
 				logger.debug("Loading keystore file " + f.getAbsolutePath());
