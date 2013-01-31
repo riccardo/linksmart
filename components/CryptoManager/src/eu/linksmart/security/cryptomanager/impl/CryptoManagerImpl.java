@@ -74,9 +74,12 @@ import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
 public class CryptoManagerImpl implements CryptoManager{
 
 	private static Logger logger = Logger.getLogger(CryptoManagerImpl.class);
+	private static String SEPARATOR = System.getProperty("file.separator");
 
-	final static public String CONFIGFOLDERPATH = "CryptoManager/configuration";
-	final static public String RESOURCEFOLDERPATH = "CryptoManager/resources";
+	final static public String CONFIGFOLDERPATH = 
+		"linksmart" + SEPARATOR + "eu.linksmart.security.cryptomanager" + SEPARATOR + "configuration";
+	final static public String RESOURCEFOLDERPATH = 
+		"linksmart" + SEPARATOR + "eu.linksmart.security.cryptomanager" + SEPARATOR + "configuration";
 
 	private static BundleContext context;
 	private CryptoMessageFormatProcessor cryptoProcessor;
@@ -104,17 +107,17 @@ public class CryptoManagerImpl implements CryptoManager{
 		Hashtable<String, String> HashFilesExtract =
 			new Hashtable<String, String>();
 		logger.debug("Deploying CryptoManager config files");
-		HashFilesExtract.put(CONFIGFOLDERPATH + "/cryptomanager-config.xml",
+		HashFilesExtract.put(CONFIGFOLDERPATH + SEPARATOR + "cryptomanager-config.xml",
 		"configuration/cryptomanager-config.xml");
-		HashFilesExtract.put(RESOURCEFOLDERPATH + "/create_cryptomanager_db.sql",
+		HashFilesExtract.put(RESOURCEFOLDERPATH + SEPARATOR + "create_cryptomanager_db.sql",
 		"resources/create_cryptomanager_db.sql");
-		HashFilesExtract.put(RESOURCEFOLDERPATH + "/delete_cryptomanager_db.sql",
+		HashFilesExtract.put(RESOURCEFOLDERPATH + SEPARATOR + "delete_cryptomanager_db.sql",
 		"resources/delete_cryptomanager_db.sql");
 		HashFilesExtract
-		.put(RESOURCEFOLDERPATH + "/keystore.bks", "resources/keystore.bks");
+		.put(RESOURCEFOLDERPATH + SEPARATOR + "keystore.bks", "resources" + SEPARATOR + "keystore.bks");
 		try {
-			JarUtil.createFolder(CONFIGFOLDERPATH);
-			JarUtil.createFolder(RESOURCEFOLDERPATH);
+			JarUtil.createDirectory(CONFIGFOLDERPATH);
+			JarUtil.createDirectory(RESOURCEFOLDERPATH);
 			JarUtil.extractFilesJar(HashFilesExtract);
 		} catch (IOException e) {
 			logger.error("Needed folder has not been created...", e);

@@ -121,8 +121,8 @@ public class Util {
 	 * 
 	 * @param stringpath
 	 */
-	private static void createDirectory(String stringpath) {
-		StringTokenizer st = new StringTokenizer(stringpath, "/");
+	public static void createDirectory(String stringpath) {
+		StringTokenizer st = new StringTokenizer(stringpath, FILE_SEPERATOR);
 		ArrayList<String> arrLst = new ArrayList<String>();
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
@@ -143,7 +143,7 @@ public class Util {
 	 * 
 	 * @param path
 	 */
-	public static void createFolder(String path) {
+	private static void createFolder(String path) {
 		File directory = new File(path);
 		directory.mkdir();
 	}

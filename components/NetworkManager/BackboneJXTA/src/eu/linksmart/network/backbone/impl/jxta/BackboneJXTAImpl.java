@@ -38,8 +38,8 @@ import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 
-import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.SecurityProperty;
@@ -90,8 +90,10 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	private Logger logger = Logger.getLogger(BackboneJXTAImpl.class.getName());
 	protected ComponentContext context;
 	private BackboneJXTAConfigurator configurator;
-
-	protected static String JXTA_HOME_DIR = "Backbone/.jxta/";
+	
+	private static String SEPARATOR = System.getProperty("file.separator");
+	protected static String JXTA_HOME_DIR = 
+		"linksmart" + SEPARATOR + "eu.linksmart.network.backbone" + SEPARATOR + ".jxta";
 
 	private String jxtaHome;
 	private BackboneRouter bbRouter;
@@ -134,7 +136,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 
 		this.name = (String) configurator
 				.get(BackboneJXTAConfigurator.PEER_NAME);
-		this.jxtaHome = JXTA_HOME_DIR + this.name;
+		this.jxtaHome = JXTA_HOME_DIR + SEPARATOR + this.name;
 
 		boolean logs = Boolean.parseBoolean((String) configurator
 				.getConfiguration().get(BackboneJXTAConfigurator.JXTA_LOGS));

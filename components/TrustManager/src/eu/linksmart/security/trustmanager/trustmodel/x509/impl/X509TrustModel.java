@@ -144,7 +144,7 @@ public class X509TrustModel implements TrustModel {
 			Hashtable<String, String> hashFilesExtract = new Hashtable<String, String>();
 			hashFilesExtract.put(KEYSTORE_DEPLOY_DIR + FILE_SEPARATOR + KEYSTORE_FILE, KEYSTORE_JAR_PATH);
 			
-			Util.createFolder(KEYSTORE_DEPLOY_DIR);
+			Util.createDirectory(KEYSTORE_DEPLOY_DIR);
 			Util.extractFilesJar(hashFilesExtract);
 			
 			// load the keystore

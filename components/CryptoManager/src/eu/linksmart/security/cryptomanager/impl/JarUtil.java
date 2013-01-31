@@ -55,6 +55,7 @@ import org.apache.log4j.Logger;
 public final class JarUtil {
 
 	private static Logger log = Logger.getLogger(JarUtil.class.getName());
+	private static String SEPARATOR = System.getProperty("file.separator");
 
 	/**
 	 * Extracts a file from the Jar archive to a local directory.
@@ -103,8 +104,8 @@ public final class JarUtil {
 		out.close();
 	}
 
-	private static void createDirectory(String stringpath) {
-		StringTokenizer st = new StringTokenizer(stringpath, "/");
+	public static void createDirectory(String stringpath) {
+		StringTokenizer st = new StringTokenizer(stringpath, SEPARATOR);
 		ArrayList<String> arrLst = new ArrayList<String>();
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
@@ -120,7 +121,7 @@ public final class JarUtil {
 		}
 	}
 
-	public static void createFolder(String path) {
+	private static void createFolder(String path) {
 		File directory = new File(path);
 		directory.mkdir();
 	}

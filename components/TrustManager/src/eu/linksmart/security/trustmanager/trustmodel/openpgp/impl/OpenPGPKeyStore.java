@@ -150,11 +150,11 @@ final public class OpenPGPKeyStore {
 	private static void initialize() {
 		//try extracting files from jar first
 		Hashtable<String, String> HashFilesExtract = new Hashtable<String, String>();
-		HashFilesExtract.put(OPENPGPFOLDERPATH + "/keys", "resources/openpgp/keys");
-		HashFilesExtract.put(OPENPGPFOLDERPATH + "/trust", "resources/openpgp/trust");
-		HashFilesExtract.put(OPENPGPFOLDERPATH + "/validity", "resources/openpgp/validity");
+		HashFilesExtract.put(OPENPGPFOLDERPATH + Util.FILE_SEPERATOR + "keys", "resources/openpgp/keys");
+		HashFilesExtract.put(OPENPGPFOLDERPATH + Util.FILE_SEPERATOR + "trust", "resources/openpgp/trust");
+		HashFilesExtract.put(OPENPGPFOLDERPATH + Util.FILE_SEPERATOR + "validity", "resources/openpgp/validity");
 		
-		Util.createFolder(OPENPGPFOLDERPATH);
+		Util.createDirectory(OPENPGPFOLDERPATH);
 		Util.extractFilesJar(HashFilesExtract);
 		
 		File fileKeyStore = new File(PATH_KEYSTORE);
