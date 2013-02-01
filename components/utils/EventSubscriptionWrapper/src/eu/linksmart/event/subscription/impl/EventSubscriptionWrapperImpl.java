@@ -204,6 +204,7 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 					String topic = queuedTopicToSubscribe.getFirst();
 					String serviceID = topicIDs.get(topic);
 					EventManagerPort eventManager = eventManagers.get(serviceID);
+					
 //					String subscriberHID = subscriberHIDs.get(serviceID);
 					
 //					if (eventManager != null && subscriberHID != null) {
@@ -211,6 +212,7 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 						try {
 							LOG.info("*********** Now trying to subscribe with TOPIC: "
 									+ topic);
+							eventManager.clearSubscriptionsWithDescription(serviceID);
 							// try to subscribe topics in queue, if succeed
 							// move the topic to subscribedTopic, if failed
 							// re-queue the topic
