@@ -268,6 +268,11 @@ public class LinkSmartRemoteServiceStoreImpl implements
 
 	}
 
+	@Override
+	public void removeRemoteHydraServiceByDescription(String description) {
+		remoteHydraServices.remove(description);
+	}
+
 	private class RegisterAtNetworkManagerThread implements Runnable {
 
 		@Override

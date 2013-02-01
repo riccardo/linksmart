@@ -20,7 +20,8 @@ public interface EventPublicationWrapper {
 	 * @param topic Topic of event
 	 * @param valueParts content of event without timestamp
 	 * @return success of publishing
-	 * @throws RemoteException EventManager could not be found
+	 * @throws RemoteException EventManager could not be found (>LS1.3: only return is used. throws is only kept for 
+	 * compatibility reasons)
 	 */
 	public boolean publishEvent(String serviceID, String topic, Part[] valueParts) throws RemoteException;
 	/**

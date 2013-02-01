@@ -7,6 +7,8 @@ public interface LinkSmartRemoteServiceStore {
 	public Object getRemoteHydraServiceByPID(String pid, String className) throws Exception;
 
 	public Object getRemoteHydraServiceByDescription(String description, String className) throws Exception;
+	
+	public void removeRemoteHydraServiceByDescription(String description);
 
 	/**
 	 * @param query  The format of the query is supposed be like this:

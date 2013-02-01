@@ -65,7 +65,7 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 	public boolean publishEvent(String serviceID, String topic, Part[] valueParts)
 			throws RemoteException {
 		if (!isEventManagerLocated(serviceID)) {
-			LOG.warn("Unable to publish Sensor Reading. Event Manager not found: Topic=" + topic);
+			LOG.warn("Unable to publish. Event Manager not found: Topic=" + topic);
 			return false;
 		}
 		
@@ -84,9 +84,11 @@ public class EventPublicationWrapperImpl implements EventPublicationWrapper {
 		catch (RemoteException ex) {
 			//if Event Manager disappears, start new search for that Event Manager
 			String eventManagerPID = eventManagers.get(serviceID).eventManagerPID;
+			remoteServiceStore.removeRemoteHydraServiceByDescription(eventManagerPID);
 			eventManagers.remove(serviceID);
 			findEventManager(serviceID, eventManagerPID);
-			throw ex;
+			LOG.warn("Unable to publish. Event Manager not found: Topic=" + topic);
+			return false;
 		}
 	}
 
