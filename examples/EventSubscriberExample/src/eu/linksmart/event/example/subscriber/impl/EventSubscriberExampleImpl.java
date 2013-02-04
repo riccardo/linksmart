@@ -15,12 +15,10 @@ public class EventSubscriberExampleImpl implements EventSubscriberExample,
 
 	private Logger LOG = Logger.getLogger(EventSubscriberExampleImpl.class);
 
-	private static final String SERVICE_ID = EventSubscriberExampleImpl.class
-			.getSimpleName();
+	private static final String SERVICE_ID = "EventSubscriber:ExampleSubscriber";
 
-	private static final String EVENT_MANAGER_PID = "EventManager:FIT:zfs15";
+	private static final String EVENT_MANAGER_PID = "EventManager:Marc13";
 	private final String EVENTTOPIC_SENSOR = "EVENT/.*";
-	// private final String EVENTTOPIC_SENSOR = "MEASUREMENT/SENSOR/w1";
 
 	private EventSubscriptionWrapper eventSubscriptionWrapper;
 

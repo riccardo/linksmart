@@ -19,7 +19,7 @@ public class EventPublisherExampleImpl implements
 		EventPublisherExample {
 
 		/* Description of the EventManager */
-	private static final String EVENT_MANAGER_PID = "EventManager:FIT:zfs15";
+	private static final String EVENT_MANAGER_PID = "EventManager:Marc13";
 	/* Topic of the events */
 	private static final String SENSOR_EVENT_TOPIC = "EVENT/POST_PROCESSED/WEATHER_FORECAST/PASSEIG_DE_GRACIA/LINE_3/2_HOUR_AHEAD";
 
@@ -28,8 +28,7 @@ public class EventPublisherExampleImpl implements
 	private Logger LOG = Logger.getLogger(EventPublisherExampleImpl.class);
 	private EventPublicationWrapper eventPublicationWrapper;
 
-	private static final String SERVICE_ID = EventPublisherExample.class
-			.getSimpleName();
+	private static final String SERVICE_ID = "EventPublisher:ExamplePublisher";
 
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting "
