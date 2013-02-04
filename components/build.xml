@@ -27,8 +27,7 @@
 	<property name="rootDistributionDir" value="${basedir}/distribution" />
 	<property name="targetPlatformDir" value="${basedir}/target_platform" />
 
-
-
+	
 	<!-- Define the ivy dependency resolution task -->
 	<path id="antlib.path">
 		<fileset dir="${antlib.dir}" includes="*.jar" />
@@ -76,10 +75,6 @@
 	</target>
 	-->
 	
-	<target name="test-all" depends="make-all" description="run unit tests for Java and .NET">
-		 <ant dir="test" target="test-all"/>
-	</target>
-
 	<target name="clean">
 		<delete dir="distribution" />
 		<delete dir="build" />

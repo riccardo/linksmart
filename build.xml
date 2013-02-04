@@ -24,7 +24,6 @@
  
  <property name="antlib.dir" value="${basedir}/antlibs"/>
  <property name="javaLibDir" value="${basedir}/libraries/java"/>
- <property name="dotnetLibDir" value="${basedir}/libraries/dotnet"/>
  <property name="rootBuildDir" value="${basedir}/build"/>
  <property name="rootDistributionDir" value="${basedir}/distribution"/>
  
@@ -42,7 +41,6 @@
 
  <!-- Define the msbuild task -->
  <taskdef resource="org/apache/ant/dotnet/antlib.xml" classpathref="antlib.path"/>
-	
 
  
  <!-- 
@@ -50,11 +48,6 @@
   -->
  <target name="make-all" depends="make-dirs" description="Currently compiles only Java components (no .NET, no DDK)">
    <ant dir="components" target="make-java"/>
-   <!-- <ant dir="ddk" target="make-all"/> -->
- </target>
- 
- <target name="test-all" depends="make-all" description="run unit tests for Java and .NET">
-  <ant dir="components" target="test-all"/>
  </target>
  
  <target name="clean">
