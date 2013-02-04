@@ -13,7 +13,7 @@
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
-	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
+	<property name="targetPlatform.dir" value="${basedir}/../../target_platform" />
 
 	<!-- paths -->
 
