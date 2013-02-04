@@ -821,7 +821,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 						if (receivedData.getData()[0] == 'N'
 								&& receivedData.getData()[1] == 'M') {
 							logger
-									.debug("Received LS1.1 Message: "
+									.trace("Received LS1.1 Message: "
 											+ ((receivedData.getLength() > 10) ? new String(
 													receivedData.getData())
 													.substring(0, 10)
