@@ -4,12 +4,12 @@ Bundle-Name: CommunicationSecurityManagerSym
 Bundle-SymbolicName: eu.linksmart.security.communicationsecuritymanager.impl.sym
 Bundle-Version: 2.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: eu.linksmart.clients,
- eu.linksmart.network,
- eu.linksmart.security.communication,
- eu.linksmart.security.cryptomanager;version="1.2.0",
- eu.linksmart.security.trustmanager,
- eu.linksmart.utils,
+Import-Package: eu.linksmart.clients;version="2.0.0",
+ eu.linksmart.network;version="2.0.0",
+ eu.linksmart.security.communication;version="2.0.0",
+ eu.linksmart.security.cryptomanager;version="2.0.0",
+ eu.linksmart.security.trustmanager;version="2.0.0",
+ eu.linksmart.utils;version="2.0.0",
  org.apache.log4j;version="1.2.15",
  org.apache.xml.security.encryption,
  org.apache.xml.security.keys,
