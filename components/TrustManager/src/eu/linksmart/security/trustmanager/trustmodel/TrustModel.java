@@ -39,7 +39,7 @@ import javax.xml.ws.Endpoint;
  * This interface describes a Trust Model. Newly created Trust Models must
  * implement this interface.
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * 
  */

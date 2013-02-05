@@ -64,7 +64,7 @@ import eu.linksmart.security.trustmanager.util.Util;
  * 
  * Singleton Pattern
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * 
  */

@@ -47,7 +47,7 @@ import org.w3c.dom.NodeList;
 /**
  * This is a utility class used for XML Configuration File Processing
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  */
 public class ConfigurationFileHandler {

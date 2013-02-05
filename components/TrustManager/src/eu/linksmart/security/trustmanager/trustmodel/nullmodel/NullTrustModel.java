@@ -42,7 +42,7 @@ import eu.linksmart.security.trustmanager.trustmodel.TrustModel;
  * write a Trust Model. It is only of limited use, as it performs no checks
  * whatsoever on the token and returns 1 as the trust value.
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * 
  */
