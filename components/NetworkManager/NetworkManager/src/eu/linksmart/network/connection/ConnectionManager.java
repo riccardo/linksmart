@@ -82,7 +82,7 @@ public class ConnectionManager {
 			for(Connection con : connections) {
 				if(con.getServerVirtualAddress().equals(regulatedVirtualAddress) 
 						|| (!(con instanceof BroadcastConnection) 
-								&& con.getServerVirtualAddress().equals(regulatedVirtualAddress))) {
+								&& con.getClientVirtualAddress().equals(regulatedVirtualAddress))) {
 					toRemove.add(con);
 				}
 			}
@@ -239,6 +239,7 @@ public class ConnectionManager {
 		if(!foundComSecMgr
 				&& policies != null 
 				&& policies.size() != 0
+				&& policies.contains(SecurityProperty.Broadcast)
 				&& !policies.contains(SecurityProperty.NoSecurity)) {
 			//no available communication security manager although required
 			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");

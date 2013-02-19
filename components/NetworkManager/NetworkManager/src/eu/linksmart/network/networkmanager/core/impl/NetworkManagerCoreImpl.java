@@ -46,10 +46,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 	/* Constants */
 	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class
-	.getSimpleName();
+			.getSimpleName();
 	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
 	private static final String STARTING_MESSAGE = "Starting"
-		+ NETWORK_MGR_CORE;
+			+ NETWORK_MGR_CORE;
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
 	private static String NETWORK_MGR_ENDPOINT = "http://localhost:9090/cxf/services/NetworkManager";
@@ -119,7 +119,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				context.getBundleContext());
 		this.configurator.registerConfiguration();
 		this.myDescription = this.configurator
-		.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
+				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
 		Part[] attributes = { new Part(ServiceAttribute.DESCRIPTION.name(),
 				this.myDescription) };
 
@@ -129,8 +129,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		// BackboneSOAPImpl.
 		try {
 			this.myVirtualAddress = registerService(attributes, NETWORK_MGR_ENDPOINT,
-			"eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl")
-			.getVirtualAddress();
+					"eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl")
+					.getVirtualAddress();
 		} catch (RemoteException e) {
 			LOG.error(
 					"PANIC - RemoteException thrown on local access of own method",
@@ -143,7 +143,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		// Services style
 		HttpService http = (HttpService) context.locateService("HttpService");
 		try {
-			
+
 			http.registerServlet("/GetNetworkManagerStatus",
 					new GetNetworkManagerStatus(this, identityManager,
 							backboneRouter), null, null);
@@ -168,7 +168,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				Registration serviceInfo = getServiceByPID(attribute.getValue());
 				if (serviceInfo != null) {
 					throw new IllegalArgumentException(
-					"PID already in use. Please choose a different one.");
+							"PID already in use. Please choose a different one.");
 				}
 			}
 		}
@@ -176,7 +176,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		Registration newRegistration = this.identityManager.createServiceByAttributes(attributes);
 		if(newRegistration != null) {
 			List<SecurityProperty> properties = this.backboneRouter
-			.getBackboneSecurityProperties(backboneName);
+					.getBackboneSecurityProperties(backboneName);
 			if(properties != null) {
 				// register VirtualAddress with backbone policies in connection manager
 				this.connectionManager.registerServicePolicy(newRegistration.getVirtualAddress(), properties);
@@ -213,7 +213,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		}
 		if (receiverVirtualAddress == null
 				|| (receiverRegistrationInfo != null && identityManager.getLocalServices()
-						.contains(receiverRegistrationInfo))) {
+				.contains(receiverRegistrationInfo))) {
 			// get connection belonging to services
 			Connection conn;
 			try {
@@ -227,8 +227,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			} catch (Exception e) {
 				LOG.warn(
 						"Error getting connection for services: "
-						+ senderVirtualAddress.toString() + " " + myVirtualAddress.toString(),
-						e);
+								+ senderVirtualAddress.toString() + " " + myVirtualAddress.toString(),
+								e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
 				response.setMessage("Error getting connection for services: "
@@ -311,7 +311,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		}
 		if (receiverVirtualAddress == null
 				|| (receiverRegistrationInfo != null && identityManager.getLocalServices()
-						.contains(receiverRegistrationInfo))) {
+				.contains(receiverRegistrationInfo))) {
 			// get connection belonging to services
 			Connection conn;
 			try {
@@ -325,8 +325,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			} catch (Exception e) {
 				LOG.warn(
 						"Error getting connection for services: "
-						+ senderVirtualAddress.toString() + " "
-						+ receiverVirtualAddress.toString(), e);
+								+ senderVirtualAddress.toString() + " "
+								+ receiverVirtualAddress.toString(), e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
 				response.setMessage("Error getting connection for services: "
@@ -427,7 +427,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		byte[] data;
 		try {
 			data = this.connectionManager.getBroadcastConnection(senderVirtualAddress)
-			.processMessage(message);
+					.processMessage(message);
 		} catch (Exception e) {
 			LOG.warn("Could not create packet from message from VirtualAddress: "
 					+ message.getSenderVirtualAddress(), e);
@@ -438,7 +438,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			return response;
 		}
 		NMResponse response = this.backboneRouter
-		.broadcastData(senderVirtualAddress, data);
+				.broadcastData(senderVirtualAddress, data);
 
 		return response;
 	}
@@ -577,6 +577,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	@Override
 	public void addRemoteVirtualAddress(VirtualAddress senderVirtualAddress, VirtualAddress remoteVirtualAddress) {
 		this.backboneRouter.addRouteForRemoteService(senderVirtualAddress, remoteVirtualAddress);
+		//add the security properties of the backbone to the new virtual address
+		String backbone = this.backboneRouter.getRouteBackbone(remoteVirtualAddress);
+		List<SecurityProperty> secProps = this.backboneRouter.getBackboneSecurityProperties(backbone);
+		if(secProps != null) {
+			connectionManager.registerServicePolicy(remoteVirtualAddress, secProps);
+		}
 	}
 
 	@Override
