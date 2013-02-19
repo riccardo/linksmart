@@ -72,12 +72,7 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 	 * Logger.
 	 */
 	private final static Logger LOG = Logger.getLogger(TrustManagerImpl.class.getName());
-	public final static String TRUSTMANAGERFOLDERPATH = 
-		"linksmart" + Util.FILE_SEPERATOR + "eu.linksmart.security.trustmanager";
-	public final static String CONFIGFOLDERPATH = 
-		TRUSTMANAGERFOLDERPATH + Util.FILE_SEPERATOR + "configuration";
-	public final static String TRUSTMANAGER_RESOURCE_FOLDERPATH = 
-		TRUSTMANAGERFOLDERPATH + Util.FILE_SEPERATOR + "resources";
+	
 	public static final String TRUST_MANAGER_PATH = "/cxf/services/TrustManager";
 	//public static final String NETWORK_MANAGER_PATH = "/cxf/services/NetworkManagerApplication"; 
 	//can be any string from the config.xml class name
@@ -268,9 +263,9 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		//create configuration files
 		Hashtable<String, String> HashFilesExtract = new Hashtable<String, String>();
 		LOG.debug("Deploying TrustManager config files");
-		HashFilesExtract.put(CONFIGFOLDERPATH + Util.FILE_SEPERATOR + "config.xml", "configuration/config.xml");
+		HashFilesExtract.put(Util.FILE_CONFIG, "configuration/config.xml");
 
-		Util.createDirectory(CONFIGFOLDERPATH);
+		Util.createDirectory(Util.CONFIGFOLDERPATH);
 		Util.extractFilesJar(HashFilesExtract);	
 
 		//set up configurator for trust manager

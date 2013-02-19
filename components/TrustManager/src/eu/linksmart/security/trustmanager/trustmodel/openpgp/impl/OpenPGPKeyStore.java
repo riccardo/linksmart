@@ -75,7 +75,7 @@ final public class OpenPGPKeyStore {
 	private static OpenPGPKeyStore instance = null;
 
 
-	public final static String OPENPGPFOLDERPATH = TrustManagerImpl.TRUSTMANAGER_RESOURCE_FOLDERPATH + Util.FILE_SEPERATOR + "openpgp";
+	public final static String OPENPGPFOLDERPATH = Util.TRUSTMANAGER_RESOURCE_FOLDERPATH + Util.FILE_SEPERATOR + "openpgp";
 	
 	/** Path to OpenPGP KeyStore */
 	private final static String PATH_KEYSTORE = OPENPGPFOLDERPATH + Util.FILE_SEPERATOR + "keys";

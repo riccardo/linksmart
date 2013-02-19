@@ -42,7 +42,7 @@ public class PasswordTrustModel implements TrustModel {
 	/** Identifier of this Trust Model */
 	public static final String IDENTIFIER = "PasswordTrustModel";
 	/** Folder path for password model resources	 */
-	public static final String PASSWORD_FOLDER_PATH = TrustManagerImpl.TRUSTMANAGER_RESOURCE_FOLDERPATH 
+	public static final String PASSWORD_FOLDER_PATH = Util.TRUSTMANAGER_RESOURCE_FOLDERPATH 
 	+ Util.FILE_SEPERATOR + "password";
 	/** File path for password file	 */
 	public static final String PASSWORD_FILE_PATH = PASSWORD_FOLDER_PATH + Util.FILE_SEPERATOR + "password.pwd";

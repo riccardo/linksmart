@@ -139,7 +139,7 @@ public class X509TrustModel implements TrustModel {
 			KEYSTORE_FILE = settings.getProperty("trustmanager.x509.keystore.file", "linksmart.trustmanager.keystore.jks");
 			KEYSTORE_PASS = settings.getProperty("trustmanager.x509.keystore.pass", "trustmanager");
 			KEYSTORE_TYPE = settings.getProperty("trustmanager.x509.keystore.type", "JKS");
-			KEYSTORE_DEPLOY_DIR = settings.getProperty("trustmanager.x509.keystore.deploydir", TrustManagerImpl.TRUSTMANAGER_RESOURCE_FOLDERPATH + FILE_SEPARATOR + "X509");
+			KEYSTORE_DEPLOY_DIR = settings.getProperty("trustmanager.x509.keystore.deploydir", Util.TRUSTMANAGER_RESOURCE_FOLDERPATH + FILE_SEPARATOR + "X509");
 
 			Hashtable<String, String> hashFilesExtract = new Hashtable<String, String>();
 			hashFilesExtract.put(KEYSTORE_DEPLOY_DIR + FILE_SEPARATOR + KEYSTORE_FILE, KEYSTORE_JAR_PATH);

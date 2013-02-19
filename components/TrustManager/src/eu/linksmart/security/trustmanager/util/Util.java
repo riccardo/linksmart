@@ -63,9 +63,13 @@ public class Util {
 	// Path to files, and OS specific stuff
 	public static final String FILE_SEPERATOR =
 			System.getProperty("file.separator");
-	public static final String PATH_ROOT = TrustManagerImpl.TRUST_MANAGER_PATH;
-	public static final String PATH_CONFIG = TrustManagerImpl.CONFIGFOLDERPATH;
-	public static final String FILE_CONFIG = PATH_CONFIG + FILE_SEPERATOR + "config.xml";
+	public final static String TRUSTMANAGERFOLDERPATH = 
+		"linksmart" + Util.FILE_SEPERATOR + "eu.linksmart.security.trustmanager";
+	public final static String CONFIGFOLDERPATH = 
+		TRUSTMANAGERFOLDERPATH + Util.FILE_SEPERATOR + "configuration";
+	public final static String TRUSTMANAGER_RESOURCE_FOLDERPATH = 
+		TRUSTMANAGERFOLDERPATH + Util.FILE_SEPERATOR + "resources";
+	public static final String FILE_CONFIG = CONFIGFOLDERPATH + FILE_SEPERATOR + "config.xml";
 	public static final String PATH_CERT = "cert" + FILE_SEPERATOR;
 
 	/**
