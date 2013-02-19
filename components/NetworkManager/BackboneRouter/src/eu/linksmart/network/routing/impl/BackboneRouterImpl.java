@@ -345,6 +345,17 @@ public class BackboneRouterImpl implements BackboneRouter {
 			return b.getName().concat(":").concat(b.getEndpoint(virtualAddress));
 		}
 	}
+	
+	
+	@Override
+	public String getRouteBackbone(VirtualAddress virtualAddress) {
+		Backbone b = activeRouteMap.get(virtualAddress);
+		if (b == null) {
+			return null;
+		} else {
+			return b.getName();
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
