@@ -19,9 +19,9 @@ public class EventPublisherExampleImpl implements
 		EventPublisherExample {
 
 		/* Description of the EventManager */
-	private static final String EVENT_MANAGER_PID = "EventManager:FIT:zfs15";
+	private static final String EVENT_MANAGER_PID = "EventManager:FIT:SEEMPubS";
 	/* Topic of the events */
-	private static final String SENSOR_EVENT_TOPIC = "EVENT/POST_PROCESSED/WEATHER_FORECAST/PASSEIG_DE_GRACIA/LINE_3/2_HOUR_AHEAD";
+	private static final String SENSOR_EVENT_TOPIC = "EVENT/TEST";
 
 	/* Thread that handles event creation */
 	private PublisherThread publisherThread;
@@ -70,8 +70,8 @@ public class EventPublisherExampleImpl implements
 				publish();
 
 				try {
-					LOG.debug("Waiting for 5 seconds.");
-					Thread.sleep(5000);
+					LOG.debug("Waiting for 10 seconds.");
+					Thread.sleep(10000);
 				} catch (InterruptedException e1) {
 					Thread.currentThread().interrupt();
 					LOG.info("Interrupt Thread");
@@ -100,7 +100,7 @@ public class EventPublisherExampleImpl implements
 					if (result) {
 						LOG.debug("Event published successfully");
 					} else {
-						LOG.debug("Unable to publish event.");
+						LOG.error("Unable to publish event.");
 					}
 				} catch (RemoteException e) {
 					LOG.error(
