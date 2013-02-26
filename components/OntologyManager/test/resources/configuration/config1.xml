@@ -1,5 +1,0 @@
-<Configuration implementationClass="another.impl.Class" name="another config name">
-	<AssociatedFile downloadURL="http://to.download/3" storageFolder="file://to.store/3"/>
-	<AssociatedFile downloadURL="http://to.download/4" storageFolder="file://to.store/4"/>
-	<AssociatedFile downloadURL="http://to.download/5" storageFolder="file://to.store/5"/>
-</Configuration>
