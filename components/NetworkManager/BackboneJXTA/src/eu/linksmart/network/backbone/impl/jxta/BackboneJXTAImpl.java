@@ -365,11 +365,11 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 */
 	public void applyConfigurations(Hashtable updates) {
 		if (updates.containsKey(BackboneJXTAConfigurator.JXTA_LOGS)) {
-			if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals("OFF")) {
+			if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals("false")) {
 				System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.OFF
 						.toString());
 			} else if (updates.get(BackboneJXTAConfigurator.JXTA_LOGS).equals(
-					"ON")) {
+					"true")) {
 				System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.ALL
 						.toString());
 			}
