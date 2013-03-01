@@ -90,8 +90,19 @@ public class SOAPTunnelServiceImpl implements SOAPTunnelService {
 				String dataproc = "";
 				while (token.hasMoreElements()) {
 					aux = token.nextToken();
+					if (aux.toLowerCase().contains("get")) {
+						String parts[] = aux.split(" ");
+						if (parts[1].startsWith("/")) {
+							parts[1] = parts[1].substring(1);
+						}
+						parts[1] = urlEndpoint.getFile() + parts[1];
+						header = "";
+						for (String part : parts) {
+							header = header + " " + part;
+						}
+						header = header.substring(1) + "\r\n";
+					} else if (aux.toLowerCase().contains("host")) {
 					//remove network manager host to real host
-					if (aux.toLowerCase().contains("host")) {
 						header = "Host: " + urlEndpoint.getHost() + ":"
 						+ urlEndpoint.getPort() + "\r\n";
 					}	
