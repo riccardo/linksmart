@@ -219,39 +219,39 @@ public class VirtualAddress implements Serializable {
 				+ String.valueOf(deviceID);
 	}
 
-    private boolean __hashCodeCalc = false;
-    /**
+	private boolean __hashCodeCalc = false;
+	/**
 	 * Returns a hash code value for the object
 	 * 
 	 * @return a hash code value for the object
 	 */
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getBytes() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getBytes());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getBytes(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
-        }
-        _hashCode += new Long(getContextID1()).hashCode();
-        _hashCode += new Long(getContextID2()).hashCode();
-        _hashCode += new Long(getContextID3()).hashCode();
-        _hashCode += new Long(getDeviceID()).hashCode();
-        _hashCode += getLevel();
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-	
-	
+	public synchronized int hashCode() {
+		if (__hashCodeCalc) {
+			return 0;
+		}
+		__hashCodeCalc = true;
+		int _hashCode = 1;
+		if (getBytes() != null) {
+			for (int i=0;
+					i<java.lang.reflect.Array.getLength(getBytes());
+					i++) {
+				java.lang.Object obj = java.lang.reflect.Array.get(getBytes(), i);
+				if (obj != null &&
+						!obj.getClass().isArray()) {
+					_hashCode += obj.hashCode();
+				}
+			}
+		}
+		_hashCode += new Long(getContextID1()).hashCode();
+		_hashCode += new Long(getContextID2()).hashCode();
+		_hashCode += new Long(getContextID3()).hashCode();
+		_hashCode += new Long(getDeviceID()).hashCode();
+		_hashCode += getLevel();
+		__hashCodeCalc = false;
+		return _hashCode;
+	}
+
+
 	/**
 	 * Returns true if the object "obj" is "equal to" this one.
 	 * 
@@ -276,27 +276,33 @@ public class VirtualAddress implements Serializable {
 	}
 
 	/**
-	 * Sets the context of the given level
+	 * Sets the context ID of the given level
 	 * 
 	 * @param contextID
-	 *            the context to set
-	 * @param level
-	 *            the level to set the context
+	 *            the context to set for that ID
 	 */
-	public void setContextID(long contextID, int level) {
-		switch (level) {
-		case 1:
-			this.contextID1 = Math.abs(contextID);
-			break;
-		case 2:
-			this.contextID2 = Math.abs(contextID);
-			break;
-		case 3:
-			this.contextID3 = Math.abs(contextID);
-			break;
-		default:
-			break;
-		}
+	public void setContextID1(long contextID) {
+		this.contextID1 = Math.abs(contextID);
+	}
+
+	/**
+	 * Sets the context ID of the given level
+	 * 
+	 * @param contextID
+	 *            the context to set for that ID
+	 */
+	public void setContextID2(long contextID) {
+		this.contextID2 = Math.abs(contextID);
+	}
+
+	/**
+	 * Sets the context ID of the given level
+	 * 
+	 * @param contextID
+	 *            the context to set for that ID
+	 */
+	public void setContextID3(long contextID) {
+		this.contextID3 = Math.abs(contextID);
 	}
 
 	/**
@@ -312,6 +318,19 @@ public class VirtualAddress implements Serializable {
 		buffer.putLong(contextID1);
 		buffer.putLong(deviceID);
 		return buffer.array();
+	}
+
+	public void setBytes(byte[] data){
+		if (data.length != VIRTUAL_ADDRESS_BYTE_LENGTH) {
+			throw new IllegalArgumentException("VirtualAddress data must be 32 bytes long");
+		}
+		ByteBuffer buffer = ByteBuffer.allocate(VIRTUAL_ADDRESS_BYTE_LENGTH);
+		buffer.put(data);
+		buffer.position(0);
+		this.contextID3 = buffer.getLong();
+		this.contextID2 = buffer.getLong();
+		this.contextID1 = buffer.getLong();
+		this.deviceID = buffer.getLong();
 	}
 
 }
