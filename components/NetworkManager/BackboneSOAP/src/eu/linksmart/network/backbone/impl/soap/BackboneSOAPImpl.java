@@ -190,11 +190,12 @@ public class BackboneSOAPImpl implements Backbone {
 	 */
 	private NMResponse processGetMessage(URL urlEndpoint, String data, NMResponse resp) {
 		StringTokenizer token = new StringTokenizer(data, "\r\n");
-		String header = "", aux = "";
+		String aux = "";
 		StringBuilder dataproc = new StringBuilder();
 
 		while (token.hasMoreElements()) {
 			aux = token.nextToken();
+			String header = "";
 			if (aux.toLowerCase().contains("get")) {
 				String parts[] = aux.split(" ");
 				if (parts[1].startsWith("/")) {
@@ -213,6 +214,27 @@ public class BackboneSOAPImpl implements Backbone {
 				header = "Connection: close\r\n";
 			} else if (aux.toLowerCase().startsWith("keep-alive")) {
 				header = "";
+			} else if (aux.startsWith("Accept-Encoding")
+					&& aux.contains("gzip")) {
+				//skip header name
+				String encodingsStr = aux.substring(15);
+				//get listed encodings
+				String[] encodings = encodingsStr.split(",");
+				String newEncodingStr = new String("Accept-Encoding: ");
+
+				//if the only encoding is not gzip than recreate encodings header but remove gzip
+				if(encodings.length != 1) {
+					int i = 0;
+					for (String encoding : encodings) {
+						if(!encoding.contains("gzip")) {
+							//last encoding does not need comma at the end
+							newEncodingStr = newEncodingStr.concat(encoding.trim()
+									+ ((i+1 == encodings.length)? "" : ","));
+						}
+						i++;
+					}
+					header = newEncodingStr + "\r\n";
+				}
 			}
 			dataproc.append(header);
 		}
@@ -228,43 +250,44 @@ public class BackboneSOAPImpl implements Backbone {
 	 * Can be a call to a Web Service or just to an WSDL.
 	 */
 	private NMResponse getResponse(URL urlEndpoint, NMResponse resp, String dataproc) {
+		Socket clientSocket = null;
 		try {
 			// Create Socket to local web service
-			Socket clientSocket = new Socket();
+			clientSocket = new Socket();
 			clientSocket.connect(new InetSocketAddress(urlEndpoint.getHost(), urlEndpoint
 					.getPort()), TIMEOUT);
 
 			flushMessage(dataproc, clientSocket);
 			String response = parseResponse(resp, clientSocket);
 
-			String[] s = response.split("\r\n\r\n");
-			if (s.length > 1) {
-				response = s[1];
-			} else {
+			if (response.length() == 0) {
 				// In case the SOAP response from the service is empty.
-				response = generateSoapResponse("No SOAP response from the service");
+				resp.setStatus(NMResponse.STATUS_ERROR);
+				resp.setMessage("HTTP/1.1 204 No Content\r\n");
 			}
 
-			LOG.debug("Response:\n" + response);
+			LOG.debug("Response:\n" + response);	
 			resp.setStatus(NMResponse.STATUS_SUCCESS);
 			resp.setMessage(response);
-			return resp;
-			
-		} catch (UnknownHostException e) {
-			String msg = "Error delivering the data to destination:\n"
-					+ e.getMessage();
-			LOG.debug(msg);
+		} catch (IllegalArgumentException e) {
+			LOG.debug("Error delivering the data to destination:\n"
+					+ e.getMessage()); 
 			resp.setStatus(NMResponse.STATUS_ERROR);
-			resp.setMessage(generateSoapResponse(msg));
-			return resp;
+			resp.setMessage("HTTP/1.1 418 I'm a teapot\r\n" + e.getMessage());
 		} catch (IOException e) {
-			String msg = "Error delivering the data to destination:\n"
-					+ e.getMessage();
-			LOG.debug(msg);
+			LOG.debug("Error delivering the data to destination:\n" 
+					+ e.getMessage()); 
 			resp.setStatus(NMResponse.STATUS_ERROR);
-			resp.setMessage(generateSoapResponse(msg));
-			return resp;
+			resp.setMessage("HTTP/1.1 500 Internal Server Error\r\n" + e.getMessage());
+		} finally {
+			try {
+			if(clientSocket != null)
+				clientSocket.close();
+			} catch(Exception e) {
+				LOG.warn("Streams could not be closed!");
+			}
 		}
+		return resp;
 	}
 
 	/**
@@ -278,7 +301,7 @@ public class BackboneSOAPImpl implements Backbone {
 		OutputStream cos = clientSocket.getOutputStream();
 		cos.write(dataproc.getBytes());
 		cos.flush();
-		// cos.close();
+		clientSocket.shutdownOutput();
 	}
 
 	/**
