@@ -9,8 +9,11 @@ import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.security.communication.SecurityProperty;
 
-/*
+/**
  * A Backbone needs to be implemented if a new communication channel (e.g. P2P, JMS, ...) should be used by LinkSmart.
+ * It should always have a static 1..1 service reference to the BackboneRouter to ensure that the BackboneRouter
+ * gets informed about its loading.
+ *
  */
 public interface Backbone {
 
@@ -90,12 +93,6 @@ public interface Backbone {
 	 * @return whether the endpoint was removed
 	 */
 	public boolean removeEndpoint(VirtualAddress virtualAddress);
-	
-	/**
-	 * used to apply configurations from the web page 
-	 * @param updates
-	 */
-	public void applyConfigurations(Hashtable updates);
 	
 	/**
 	 * 

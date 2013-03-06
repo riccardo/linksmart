@@ -357,7 +357,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 */
 
 	@SuppressWarnings("rawtypes")
-	@Override
 	/**
 	 * Apply the configuration changes
 	 * 

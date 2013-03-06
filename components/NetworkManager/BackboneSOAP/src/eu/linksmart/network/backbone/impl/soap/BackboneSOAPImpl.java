@@ -418,13 +418,6 @@ public class BackboneSOAPImpl implements Backbone {
 	}
 
 	@Override
-	public void applyConfigurations(Hashtable updates) {
-		// at this point there is nothing that is saved in the configurations
-		// that needs to be updated when they change
-
-	}
-
-	@Override
 	public boolean addEndpoint(VirtualAddress virtualAddress, String endpoint) {
 		if (this.virtualAddressUrlMap.containsKey(virtualAddress)) {
 			return false;
