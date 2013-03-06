@@ -288,5 +288,4 @@ public class Subscription  implements java.io.Serializable {
         __hashCodeCalc = false;
         return _hashCode;
     }
-
 }

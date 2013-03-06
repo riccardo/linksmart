@@ -100,5 +100,4 @@ public class Part  implements java.io.Serializable {
         __hashCodeCalc = false;
         return _hashCode;
     }
-
 }
