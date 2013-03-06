@@ -15,7 +15,7 @@ public class EventManagerPortProxy implements eu.linksmart.eventmanager.EventMan
   
   private void _initEventManagerPortProxy() {
     try {
-      eventManagerPort = (new eu.linksmart.eventmanager.client.EventManagerPortServiceLocator()).getEventManagerPort();
+      eventManagerPort = (new eu.linksmart.eventmanager.client.EventManagerPortServiceLocator()).getBasicHttpBinding_EventManagerPort();
       if (eventManagerPort != null) {
         if (_endpoint != null)
           ((javax.xml.rpc.Stub)eventManagerPort)._setProperty("javax.xml.rpc.service.endpoint.address", _endpoint);
@@ -42,6 +42,30 @@ public class EventManagerPortProxy implements eu.linksmart.eventmanager.EventMan
     if (eventManagerPort == null)
       _initEventManagerPortProxy();
     return eventManagerPort;
+  }
+  
+  public boolean publishXmlEvent(java.lang.String eventXmlString) throws java.rmi.RemoteException{
+    if (eventManagerPort == null)
+      _initEventManagerPortProxy();
+    return eventManagerPort.publishXmlEvent(eventXmlString);
+  }
+  
+  public boolean unsubscribeWithDescription(java.lang.String topic, java.lang.String description) throws java.rmi.RemoteException{
+    if (eventManagerPort == null)
+      _initEventManagerPortProxy();
+    return eventManagerPort.unsubscribeWithDescription(topic, description);
+  }
+  
+  public boolean subscribeWithDescription(java.lang.String topic, java.lang.String description, int priority) throws java.rmi.RemoteException{
+    if (eventManagerPort == null)
+      _initEventManagerPortProxy();
+    return eventManagerPort.subscribeWithDescription(topic, description, priority);
+  }
+  
+  public boolean clearSubscriptionsWithDescription(java.lang.String description) throws java.rmi.RemoteException{
+    if (eventManagerPort == null)
+      _initEventManagerPortProxy();
+    return eventManagerPort.clearSubscriptionsWithDescription(description);
   }
   
   public boolean subscribe(java.lang.String topic, java.lang.String endpoint, int priority) throws java.rmi.RemoteException{
@@ -102,24 +126,6 @@ public class EventManagerPortProxy implements eu.linksmart.eventmanager.EventMan
     if (eventManagerPort == null)
       _initEventManagerPortProxy();
     return eventManagerPort.publish(topic, in1);
-  }
-  
-  public boolean unsubscribeWithDescription(java.lang.String topic, java.lang.String description) throws java.rmi.RemoteException{
-    if (eventManagerPort == null)
-      _initEventManagerPortProxy();
-    return eventManagerPort.unsubscribeWithDescription(topic, description);
-  }
-  
-  public boolean subscribeWithDescription(java.lang.String topic, java.lang.String description, int priority) throws java.rmi.RemoteException{
-    if (eventManagerPort == null)
-      _initEventManagerPortProxy();
-    return eventManagerPort.subscribeWithDescription(topic, description, priority);
-  }
-  
-  public boolean clearSubscriptionsWithDescription(java.lang.String description) throws java.rmi.RemoteException{
-    if (eventManagerPort == null)
-      _initEventManagerPortProxy();
-    return eventManagerPort.clearSubscriptionsWithDescription(description);
   }
   
   
