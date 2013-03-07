@@ -71,29 +71,6 @@ public class SOAPTunnelServlet extends HttpServlet {
 	}
 
 	/**
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public boolean checkIfValidURLInRequest(String path){
-
-		String parts[] = path.split("/", 6);
-
-		if ((parts.length > 3 && parts[3].equals("wsdl")) 
-				|| (parts.length == 6 && parts[5].equals("wsdl"))) {
-			return true;
-		} else {
-			//if attributes were passed with the url add them
-			if (parts.length > 3) {
-				return true;
-			}
-
-		}
-
-		return false;	
-	}
-
-	/**
 	 * Performs the HTTP DELETE operation
 	 * Is identical to GET
 	 * @param request HttpServletRequest that encapsulates the request to the servlet 
@@ -173,34 +150,45 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+		VirtualAddress senderVirtualAddress = null;
+		VirtualAddress receiverVirtualAddress = null;
+		StringBuilder requestBuilder = null;
+
 		// split path - path contains virtual addresses and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		StringTokenizer token = new StringTokenizer(path, "/");
 		if (token.countTokens() >= 2) {
-			StringBuilder requestBuilder = new StringBuilder();
-			String sVirtualAddress = token.nextToken();
-			VirtualAddress senderVirtualAddress = (sVirtualAddress.contentEquals("0")) ? nmCore.getService() : new VirtualAddress(sVirtualAddress);
-			VirtualAddress receiverVirtualAddress = new VirtualAddress(token.nextToken());
-			// sessionID = new VirtualAddress(token.nextToken());
+			try{
+				requestBuilder = new StringBuilder();
+				String sVirtualAddress = token.nextToken();
+				senderVirtualAddress = (sVirtualAddress.contentEquals("0")) ? nmCore.getService() : new VirtualAddress(sVirtualAddress);
+				receiverVirtualAddress = new VirtualAddress(token.nextToken());
+				// sessionID = new VirtualAddress(token.nextToken());
 
-			// append headers and blank line for end of headers
-			requestBuilder.append(buildHeaders(request));
-			requestBuilder.append("\r\n");
+				// append headers and blank line for end of headers
+				requestBuilder.append(buildHeaders(request));
+				requestBuilder.append("\r\n");
 
-			// append content
-			if ((request.getContentLength() > 0)) {
-				try {
-					BufferedReader reader = request.getReader();
-					for (String line = null; (line = reader.readLine()) != null;)
-						requestBuilder.append(line);
-				} catch (Exception e) {
-					e.printStackTrace();
+				// append content
+				if ((request.getContentLength() > 0)) {
+					try {
+						BufferedReader reader = request.getReader();
+						for (String line = null; (line = reader.readLine()) != null;)
+							requestBuilder.append(line);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-			}
 
-			// send request to NetworkManagerCore
-			logger.debug("Sending soap request through tunnel");
+				// send request to NetworkManagerCore
+				logger.debug("Sending soap request through tunnel");
+			}catch (Exception e) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
 			sendRequest(senderVirtualAddress, receiverVirtualAddress, requestBuilder.toString(), response);
+		} else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
 
