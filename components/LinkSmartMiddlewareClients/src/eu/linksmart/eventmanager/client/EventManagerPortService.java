@@ -10,7 +10,7 @@ package eu.linksmart.eventmanager.client;
 public interface EventManagerPortService extends javax.xml.rpc.Service {
     public java.lang.String getBasicHttpBinding_EventManagerPortAddress();
 
-    public eu.linksmart.eventmanager.EventManagerPort getBasicHttpBinding_EventManagerPort() throws javax.xml.rpc.ServiceException;
+    public eu.linksmart.eventmanager.EventManagerPort getEventManagerPort() throws javax.xml.rpc.ServiceException;
 
-    public eu.linksmart.eventmanager.EventManagerPort getBasicHttpBinding_EventManagerPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
+    public eu.linksmart.eventmanager.EventManagerPort getEventManagerPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
 }

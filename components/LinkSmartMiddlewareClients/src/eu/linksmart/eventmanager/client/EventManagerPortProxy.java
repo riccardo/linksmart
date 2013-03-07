@@ -15,7 +15,7 @@ public class EventManagerPortProxy implements eu.linksmart.eventmanager.EventMan
   
   private void _initEventManagerPortProxy() {
     try {
-      eventManagerPort = (new eu.linksmart.eventmanager.client.EventManagerPortServiceLocator()).getBasicHttpBinding_EventManagerPort();
+      eventManagerPort = (new eu.linksmart.eventmanager.client.EventManagerPortServiceLocator()).getEventManagerPort();
       if (eventManagerPort != null) {
         if (_endpoint != null)
           ((javax.xml.rpc.Stub)eventManagerPort)._setProperty("javax.xml.rpc.service.endpoint.address", _endpoint);
