@@ -211,7 +211,7 @@ function showConfigurationDataForm(configuration){
 									.attr('type', 'radio')
 									.attr('id', cssParamName + '_form_n')
 									.attr('name', paramName )
-									.val('true');
+									.val('false');
 					if (paramValue=='false' || paramValue == '') {
 						noOption.attr('checked', 'checked');
 					}
