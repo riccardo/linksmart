@@ -18,7 +18,8 @@ public class EventSubscriberExampleImpl implements EventSubscriberExample,
 	private static final String SERVICE_ID = "EventSubscriber:ExampleSubscriber";
 
 	private static final String EVENT_MANAGER_PID = "EventManager:Marc13";
-	private final String EVENTTOPIC_SENSOR = "EVENT/.*";
+	private static final String WEATHER_EVENT_TOPIC = "EVENT/POST_PROCESSED/WEATHER_FORECAST/PASSEIG_DE_GRACIA/LINE_3/2_HOUR_AHEAD";
+	private static final String CO2_EVENT_TOPIC = "EVENT/CO2";
 
 	private EventSubscriptionWrapper eventSubscriptionWrapper;
 
@@ -31,7 +32,8 @@ public class EventSubscriberExampleImpl implements EventSubscriberExample,
 				.locateService(EventSubscriptionWrapper.class.getSimpleName());
 		eventSubscriptionWrapper.registerCallback(this, SERVICE_ID);
 		eventSubscriptionWrapper.findEventManager(SERVICE_ID, EVENT_MANAGER_PID);
-		eventSubscriptionWrapper.subscribeWithTopic(SERVICE_ID, EVENTTOPIC_SENSOR);
+		eventSubscriptionWrapper.subscribeWithTopic(SERVICE_ID, WEATHER_EVENT_TOPIC);
+		eventSubscriptionWrapper.subscribeWithTopic(SERVICE_ID, CO2_EVENT_TOPIC);
 
 		LOG.debug("Started "
 				+ context.getBundleContext().getBundle().getSymbolicName());

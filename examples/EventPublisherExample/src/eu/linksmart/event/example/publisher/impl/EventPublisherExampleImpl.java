@@ -21,7 +21,8 @@ public class EventPublisherExampleImpl implements
 		/* Description of the EventManager */
 	private static final String EVENT_MANAGER_PID = "EventManager:Marc13";
 	/* Topic of the events */
-	private static final String SENSOR_EVENT_TOPIC = "EVENT/POST_PROCESSED/WEATHER_FORECAST/PASSEIG_DE_GRACIA/LINE_3/2_HOUR_AHEAD";
+	private static final String WEATHER_EVENT_TOPIC = "EVENT/POST_PROCESSED/WEATHER_FORECAST/PASSEIG_DE_GRACIA/LINE_3/2_HOUR_AHEAD";
+	private static final String CO2_EVENT_TOPIC = "EVENT/CO2";
 
 	/* Thread that handles event creation */
 	private PublisherThread publisherThread;
@@ -81,7 +82,7 @@ public class EventPublisherExampleImpl implements
 
 		private void publish() {
 			if (eventPublicationWrapper.isEventManagerLocated(SERVICE_ID)) {
-				// Create Event
+				// Create Events
 				Part[] weatherForecastEvent = new Part[7];
 				weatherForecastEvent[0] = new Part("temperature",Float.toString(26.3f));
 				weatherForecastEvent[1] = new Part("relativeHumidity",Float.toString(45.3f));
@@ -89,15 +90,17 @@ public class EventPublisherExampleImpl implements
 				weatherForecastEvent[3] = new Part("windDirection",Float.toString(270.0f));
 				weatherForecastEvent[4] = new Part("windDirectionString","West");
 				weatherForecastEvent[5] = new Part("skyCondition", "sunny");
-				weatherForecastEvent[5] = new Part("icon","http://iconserver/sunny.gif");
+				weatherForecastEvent[6] = new Part("icon","http://iconserver/sunny.gif");
+				Part[] co2Event = new Part[1];
+				co2Event[0] = new Part("concentration",Float.toString(14.5f));
 
-				// Publish Event
+				// Publish Events
 				try {
-					boolean result = eventPublicationWrapper.publishEvent(SERVICE_ID ,SENSOR_EVENT_TOPIC,
+					boolean result = eventPublicationWrapper.publishEvent(SERVICE_ID ,WEATHER_EVENT_TOPIC,
 							weatherForecastEvent);
-					
-					if (result) {
-						LOG.debug("Event published successfully");
+					boolean result2 = eventPublicationWrapper.publishEvent(SERVICE_ID ,CO2_EVENT_TOPIC, co2Event);
+					if (result && result2) {
+						LOG.debug("Events published successfully");
 					} else {
 						LOG.debug("Unable to publish event.");
 					}
