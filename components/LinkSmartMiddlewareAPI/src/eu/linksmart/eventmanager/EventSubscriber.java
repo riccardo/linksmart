@@ -40,16 +40,6 @@ package eu.linksmart.eventmanager;
 
 
 public interface EventSubscriber extends java.rmi.Remote {
-	
-	/**
-	 * notify method - notifies a subscriber of the arrival of the new event.
-	 * 
-	 * @param topic topic of the event published.
-	 * @param parts event published.
-	 * @return true or false depending on the result of the notification.
-	 * @throws java.rmi.RemoteException
-	 */
-	 public java.lang.Boolean notify(java.lang.String topic, 
-		eu.linksmart.eventmanager.Part[] parts) throws java.rmi.RemoteException;
-
+    public java.lang.Boolean notify(java.lang.String topic, eu.linksmart.eventmanager.Part[] parts) throws java.rmi.RemoteException;
+    public java.lang.Boolean notifyXmlEvent(java.lang.String xmlEventString) throws java.rmi.RemoteException;
 }
