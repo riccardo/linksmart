@@ -51,4 +51,10 @@ public class EventSubscriberExampleImpl implements EventSubscriberExample,
 				+ parts[1].getValue());
 		return true;
 	}
+
+	@Override
+	public Boolean notifyXmlEvent(String xmlEventString) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
