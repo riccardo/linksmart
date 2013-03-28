@@ -518,8 +518,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			if(response.getStatus() == NMResponse.STATUS_SUCCESS) {
 				// process response message with logical endpoints in connection
 				// with physical endpoints
-				tempMessage = connection.processData(message.getReceiverVirtualAddress(),
-						message.getSenderVirtualAddress(), response.getMessage().getBytes());
+				tempMessage = connection.processData(
+						message.getReceiverVirtualAddress(),
+						message.getSenderVirtualAddress(),
+						(response.getMessage() != null)? response.getMessage().getBytes(): new byte[0]);
 				// repeat sending and receiving until security protocol is over
 				while (tempMessage != null
 						&& tempMessage
