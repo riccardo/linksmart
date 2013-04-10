@@ -158,4 +158,13 @@ public interface BackboneRouter {
 
 	Map<VirtualAddress, List<RouteEntry>> getCopyOfPotentialRouteMap();
 	
+	/**
+	 * This function returns information about the backbone of the VirtualAddress
+	 * The return format is backbone class name
+	 * 
+	 * @param virtualAddress VirtualAddress of the node to request the route from
+	 * @return Backbone name
+	 */
+	String getRouteBackbone(VirtualAddress virtualAddress);
+	
 }
