@@ -199,7 +199,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 */
 	public String buildHeaders(HttpServletRequest request) {
 		StringBuilder builder = new StringBuilder();
-		Enumeration headerNames = request.getHeaderNames();
+		Enumeration<?> headerNames = request.getHeaderNames();
 
 		while (headerNames.hasMoreElements()) {
 			String header = (String) headerNames.nextElement();
