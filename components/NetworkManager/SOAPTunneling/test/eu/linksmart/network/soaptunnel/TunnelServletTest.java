@@ -34,7 +34,7 @@ public class TunnelServletTest {
 	private HttpServletResponse response;
 	private String receiverString = "0.0.0.6986094776732394497";
 	private String urlShort = "/0?description=\"CalculatorForBeginners\"";
-	private String urlLong = "/0.0.0.1/default/some/addition?description=\"CalculatorForBeginners\"&pid=\"010\"";
+	private String urlLong = "/0.0.0.1/some/addition?description=\"CalculatorForBeginners\"&pid=\"010\"#default";
 	private String urlWsdl = "/0/wsdl?description=\"CalculatorForBeginners\"";
 	private VirtualAddress nmAddress;
 	private String nmAddressString = "0.0.0.0";
@@ -90,19 +90,19 @@ public class TunnelServletTest {
 
 		this.requestShort = mock(HttpServletRequest.class);
 		when(this.requestShort.getHeaderNames()).thenReturn(new Hashtable<String, String>().elements());
-		when(this.requestShort.getPathInfo()).thenReturn(urlShort);
+		when(this.requestShort.getPathInfo()).thenReturn(urlShort.substring(0, urlShort.indexOf("?")));
 		when(this.requestShort.getMethod()).thenReturn("POST");
 		when(this.requestShort.getProtocol()).thenReturn("HTTP/1.1");
 		when(this.requestShort.getQueryString()).thenReturn(this.urlShort.substring(urlShort.indexOf("?") + 1));
 		this.requestLong = mock(HttpServletRequest.class);
 		when(this.requestLong.getHeaderNames()).thenReturn(new Hashtable<String, String>().elements());
-		when(this.requestLong.getPathInfo()).thenReturn(urlLong);
+		when(this.requestLong.getPathInfo()).thenReturn(urlLong.substring(0, urlLong.indexOf("?")));
 		when(this.requestLong.getMethod()).thenReturn("POST");
 		when(this.requestLong.getProtocol()).thenReturn("HTTP/1.1");
 		when(this.requestLong.getQueryString()).thenReturn(this.urlLong.substring(urlLong.indexOf("?") + 1));
 		this.requestWsdl = mock(HttpServletRequest.class);
 		when(this.requestWsdl.getHeaderNames()).thenReturn(new Hashtable<String, String>().elements());
-		when(this.requestWsdl.getPathInfo()).thenReturn(urlWsdl);
+		when(this.requestWsdl.getPathInfo()).thenReturn(urlWsdl.substring(0, urlWsdl.indexOf("?")));
 		when(this.requestWsdl.getMethod()).thenReturn("GET");
 		when(this.requestWsdl.getProtocol()).thenReturn("HTTP/1.1");
 		when(this.requestWsdl.getQueryString()).thenReturn(this.urlWsdl.substring(urlWsdl.indexOf("?") + 1));

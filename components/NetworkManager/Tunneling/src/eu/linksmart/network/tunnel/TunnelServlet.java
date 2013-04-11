@@ -39,7 +39,7 @@ public class TunnelServlet extends HttpServlet{
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		//path without query
-		String path = request.getPathInfo().substring(0, request.getPathInfo().indexOf("?"));
+		String path = request.getPathInfo();
 		//get sender address and check if path contained default switch
 		VirtualAddress senderVirtualAddress = null;
 		if (path.startsWith("/0/") || path.equals("/0")) {
@@ -58,16 +58,11 @@ public class TunnelServlet extends HttpServlet{
 				return;
 			}
 		}
-
-		boolean isDefault = path.startsWith("/default");
-		if(isDefault) {
-			//remove default switch similarly to sender
-			path = path.substring(8);
-		}
+		
 		//get service
 		Registration registration = null;
 		try {
-			registration = getSearchedService(request.getQueryString(), isDefault);
+			registration = getSearchedService(request.getQueryString());
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
 			return;
@@ -110,7 +105,7 @@ public class TunnelServlet extends HttpServlet{
 	private void processDatalessRequest(HttpServletRequest request, HttpServletResponse response)
 			throws IOException{		
 		//path without query
-		String path = request.getPathInfo().substring(0, request.getPathInfo().indexOf("?"));
+		String path = request.getPathInfo();
 		//get sender address and check if path contained default switch
 		VirtualAddress senderVirtualAddress = null;
 		if (path.startsWith("/0/") || path.equals("/0")) {
@@ -130,15 +125,10 @@ public class TunnelServlet extends HttpServlet{
 			}
 		}
 
-		boolean isDefault = path.startsWith("/default");
-		if(isDefault) {
-			//remove default switch similarly to sender
-			path = path.substring(8);
-		}
 		//get service
 		Registration registration = null;
 		try {
-			registration = getSearchedService(request.getQueryString(), isDefault);
+			registration = getSearchedService(request.getQueryString());
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
 			return;
@@ -175,9 +165,16 @@ public class TunnelServlet extends HttpServlet{
 		}
 	}
 
-	private Registration getSearchedService(String query, boolean getDefault) throws MultipleMatchException, Exception {
+	private Registration getSearchedService(String query) throws MultipleMatchException, Exception {
 		ArrayList<Part> attributes = new ArrayList<Part>();
-		//divide query into attributes
+		boolean getDefault = false;
+		if(query.contains("#default")) {
+			//cut off default switch from end as it is not part of the query
+			query = query.substring(0, query.indexOf("#default"));
+			getDefault = true;
+		}
+		
+		//divide query into individual attributes
 		String[] queryAttrs = query.split("&");
 
 		for(String queryAttr : queryAttrs) {
