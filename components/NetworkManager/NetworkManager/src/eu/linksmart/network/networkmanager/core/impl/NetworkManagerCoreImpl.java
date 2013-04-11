@@ -237,6 +237,15 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			}
 
 			Message msg = conn.processData(senderVirtualAddress, receiverVirtualAddress, data);
+			
+			//drop error messages from further processing
+			if(msg instanceof ErrorMessage) {
+				NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
+				if(msg.getData() != null) {
+				response.setMessage(new String(msg.getData()));
+				}
+				return response;
+			}
 			String topic = msg.getTopic();
 			// go through MsgObservers for additional processing
 			List<MessageProcessor> observers = msgObservers.get(topic);

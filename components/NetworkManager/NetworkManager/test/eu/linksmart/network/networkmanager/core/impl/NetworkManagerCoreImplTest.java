@@ -165,7 +165,6 @@ public class NetworkManagerCoreImplTest {
 		// Check if the response is as expected
 		assertEquals("The request should not be successful.",  
 				NMResponse.STATUS_ERROR, response.getStatus());
-		assertEquals("Error in processing request", response.getMessage());
 	}
 	
 	/**
