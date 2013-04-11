@@ -235,21 +235,28 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		logger.debug("Sending data over pipe to VirtualAddress= " + receiverVirtualAddress);
 
 		String receiverJxtaAddress = listOfRemoteEndpoints.get(receiverVirtualAddress);
-		URI receiverJxtaURI;
-		PeerID receiverPeerID = null;
-		try {
-			receiverJxtaURI = new URI(receiverJxtaAddress);
-			receiverPeerID = (PeerID) IDFactory.fromURI(receiverJxtaURI);
-		} catch (URISyntaxException e) {
-			logger.warn("Wrong syntax in URI " + receiverJxtaAddress, e);
+		if(receiverJxtaAddress != null) {
+			URI receiverJxtaURI;
+			PeerID receiverPeerID = null;
+			try {
+				receiverJxtaURI = new URI(receiverJxtaAddress);
+				receiverPeerID = (PeerID) IDFactory.fromURI(receiverJxtaURI);
+			} catch (URISyntaxException e) {
+				logger.warn("Wrong syntax in URI " + receiverJxtaAddress, e);
+			}
+
+			response = pipeSyncHandler.sendData(senderVirtualAddress.toString(), receiverVirtualAddress
+					.toString(), data, receiverPeerID, synch);
+
+			logger.debug("sendData Response: " + response.toString());
+
+			return response;
+		} else {
+			response.setStatus(NMResponse.STATUS_ERROR);
+			response.setMessage("Cannot find JXTA endpoint of VirtualAddress");
+			return response;
 		}
-
-		response = pipeSyncHandler.sendData(senderVirtualAddress.toString(), receiverVirtualAddress
-				.toString(), data, receiverPeerID, synch);
-
-		logger.debug("sendData Response: " + response.toString());
-
-		return response;
+		
 	}
 
 
