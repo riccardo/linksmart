@@ -6,9 +6,9 @@ public class VirtualAddressConverter {
 
 	public static eu.linksmart.network.VirtualAddress toApi(eu.linksmart.network.client.VirtualAddress va) {
 		eu.linksmart.network.VirtualAddress vaApi = new VirtualAddress();
-		vaApi.setContextID(va.getContextID1(), 1);
-		vaApi.setContextID(va.getContextID2(), 2);
-		vaApi.setContextID(va.getContextID3(), 3);
+		vaApi.setContextID1(va.getContextID1());
+		vaApi.setContextID2(va.getContextID2());
+		vaApi.setContextID3(va.getContextID3());
 		vaApi.setDeviceID(va.getDeviceID());
 		
 		return vaApi;
