@@ -67,8 +67,8 @@
         <ant dir="NetworkManager/SOAPTunneling" target="make" />
         <ant dir="CryptoManager" target="make" />
         <ant dir="TrustManager" target="make" />
-		<ant dir="/utils/EventPublicationWrapper" target="make" />
-		<ant dir="/utils/EventSubscriptionWrapper" target="make" />
+		<ant dir="utils/EventPublicationWrapper" target="make" />
+		<ant dir="utils/EventSubscriptionWrapper" target="make" />
 	</target>
 	
 	<!--
