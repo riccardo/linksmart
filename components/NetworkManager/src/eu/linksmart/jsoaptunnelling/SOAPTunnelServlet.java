@@ -284,6 +284,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 			response.setContentLength(sResp.getBytes().length);
 			response.setContentType("text/xml");
+			response.setCharacterEncoding("UTF-8");
 			response.getWriter().write(sResp);
 		}
 	}
