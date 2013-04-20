@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="eu.linksmart.eventing.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="NetworkManagerStubUrl" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:9090/cxf/services/NetworkManager</Value>
+    </Setting>
+    <Setting Name="SubscriberDescription" Type="System.String" Scope="User">
+      <Value Profile="(Default)">EventSubscriber</Value>
+    </Setting>
+    <Setting Name="EventSubscriberService_EventManagerStub_EventManagerImplementation" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://129.26.162.159:8124/Service</Value>
+    </Setting>
+    <Setting Name="SoapTunnelUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:8082</Value>
+    </Setting>
+    <Setting Name="RetryDelay" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">2000</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

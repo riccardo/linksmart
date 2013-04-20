@@ -1,0 +1,2 @@
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\obj\Release\EventSubscriberService.dll
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\obj\Release\EventSubscriberService.XmlSerializers.dll

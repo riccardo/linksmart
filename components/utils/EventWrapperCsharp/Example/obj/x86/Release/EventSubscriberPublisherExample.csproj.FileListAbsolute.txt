@@ -1,0 +1,1 @@
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\ConsoleApplication1\obj\x86\Release\EventSubscriberPublisherExample.csprojResolveAssemblyReference.cache
