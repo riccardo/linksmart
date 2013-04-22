@@ -15,9 +15,9 @@ public class EventSubscriberExampleImpl implements EventSubscriberExample,
 
 	private Logger LOG = Logger.getLogger(EventSubscriberExampleImpl.class);
 
-	private static final String SERVICE_ID = "EventSubscriber:ExampleSubscriber";
+	private static final String SERVICE_ID = "EventSubscriber:CHANGEME";
 
-	private static final String EVENT_MANAGER_PID = "EventManager:FIT:Training";
+	private static final String EVENT_MANAGER_PID = "EventManager:CHANGEME";
 	private static final String WEATHER_EVENT_TOPIC = "EVENT/POST_PROCESSED/WEATHER_FORECAST/PASSEIG_DE_GRACIA/LINE_3/2_HOUR_AHEAD";
 	private static final String CO2_EVENT_TOPIC = "EVENT/.*";
 
