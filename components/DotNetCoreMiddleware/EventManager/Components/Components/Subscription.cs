@@ -84,6 +84,8 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Components
 {
@@ -95,13 +97,21 @@ namespace Components
     public class Subscription //: IComparable<Subscription>
     {
         /// <summary>
-        /// Topic connected to an event
+        /// Topic connected to an event (or rather, the expression used to match a topic)
         /// </summary>
         private string topic;
         /// <summary>
         /// Subscriber endpoint
         /// </summary>
+        /// <summary>
+        /// Topic connected to an event
+        /// </summary>
+        private string protocol = "WebService";
         private string endpoint;
+        /// <summary>
+        /// Subscriber description (as registered with Network Manager)
+        /// </summary>
+        private string description;
         /// <summary>
         /// Subscriber HID
         /// </summary>
@@ -168,7 +178,7 @@ namespace Components
         //#endregion
 
         /// <summary>
-        /// Topic connected to an event
+        /// Topic connected to an event (the expression used to match an event topic)
         /// </summary>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = true, Order = 0)]
         public string Topic
@@ -195,9 +205,18 @@ namespace Components
             set { endpoint = value; }
         }
         /// <summary>
+        /// Subscribers description (as registered with Network Manager))
+        /// </summary>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = true, Order = 3)]
+        public string Description
+        {
+            get { return description; }
+            set { description = value; }
+        }
+        /// <summary>
         /// Priority of the event, higher value means higher priority
         /// </summary>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false, Order = 3)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false, Order = 4)]
         public int Priority
         {
             get { return priority; }
@@ -206,7 +225,7 @@ namespace Components
         /// <summary>
         /// Part that contains the data of an event
         /// </summary>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, IsNullable = true, Order = 4)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, IsNullable = true, Order = 5)]
         public Components.Part[] Parts
         {
             get { return data; }
@@ -215,7 +234,7 @@ namespace Components
         /// <summary>
         /// Number of retries
         /// </summary>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false, Order = 5)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false, Order = 6)]
         public int NumberOfRetries
         {
             get { return numberOfRetries; }
@@ -224,7 +243,7 @@ namespace Components
         /// <summary>
         /// DateTime for when the EventManager receives the publish call
         /// </summary>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = true, Order = 6)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = true, Order = 7)]
         public Nullable<DateTime> @DateTime
         {
             get { return dateTime; }
@@ -236,6 +255,9 @@ namespace Components
         /// This match uses RegEx.IsMatch(), with the start and end of sting anchors added: 
         /// "^"+subscriptionTopic+"$". A published event "topic12" matches subscriptions to:
         /// "topic12", "topic1.*", but not subscriptions to "topic123" or "opic12".
+        /// 
+        /// If the regex doesn't match anything, the subscription expression is used as XPath 
+        /// and if this results in one or more nodes, IsMatch returns <c>true</c>.
         /// </summary>
         /// <param name="publishedTopic">The published topic.</param>
         /// <returns>
@@ -244,23 +266,107 @@ namespace Components
         public bool IsMatch(string publishedTopic)
         {
             bool isMatch = false;
-            Regex regex = new Regex("^"+this.topic + "$", RegexOptions.None);
+            try
+            {
+                isMatch = IsRegexMatch(publishedTopic);
+            }
+            catch { }
+            if (!isMatch)
+            {
+                try
+                {
+                    isMatch = IsXpathMatch(publishedTopic);
+                    if (!isMatch)
+                    {
+                        try
+                        {
+                            isMatch = IsMatchToTopicStringInXmlEvent(publishedTopic);
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            return isMatch;
+        }
+
+      
+        private bool IsRegexMatch(string publishedTopic)
+        {
+            bool isMatch = false;
+            Regex regex = new Regex("^" + this.topic + "$", RegexOptions.None);
             isMatch = regex.IsMatch(publishedTopic);
+            return isMatch;
+        }
+
+        private bool IsXpathMatch(string publishedTopic)
+        {
+            bool isMatch = false;
+            // We assume that the published topic is a valid XML document.
+            XmlDocument xDoc = new XmlDocument();
+            var nsmgr = new XmlNamespaceManager(xDoc.NameTable);
+            nsmgr.AddNamespace("", @"urn:linksmart/eventmodel/1.0");
+            nsmgr.AddNamespace("linksmart",@"urn:linksmart/typelibrary/1.0");
+            nsmgr.AddNamespace("seempubs-em",@"urn:seempubs/eventmodel/1.0");
+            xDoc.LoadXml(publishedTopic);
+            XmlNode node = xDoc.SelectSingleNode(this.topic, nsmgr);
+            isMatch = null != node;
+            return isMatch;
+        }
+
+        private bool IsMatchToTopicStringInXmlEvent(string publishedTopic)
+        {
+            bool isMatch = false;
+            // We assume that the published topic is a valid XML document.
+            XmlDocument xDoc = new XmlDocument();
+            var nsmgr = new XmlNamespaceManager(xDoc.NameTable);
+            nsmgr.AddNamespace("", @"urn:linksmart/eventmodel/1.0");
+            nsmgr.AddNamespace("linksmart", @"urn:linksmart/typelibrary/1.0");
+            nsmgr.AddNamespace("seempubs-em", @"urn:seempubs/eventmodel/1.0");
+            xDoc.LoadXml(publishedTopic);
+            XmlNode node = xDoc.SelectSingleNode("//*[local-name()='TopicString']", nsmgr);
+            if (null != node && node.NodeType.Equals(XmlNodeType.Element))
+            {
+                string topicString = node.InnerText;
+                isMatch = IsRegexMatch(topicString);
+            }
+            isMatch = null != node;
             return isMatch;
         }
 
         /// <summary>
         /// Method to create an object. Can be used as an element in a list
         /// </summary>
-        public Subscription(string topic, string hid, string endpoint, int priority, Components.Part[] data, int numberOfRetries, Nullable<DateTime> dateTime)
+        public Subscription(string topic, string hid, string endpoint, string description, int priority, Components.Part[] data, int numberOfRetries, Nullable<DateTime> dateTime)
         {
             this.topic = topic;
             this.hid = hid;
             this.endpoint = endpoint;
+            this.description = description;
             this.priority = priority;
             this.data = data;
             this.numberOfRetries = numberOfRetries;
             this.dateTime = dateTime;
+        }
+
+        /// <summary>
+        /// Method to create an object. Can be used as an element in a list
+        /// </summary>
+        public Subscription(string topic, string hid, string endpoint, string description, int priority, Components.Part[] data, int numberOfRetries, Nullable<DateTime> dateTime, string protocol)
+        {
+            this.topic = topic;
+            this.hid = hid;
+            this.endpoint = endpoint;
+            this.description = description;
+            this.priority = priority;
+            this.data = data;
+            this.numberOfRetries = numberOfRetries;
+            this.dateTime = dateTime;
+            this.protocol = protocol;
         }
 
         public Subscription()
@@ -268,6 +374,7 @@ namespace Components
             this.topic = String.Empty;
             this.hid = String.Empty;
             this.endpoint = String.Empty;
+            this.description = String.Empty;
             this.priority = int.MaxValue;
             this.data = null;
             this.numberOfRetries = int.MaxValue;

@@ -87,13 +87,20 @@ namespace EventStorage
 {
     public class EventStorage
     {
-        public void store(Components.Subscription failedEventNotification)
+        public void storeFailedEvent(Components.Subscription failedEventNotification)
         {
             EventStorageService.EventStorageService ess = new EventStorageService.EventStorageService();
+            ess.Init("retry");
             if (failedEventNotification.Endpoint != null)
                 ess.WriteDatabaseSqlLiteCallbackAddress(failedEventNotification);
             else
                 ess.WriteDatabaseSqlLite(failedEventNotification);
+        }
+        public void storeEvent(string topic, Components.Part[] parts)
+        {
+            EventStorageService.EventStorageService ess = new EventStorageService.EventStorageService();
+            ess.Init(global::EventStorage.Properties.Settings.Default.ProjectInUse);
+            ess.WriteToDB(topic, parts);
         }
     }
 }

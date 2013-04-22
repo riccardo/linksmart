@@ -93,26 +93,26 @@ If the Library as you received it specifies that a proxy can decide whether futu
 using System;
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
 [System.ServiceModel.ServiceContractAttribute(Namespace="http://eventmanager.linksmart.eu", ConfigurationName="EventManagerPort")]
-public interface EventManagerPort
+public partial interface EventManagerPort
 {
 
     [System.ServiceModel.OperationContractAttribute(Action = "subscribe", ReplyAction = "")]
-    [System.ServiceModel.XmlSerializerFormatAttribute(Style=System.ServiceModel.OperationFormatStyle.Rpc)]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="subscribeReturn")]
     bool subscribe(string topic, string endpoint, int priority);
 
     [System.ServiceModel.OperationContractAttribute(Action = "unsubscribe", ReplyAction = "")]
-    [System.ServiceModel.XmlSerializerFormatAttribute(Style=System.ServiceModel.OperationFormatStyle.Rpc)]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="unsubscribeReturn")]
     bool unsubscribe(string topic, string endpoint);
 
     [System.ServiceModel.OperationContractAttribute(Action = "subscribeWithHID", ReplyAction = "")]
-    [System.ServiceModel.XmlSerializerFormatAttribute(Style=System.ServiceModel.OperationFormatStyle.Rpc)]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="subscribeWithHIDReturn")]
     bool subscribeWithHID(string topic, string hid, int priority);
 
     [System.ServiceModel.OperationContractAttribute(Action = "unsubscribeWithHID", ReplyAction = "")]
-    [System.ServiceModel.XmlSerializerFormatAttribute(Style=System.ServiceModel.OperationFormatStyle.Rpc)]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="unsubscribeWithHIDReturn")]
     bool unsubscribeWithHID(string topic, string hid);
     
@@ -123,22 +123,22 @@ public interface EventManagerPort
     getSubscriptionsResponse getSubscriptions(getSubscriptionsRequest request);
 
     [System.ServiceModel.OperationContractAttribute(Action = "clearSubscriptions", ReplyAction = "")]
-    [System.ServiceModel.XmlSerializerFormatAttribute(Style=System.ServiceModel.OperationFormatStyle.Rpc)]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="clearSubscriptionsReturn")]
     bool clearSubscriptions(string endpoint);
 
     [System.ServiceModel.OperationContractAttribute(Action = "clearSubscriptionsWithHID", ReplyAction = "")]
-    [System.ServiceModel.XmlSerializerFormatAttribute(Style=System.ServiceModel.OperationFormatStyle.Rpc)]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="clearSubscriptionsWithHIDReturn")]
     bool clearSubscriptionsWithHID(string hid);
 
     [System.ServiceModel.OperationContractAttribute(Action = "setPriority", ReplyAction = "")]
-    [System.ServiceModel.XmlSerializerFormatAttribute(Style=System.ServiceModel.OperationFormatStyle.Rpc)]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name="setPriorityReturn")]
     bool setPriority(string in0, int in1);
 
     [System.ServiceModel.OperationContractAttribute(Action = "triggerRetryQueue", ReplyAction = "")]
-    [System.ServiceModel.XmlSerializerFormatAttribute(Style = System.ServiceModel.OperationFormatStyle.Rpc)]
+    [System.ServiceModel.XmlSerializerFormatAttribute()]
     [return: System.ServiceModel.MessageParameterAttribute(Name = "triggerRetryQueueReturn")]
     bool triggerRetryQueue();
     
@@ -397,7 +397,18 @@ public partial class EventManagerPortClient : System.ServiceModel.ClientBase<Eve
     {
         return base.Channel.unsubscribeWithHID(topic, hid);
     }
-    
+
+
+    public bool subscribeWithDescription(string topic, string description, int priority)
+    {
+        return base.Channel.subscribeWithDescription(topic, description, priority);
+    }
+
+    public bool unsubscribeWithDescription(string topic, string description)
+    {
+        return base.Channel.unsubscribeWithDescription(topic, description);
+    }
+
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     getSubscriptionsResponse EventManagerPort.getSubscriptions(getSubscriptionsRequest request)
     {
@@ -419,6 +430,11 @@ public partial class EventManagerPortClient : System.ServiceModel.ClientBase<Eve
     public bool clearSubscriptionsWithHID(string hid)
     {
         return base.Channel.clearSubscriptionsWithHID(hid);
+    }
+
+    public bool clearSubscriptionsWithDescription(string description)
+    {
+        return base.Channel.clearSubscriptionsWithDescription(description);
     }
     
     public bool setPriority(string topic, int priority)
@@ -445,4 +461,9 @@ public partial class EventManagerPortClient : System.ServiceModel.ClientBase<Eve
         return retVal.publishReturn;
     }
 
+    public bool publishXmlEvent(string xmlEventString)
+    {
+
+        return base.Channel.publishXmlEvent(xmlEventString);
+    }
 }

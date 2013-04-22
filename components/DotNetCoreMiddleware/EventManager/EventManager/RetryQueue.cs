@@ -99,7 +99,7 @@ namespace EventManager
         public void queue(Components.Subscription @event, publishRequest request)
         {
             @event.Parts = request.in1;
-            Program.failedEventList.Add(@event);
+            EventManagerImplementation.failedEventList.Add(@event);
         }
         /// <summary>
         /// Retrieve and remove the first element of the queue
@@ -109,7 +109,7 @@ namespace EventManager
             /// <summary>
             /// Method to sort the list, ascending order of NumberOfRetries descending order of Priority.
             /// </summary>
-            Program.failedEventList.Sort(delegate(Components.Subscription s1, Components.Subscription s2)
+            EventManagerImplementation.failedEventList.Sort(delegate(Components.Subscription s1, Components.Subscription s2)
             {
                 int retriesComparison = s2.NumberOfRetries.CompareTo(s1.NumberOfRetries);
                 // If NumberOfRetries are the same we sort on Priority
@@ -123,9 +123,9 @@ namespace EventManager
             try 
             {
                 //Program.failedEventList = Program.failedEventList.OrderBy(q => q.NumberOfRetries).ThenByDescending(q => q.Priority).ToList();
-                Components.Subscription @return = Program.failedEventList.First();
+                Components.Subscription @return = EventManagerImplementation.failedEventList.First();
                 @return.NumberOfRetries++;
-                Program.failedEventList.RemoveAt(0);
+                EventManagerImplementation.failedEventList.RemoveAt(0);
                 return @return;
             }
             catch { return null; }

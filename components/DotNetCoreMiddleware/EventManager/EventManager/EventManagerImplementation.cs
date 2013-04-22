@@ -87,12 +87,15 @@ using System.Threading;
 using System.Web.Services;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using EventStorage;
 
 namespace EventManager
 {
     [ServiceBehavior(Name = "EventManagerImplementation", Namespace = "http://eventmanager.linksmart.eu", IncludeExceptionDetailInFaults=true)]
-    class EventManagerImplementation : EventManagerPort
+    public partial class EventManagerImplementation : EventManagerPort
     {
+        private readonly string XMLEVENT = "###XMLEVENT###";
+        EventStorage.EventStorage ess = new EventStorage.EventStorage();
         /// <summary>
         /// Instance of the SubscriberInterface web service
         /// </summary>
@@ -119,15 +122,15 @@ namespace EventManager
         {
             try
             {
-                if (Program.subscriptionList.Exists(f => (f.Endpoint != null && f.Endpoint.Equals(endpoint) == true && f.Topic.Equals(topic) == true)))
+                if (EventManagerImplementation.subscriptionList.Exists(f => (f.Endpoint != null && f.Endpoint.Equals(endpoint) == true && f.Topic.Equals(topic) == true)))
                 { Console.WriteLine("Subscription already exists"); }
                 else
                 {
-                    Components.Subscription subscription = new Components.Subscription(topic, null, endpoint, priority, null, 0, null);
+                    Components.Subscription subscription = new Components.Subscription(topic, null, endpoint,null, priority, null, 0, null);
                     Subscribe subscribeClass = new Subscribe(subscription);
                     Thread subscribeThread = new Thread(new ThreadStart(subscribeClass.subscribe));
                     subscribeThread.Start();
-                    subscribeThread.Join();
+                    //subscribeThread.Join();
                 }
                 return true;
             }
@@ -142,7 +145,9 @@ namespace EventManager
         {
             try
             {
-                Program.subscriptionList.RemoveAll(f => (f.Endpoint.Equals(endpoint) && f.Topic.Equals(topic)));
+                EventManagerImplementation.subscriptionList.RemoveAll(f => (f.Endpoint.Equals(endpoint) && f.Topic.Equals(topic)));
+                Components.Subscription subscription = new Components.Subscription(topic, null, endpoint, null, 0, null, 0, null);
+                SubscriptionStore.Store.RemoveSubscription(subscription);
                 Console.WriteLine("Unsubscribe:\nTopic: {0}\nEndpoint: {1}", topic, endpoint);
                 return true;
             }
@@ -175,15 +180,15 @@ namespace EventManager
         {
             try
             {
-                if (Program.subscriptionList.Exists(f => (f.HID != null && f.HID.Equals(hid) == true && f.Topic.Equals(topic) == true)))
+                if (EventManagerImplementation.subscriptionList.Exists(f => (f.HID != null && f.HID.Equals(hid) == true && f.Topic.Equals(topic) == true)))
                 { Console.WriteLine("Subscription already exists"); }
                 else
                 {
-                    Components.Subscription subscription = new Components.Subscription(topic, hid, null, priority, null, 0, null);
+                    Components.Subscription subscription = new Components.Subscription(topic, hid, null,null, priority, null, 0, null);
                     Subscribe subscribeClass = new Subscribe(subscription);
                     Thread subscribeThread = new Thread(new ThreadStart(subscribeClass.subscribe));
                     subscribeThread.Start();
-                    subscribeThread.Join();
+                    //subscribeThread.Join();
                 }
                 return true;
             }
@@ -197,7 +202,10 @@ namespace EventManager
         {
             try
             {
-                Program.subscriptionList.RemoveAll(f => (f.HID.Equals(hid) && f.Topic.Equals(topic)));
+                EventManagerImplementation.subscriptionList.RemoveAll(f => (f.HID.Equals(hid) && f.Topic.Equals(topic)));
+                //SubscriptionStore.Store.RemoveSubscriptionWithTopicAndHid(topic, hid);
+                Components.Subscription subscription = new Components.Subscription(topic, hid, null, null, 0, null, 0, null);
+                SubscriptionStore.Store.RemoveSubscription(subscription);
                 Console.WriteLine("Unsubscribe:\nTopic: {0}\nHID: {1}", topic, hid);
                 return true;
             }
@@ -217,7 +225,10 @@ namespace EventManager
         {
             try
             {
-                Program.subscriptionList.RemoveAll(f => (f.Endpoint.Equals(endpoint)));
+                EventManagerImplementation.subscriptionList.RemoveAll(f => (f.Endpoint.Equals(endpoint)));
+                Components.Subscription subscription = new Components.Subscription(null, null, endpoint, null, 0, null, 0, null);
+                SubscriptionStore.Store.RemoveSubscriptions(subscription);
+                
                 Console.WriteLine("Subscription cleared:\nEndpoint: {0}", endpoint);
                 return true;
             }
@@ -232,7 +243,10 @@ namespace EventManager
         {
             try
             {
-                Program.subscriptionList.RemoveAll(f => (f.HID.Equals(hid)));
+                EventManagerImplementation.subscriptionList.RemoveAll(f => (f.HID.Equals(hid)));
+                Components.Subscription subscription = new Components.Subscription(null, hid, null, null, 0, null, 0, null);
+                SubscriptionStore.Store.RemoveSubscriptions(subscription);
+                
                 Console.WriteLine("Subscription cleared:\nHID: {0}", hid);
                 return true;
             }
@@ -246,7 +260,7 @@ namespace EventManager
         {
             try
             {
-                foreach (Components.Subscription subscription in Program.subscriptionList.Where(f => f.Topic.Equals(topic) == true))
+                foreach (Components.Subscription subscription in EventManagerImplementation.subscriptionList.Where(f => f.Topic.Equals(topic) == true))
                 { subscription.Priority = priority; }
                 //callRetryQueue();
                 return true;
@@ -256,6 +270,9 @@ namespace EventManager
 
         public bool triggerRetryQueue()
         {
+            Thread retryThread = new Thread(new ThreadStart(callRetryQueue));
+            retryThread.Start();
+            //retryThread.Join();
             callRetryQueue();
             return true;
         }
@@ -264,19 +281,33 @@ namespace EventManager
         /// Send the published event to all subscribers to the specified topic.
         /// The matching of published topic to subscriptions is done with Subscription.IsMatch(string topic),
         /// which uses RexEx to match the subscription topic to published events. 
+        /// 
+        /// If the topic is equal to the string "###XMLEVENT###", the value Part with key=="value" will be sent to publishXmlEvent(). 
         /// </summary>
         /// <param name="request">Request that contains topic and values regarding the event</param>
         public publishResponse publish(publishRequest request)
-        {   //Make a copy of the list in order to avoid it being changed during the forea.ch loop. As long as copy is used, foreach can stay here. Otherwise -> Notification.cs
-            //Parallel.ForEach(Components.Subscription subscription in Program.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList(), 
-            foreach (Components.Subscription subscription in Program.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList())
+        {
+            if (request.topic.Equals(this.XMLEVENT))
             {
-                subscription.NumberOfRetries = 0;
-                if (subscription.DateTime != null) { }
-                else { subscription.DateTime = DateTime.Now; }
-                Notification notification = new Notification(subscription, request);
-                Thread notificationThread = new Thread(new ThreadStart(notification.notify));
-                notificationThread.Start();
+                var xmlContent = (from part in request.in1 where part.key.Equals("value") select part.value).FirstOrDefault();
+                if (!string.IsNullOrEmpty(xmlContent))
+                {
+                    publishXmlEvent(xmlContent);
+                }
+            }
+            else
+            {
+                //Make a copy of the list in order to avoid it being changed during the forea.ch loop. As long as copy is used, foreach can stay here. Otherwise -> Notification.cs
+                //Parallel.ForEach(Components.Subscription subscription in Program.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList(), 
+                foreach (Components.Subscription subscription in EventManagerImplementation.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList())
+                {
+                    subscription.NumberOfRetries = 0;
+                    if (subscription.DateTime != null) { }
+                    else { subscription.DateTime = DateTime.Now; }
+                    Notification notification = new Notification(subscription, request);
+                    Thread notificationThread = new Thread(new ThreadStart(notification.notify));
+                    notificationThread.Start();
+                }
             }
 
             publishResponse p = new publishResponse();
@@ -295,17 +326,20 @@ namespace EventManager
                 Components.Subscription subscription = retryQueue.dequeue();
                 if (subscription != null)
                 {
+                    Console.WriteLine("Retry: {0}\nTimestamp: {1}\n\n\n\n", subscription.Topic, subscription.DateTime);
                     publishRequest request = new publishRequest();
                     request.topic = subscription.Topic;
                     request.in1 = subscription.Parts;
                     notification = new Notification(subscription, request);
                     Thread retryThread = new Thread(new ThreadStart(notification.notify));
                     retryThread.Start();
-                    retryThread.Join();
+                    //retryThread.Join();
                 }
                 else
                     break;
             }
         }
+
+
     }
 }

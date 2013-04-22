@@ -8,6 +8,13 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="notifyXmlEvent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="xmlEventString" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:complexType name="ArrayOfPart">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Part" nillable="true" type="tns:Part" />

@@ -86,6 +86,7 @@ using System.ServiceModel;
 using System.IO;
 using System.Diagnostics;
 using System.Globalization;
+using System.Data.SQLite;
 using System.Threading;
 using System.Data;
 using System.Data.Common;
@@ -95,25 +96,60 @@ namespace EventStorageService
     /// <summary>
     /// This Class stores the failed event notification after it has passed the retry queue. Generic SQL databases are supported as well as a specific SqlLite interface that uses optimised database calls
     /// </summary>
-   [ServiceBehavior(Name = "EventSubscriberService", Namespace = "http://eventmanager.linksmart.eu")]
+    [ServiceBehavior(Name = "EventSubscriberService", Namespace = "http://eventmanager.linksmart.eu")]
     public class EventStorageService
     {
-       DbConnection eventDB = null;
-       public EventStorageService()
-       {
-           DbProviderFactory fact = DbProviderFactories.GetFactory("System.Data.SQLite");
-           eventDB = fact.CreateConnection();
-           try
-           {
-               //// Event database with Callback address (Endpoint or HID)
-               //eventDB.ConnectionString = "Data Source=EbbitsEventDB.s3db;Pooling=true;FailIfMissing=true;Journal Mode=Off";
-               // Event databese without callback address, just event topic
-               eventDB.ConnectionString = "Data Source=EbbitsRetryDB.s3db; Pooling=true; FailIfMissing=true; Journal Mode=Off";
-               
-               eventDB.Open();
-           }
-           catch (Exception e) {Console.WriteLine(e.Message);}
-       }
+        DbConnection eventDB = null;
+        public EventStorageService()
+        {
+            SQLiteConnection cnn = new SQLiteConnection();
+            //DbProviderFactory fact = DbProviderFactories.GetFactory("System.Data.SQLite");
+            //eventDB = fact.CreateConnection();
+            eventDB = cnn;
+        }
+        public void Init(string type)
+        {
+            switch (type)
+            {
+                case "seam4us":
+                    try
+                    {
+                        //// Event database with Callback address (Endpoint or HID)
+                        //eventDB.ConnectionString = "Data Source=EbbitsEventDB.s3db;Pooling=true;FailIfMissing=true;Journal Mode=Off";
+                        // Event databese without callback address, just event topic
+                        eventDB.ConnectionString = "Data Source=Seam4UsDB.s3db; Pooling=true; FailIfMissing=true; Journal Mode=Off";
+
+                        eventDB.Open();
+                    }
+                    catch (Exception e) { Console.WriteLine(e.Message); }
+                    break;
+                case "retry":
+                    try
+                    {
+                        //// Event database with Callback address (Endpoint or HID)
+                        //eventDB.ConnectionString = "Data Source=EbbitsEventDB.s3db;Pooling=true;FailIfMissing=true;Journal Mode=Off";
+                        // Event databese without callback address, just event topic
+                        eventDB.ConnectionString = "Data Source=EbbitsRetryDB.s3db; Pooling=true; FailIfMissing=true; Journal Mode=Off";
+
+                        eventDB.Open();
+                    }
+                    catch (Exception e) { Console.WriteLine(e.Message); }
+                    break;
+                case "ebbits":
+                    try
+                    {
+                        //// Event database with Callback address (Endpoint or HID)
+                        //eventDB.ConnectionString = "Data Source=EbbitsEventDB.s3db;Pooling=true;FailIfMissing=true;Journal Mode=Off";
+                        // Event databese without callback address, just event topic
+                        eventDB.ConnectionString = "Data Source=EventDB.s3db; Pooling=true; FailIfMissing=true; Journal Mode=Off";
+
+                        eventDB.Open();
+                    }
+                    catch (Exception e) { Console.WriteLine(e.Message); }
+                    break;
+            }
+      
+        }
         /// <summary>
         /// Static method for adding an entry to a log file including a time stamp
         /// </summary>
@@ -202,6 +238,15 @@ namespace EventStorageService
             }
         }
 
+        protected void AddParameter(ref DbCommand dbcommand, string paramenterName, DbType dbType, object value)
+        {
+            DbParameter keyParam = dbcommand.CreateParameter();
+            keyParam.ParameterName = paramenterName;
+            keyParam.DbType = dbType;
+            keyParam.Value = value;
+            dbcommand.Parameters.Add(keyParam);
+        }
+
         /// <summary>
         /// Method for adding an failed event notification to the database optimised for the Opebn Source Database SqlLite. Stores the event by topic, not involving any endpoint or hid or anything connected to subscribers
         /// </summary>
@@ -211,18 +256,68 @@ namespace EventStorageService
             try
             {
                 string topic = failedEventNotification.Topic;
+                string endpoint = failedEventNotification.Endpoint;
+                string hid = failedEventNotification.HID;
                 Nullable<DateTime> dateTime = failedEventNotification.DateTime;
+                int priority = failedEventNotification.Priority;
                 Components.Part[] parts = failedEventNotification.Parts;
-                string myId = System.Guid.NewGuid().ToString();
 
+                string myId = System.Guid.NewGuid().ToString();
                 DbCommand dbcommand = eventDB.CreateCommand();
                 dbcommand.Connection = eventDB;
                 dbcommand.CommandType = CommandType.Text;
 
-                dbcommand.CommandText = "INSERT INTO [Events] ([ID], TimeStamp, Topic) VALUES(@ID, @TimeStamp, @Topic); ";
+                dbcommand.CommandText = "INSERT INTO [Events] ([ID],stored_timestamp,Topic,Priority) VALUES(@ID,@stored_timestamp,@Topic,@Priority); ";
 
                 AddParameter(ref dbcommand, "@ID", DbType.String, myId);
-                AddParameter(ref dbcommand, "@TimeStamp", DbType.DateTime, dateTime);
+                AddParameter(ref dbcommand, "@stored_timestamp", DbType.DateTime, dateTime);
+                AddParameter(ref dbcommand, "@Topic", DbType.String, topic);
+                AddParameter(ref dbcommand, "@Priority", DbType.Int32, priority);
+
+                dbcommand.ExecuteScalar();
+                dbcommand.CommandText = "INSERT INTO [CallbackAddress] (Endpoint,HID,EventID) VALUES(@Endpoint,@HID,@EventID); ";
+
+                AddParameter(ref dbcommand, "@Endpoint", DbType.String, endpoint);
+                AddParameter(ref dbcommand, "@HID", DbType.String, hid);
+                AddParameter(ref dbcommand, "@EventID", DbType.String, myId);
+                dbcommand.ExecuteScalar();
+
+                foreach (Components.Part current in parts)
+                {
+                    DbCommand dbcommand2 = eventDB.CreateCommand();
+                    dbcommand2.Connection = eventDB;
+                    dbcommand2.CommandType = CommandType.Text;
+                    dbcommand2.CommandText = "INSERT INTO [KeyValuePairs] ([EventId], [Key], [Value]) VALUES(@EventID, @Key, @Value); ";
+                    string sVal = current.value;
+                    if (sVal == null) sVal = "";
+                    string sKey = current.key;
+                    if (sKey == null) sKey = "";
+                    AddParameter(ref dbcommand2, "@EventID", DbType.String, myId);
+                    AddParameter(ref dbcommand2, "@Key", DbType.String, sKey);
+                    AddParameter(ref dbcommand2, "@Value", DbType.String, sVal);
+                    dbcommand2.ExecuteScalar();
+                }
+            }
+            catch (Exception e) { System.Console.WriteLine(e.Message); }
+        }
+
+        public void WriteToDB(string eventTopic, Components.Part[] eventParts)
+        {
+            try
+            {
+                string topic = eventTopic;
+                Nullable<DateTime> timestamp = DateTime.Now;
+                Components.Part[] parts = eventParts;
+
+                string myId = System.Guid.NewGuid().ToString();
+                DbCommand dbcommand = eventDB.CreateCommand();
+                dbcommand.Connection = eventDB;
+                dbcommand.CommandType = CommandType.Text;
+
+                dbcommand.CommandText = "INSERT INTO [Events] ([ID],stored_timestamp,Topic) VALUES(@ID,@stored_timestamp,@Topic); ";
+
+                AddParameter(ref dbcommand, "@ID", DbType.String, myId);
+                AddParameter(ref dbcommand, "@stored_timestamp", DbType.DateTime, timestamp);
                 AddParameter(ref dbcommand, "@Topic", DbType.String, topic);
 
                 dbcommand.ExecuteScalar();
@@ -266,7 +361,6 @@ namespace EventStorageService
                 dbcommand.Connection = eventDB;
                 dbcommand.CommandType = CommandType.Text;
 
-
                 dbcommand.CommandText = "INSERT INTO [Events] ([ID],stored_timestamp,Topic,Priority) VALUES(@ID,@stored_timestamp,@Topic,@Priority); ";
 
                 AddParameter(ref dbcommand, "@ID", DbType.String, myId);
@@ -308,13 +402,8 @@ namespace EventStorageService
         /// <param name="paramenterName">Name of the parameter to be added</param>
         /// <param name="dbType">The database datatype of the parameter</param>
         /// <param name="value">The actual value</param>
-        protected void AddParameter(ref DbCommand dbcommand, string paramenterName, DbType dbType, object value)
-        {
-            DbParameter keyParam = dbcommand.CreateParameter();
-            keyParam.ParameterName = paramenterName;
-            keyParam.DbType = dbType;
-            keyParam.Value = value;
-            dbcommand.Parameters.Add(keyParam);
-        }
+    
+      
+
     }
 }

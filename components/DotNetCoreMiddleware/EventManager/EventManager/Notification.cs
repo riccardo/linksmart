@@ -87,12 +87,15 @@ namespace EventManager
 {
     public class Notification
     {
+        public string EventString;
+        public EventFormat EventFormat = EventFormat.Part;
+        private EventStorage.EventStorage es = new EventStorage.EventStorage();
         private publishRequest request = null;
         private Components.Subscription subscription = null;
         private readonly Object m_lock = new Object();
         Operations operations = new Operations();
         /// <summary>
-        /// Initiation of variables needed for notification
+        /// Initiation of variables needed for notification using a publishRequest structure
         /// </summary>
         public Notification(Components.Subscription subscription, publishRequest request)
         {
@@ -102,14 +105,32 @@ namespace EventManager
                 this.request = request;
             }
         }
+        /// <summary>
+        /// Initiation of variables needed for notification using an Xml event as a string
+        /// </summary>
+        public Notification(Components.Subscription subscription, string xmlEventString)
+        {
+            lock (m_lock)
+            {
+                this.subscription = subscription;
+                this.EventFormat = EventFormat.Xml;
+                this.EventString = xmlEventString;
+            }
+        }
+
         public void notify() 
         {
             if (subscription.NumberOfRetries <= 5)
-                operations.eventNotification(subscription, request);
+            {
+                if (this.EventFormat.Equals(EventFormat.Part)) {
+                    operations.eventNotification(subscription, request);
+                } else {
+                    operations.eventNotification(subscription, this.EventString, this.EventFormat);
+                }
+            }
             else
             {
-                EventStorage.EventStorage es = new EventStorage.EventStorage();
-                es.store(subscription);
+                es.storeFailedEvent(subscription);
                 //EventStorageService.EventStorageService ess = new EventStorageService.EventStorageService();
                 //ess.WriteDatabaseSqlLite(subscription);
             }

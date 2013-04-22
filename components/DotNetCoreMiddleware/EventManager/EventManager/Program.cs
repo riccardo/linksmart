@@ -78,7 +78,7 @@ Each version is given a distinguishing version number. If the Library as you rec
 
 If the Library as you received it specifies that a proxy can decide whether future versions of the GNU Lesser General Public License shall apply, that proxy's public statement of acceptance of any version is permanent authorization for you to choose that version for the Library.
 */
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -89,57 +89,28 @@ using System.Net.Sockets;
 
 namespace EventManager
 {
-    class Program
+     class Program
     {
-        /// <summary>
-        /// List where the subscriptions are stored
-        /// </summary>
-        public static List<Components.Subscription> subscriptionList = new List<Components.Subscription>();
-        /// <summary>
-        /// List where the failed event notifications are stored
-        /// </summary>
-        public static List<Components.Subscription> failedEventList = new List<Components.Subscription>();
 
+       
         static void Main(string[] args)
         {
-             String ipAddress = "";
-            if (!Properties.Settings.Default.UseIPv6)
-                ipAddress = Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).First().ToString();
-            else
-                ipAddress = Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily == AddressFamily.InterNetworkV6).First().ToString();
+            //ProgramHelper programHelper = new ProgramHelper();
+            //programHelper.Start();
 
-            string address = string.Format("http://{0}:{1}/Service", ipAddress, "8124"); //Change localhost to your own ip-address
-            Uri[] BaseAddresses = new Uri[]{ new Uri(address) };
-            //Turn off 100-continue
-            System.Net.ServicePointManager.Expect100Continue = false;
-            //Turn off 100-continue
-            System.Net.ServicePointManager.Expect100Continue = false;
-            //Create the even subscriber
-            ServiceHost serviceHost = new ServiceHost(typeof(EventManagerImplementation), BaseAddresses);
-            try
-            {
-                ServiceMetadataBehavior smb;
-                if ((smb = serviceHost.Description.Behaviors.Find<ServiceMetadataBehavior>()) == null)
-                {
-                    smb = new ServiceMetadataBehavior();
-                    smb.HttpGetEnabled = true;
-                    smb.HttpGetUrl = new Uri(address + "/Meta");
-                    serviceHost.Description.Behaviors.Add(smb);
-                }
-                BasicHttpBinding myBinding = new BasicHttpBinding(BasicHttpSecurityMode.None);
-                myBinding.Namespace = "http://eventmanager.linksmart.eu";
-                serviceHost.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexHttpBinding(), address + "mex");
-                serviceHost.AddServiceEndpoint(typeof(EventManagerPort), myBinding, "");
-                serviceHost.Open();
-
-                if (serviceHost.State == CommunicationState.Opened && Properties.Settings.Default.UseNetworkManager) {
-                    NetworkManager.NetworkManagerApplicationService nma = new NetworkManager.NetworkManagerApplicationService();
-                    nma.createHIDwDesc(Properties.Settings.Default.EventManagerDesc, address);
-                }
-            }catch (Exception e) { Console.WriteLine(e.Message); }
-
-            EventManagerImplementation m_eventmanager = new EventManager.EventManagerImplementation();
+            EventManagerImplementation.Start();
+            
             Console.ReadLine();
+            EventManagerImplementation.Stop();
+            
+           
         }
+
+
+
+
+
     }
 }
+
+

@@ -109,6 +109,8 @@ namespace EventManager.SubscriberInterface {
     public partial class EventSubscriberService : System.Web.Services.Protocols.SoapHttpClientProtocol {
       
         private System.Threading.SendOrPostCallback notifyOperationCompleted;
+        private System.Threading.SendOrPostCallback notifyXmlEventOperationCompleted;
+        
         
         private bool useDefaultCredentialsSetExplicitly;
         
@@ -150,6 +152,9 @@ namespace EventManager.SubscriberInterface {
         
         /// <remarks/>
         public event notifyCompletedEventHandler notifyCompleted;
+
+        /// <remarks/>
+        public event notifyCompletedEventHandler notifyXmlEventCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://eventmanager.linksmart.eu/EventSubscriber/notify", RequestNamespace="http://eventmanager.linksmart.eu", ResponseNamespace="http://eventmanager.linksmart.eu", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -160,10 +165,25 @@ namespace EventManager.SubscriberInterface {
             notifyResult = ((bool)(results[0]));
             notifyResultSpecified = ((bool)(results[1]));
         }
+
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://eventmanager.linksmart.eu/EventSubscriber/notifyXmlEvent", RequestNamespace = "http://eventmanager.linksmart.eu", ResponseNamespace = "http://eventmanager.linksmart.eu", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void notifyXmlEvent([System.Xml.Serialization.XmlElementAttribute(IsNullable = true)] string xmlEventString, out bool notifyResult, [System.Xml.Serialization.XmlIgnoreAttribute()] out bool notifyResultSpecified)
+        {
+            object[] results = this.Invoke("notifyXmlEvent", new object[] {
+                        xmlEventString});
+            notifyResult = ((bool)(results[0]));
+            notifyResultSpecified = ((bool)(results[1]));
+        }
         
         /// <remarks/>
         public void notifyAsync(string topic, Part[] parts) {
             this.notifyAsync(topic, parts, null);
+        }
+
+        /// <remarks/>
+        public void notifyXmlEventAsync(string xmlEventString)
+        {
+            this.notifyXmlEventAsync(xmlEventString, null);
         }
         
         /// <remarks/>
@@ -175,11 +195,30 @@ namespace EventManager.SubscriberInterface {
                         topic,
                         parts}, this.notifyOperationCompleted, userState);
         }
+
+        /// <remarks/>
+        public void notifyXmlEventAsync(string  xmlEventString, object userState)
+        {
+            if ((this.notifyXmlEventOperationCompleted == null))
+            {
+                this.notifyXmlEventOperationCompleted = new System.Threading.SendOrPostCallback(this.OnnotifyXmlEventOperationCompleted);
+            }
+            this.InvokeAsync("notifyXmlEvent", new object[] {xmlEventString}, this.notifyXmlEventOperationCompleted, userState);
+        }
         
         private void OnnotifyOperationCompleted(object arg) {
             if ((this.notifyCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.notifyCompleted(this, new notifyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+
+        private void OnnotifyXmlEventOperationCompleted(object arg)
+        {
+            if ((this.notifyXmlEventCompleted != null))
+            {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.notifyXmlEventCompleted(this, new notifyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         

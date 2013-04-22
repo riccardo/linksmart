@@ -83,12 +83,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using EventStorage;
+using System.Configuration;
+using System.Globalization;
 
 namespace EventManager
 {
     public class Operations
     {
+        EventStorage.EventStorage es = new EventStorage.EventStorage();
         SubscriberInterface.EventSubscriberService eventSubscriberService = new SubscriberInterface.EventSubscriberService();
+        SubscriberInterface20.EventSubscriber eventSubscriberService20 = new SubscriberInterface20.EventSubscriber();
         private publishRequest request = new publishRequest();
         private RetryQueue retryQueue = new RetryQueue();
         /// <summary>
@@ -96,20 +101,148 @@ namespace EventManager
         /// </summary>
         public void addSubscription(Components.Subscription subscription)
         {
-            Program.subscriptionList.Add(subscription);
-            if (subscription.HID != null)
+            SubscriptionStore.Store.SaveSubscription(subscription);
+            EventManagerImplementation.subscriptionList.Add(subscription);
+            if (!string.IsNullOrEmpty(subscription.HID))
+            {
                 Console.WriteLine("Subscribe:\nTopic: {0}\nHid: {1}\nPriority: {2}", subscription.Topic, subscription.HID, subscription.Priority);
-            else
+            }
+            else if (!string.IsNullOrEmpty(subscription.Endpoint)) 
+            {
                 Console.WriteLine("Subscribe:\nTopic: {0}\nEndpoint: {1}\nPriority: {2}", subscription.Topic, subscription.Endpoint, subscription.Priority);
+            }
+            else if (!string.IsNullOrEmpty(subscription.Description)) {
+                Console.WriteLine("Subscribe:\nTopic: {0}\nDescription: {1}\nPriority: {2}", subscription.Topic, subscription.Description, subscription.Priority);
+            }
+            
         }
         /// <summary>
         /// Notify published event to listed subscribers
+        /// 
+        //if (subscription.Protocol == "REST")
+        //{
+        //    string xmlEvent = @"<Event Topic=" + subscription.Topic + "><Part Key=" + subscription.Parts[0].key + 
+        //                       " Value=" + subscription.Parts[0].key + "/><Part Key=" + subscription.Parts[1].key + 
+        //                       " Value=" + subscription.Parts[1].value + " /></Event>";
+
+        //    XmlDocument doc = new XmlDocument();
+        //    doc.LoadXml(xmlEvent);
+
+        //    string jsonText = JsonConvert.SerializeXmlNode(doc);
+
+        //    HttpWebRequest req = (HttpWebRequest)WebRequest.Create(subscription.Endpoint);
+        //    //GenericSoapCaller.HttpHandler httpReq = new GenericSoapCaller.HttpHandler();
+        //    //httpReq.Init();
+        //    StreamWriter sw = new StreamWriter(req.GetRequestStream());
+        //    sw.Write(jsonText);
+        //    sw.Close();
+        //}
+        //else
+        //{
         /// </summary>
         public void eventNotification(Components.Subscription subscription, publishRequest request)
         {
             bool notifyResult = false;
+            bool notifyResultSpecified = false;            
+
+            lock (this)
+            {
+                double emVersion = 0;
+                double.TryParse(Properties.Settings.Default.EventManagerVersion, NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"), out emVersion);
+                //double emVersion = 2;
+                if (emVersion < 2.0)
+                {
+                    eventSubscriberService.Url = GetEventSubscriberServiceUrl(subscription);
+                    try
+                    {
+                        SubscriberInterface.Part[] parts = CopyPartArray(request);
+                        eventSubscriberService.notify(request.topic, parts, out notifyResult, out notifyResultSpecified);
+                        subscription.Parts = request.in1;
+                        //es.storeEvent(subscription);
+                        // to many logging. maybe change this to Log4Net in the future.
+                        //Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                        //eventSubscriberService.notifyAsync(request.topic, parts);
+                    }
+                    catch (Exception e)
+                    {
+                        //Console.WriteLine(e.Message + e.StackTrace);
+                        Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber is overloaded, or the subscriber service does not fulfill the notify contract! ");
+                        retryQueue.queue(subscription, request); Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                    }
+                }
+                else if (emVersion >= 2.0) {
+                    bool? notifyResultNullable = false;
+                    eventSubscriberService20.Url = GetEventSubscriberServiceUrl(subscription);
+                    try
+                    {
+                        SubscriberInterface20.Part[] parts = CopyPart20Array(request);
+                        eventSubscriberService20.notify(request.topic, parts, out notifyResultNullable, out notifyResultSpecified);
+                        subscription.Parts = request.in1;
+                        // to many logging. maybe change this to Log4Net in the future.
+                        //es.storeEvent(subscription);
+                        //Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                        //eventSubscriberService.notifyAsync(request.topic, parts);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber is overloaded, or the subscriber service does not fulfill the notify contract! ");
+                        retryQueue.queue(subscription, request); Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                    }
+                }
+               
+            }
+        }
+
+        public void eventNotification(Components.Subscription subscription, string xmlEventString, EventFormat eventFormat)
+        {
+            bool? notifyResult = false;
             bool notifyResultSpecified = false;
 
+            lock (this)
+            {
+                //eventSubscriberService.Url = GetEventSubscriberServiceUrl(subscription);
+                eventSubscriberService20.Url = GetEventSubscriberServiceUrl(subscription);
+                try
+                {
+                    eventSubscriberService20.notifyXmlEvent(xmlEventString, out notifyResult, out notifyResultSpecified);
+                    subscription.Parts = request.in1;
+                    //es.storeEvent(subscription);
+                    Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                    //eventSubscriberService.notifyXmlEventAsync(xmlEventString);
+                }
+                catch { 
+                    //retryQueue.queue(subscription, request); 
+                    Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description)))); 
+                }
+            }
+        }
+
+        private string GetEventSubscriberServiceUrl(Components.Subscription subscription)
+        {
+            string eventSubscriberServiceUrl = string.Empty;
+            if (!string.IsNullOrEmpty(subscription.Endpoint))
+            {
+                eventSubscriberServiceUrl = subscription.Endpoint;
+
+            }
+
+            else if (!string.IsNullOrEmpty(subscription.HID))
+            {
+                eventSubscriberServiceUrl = EventManagerImplementation.GetNetworkManagerLocalEndpointForHid(subscription.HID); // string.Format("http://127.0.0.1:8082/SOAPTunneling/0/{0}/0/", subscription.HID.ToString());
+                System.Net.ServicePointManager.Expect100Continue = false;
+            }
+            else if (!string.IsNullOrEmpty(subscription.Description))
+            {
+
+                eventSubscriberServiceUrl = EventManagerImplementation.GetNetworkManagerLocalEndpointForDescription(subscription.Description);
+                System.Net.ServicePointManager.Expect100Continue = false;
+            }
+            else { Console.WriteLine("Faulty address"); }
+            return eventSubscriberServiceUrl;
+        }
+
+        private static SubscriberInterface.Part[] CopyPartArray(publishRequest request)
+        {
             SubscriberInterface.Part[] parts = new SubscriberInterface.Part[request.in1.Length];
             SubscriberInterface.Part p;
             //SubscriberInterface.Part p1 = new SubscriberInterface.Part();
@@ -125,44 +258,29 @@ namespace EventManager
                 parts[i].value = request.in1[i].value;
                 i++;
             }
-
-            lock (this)
-            {
-                if (subscription.Endpoint != null)
-                {
-                    #region regex
-                    //string address = null;
-                    //string port = null;
-                    //string pattern = @"\b(((\d{1,2})|(1\d{2,2})|(2[0-4][0-9])|(25[0-5])|\*)\.){3}((\d{1,2})|(1\d{2,2})|(2[0-4][0-9])|(25[0-5])|\*)\:(\s?)*\d{1,5}\b";
-
-                    //Regex compare = new Regex(pattern);
-                    //string[] endpoint = compare.Match(events.Endpoint).ToString().Split(':');
-                    //address = endpoint[0];
-                    //port = endpoint[1];
-                    #endregion
-                    eventSubscriberService.Url = subscription.Endpoint;
-
-                    try
-                    {
-                        eventSubscriberService.notify(request.topic, parts, out notifyResult, out notifyResultSpecified);
-                        //eventSubscriberService.notifyAsync(request.topic, parts);
-                    }
-                    catch { retryQueue.queue(subscription, request); }
-                }
-
-                else if (subscription.HID != null)
-                {
-                    eventSubscriberService.Url = string.Format("http://127.0.0.1:8082/SOAPTunneling/0/{0}/0/", subscription.HID.ToString());
-                    System.Net.ServicePointManager.Expect100Continue = false;
-                    try
-                    {
-                        eventSubscriberService.notify(request.topic, parts, out notifyResult, out notifyResultSpecified);
-                        //eventSubscriberService.notifyAsync(request.topic, parts);
-                    }
-                    catch { retryQueue.queue(subscription, request); }
-                }
-                else { Console.WriteLine("Faulty address"); }
-            }
+            return parts;
         }
+
+        private static SubscriberInterface20.Part[] CopyPart20Array(publishRequest request)
+        {
+            SubscriberInterface20.Part[] parts = new SubscriberInterface20.Part[request.in1.Length];
+            SubscriberInterface20.Part p;
+            //SubscriberInterface.Part p1 = new SubscriberInterface.Part();
+            //SubscriberInterface.Part p2 = new SubscriberInterface.Part();
+            int i = 0;
+            foreach (Components.Part a in request.in1)//SubscriberInterface.Part p in parts)
+            {
+                p = new SubscriberInterface20.Part();
+                p.key = "";
+                p.value = "";
+                parts[i] = p;
+                parts[i].key = request.in1[i].key;
+                parts[i].value = request.in1[i].value;
+                i++;
+            }
+            return parts;
+        }
+
+       
     }
 }
