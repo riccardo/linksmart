@@ -1,0 +1,17 @@
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\EventManager.exe.config
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\System.Data.SQLite.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\EbbitsEventDB.s3db
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\EbbitsRetryDB.s3db
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\EventManager.exe
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\EventManager.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\Components.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\Event.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\EventStorage.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\Newtonsoft.Json.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\Components.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\EventStorage.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\Event.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\bin\Debug\Newtonsoft.Json.xml
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\obj\x86\Debug\EventManager.exe
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\obj\x86\Debug\EventManager.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManager\obj\x86\Debug\EventManager.csprojResolveAssemblyReference.cache

@@ -1,0 +1,9 @@
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\bin\Release\EventManagerTests.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\bin\Release\EventManagerTests.pdb
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\bin\Release\Components.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\bin\Release\NSubstitute.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\bin\Release\nunit.framework.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\bin\Release\Components.pdb
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\obj\Release\EventManagerTests.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventManagerTests\obj\Release\EventManagerTests.pdb

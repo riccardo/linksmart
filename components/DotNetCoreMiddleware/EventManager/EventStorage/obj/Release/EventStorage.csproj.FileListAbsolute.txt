@@ -1,0 +1,11 @@
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\bin\Release\System.Data.SQLite.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\bin\Release\EbbitsEventDB.s3db
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\bin\Release\EbbitsRetryDB.s3db
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\bin\Release\EventStorage.dll.config
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\bin\Release\EventStorage.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\bin\Release\EventStorage.pdb
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\bin\Release\Components.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\bin\Release\Components.pdb
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\obj\Release\EventStorage.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\EventStorage\obj\Release\EventStorage.pdb

@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://networkmanager.network.linksmart.eu/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="NetworkManager" targetNamespace="http://networkmanager.network.linksmart.eu/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns:ns2="http://lang.java" xmlns:ns1="http://utils.linksmart.eu" xmlns:ns0="http://network.linksmart.eu" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://networkmanager.network.linksmart.eu/">
+      <xsd:import namespace="http://network.linksmart.eu" />
+      <xsd:import namespace="http://utils.linksmart.eu" />
+      <xsd:complexType name="ArrayOfString">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="removeService" type="tns:removeService" />
+      <xsd:complexType name="removeService">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="arg0" type="ns0:VirtualAddress" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="removeServiceResponse" type="tns:removeServiceResponse" />
+      <xsd:complexType name="removeServiceResponse">
+        <xsd:sequence>
+          <xsd:element name="return" type="xsd:boolean" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="registerService" type="tns:registerService" />
+      <xsd:complexType name="registerService">
+        <xsd:sequence>
+          <xsd:element name="arg0" nillable="true" type="ns1:ArrayOfPart" />
+          <xsd:element minOccurs="0" name="arg1" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" name="arg2" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="registerServiceResponse" type="tns:registerServiceResponse" />
+      <xsd:complexType name="registerServiceResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="return" type="ns0:Registration" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="sendData" type="tns:sendData" />
+      <xsd:complexType name="sendData">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="arg0" type="ns0:VirtualAddress" />
+          <xsd:element minOccurs="0" name="arg1" type="ns0:VirtualAddress" />
+          <xsd:element name="arg2" nillable="true" type="xsd:base64Binary" />
+          <xsd:element name="arg3" type="xsd:boolean" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="sendDataResponse" type="tns:sendDataResponse" />
+      <xsd:complexType name="sendDataResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="return" type="ns0:NMResponse" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getAvailableBackbones" type="tns:getAvailableBackbones" />
+      <xsd:complexType name="getAvailableBackbones">
+        <xsd:sequence />
+      </xsd:complexType>
+      <xsd:element name="getAvailableBackbonesResponse" type="tns:getAvailableBackbonesResponse" />
+      <xsd:complexType name="getAvailableBackbonesResponse">
+        <xsd:sequence>
+          <xsd:element name="return" nillable="true" type="tns:ArrayOfString" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByAttributes1" type="tns:getServiceByAttributes1" />
+      <xsd:complexType name="getServiceByAttributes1">
+        <xsd:sequence>
+          <xsd:element name="arg0" nillable="true" type="ns1:ArrayOfPart" />
+          <xsd:element name="arg1" type="xsd:long" />
+          <xsd:element name="arg2" type="xsd:boolean" />
+          <xsd:element name="arg3" type="xsd:boolean" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByAttributes1Response" type="tns:getServiceByAttributes1Response" />
+      <xsd:complexType name="getServiceByAttributes1Response">
+        <xsd:sequence>
+          <xsd:element name="return" nillable="true" type="ns0:ArrayOfRegistration" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByAttributes" type="tns:getServiceByAttributes" />
+      <xsd:complexType name="getServiceByAttributes">
+        <xsd:sequence>
+          <xsd:element name="arg0" nillable="true" type="ns1:ArrayOfPart" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByAttributesResponse" type="tns:getServiceByAttributesResponse" />
+      <xsd:complexType name="getServiceByAttributesResponse">
+        <xsd:sequence>
+          <xsd:element name="return" nillable="true" type="ns0:ArrayOfRegistration" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getService" type="tns:getService" />
+      <xsd:complexType name="getService">
+        <xsd:sequence />
+      </xsd:complexType>
+      <xsd:element name="getServiceResponse" type="tns:getServiceResponse" />
+      <xsd:complexType name="getServiceResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="return" type="ns0:VirtualAddress" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByPID" type="tns:getServiceByPID" />
+      <xsd:complexType name="getServiceByPID">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="arg0" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByPIDResponse" type="tns:getServiceByPIDResponse" />
+      <xsd:complexType name="getServiceByPIDResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="return" type="ns0:Registration" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByQuery" type="tns:getServiceByQuery" />
+      <xsd:complexType name="getServiceByQuery">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="arg0" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByQueryResponse" type="tns:getServiceByQueryResponse" />
+      <xsd:complexType name="getServiceByQueryResponse">
+        <xsd:sequence>
+          <xsd:element name="return" nillable="true" type="ns0:ArrayOfRegistration" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByDescription" type="tns:getServiceByDescription" />
+      <xsd:complexType name="getServiceByDescription">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="arg0" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getServiceByDescriptionResponse" type="tns:getServiceByDescriptionResponse" />
+      <xsd:complexType name="getServiceByDescriptionResponse">
+        <xsd:sequence>
+          <xsd:element name="return" nillable="true" type="ns0:ArrayOfRegistration" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="IllegalArgumentException" nillable="true" type="ns2:IllegalArgumentException" />
+    </xsd:schema>
+    <xsd:schema xmlns:tns="http://lang.java" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://lang.java">
+      <xsd:complexType name="IllegalArgumentException">
+        <xsd:sequence />
+      </xsd:complexType>
+    </xsd:schema>
+    <xsd:schema xmlns:tns="http://network.linksmart.eu" xmlns:ns1="http://networkmanager.network.linksmart.eu/" xmlns:ns0="http://utils.linksmart.eu" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://network.linksmart.eu">
+      <xsd:import namespace="http://utils.linksmart.eu" />
+      <xsd:import namespace="http://networkmanager.network.linksmart.eu/" />
+      <xsd:complexType name="NMResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="message" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" name="messageObject" nillable="true" type="tns:Message" />
+          <xsd:element minOccurs="0" name="status" type="xsd:int" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="Registration">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="attributes" nillable="true" type="ns0:ArrayOfPart" />
+          <xsd:element minOccurs="0" name="description" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" name="virtualAddress" nillable="true" type="tns:VirtualAddress" />
+          <xsd:element minOccurs="0" name="virtualAddressAsString" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="Message">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="data" nillable="true" type="xsd:base64Binary" />
+          <xsd:element minOccurs="0" name="keySet" nillable="true" type="ns1:ArrayOfString" />
+          <xsd:element minOccurs="0" name="receiverVirtualAddress" nillable="true" type="tns:VirtualAddress" />
+          <xsd:element minOccurs="0" name="senderVirtualAddress" nillable="true" type="tns:VirtualAddress" />
+          <xsd:element minOccurs="0" name="topic" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ArrayOfRegistration">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Registration" nillable="true" type="tns:Registration" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="VirtualAddress">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="bytes" nillable="true" type="xsd:base64Binary" />
+          <xsd:element minOccurs="0" name="contextID1" type="xsd:long" />
+          <xsd:element minOccurs="0" name="contextID2" type="xsd:long" />
+          <xsd:element minOccurs="0" name="contextID3" type="xsd:long" />
+          <xsd:element minOccurs="0" name="deviceID" type="xsd:long" />
+          <xsd:element minOccurs="0" name="level" type="xsd:int" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+    <xsd:schema xmlns:tns="http://utils.linksmart.eu" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://utils.linksmart.eu">
+      <xsd:complexType name="ArrayOfPart">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Part" nillable="true" type="tns:Part" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="Part">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="key" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" name="value" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="getServiceByQuery">
+    <wsdl:part name="parameters" element="tns:getServiceByQuery" />
+  </wsdl:message>
+  <wsdl:message name="removeServiceResponse">
+    <wsdl:part name="parameters" element="tns:removeServiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="sendData">
+    <wsdl:part name="parameters" element="tns:sendData" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByPIDResponse">
+    <wsdl:part name="parameters" element="tns:getServiceByPIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="sendDataResponse">
+    <wsdl:part name="parameters" element="tns:sendDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByDescriptionResponse">
+    <wsdl:part name="parameters" element="tns:getServiceByDescriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="getService">
+    <wsdl:part name="parameters" element="tns:getService" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByAttributes">
+    <wsdl:part name="parameters" element="tns:getServiceByAttributes" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByAttributesResponse">
+    <wsdl:part name="parameters" element="tns:getServiceByAttributesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IllegalArgumentException">
+    <wsdl:part name="IllegalArgumentException" element="tns:IllegalArgumentException" />
+  </wsdl:message>
+  <wsdl:message name="getAvailableBackbones">
+    <wsdl:part name="parameters" element="tns:getAvailableBackbones" />
+  </wsdl:message>
+  <wsdl:message name="getServiceResponse">
+    <wsdl:part name="parameters" element="tns:getServiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByAttributes1Response">
+    <wsdl:part name="parameters" element="tns:getServiceByAttributes1Response" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByPID">
+    <wsdl:part name="parameters" element="tns:getServiceByPID" />
+  </wsdl:message>
+  <wsdl:message name="registerService">
+    <wsdl:part name="parameters" element="tns:registerService" />
+  </wsdl:message>
+  <wsdl:message name="removeService">
+    <wsdl:part name="parameters" element="tns:removeService" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByDescription">
+    <wsdl:part name="parameters" element="tns:getServiceByDescription" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByAttributes1">
+    <wsdl:part name="parameters" element="tns:getServiceByAttributes1" />
+  </wsdl:message>
+  <wsdl:message name="registerServiceResponse">
+    <wsdl:part name="parameters" element="tns:registerServiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="getAvailableBackbonesResponse">
+    <wsdl:part name="parameters" element="tns:getAvailableBackbonesResponse" />
+  </wsdl:message>
+  <wsdl:message name="getServiceByQueryResponse">
+    <wsdl:part name="parameters" element="tns:getServiceByQueryResponse" />
+  </wsdl:message>
+  <wsdl:portType name="NetworkManagerPortType">
+    <wsdl:operation name="removeService">
+      <wsdl:input name="removeService" message="tns:removeService" />
+      <wsdl:output name="removeServiceResponse" message="tns:removeServiceResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="registerService">
+      <wsdl:input name="registerService" message="tns:registerService" />
+      <wsdl:output name="registerServiceResponse" message="tns:registerServiceResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="sendData">
+      <wsdl:input name="sendData" message="tns:sendData" />
+      <wsdl:output name="sendDataResponse" message="tns:sendDataResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getAvailableBackbones">
+      <wsdl:input name="getAvailableBackbones" message="tns:getAvailableBackbones" />
+      <wsdl:output name="getAvailableBackbonesResponse" message="tns:getAvailableBackbonesResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByAttributes1">
+      <wsdl:input name="getServiceByAttributes1" message="tns:getServiceByAttributes1" />
+      <wsdl:output name="getServiceByAttributes1Response" message="tns:getServiceByAttributes1Response" />
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByAttributes">
+      <wsdl:input name="getServiceByAttributes" message="tns:getServiceByAttributes" />
+      <wsdl:output name="getServiceByAttributesResponse" message="tns:getServiceByAttributesResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getService">
+      <wsdl:input name="getService" message="tns:getService" />
+      <wsdl:output name="getServiceResponse" message="tns:getServiceResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByPID">
+      <wsdl:input name="getServiceByPID" message="tns:getServiceByPID" />
+      <wsdl:output name="getServiceByPIDResponse" message="tns:getServiceByPIDResponse" />
+      <wsdl:fault name="IllegalArgumentException" message="tns:IllegalArgumentException" />
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByQuery">
+      <wsdl:input name="getServiceByQuery" message="tns:getServiceByQuery" />
+      <wsdl:output name="getServiceByQueryResponse" message="tns:getServiceByQueryResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByDescription">
+      <wsdl:input name="getServiceByDescription" message="tns:getServiceByDescription" />
+      <wsdl:output name="getServiceByDescriptionResponse" message="tns:getServiceByDescriptionResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="NetworkManagerSoapBinding" type="tns:NetworkManagerPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="removeService">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="removeService">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="removeServiceResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="registerService">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="registerService">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="registerServiceResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendData">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="sendData">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="sendDataResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAvailableBackbones">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="getAvailableBackbones">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getAvailableBackbonesResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByAttributes">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="getServiceByAttributes">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getServiceByAttributesResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByAttributes1">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="getServiceByAttributes1">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getServiceByAttributes1Response">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getService">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="getService">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getServiceResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByPID">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="getServiceByPID">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getServiceByPIDResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="IllegalArgumentException">
+        <soap:fault use="literal" name="IllegalArgumentException" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByDescription">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="getServiceByDescription">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getServiceByDescriptionResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getServiceByQuery">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="getServiceByQuery">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getServiceByQueryResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="NetworkManager">
+    <wsdl:port name="NetworkManagerPort" binding="tns:NetworkManagerSoapBinding">
+      <soap:address location="http://localhost:9090/cxf/services/NetworkManager" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

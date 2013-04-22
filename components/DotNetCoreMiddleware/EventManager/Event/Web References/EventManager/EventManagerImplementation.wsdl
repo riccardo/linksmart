@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://eventmanager.linksmart.eu" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="EventManagerImplementation" targetNamespace="http://eventmanager.linksmart.eu" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://eventmanager.linksmart.eu/Imports">
+      <xsd:import namespace="http://www.w3.org/2001/XMLSchema" />
+      <xsd:import schemaLocation="http://127.0.0.1:8124/Service/Meta?xsd=xsd0" namespace="http://eventmanager.linksmart.eu" />
+      <xsd:import schemaLocation="http://127.0.0.1:8124/Service/Meta?xsd=xsd1" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="EventManagerPort_subscribe_InputMessage">
+    <wsdl:part name="topic" type="xsd:string" />
+    <wsdl:part name="endpoint" type="xsd:string" />
+    <wsdl:part name="priority" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribe_OutputMessage">
+    <wsdl:part name="subscribeReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribe_InputMessage">
+    <wsdl:part name="topic" type="xsd:string" />
+    <wsdl:part name="endpoint" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribe_OutputMessage">
+    <wsdl:part name="unsubscribeReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribeWithHID_InputMessage">
+    <wsdl:part name="topic" type="xsd:string" />
+    <wsdl:part name="hid" type="xsd:string" />
+    <wsdl:part name="priority" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribeWithHID_OutputMessage">
+    <wsdl:part name="subscribeWithHIDReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribeWithHID_InputMessage">
+    <wsdl:part name="topic" type="xsd:string" />
+    <wsdl:part name="hid" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribeWithHID_OutputMessage">
+    <wsdl:part name="unsubscribeWithHIDReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="getSubscriptionsRequest">
+    <wsdl:part name="parameters" element="tns:getSubscriptions" />
+  </wsdl:message>
+  <wsdl:message name="getSubscriptionsResponse">
+    <wsdl:part name="parameters" element="tns:getSubscriptionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptions_InputMessage">
+    <wsdl:part name="endpoint" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptions_OutputMessage">
+    <wsdl:part name="clearSubscriptionsReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptionsWithHID_InputMessage">
+    <wsdl:part name="hid" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptionsWithHID_OutputMessage">
+    <wsdl:part name="clearSubscriptionsWithHIDReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_setPriority_InputMessage">
+    <wsdl:part name="in0" type="xsd:string" />
+    <wsdl:part name="in1" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_setPriority_OutputMessage">
+    <wsdl:part name="setPriorityReturn" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="publishRequest">
+    <wsdl:part name="parameters" element="tns:publish" />
+  </wsdl:message>
+  <wsdl:message name="publishResponse">
+    <wsdl:part name="parameters" element="tns:publishResponse" />
+  </wsdl:message>
+  <wsdl:portType name="EventManagerPort">
+    <wsdl:operation name="subscribe" parameterOrder="topic endpoint priority">
+      <wsdl:input wsaw:Action="subscribe" message="tns:EventManagerPort_subscribe_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_subscribe_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribe" parameterOrder="topic endpoint">
+      <wsdl:input wsaw:Action="unsubscribe" message="tns:EventManagerPort_unsubscribe_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_unsubscribe_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="subscribeWithHID" parameterOrder="topic hid priority">
+      <wsdl:input wsaw:Action="subscribeWithHID" message="tns:EventManagerPort_subscribeWithHID_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_subscribeWithHID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribeWithHID" parameterOrder="topic hid">
+      <wsdl:input wsaw:Action="unsubscribeWithHID" message="tns:EventManagerPort_unsubscribeWithHID_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_unsubscribeWithHID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getSubscriptions">
+      <wsdl:input wsaw:Action="getSubscriptions" name="getSubscriptionsRequest" message="tns:getSubscriptionsRequest" />
+      <wsdl:output wsaw:Action="" name="getSubscriptionsResponse" message="tns:getSubscriptionsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptions" parameterOrder="endpoint">
+      <wsdl:input wsaw:Action="clearSubscriptions" message="tns:EventManagerPort_clearSubscriptions_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_clearSubscriptions_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptionsWithHID" parameterOrder="hid">
+      <wsdl:input wsaw:Action="clearSubscriptionsWithHID" message="tns:EventManagerPort_clearSubscriptionsWithHID_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_clearSubscriptionsWithHID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="setPriority" parameterOrder="in0 in1">
+      <wsdl:input wsaw:Action="setPriority" message="tns:EventManagerPort_setPriority_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_setPriority_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="publish">
+      <wsdl:input wsaw:Action="publish" name="publishRequest" message="tns:publishRequest" />
+      <wsdl:output wsaw:Action="" name="publishResponse" message="tns:publishResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_EventManagerPort" type="tns:EventManagerPort">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" />
+    <wsdl:operation name="subscribe">
+      <soap:operation soapAction="subscribe" style="rpc" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribe">
+      <soap:operation soapAction="unsubscribe" style="rpc" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="subscribeWithHID">
+      <soap:operation soapAction="subscribeWithHID" style="rpc" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribeWithHID">
+      <soap:operation soapAction="unsubscribeWithHID" style="rpc" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSubscriptions">
+      <soap:operation soapAction="getSubscriptions" style="document" />
+      <wsdl:input name="getSubscriptionsRequest">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getSubscriptionsResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptions">
+      <soap:operation soapAction="clearSubscriptions" style="rpc" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptionsWithHID">
+      <soap:operation soapAction="clearSubscriptionsWithHID" style="rpc" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setPriority">
+      <soap:operation soapAction="setPriority" style="rpc" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://eventmanager.linksmart.eu" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="publish">
+      <soap:operation soapAction="publish" style="document" />
+      <wsdl:input name="publishRequest">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="publishResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EventManagerImplementation">
+    <wsdl:port name="BasicHttpBinding_EventManagerPort" binding="tns:BasicHttpBinding_EventManagerPort">
+      <soap:address location="http://127.0.0.1:8124/Service" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
