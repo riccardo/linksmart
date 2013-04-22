@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="EventManager.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="EventManager_SubscriberInterface_EventSubscriberService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://127.0.0.1:8123/Service</Value>
+    </Setting>
+    <Setting Name="EventManager_NetworkManager1_NetworkManagerApplicationService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:8082/axis/services/NetworkManagerApplication</Value>
+    </Setting>
+    <Setting Name="UseNetworkManager" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="UseIPv6" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EventManager_NetworkManager20ServiceReference_NetworkManager" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:9090/cxf/services/NetworkManager</Value>
+    </Setting>
+    <Setting Name="EventManagerDesc" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">EventManager:BOB</Value>
+    </Setting>
+    <Setting Name="EventManagerVersion" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2.0</Value>
+    </Setting>
+    <Setting Name="EventManager_SubscriberInterface2_EventSubscriber" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:9090/cxf/services/EventSubscriber:ExampleSubscriber</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

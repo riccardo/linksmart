@@ -1,0 +1,6 @@
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\bin\Debug\Event.dll.config
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\bin\Debug\Event.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\bin\Debug\Event.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\obj\Debug\Event.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\obj\Debug\Event.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\obj\Debug\Event.csprojResolveAssemblyReference.cache

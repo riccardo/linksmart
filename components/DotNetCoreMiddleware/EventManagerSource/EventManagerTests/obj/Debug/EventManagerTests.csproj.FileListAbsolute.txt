@@ -1,0 +1,9 @@
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\bin\Debug\EventManagerTests.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\bin\Debug\EventManagerTests.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\bin\Debug\Components.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\bin\Debug\NSubstitute.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\bin\Debug\nunit.framework.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\bin\Debug\Components.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\obj\Debug\EventManagerTests.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\obj\Debug\EventManagerTests.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\EventManagerTests\obj\Debug\EventManagerTests.csprojResolveAssemblyReference.cache

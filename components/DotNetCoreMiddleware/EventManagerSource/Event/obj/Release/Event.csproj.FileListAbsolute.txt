@@ -1,0 +1,8 @@
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Event\bin\Release\Event.dll.config
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Event\bin\Release\Event.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Event\bin\Release\Event.XmlSerializers.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Event\bin\Release\Event.pdb
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Event\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Event\obj\Release\Event.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Event\obj\Release\Event.pdb
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Event\obj\Release\Event.XmlSerializers.dll
