@@ -1,0 +1,31 @@
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\bin\Debug\EventSubscriberService.dll.config
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\bin\Debug\EventSubscriberService.dll
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\bin\Debug\EventSubscriberService.pdb
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\obj\Debug\EventSubscriberService.dll
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\obj\Debug\EventSubscriberService.pdb
+E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\obj\Debug\EventManagerWrapper.csprojResolveAssemblyReference.cache
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\EventServiceSubscriber\EventSubscriberService\bin\Debug\EventSubscriberService.dll.config
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\EventServiceSubscriber\EventSubscriberService\bin\Debug\EventSubscriberService.dll
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\EventServiceSubscriber\EventSubscriberService\bin\Debug\EventSubscriberService.pdb
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\EventServiceSubscriber\EventSubscriberService\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\EventServiceSubscriber\EventSubscriberService\obj\Debug\EventSubscriberService.dll
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\EventServiceSubscriber\EventSubscriberService\obj\Debug\EventSubscriberService.pdb
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\LinkSmartOPC\EventManagerWrapper\bin\Debug\EventSubscriberService.dll.config
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\LinkSmartOPC\EventManagerWrapper\bin\Debug\EventSubscriberService.dll
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\LinkSmartOPC\EventManagerWrapper\bin\Debug\EventSubscriberService.pdb
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\LinkSmartOPC\EventManagerWrapper\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\LinkSmartOPC\EventManagerWrapper\obj\Debug\EventSubscriberService.dll
+C:\Documents and Settings\demo\My Documents\Visual Studio 2010\LinkSmartOPC\EventManagerWrapper\obj\Debug\EventSubscriberService.pdb
+C:\Documents and Settings\demo\workspace\PlcProxy\EventManagerWrapper\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\demo\workspace\PlcProxy\EventManagerWrapper\obj\Debug\EventSubscriberService.dll
+C:\Documents and Settings\demo\workspace\PlcProxy\EventManagerWrapper\obj\Debug\EventSubscriberService.pdb
+C:\Documents and Settings\demo\workspace\PlcProxy\EventManagerWrapper\bin\Debug\EventSubscriberService.dll.config
+C:\Documents and Settings\demo\workspace\PlcProxy\EventManagerWrapper\bin\Debug\EventSubscriberService.dll
+C:\Documents and Settings\demo\workspace\PlcProxy\EventManagerWrapper\bin\Debug\EventSubscriberService.pdb
+C:\Users\Ferry\Desktop\EventManagerWrapper1.3\bin\Debug\EventSubscriberService.dll.config
+C:\Users\Ferry\Desktop\EventManagerWrapper1.3\bin\Debug\EventSubscriberService.dll
+C:\Users\Ferry\Desktop\EventManagerWrapper1.3\bin\Debug\EventSubscriberService.pdb
+C:\Users\Ferry\Desktop\EventManagerWrapper1.3\bin\Debug\log4net.dll
+C:\Users\Ferry\Desktop\EventManagerWrapper1.3\obj\Debug\EventManagerWrapper.csprojResolveAssemblyReference.cache
+C:\Users\Ferry\Desktop\EventManagerWrapper1.3\obj\Debug\EventSubscriberService.dll
+C:\Users\Ferry\Desktop\EventManagerWrapper1.3\obj\Debug\EventSubscriberService.pdb

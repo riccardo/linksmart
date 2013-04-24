@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://eventmanager.linksmart.eu" elementFormDefault="qualified" targetNamespace="http://eventmanager.linksmart.eu" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://192.168.0.102:8124/Service/Meta?xsd=xsd1" />
+  <xs:element name="publishXmlEvent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="eventXmlString" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="publishXmlEventResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="publishReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unsubscribeWithDescription">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unsubscribeWithDescriptionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="unsubscribeWithDescriptionReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subscribeWithDescription">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string" />
+        <xs:element minOccurs="1" maxOccurs="1" name="priority" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subscribeWithDescriptionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="subscribeWithDescriptionReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="clearSubscriptionsWithDescription">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="clearSubscriptionsWithDescriptionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="clearSubscriptionsWithDescriptionReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subscribe">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="endpoint" type="xs:string" />
+        <xs:element minOccurs="1" maxOccurs="1" name="priority" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subscribeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="subscribeReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unsubscribe">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="endpoint" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unsubscribeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="unsubscribeReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subscribeWithHID">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="hid" type="xs:string" />
+        <xs:element minOccurs="1" maxOccurs="1" name="priority" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subscribeWithHIDResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="subscribeWithHIDReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unsubscribeWithHID">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="hid" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unsubscribeWithHIDResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="unsubscribeWithHIDReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="getSubscriptions">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="getSubscriptionsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="getSubscriptionsReturn" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="Subscription">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="Topic" nillable="true" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="HID" nillable="true" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="Endpoint" nillable="true" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="Priority" type="xs:int" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Parts" nillable="true" type="tns:Part" />
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="NumberOfRetries" type="xs:int" />
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="DateTime" nillable="true" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Part">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="key" nillable="true" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="value" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="clearSubscriptions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="endpoint" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="clearSubscriptionsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="clearSubscriptionsReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="clearSubscriptionsWithHID">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="hid" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="clearSubscriptionsWithHIDResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="clearSubscriptionsWithHIDReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="setPriority">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="in0" type="xs:string" />
+        <xs:element minOccurs="1" maxOccurs="1" name="in1" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="setPriorityResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="setPriorityReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="triggerRetryQueue">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="triggerRetryQueueResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="triggerRetryQueueReturn" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="publish">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="topic" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="in1" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="publishResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="publishReturn" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
