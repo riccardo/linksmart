@@ -56,7 +56,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger
-	.getLogger(SOAPTunnelServlet.class.getName());
+			.getLogger(SOAPTunnelServlet.class.getName());
 	private NetworkManagerCore nmCore;
 
 	/**
@@ -69,44 +69,32 @@ public class SOAPTunnelServlet extends HttpServlet {
 	public SOAPTunnelServlet(NetworkManagerCore nmCore) {
 		this.nmCore = nmCore;
 	}
-	
-	/**
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public boolean checkIfValidURLInRequest(String path){
-		
-		String parts[] = path.split("/", 6);
 
-		if ((parts.length > 3 && parts[3].equals("wsdl")) 
-				|| (parts.length == 6 && parts[5].equals("wsdl"))) {
-			return true;
-		} else {
-			//if attributes were passed with the url add them
-			if (parts.length > 3) {
-				return true;
-			}
-			
-		}
-		
-		return false;	
+	/**
+	 * Performs the HTTP DELETE operation
+	 * Is identical to GET
+	 * @param request HttpServletRequest that encapsulates the request to the servlet 
+	 * @param response HttpServletResponse that encapsulates the response from the servlet
+	 */
+	public void doDelete(HttpServletRequest request, HttpServletResponse response) 
+			throws IOException {
+		processDatalessRequest(request, response);
 	}
 
 	/**
 	 * Performs the HTTP GET operation
 	 * 
-	 * @param request
-	 *            HttpServletRequest that encapsulates the request to the
-	 *            servlet
-	 * @param response
-	 *            HttpServletResponse that encapsulates the response from the
-	 *            servlet
+	 * @param request HttpServletRequest that encapsulates the request to the servlet 
+	 * @param response HttpServletResponse that encapsulates the response from the servlet
 	 */
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-	throws IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+			throws IOException {
+		processDatalessRequest(request, response);
+	}
 
+	private void processDatalessRequest(HttpServletRequest request, HttpServletResponse response)
+			throws IOException{		
 		// split path - path contains virtual addresses and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		String parts[] = path.split("/", 6);
@@ -135,11 +123,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 		}
 
 		// build request
-
 		StringBuilder requestBuilder = new StringBuilder();
-		HttpServletRequestWrapper hsrw = new HttpServletRequestWrapper(request);
-		//		hsrw.
-
 		// append request line
 		requestBuilder.append(request.getMethod()).append(" /");
 		if (queryBuilder.length() > 0) {
@@ -152,9 +136,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 
 		// send request to NetworkManagerCore
 		sendRequest(sVirtualAddress, rVirtualAddress, requestBuilder.toString(), response);
-
 	}
-
 
 	/**
 	 * Performs the HTTP POST operation
@@ -167,35 +149,46 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 *            servlet
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
-	throws IOException {
+			throws IOException {
+		VirtualAddress senderVirtualAddress = null;
+		VirtualAddress receiverVirtualAddress = null;
+		StringBuilder requestBuilder = null;
+
 		// split path - path contains virtual addresses and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
 		StringTokenizer token = new StringTokenizer(path, "/");
 		if (token.countTokens() >= 2) {
-			StringBuilder requestBuilder = new StringBuilder();
-			String sVirtualAddress = token.nextToken();
-			VirtualAddress senderVirtualAddress = (sVirtualAddress.contentEquals("0")) ? nmCore.getService() : new VirtualAddress(sVirtualAddress);
-			VirtualAddress receiverVirtualAddress = new VirtualAddress(token.nextToken());
-			// sessionID = new VirtualAddress(token.nextToken());
+			try{
+				requestBuilder = new StringBuilder();
+				String sVirtualAddress = token.nextToken();
+				senderVirtualAddress = (sVirtualAddress.contentEquals("0")) ? nmCore.getService() : new VirtualAddress(sVirtualAddress);
+				receiverVirtualAddress = new VirtualAddress(token.nextToken());
+				// sessionID = new VirtualAddress(token.nextToken());
 
-			// append headers and blank line for end of headers
-			requestBuilder.append(buildHeaders(request));
-			requestBuilder.append("\r\n");
+				// append headers and blank line for end of headers
+				requestBuilder.append(buildHeaders(request));
+				requestBuilder.append("\r\n");
 
-			// append content
-			if ((request.getContentLength() > 0)) {
-				try {
-					BufferedReader reader = request.getReader();
-					for (String line = null; (line = reader.readLine()) != null;)
-						requestBuilder.append(line);
-				} catch (Exception e) {
-					e.printStackTrace();
+				// append content
+				if ((request.getContentLength() > 0)) {
+					try {
+						BufferedReader reader = request.getReader();
+						for (String line = null; (line = reader.readLine()) != null;)
+							requestBuilder.append(line);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-			}
 
-			// send request to NetworkManagerCore
-			logger.debug("Sending soap request through tunnel");
+				// send request to NetworkManagerCore
+				logger.debug("Sending soap request through tunnel");
+			}catch (Exception e) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
 			sendRequest(senderVirtualAddress, receiverVirtualAddress, requestBuilder.toString(), response);
+		} else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
 
@@ -206,7 +199,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 	 */
 	public String buildHeaders(HttpServletRequest request) {
 		StringBuilder builder = new StringBuilder();
-		Enumeration headerNames = request.getHeaderNames();
+		Enumeration<?> headerNames = request.getHeaderNames();
 
 		while (headerNames.hasMoreElements()) {
 			String header = (String) headerNames.nextElement();
@@ -228,22 +221,38 @@ public class SOAPTunnelServlet extends HttpServlet {
 	private void sendRequest(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, String requestString,
 			HttpServletResponse response) throws IOException {
 		NMResponse r = this.nmCore.sendData(senderVirtualAddress, receiverVirtualAddress, requestString.getBytes(), true);
-		if(r.getStatus() != NMResponse.STATUS_SUCCESS) {
-			throw new IOException(r.getMessage());
+		String body = new String();
+		//check response status and if error response BAD_GATEWAY else parse response for client
+		if (!r.getMessage().startsWith("HTTP/1.1 200 OK")) {
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			//set whole response data as body
+			body = r.getMessage();
+		} else {		
+			//take headers from data and add them to response
+			String[] headers = r.getMessage().split("(?<=\r\n)");
+			//use it to get index of data element
+			int i = 0;
+			//go through headers and put them to response until empty line is reached
+			for (String header : headers) {	
+				if(header.contentEquals("\r\n")) {
+					break;
+				}
+				if(!header.toLowerCase().startsWith("http")) {
+					header = header.replace("\r\n", "");
+					String[] headerParts = header.split(":");
+					if(headerParts.length == 2) {
+						response.setHeader(headerParts[0], headerParts[1].trim());
+					}
+				}
+				i++;
+			}
+			//concat remaining elements of 'headers' array (the real data) into response body
+			for(i++;i < headers.length;i++) {
+				body = body.concat(headers[i]);
+			}
 		}
-		String sResp = r.getMessage();
-
-		// /**
-		// * If access has been denied, we throw an AccessException to
-		// report
-		// * to the caller correctly
-		// */
-		// if (accessDenied)
-		// throw new AccessException("Access Denied by Security Policies");
-
-		response.setContentLength(sResp.getBytes().length);
-		response.setContentType("text/xml");
-		response.getWriter().write(sResp);
-
+		//write body data
+		response.setContentLength(body.getBytes().length);
+		response.getWriter().write(body);
 	}
 }

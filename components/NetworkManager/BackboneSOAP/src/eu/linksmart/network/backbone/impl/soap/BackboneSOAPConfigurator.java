@@ -47,7 +47,7 @@ public class BackboneSOAPConfigurator extends Configurator {
 	 * @param updates the configuration changes
 	 */
 	public void applyConfigurations(Hashtable updates) {
-		bbSOAPImpl.applyConfigurations(updates);
+//		bbSOAPImpl.applyConfigurations(updates);
 	}
 
 }
