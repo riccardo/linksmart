@@ -55,7 +55,12 @@ public class SOAPTunnelServletTest {
 		}
 		this.nmAddress = new VirtualAddress(nmAddressString);
 		this.nmResponse = new NMResponse(NMResponse.STATUS_SUCCESS);
-		this.nmResponse.setMessage("Bla");
+		this.nmResponse.setMessage(
+				"HTTP/1.1 200 OK\r\n" +
+				"Content-Encoding: gzip\r\n" +
+				"Connection: Keep-Alive\r\n" +
+				"Transfer-Encoding: chunked\r\n" +
+				"Content-Type: text/html; charset=UTF-8\r\n\r\nBla");
 
 		try {
 			when(this.nmCore.getService()).thenReturn(nmAddress);
@@ -90,8 +95,30 @@ public class SOAPTunnelServletTest {
 		when(this.requestBad.getMethod()).thenReturn("GET");
 		when(this.requestBad.getProtocol()).thenReturn("HTTP/1.1");
 	}
+	
+	@Test
+	/**
+	 * Checks whether the headers which are returned with the method are set in the response.
+	 */
+	public void testHeaderForwarding() {
+		try {
+			this.soapTunnelServlet.doPost(requestShort, response);
+		} catch (IOException e1) {
+			// NOP
+		}
+		
+		Mockito.verify(response).setHeader("Content-Encoding", "gzip");
+		Mockito.verify(response).setHeader("Connection", "Keep-Alive");
+		Mockito.verify(response).setHeader("Content-Encoding", "gzip");
+		Mockito.verify(response).setHeader("Content-Type", "text/html; charset=UTF-8");
+		Mockito.verify(response).setHeader("Transfer-Encoding", "chunked");
+	}
 
 	@Test
+	/**
+	 * Tests whether a short URL is passed properly into VirtualAddresses.
+	 * Sender VA is 0 so should be NM.
+	 */
 	public void testValidURLShort(){	
 		try {
 			this.soapTunnelServlet.doPost(requestShort, response);
@@ -110,6 +137,9 @@ public class SOAPTunnelServletTest {
 	}
 
 	@Test
+	/**
+	 * Tests whether a short URL is passed properly into VirtualAddresses.
+	 */
 	public void testValidURLong(){	
 		try {
 			this.soapTunnelServlet.doPost(requestLong, response);
@@ -129,6 +159,9 @@ public class SOAPTunnelServletTest {
 
 
 	@Test
+	/**
+	 * Tests whether the WSDL attribute in the request is properly forwarded.
+	 */
 	public void testValidURWsdl(){	
 		try {
 			this.soapTunnelServlet.doGet(requestWsdl, response);
@@ -147,6 +180,9 @@ public class SOAPTunnelServletTest {
 	}
 
 	@Test
+	/**
+	 * Tests whether a bad URL is properly handled.
+	 */
 	public void testValidURLBad(){	
 		try {
 			this.soapTunnelServlet.doPost(requestBad, response);
