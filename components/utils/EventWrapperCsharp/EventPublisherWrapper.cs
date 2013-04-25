@@ -11,9 +11,8 @@ namespace eu.linksmart.eventing
 {
     public class EventPublisherWrapper
     {
-
         ILog Log = LogManager.GetLogger(typeof(EventSubscriberWrapper));
-
+        const int retry_delay = 1000;
         /// <summary>
         /// This method finds the EventManager with the "eventManagerDesc" 
         /// by asking the local network manager
@@ -29,13 +28,12 @@ namespace eu.linksmart.eventing
             {
                 // try to find the event manager
                 int retry = 0;
-                String emUrl = "";
-                do
+                String emUrl = null;
+                while ((emUrl = NetworkManagerUtil.GetLinksmartUrlFromDesc(Properties.Settings.Default.NetworkManagerStubUrl, eventManagerDesc))==null)
                 {
-                    emUrl = NetworkManagerUtil.GetLinksmartUrlFromDesc(Properties.Settings.Default.NetworkManagerStubUrl, eventManagerDesc);
                     retry++;
-                    if (emUrl.Equals("")) Log.DebugFormat("re-trying to get the event manager address in 500 ms ....({0}x)", retry);                   
-                    Thread.Sleep(500);
+                    Log.DebugFormat("re-trying to get the event manager address in " + retry_delay + " ms ....({0}x)", retry);                   
+                    Thread.Sleep(retry_delay);
                 } while (emUrl == "");
                 EventManagerImplementation eventManager = new EventManagerImplementation();
                 eventManager.Url = emUrl;
@@ -49,16 +47,19 @@ namespace eu.linksmart.eventing
                         subscribeResult = eventManager.publish(topic, parts);                       
                     }
                     catch (Exception e){
-                        Log.DebugFormat("exception on publish to topic " + topic + ", " + e.Message);
+                        Log.ErrorFormat("exception on publish to topic " + topic + ", " + e.Message);
                     }
 
                     if (!subscribeResult){
                         retry++;
-                        Log.DebugFormat("re-trying to publish to topic " + topic + " in 500 ms ....({0}x)", retry);
-                        Thread.Sleep(500);
+                        Log.DebugFormat("re-trying to publish to topic " + topic + " in " + retry_delay * retry + " ms  ....({0}x)", retry);
+                        Thread.Sleep(retry_delay *  retry);
                     }            
-                } while (!subscribeResult);
-                if (subscribeResult) Log.InfoFormat("event is published to topic : " + topic);
+                } while (!subscribeResult && retry < 5);
+                if (subscribeResult) 
+                    Log.DebugFormat("event is published to topic : " + topic);
+                else
+                    Log.ErrorFormat("Event with topic {0} can't be published ", topic);
             });
 
             thPublisher.Start();

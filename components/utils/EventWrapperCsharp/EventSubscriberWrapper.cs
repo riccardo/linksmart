@@ -8,6 +8,7 @@ using eu.linksmart.eventing.NetworkManagerStub;
 using eu.linksmart.eventing.EventManagerStub;
 using System.Threading;
 using eu.linksmart.eventing.util;
+using eu.linksmart.eventing.EventManagerStub;
 using log4net;
 
 namespace eu.linksmart.eventing
@@ -15,10 +16,10 @@ namespace eu.linksmart.eventing
     public class EventSubscriberWrapper : EventSubscriber
     {
         public delegate Boolean NotifyDelegate(String topic, eu.linksmart.eventing.EventManagerStub.Part[] parts);
-        private static List<Subscription> successfulSubscriptions = new List<Subscription>();
+        private static List<Subscription> successfulSubscriptions = new List<Subscription>();        
         ILog Log = LogManager.GetLogger(typeof(EventSubscriberWrapper));
         public String subscriberDesc = "EventSubscriber:" + System.Environment.MachineName;
-           
+        const int retry_delay = 1000;   
 
         private class Subscription
         {
@@ -98,18 +99,28 @@ namespace eu.linksmart.eventing
                     EventSubscriberHid = "";
                     int retry = 0;
                     do
-                    {  
-                        EventSubscriberHid = nm.createHIDwDesc("EventSubscriber:" + System.Environment.MachineName, EventSubscriberUrl).Trim();
-                        retry++;
-                        if (EventSubscriberHid.Equals("")) Log.DebugFormat("re-trying to create HID for  EventSubscriber:" + System.Environment.MachineName + " in 500 ms ....({0}x)", retry);
-                        else Log.InfoFormat("Found EventSubscriberHid : " + EventSubscriberHid);
-                        Thread.Sleep(500) ;
+                    {
+                        try
+                        {
+                            EventSubscriberHid = nm.createHIDwDesc("EventSubscriber:" + System.Environment.MachineName, EventSubscriberUrl).Trim();
+                            retry++;
+                            if (EventSubscriberHid.Equals("")) 
+                                Log.Debug("re-trying to create HID for  EventSubscriber:" + System.Environment.MachineName + " in " + retry_delay+ " ms ....(" + retry + "x)");
+                            else 
+                                Log.Info("Found EventSubscriberHid : " + EventSubscriberHid);
+                            Thread.Sleep(retry_delay);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug("Cannot find the Network Manager just yet. " + ex.Message);
+                            
+                        }                      
                     } while (EventSubscriberHid == "");
       
                 });
                 createHidThread.Start();
             }
-            catch (Exception e) { Log.DebugFormat(e.Message); }
+            catch (Exception e) { Log.Error(e.Message); }
             return serviceHost;
         }
 
@@ -126,14 +137,13 @@ namespace eu.linksmart.eventing
                 // try to find the event manager
                 int retry = 0;
                 String emUrl = "";
-                do
+                while ((emUrl = NetworkManagerUtil.GetLinksmartUrlFromDesc(Properties.Settings.Default.NetworkManagerStubUrl, eventManagerDesc))==null)
                 {
-                    emUrl = NetworkManagerUtil.GetLinksmartUrlFromDesc(Properties.Settings.Default.NetworkManagerStubUrl, eventManagerDesc);
                     retry++;
-                    if (emUrl.Equals("")) Log.DebugFormat("re-trying to get the event manager address in 500 ms ....({0}x)", retry);
-                    else Log.InfoFormat("Found emUrl : " + emUrl);
-                    Thread.Sleep(500);
-                } while (emUrl == "");
+                    Log.Debug("re-trying to get the event manager address in " + retry_delay + " ms ....(" + retry + "x)");                    
+                    Thread.Sleep(retry_delay);
+                }
+                Log.Info("Found emUrl : " + emUrl);
                 EventManagerImplementation eventManager = new EventManagerImplementation();
                 eventManager.Url = emUrl;
                 Subscription s = new Subscription(eventManager, eventManagerDesc, topicName, callback);
@@ -142,13 +152,21 @@ namespace eu.linksmart.eventing
                 retry = 0;
                 bool subscribeResult = false;
                 do{
-                    // change with subscribe by description
-                    if (!(subscribeResult = eventManager.subscribeWithDescription(topicName, subscriberDesc, 0)))
+                    try
                     {
-                        retry++;
-                        if (!subscribeResult) Log.DebugFormat("re-trying to subscribe to topic " + topicName + " in 500 ms ....({0}x)", retry);
-                        else Log.InfoFormat("topic  : " + topicName + " subscribed");
-                        Thread.Sleep(500);
+                        // change with subscribe by description
+                        if (!(subscribeResult = eventManager.subscribeWithDescription(topicName, subscriberDesc, 0)))
+                        {
+                            retry++;
+                            if (!subscribeResult) 
+                                Log.Debug("re-trying to subscribe to topic " + topicName + " in " + retry_delay + " ms ....(" + retry + "x)");
+                            else 
+                                Log.Info("topic  : " + topicName + " subscribed");
+                            Thread.Sleep(retry_delay);
+                        }
+                    }
+                    catch (Exception ex) {
+                        Log.Debug(ex.Message);
                     }
                 } while (!subscribeResult);
 

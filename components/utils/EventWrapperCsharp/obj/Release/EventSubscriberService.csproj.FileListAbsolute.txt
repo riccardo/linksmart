@@ -1,7 +1,0 @@
-E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\bin\Release\EventSubscriberService.dll.config
-E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\bin\Release\EventSubscriberService.dll
-E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\bin\Release\EventSubscriberService.XmlSerializers.dll
-E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\bin\Release\EventSubscriberService.pdb
-E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\obj\Release\EventSubscriberService.dll
-E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\obj\Release\EventSubscriberService.pdb
-E:\Documents\Bemo Cofra\M12Demo\EventManagerWrapperCsharp\EventSubscriberService\EventSubscriberService\obj\Release\EventSubscriberService.XmlSerializers.dll
