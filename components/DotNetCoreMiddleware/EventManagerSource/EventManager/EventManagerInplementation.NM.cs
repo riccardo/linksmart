@@ -165,7 +165,7 @@ namespace EventManager
 
         public static bool IsRegisteredAtNetworkManager;
 
-        private static string SoapTunnelingEndpoint = "http://127.0.0.1:8082/SOAPTunneling/0/{0}/0/";
+        private static string SoapTunnelingEndpoint = Properties.Settings.Default.SOAPTunnelingEndpointTemplate; //"http://127.0.0.1:8082/SOAPTunneling/0/{0}/0/";
 
         public static string GetNetworkManagerLocalEndpointForHid(string hid)
         {    
