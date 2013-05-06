@@ -973,4 +973,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		return peerID;
 	}
 
+	public PeerID getPeerID() {
+		return this.peerID;
+	}
 }

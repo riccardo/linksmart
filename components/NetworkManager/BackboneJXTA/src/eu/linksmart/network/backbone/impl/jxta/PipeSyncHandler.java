@@ -106,6 +106,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	private static final String MESSAGE_ELEMENT_TYPE_RESPONSE = "RESPONSE2";	
 	private static final String MESSAGE_ELEMENT_NAME_REQUESTID = "RequestId";
 	private static final String MESSAGE_ELEMENT_NAME_SYNCH = "Synch";
+	private static final String MESSAGE_ELEMENT_SENDER_PEER_ID = "PeerID";
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
 
@@ -197,7 +198,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	 *            the index
 	 * @return the request message
 	 */
-	private Message createRequestMessage(VirtualAddress source, VirtualAddress dest, byte[] data, String requestID, boolean synch) {
+	private Message createRequestMessage(VirtualAddress source, VirtualAddress dest, byte[] data, String requestID, PeerID senderID, boolean synch) {
 
 		Message msg = new Message();
 		msg.addMessageElement(new ByteArrayMessageElement(
@@ -211,6 +212,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		msg.addMessageElement(new StringMessageElement(
 				MESSAGE_ELEMENT_NAME_TYPE, MESSAGE_ELEMENT_TYPE_REQUEST, null));
 		msg.addMessageElement(new StringMessageElement(MESSAGE_ELEMENT_NAME_REQUESTID, requestID, null));
+		msg.addMessageElement(new StringMessageElement(
+				MESSAGE_ELEMENT_SENDER_PEER_ID, senderID.getURL().toString(), null));
 		return msg;
 	}
 
@@ -334,7 +337,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			while (numRetries < MAXNUMRETRIES) {
 				try {
 					pID = bbjxta.getPeerID(dest);
-
+					bbjxta.getPeerID(source);
 					if (pID != null) {
 						if (pipeTable.containsKey(pID))
 							outPipe = pipeTable.get(pID).getOutputPipe();
@@ -358,7 +361,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					outPipe = createOutputPipe(pID);
 					logger.debug("The pipe to " + pID.toString()
 							+ " was closed or never created before");
-					Message message = createRequestMessage(source, dest, data, i.toString(), synch);
+					Message message = createRequestMessage(source, dest, data, i.toString(), bbjxta.getPeerID(), synch);
 
 					try {
 						if(outPipe.send(message)){
@@ -384,7 +387,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					return resp;
 				}
 			} else {
-				Message message = createRequestMessage(source, dest, data, i.toString(), true);
+				Message message = createRequestMessage(source, dest, data, i.toString(), bbjxta.getPeerID(), true);
 
 				try {
 
@@ -519,7 +522,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			ByteArrayMessageElement dest = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DESTINATION);
 			ByteArrayMessageElement source = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SOURCE);			
 			String requestId = msg.getMessageElement(MESSAGE_ELEMENT_NAME_REQUESTID).toString();
-
+            
 			if(type.equals(MESSAGE_ELEMENT_TYPE_REQUEST)){
 				/*
 				 * MESSAGE request arrived. Call the NMSoapImp.receiveData(). Once
@@ -532,6 +535,12 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				VirtualAddress sourceVirtualAddress = new VirtualAddress(source.getBytes());
 				VirtualAddress destVirtualAddress = new VirtualAddress(dest.getBytes());
 
+				//
+				// adding into map the sender jxta peerId
+				//
+				String senderPeerID = msg.getMessageElement(MESSAGE_ELEMENT_SENDER_PEER_ID).toString();
+				bbjxta.addEndpoint(sourceVirtualAddress, senderPeerID);
+				
 				ByteArrayMessageElement synchBytes = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SYNCH);
 				boolean synch = new String(synchBytes.getBytes()).contentEquals(TRUE);
 				try {
@@ -709,5 +718,4 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			running = false;
 		}
 	}
-
 }
