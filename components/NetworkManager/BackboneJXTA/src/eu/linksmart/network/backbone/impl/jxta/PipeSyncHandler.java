@@ -156,7 +156,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 		PipeID pipeID = IDFactory.newPipeID(bbjxta.netPeerGroup
 				.getPeerGroupID());
 		PipeAdvertisement pipeAdv = (PipeAdvertisement) AdvertisementFactory
-		.newAdvertisement(PipeAdvertisement.getAdvertisementType());
+				.newAdvertisement(PipeAdvertisement.getAdvertisementType());
 		String ppid = PIPE_ID;
 
 		try {
@@ -522,7 +522,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			ByteArrayMessageElement dest = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_DESTINATION);
 			ByteArrayMessageElement source = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SOURCE);			
 			String requestId = msg.getMessageElement(MESSAGE_ELEMENT_NAME_REQUESTID).toString();
-            
+
 			if(type.equals(MESSAGE_ELEMENT_TYPE_REQUEST)){
 				/*
 				 * MESSAGE request arrived. Call the NMSoapImp.receiveData(). Once
@@ -538,9 +538,11 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				//
 				// adding into map the sender jxta peerId
 				//
-				String senderPeerID = msg.getMessageElement(MESSAGE_ELEMENT_SENDER_PEER_ID).toString();
-				bbjxta.addEndpoint(sourceVirtualAddress, senderPeerID);
-				
+				if(msg.getMessageElement(MESSAGE_ELEMENT_SENDER_PEER_ID) != null) {
+					String senderPeerID = msg.getMessageElement(MESSAGE_ELEMENT_SENDER_PEER_ID).toString();
+					bbjxta.addEndpoint(sourceVirtualAddress, senderPeerID);
+				}
+
 				ByteArrayMessageElement synchBytes = (ByteArrayMessageElement) msg.getMessageElement(MESSAGE_ELEMENT_NAME_SYNCH);
 				boolean synch = new String(synchBytes.getBytes()).contentEquals(TRUE);
 				try {
@@ -597,7 +599,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					pID = bbjxta.getPeerID(destination);
 					if (pID != null) {
 						if (pipeTable.containsKey(pID)) outPipe = 
-							pipeTable.get(pID).getOutputPipe();
+								pipeTable.get(pID).getOutputPipe();
 						break;
 					}
 					numRetries++;
