@@ -359,7 +359,6 @@ public class ConnectionManager {
 	private String findMatchingCommunicationSecurityManager(
 			List<SecurityProperty> policies, String[] requiredSecProps,
 			String[] availableComSecMgrs) throws Exception {
-		String foundMatchingComSecMgr = null;
 		
 		//check if requirements are not colliding in local policies
 		boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
