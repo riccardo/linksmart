@@ -390,10 +390,12 @@ public class ConnectionManager {
 		}
 		
 		//go through the available comSecMgrs and check whether they can fulfill both requirements
+		boolean ownRequirementsOk = false;
 		if (!this.communicationSecurityManagers.isEmpty()) {
 			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
 				//first check against local policies
 				if (matchingPolicies(policies, comSecMgr.getProperties())){
+					ownRequirementsOk = true;
 					//now check against received policies
 					if(matchingPolicies(requiredSecPropsList, comSecMgr.getProperties())) {
 						return comSecMgr.getClass().getName();
@@ -403,14 +405,14 @@ public class ConnectionManager {
 		}
 		
 		//there was no matching comSecMgr so check whether no security is an option
-		if ((policies.size() != 0 && !noSecurity)) {
+		if ((policies.size() != 0 && !noSecurity && !ownRequirementsOk)) {
 			//no available communication security manager although required locally - that is a problem
 			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
 		}
 		if(noSecurity && noSecurityRequired) {
 			return SecurityProperty.NoSecurity.name();
 		}
-
+		//no match found so just return
 		return null;
 	}
 
