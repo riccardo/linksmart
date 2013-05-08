@@ -1,16 +1,30 @@
 package eu.linksmart.network.connection;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
+import eu.linksmart.network.ErrorMessage;
+import eu.linksmart.network.Message;
+import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.Registration;
 import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.identity.IdentityManager;
+import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.SecurityProperty;
 
@@ -21,6 +35,10 @@ import eu.linksmart.security.communication.SecurityProperty;
  */
 public class ConnectionManager {
 	/**
+	 * Logger from log4j
+	 */
+	Logger logger = Logger.getLogger(ConnectionManager.class.getName());
+	/**
 	 * Stores the last usage of a connection.
 	 */
 	private HashMap<Connection, Date> timeouts = new HashMap<Connection, Date>();
@@ -28,6 +46,10 @@ public class ConnectionManager {
 	 * List of stored connections.
 	 */
 	private List<Connection> connections = new ArrayList<Connection>();
+	/**
+	 * List of connections where the handshake failed.
+	 */
+	private List<Connection> bannedConnections = new ArrayList<Connection>();
 	/**
 	 * Number of minutes a connection can at least live after last use.
 	 */
@@ -45,20 +67,31 @@ public class ConnectionManager {
 	 * List of available managers to use for connection protection.
 	 */
 	private ArrayList<CommunicationSecurityManager> communicationSecurityManagers = 
-		new ArrayList<CommunicationSecurityManager>();
+			new ArrayList<CommunicationSecurityManager>();
 
 	/**
 	 * Used to avoid access and change of policies
 	 */
 	private Object policyModificationLock = new Object();
 
-	private VirtualAddress nmVirtualAddress = null;;
+	private static final String HANDSHAKE_COMSECMGRS_KEY = "CommunicationSecurityManagers";
+	private static final String HANDSHAKE_SECPROPS_KEY = "SecurityProperties";
+	private static final String HANDSHAKE_DECLINE = "CommunicationDeclined";
+	protected static final String HANDSHAKE_ACCEPT = "CommunicationAccepted";
+
+	private NetworkManagerCore nmCore;
+	private IdentityManager idM;
 
 
-	public ConnectionManager(){
+	public ConnectionManager(NetworkManagerCore nmCore){
+		this.nmCore = nmCore;
 		//Timer which periodically calls the clearer task
 		timer = new Timer(true);
 		timer.schedule(new ConnectionClearer(), 0, timeoutMinutes * 60 * 1000 / 2);
+	}
+	
+	public void setIdentityManager(IdentityManager idM) {
+		this.idM = idM;
 	}
 
 	public void setCommunicationSecurityManager(CommunicationSecurityManager comSecMgr){
@@ -108,13 +141,12 @@ public class ConnectionManager {
 
 	/**
 	 * Returns {@link Connection} object associated to two entities.
-	 * Creates new if there exists none yet.
+	 * Returns null if there exists none yet.
 	 * @param receiverVirtualAddress physical endpoint of connection
 	 * @param senderVirtualAddress physical endpoint of connection
-	 * @return Connection to use for processing of communication
-	 * @throws Exception If there are policies for an VirtualAddress but no CommunicationSecurityManager
+	 * @return Connection to use for processing of communication, null if no connection existing
 	 */
-	public synchronized Connection getConnection(VirtualAddress receiverVirtualAddress, VirtualAddress senderVirtualAddress) throws Exception{
+	public synchronized Connection getConnection(VirtualAddress receiverVirtualAddress, VirtualAddress senderVirtualAddress){
 		Calendar cal = Calendar.getInstance();
 		//find connection belonging to these services
 		for(Connection c : connections){
@@ -132,62 +164,303 @@ public class ConnectionManager {
 			Connection conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
 			connections.add(conn);
 			timeouts.put(conn, cal.getTime());
+			return conn;
+		}
+		return null;
+	}
+
+	/**
+	 * Processes or starts a handshake with the other node deciding on the communication
+	 * parameters to be used. Depending on the result of the handshake returns the created
+	 * communication object.
+	 * @param receiverVirtualAddress
+	 * @param senderVirtualAddress
+	 * @param data
+	 * @return
+	 * @throws Exception If there are policies for an VirtualAddress but no CommunicationSecurityManager
+	 */
+	public synchronized Connection createConnection(
+			VirtualAddress receiverVirtualAddress,
+			VirtualAddress senderVirtualAddress,
+			byte[] data) throws Exception {
+		//method variables
+		Calendar cal = Calendar.getInstance();
+		CommunicationSecurityManager agreedComSecMgr = null;
+		String comSecMgrName = null;
+		boolean match = false;
+
+		//the remote side of this connection
+		VirtualAddress remoteEndpoint = null;
+		if(receiverVirtualAddress.equals(nmCore.getService()) || senderVirtualAddress.equals(nmCore.getService())) {
+			//get virtual address of remote entity
+			remoteEndpoint = nmCore.getService().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
+
 		}
 
-		//policies should not be changed while reading them
-		synchronized(policyModificationLock) {
-			//there was no connection found so create new connection
-			//policies only apply for connections between this NM and other entity
-			List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
-			if(receiverVirtualAddress.equals(nmVirtualAddress) || senderVirtualAddress.equals(nmVirtualAddress)) {
-				//get virtual address of remote entity
-				VirtualAddress remoteVirtualAddress = nmVirtualAddress.equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
-				//check if there are policies for the VirtualAddress
-				if(this.servicePolicies.containsKey(remoteVirtualAddress)){
-					//add policies to requirement list
-					policies = servicePolicies.get(remoteVirtualAddress);
-				}
+		Registration receiverRegInfo = idM.getServiceInfo(remoteEndpoint);
+		//check if the remote side is a local service and than do not start the handshake
+		if(receiverRegInfo != null && idM.getLocalServices().contains(receiverRegInfo)) {
+			return createConnectionForLocalServices(receiverVirtualAddress, senderVirtualAddress);
+		}
 
-				//check if requirements are not colliding
-				boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
-				boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
-				boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
-				//if there are more requirements and noEnc or noSec is included it must be colliding
-				if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
-					throw new Exception("Colliding policies for services");
-				}
+		//this connection is temporal until the handshake is able to resolve the proper connection
+		HandshakeConnection tempCon = new HandshakeConnection(senderVirtualAddress, receiverVirtualAddress, this);
+		if(bannedConnections.contains(tempCon)) {
+			return null;
+		} else {
+			connections.add(tempCon);
+		}
+
+		//try to open message in standard way
+		Message handshakeMessage = 
+				MessageSerializerUtiliy.
+				unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress);
+
+		//if the message could not be opened or it was opened and it is not a handshake message we start the handshake
+		if(handshakeMessage instanceof ErrorMessage 
+				|| !handshakeMessage.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
+			comSecMgrName = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress);
+		} else if (handshakeMessage.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)){
+			//we received a handshake message
+			//open handshake body
+			Properties properties = new Properties();
+			try {
+				properties.loadFromXML(new ByteArrayInputStream(handshakeMessage.getData()));
+			} catch (InvalidPropertiesFormatException e) {
+				logger.error(
+						"Unable to load properties from XML data. Data is not valid XML: "
+								+ new String(handshakeMessage.getData()), e);
+				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
+				return null;
+			} catch (IOException e) {
+				logger.error("Unable to load properties from XML data: "
+						+ new String(handshakeMessage.getData()), e);
+				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
+				return null;
 			}
 
-			//if there was no connection that means that the sender is the client and the receiver is the server
-			//check if an active connection or a dummy connectin is needed
-			Connection conn = null;
-			if(policies.contains(SecurityProperty.NoEncoding)) {
-				conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
+			String[] availableComSecMgrs = properties.getProperty(HANDSHAKE_COMSECMGRS_KEY).split(";");
+			String[] requiredSecProps = properties.getProperty(HANDSHAKE_SECPROPS_KEY).split(";");
+
+			//find common agreement of provided CommunicationSecurityManagers and required policies
+			comSecMgrName = findMatchingCommunicationSecurityManager(
+					servicePolicies.get(remoteEndpoint),
+					requiredSecProps,
+					availableComSecMgrs);
+
+		}
+
+		if(comSecMgrName == null) {
+			//communication has been declined
+			handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
+			return null;
+		} else {
+			//determine common communicationSecurityManager
+			for(CommunicationSecurityManager comSecMgr : communicationSecurityManagers) {
+				if(comSecMgr.getClass().getName().equals(comSecMgrName)) {
+					agreedComSecMgr = comSecMgr;
+					match = true;
+					break;
+				}
+			}
+			//there was no matching comSecMgr but no security could still match
+			if(!match && (comSecMgrName.equals(SecurityProperty.NoSecurity.name()) 
+					&& servicePolicies.get(remoteEndpoint).contains(SecurityProperty.NoSecurity))) {
+				match = true;
+			}
+
+			if(!match) {
+				//agreed CommunicationSecurityManager was not found on our side
+				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
+				return null;
+			}
+		}
+
+		//create the connection
+		//if there was no connection that means that the sender is the client and the receiver is the server
+		Connection conn = new Connection(senderVirtualAddress, receiverVirtualAddress);
+		if (agreedComSecMgr != null) {
+			conn.setCommunicationSecMgr(agreedComSecMgr);
+		}
+		//add connection to list
+		connections.add(conn);
+		timeouts.put(conn, cal.getTime());
+		//remove temporary connection as proper connection has been added now
+		connections.remove(tempCon);
+		tempCon.setStateResolved();
+
+		return conn;
+	}
+
+	private Connection createConnectionForLocalServices(VirtualAddress receiverVirtualAddress, VirtualAddress senderVirtualAddress) throws Exception{
+		//policies only apply for connections between this NM and other entity
+		List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
+		if(receiverVirtualAddress.equals(nmCore.getService()) || senderVirtualAddress.equals(nmCore.getService())) {
+			//get virtual address of remote entity
+			VirtualAddress remoteVirtualAddress = nmCore.getService().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
+			//check if there are policies for the VirtualAddress
+			if(this.servicePolicies.containsKey(remoteVirtualAddress)){
+				//add policies to requirement list
+				policies = servicePolicies.get(remoteVirtualAddress);
+			}
+
+			//check if requirements are not colliding
+			boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
+			boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
+			boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
+			//if there are more requirements and noEnc or noSec is included it must be colliding
+			if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
+				throw new Exception("Colliding policies for services");
+			}
+		}
+
+
+		//check if an active connection or a dummy connection is needed
+		Connection conn = null;
+		if(policies.contains(SecurityProperty.NoEncoding)) {
+			conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
+		} else {
+			conn = new Connection(senderVirtualAddress, receiverVirtualAddress);
+		}
+
+		boolean foundComSecMgr = false;
+		if (!this.communicationSecurityManagers.isEmpty()) {
+			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
+				if (matchingPolicies(policies, comSecMgr.getProperties())){
+					conn.setCommunicationSecMgr(comSecMgr);
+					foundComSecMgr = true;
+					break;
+				}
+			}
+		}
+		if (!foundComSecMgr 
+				&& policies.size() != 0 
+				&& !policies.contains(SecurityProperty.NoSecurity)) {
+			//no available communication security manager although required
+			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
+		}
+
+		//add connection to list
+		connections.add(conn);
+		timeouts.put(conn, Calendar.getInstance().getTime());
+
+		return conn;
+	}
+
+	private String findMatchingCommunicationSecurityManager(
+			List<SecurityProperty> list, String[] requiredSecProps,
+			String[] availableComSecMgrs) {
+		//	//policies only apply for connections between this NM and other entity
+		//		List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
+		//		if(receiverVirtualAddress.equals(nmCore.getService()) || senderVirtualAddress.equals(nmCore.getService())) {
+		//			//get virtual address of remote entity
+		//			VirtualAddress remoteVirtualAddress = nmCore.getService().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
+		//			//check if there are policies for the VirtualAddress
+		//			if(this.servicePolicies.containsKey(remoteVirtualAddress)){
+		//				//add policies to requirement list
+		//				policies = servicePolicies.get(remoteVirtualAddress);
+		//			}
+		//
+		//			//check if requirements are not colliding
+		//			boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
+		//			boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
+		//			boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
+		//			//if there are more requirements and noEnc or noSec is included it must be colliding
+		//			if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
+		//				throw new Exception("Colliding policies for services");
+		//			}
+		//		}
+		//
+		//		
+		//		//check if an active connection or a dummy connectin is needed
+		//		Connection conn = null;
+		//		if(policies.contains(SecurityProperty.NoEncoding)) {
+		//			conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
+		//		} else {
+		//			conn = new Connection(senderVirtualAddress, receiverVirtualAddress);
+		//		}
+		//
+		//		boolean foundComSecMgr = false;
+		//		if (!this.communicationSecurityManagers.isEmpty()) {
+		//			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
+		//				if (matchingPolicies(policies, comSecMgr.getProperties())){
+		//					conn.setCommunicationSecMgr(comSecMgr);
+		//					foundComSecMgr = true;
+		//					break;
+		//				}
+		//			}
+		//		}
+		//		if (!foundComSecMgr 
+		//				&& policies.size() != 0 
+		//				&& !policies.contains(SecurityProperty.NoSecurity)) {
+		//			//no available communication security manager although required
+		//			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
+		//		}
+		return null;
+	}
+
+	//Compose message of communication properties and send it to other end. Wait for answer of handshake. 
+	private String startHandshakeOnCommunicationProperties(
+			VirtualAddress receiverVirtualAddress,
+			VirtualAddress senderVirtualAddress) {
+		//compose message with communication parameters
+		//collect list of available communication security managers
+		StringBuilder comSecMgrNames = new StringBuilder();
+		for(CommunicationSecurityManager comSecMgr : communicationSecurityManagers){
+			comSecMgrNames.append(comSecMgr.getClass().getName() + ";");
+		}
+
+		//compose list of security properties required by own configuration
+		//as we initiate the communication we already know the server
+		StringBuilder secProperties = new StringBuilder();
+		for (SecurityProperty prop : servicePolicies.get(receiverVirtualAddress)) {
+			secProperties.append(prop.name() + ";");
+		}
+
+		Properties props = new Properties();
+		props.put(HANDSHAKE_COMSECMGRS_KEY, comSecMgrNames.toString());
+		props.put(HANDSHAKE_SECPROPS_KEY, secProperties.toString());
+
+		//convert properties to xml and put it into stream
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		byte[] serializedPayload = null;
+		try {
+			props.storeToXML(bos, null);
+			serializedPayload = bos.toByteArray();
+		} catch (IOException e) {
+			logger.warn("Message to be sent cannot be parsed!");
+		} finally {
+			try {
+				bos.close();
+			} catch (IOException e) {
+				logger.error("Error closing stream", e);
+			}
+		}
+		//finally create the actual message to be sent
+		Message handshakeMsg = new Message(
+				Message.TOPIC_CONNECTION_HANDSHAKE,
+				senderVirtualAddress,
+				receiverVirtualAddress,
+				serializedPayload);
+
+		//the response contains the communication parameters or a decline
+		NMResponse response = nmCore.sendMessage(handshakeMsg, true);
+		Message respMsg = response.getMessageObject();
+
+		if(new String(respMsg.getData()).startsWith(HANDSHAKE_ACCEPT)){
+			//take the matching ComSecMgr and return it
+			String comSecMgrName = new String(respMsg.getData()).
+					substring(HANDSHAKE_ACCEPT.length() + 1);
+			return comSecMgrName;
+		} else {
+			if(new String(response.getMessage().getBytes()).contains(HANDSHAKE_DECLINE)){
+				//decline message looks like HANDSHAKE_DECLINED [PropertiesOfOtherEndpoint]
+				logger.warn("Could not establish common parameters with " + receiverVirtualAddress + " as it required:" +
+						new String(response.getMessage().getBytes()).substring(HANDSHAKE_DECLINE.length() + 1));
 			} else {
-				conn = new Connection(senderVirtualAddress, receiverVirtualAddress);
+				logger.error("Something went wrong during the communication handshake process!");
 			}
-
-			boolean foundComSecMgr = false;
-			if (!this.communicationSecurityManagers.isEmpty()) {
-				for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
-					if (matchingPolicies(policies, comSecMgr.getProperties())){
-						conn.setCommunicationSecMgr(comSecMgr);
-						foundComSecMgr = true;
-						break;
-					}
-				}
-			}
-			if (!foundComSecMgr 
-					&& policies.size() != 0 
-					&& !policies.contains(SecurityProperty.NoSecurity)) {
-				//no available communication security manager although required
-				throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
-			}
-			//add connection to list
-			connections.add(conn);
-			timeouts.put(conn, cal.getTime());
-
-			return conn;
+			return null;
 		}
 	}
 
@@ -213,7 +486,7 @@ public class ConnectionManager {
 
 		//there was no connection found so create new connection	
 		List<SecurityProperty> policies = null;
-		if(!senderVirtualAddress.equals(nmVirtualAddress)) {
+		if(!senderVirtualAddress.equals(nmCore.getService())) {
 			policies = this.servicePolicies.get(senderVirtualAddress);
 		}
 		//check if an active connection or a dummy connection is needed
@@ -261,10 +534,6 @@ public class ConnectionManager {
 		timer.schedule(new ConnectionClearer(), 0, timeoutMinutes * 60 * 1000 / 2);
 	}
 
-	public void setOwnerVirtualAddress(VirtualAddress virtualAddress) {
-		nmVirtualAddress  = virtualAddress;
-	}
-
 	/**
 	 * Checks whether to sets of policies math each other.
 	 * @param required List of required properties
@@ -289,6 +558,22 @@ public class ConnectionManager {
 		timeouts.remove(con);
 	}
 
+	private void handleUnsuccesfulHandshake(VirtualAddress remoteEndpoint, HandshakeConnection tempCon) {
+		connections.remove(tempCon);
+		tempCon.setFailed();
+		
+		Connection bannedConnection;
+		try {
+		bannedConnection = new Connection(nmCore.getService(), remoteEndpoint);
+		if(!bannedConnections.contains(bannedConnection)) {
+			this.bannedConnections.add(bannedConnection);	
+		}
+		this.timeouts.put(bannedConnection, Calendar.getInstance().getTime());
+		} catch(RemoteException e) {
+			//local invocation
+		}
+	}
+
 	/**
 	 * Clears not used connections from list.
 	 * @author Vinkovits
@@ -297,7 +582,7 @@ public class ConnectionManager {
 	private class ConnectionClearer extends TimerTask{
 
 		/**
-		 * Runs through all referenced connections and deletes them if timeout expired
+		 * Runs through all referenced and banned connections and deletes them if timeout expired
 		 */
 		public void run() {
 			//go through all references and remove them when needed
@@ -309,7 +594,11 @@ public class ConnectionManager {
 				if(calendar.getTimeInMillis() - timeouts.get(con).getTime() > timeoutMinutes * 60 * 1000){
 					//timeout has expired so delete it
 					i.remove();
-					connections.remove(con);
+					if(connections.contains(con)) {
+						connections.remove(con);
+					} else if (bannedConnections.contains(con)) {
+						bannedConnections.remove(con);
+					}
 				}
 			}
 		}	

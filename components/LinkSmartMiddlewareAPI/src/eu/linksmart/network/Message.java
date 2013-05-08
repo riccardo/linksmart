@@ -23,6 +23,7 @@ public class Message {
 	private VirtualAddress receiverVirtualAddress = null;
 	
 	public final static String TOPIC_APPLICATION = "eu.linksmart.application";
+	public final static String TOPIC_CONNECTION_HANDSHAKE = "eu.linksmart.network.connection.handshake";
 	
 	
 	/**

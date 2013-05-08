@@ -40,4 +40,23 @@ public class BroadcastConnection extends Connection {
 			return null;
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj.getClass().equals(this.getClass())) {
+			Connection c = (Connection)obj;
+			if(c.getServerVirtualAddress().equals(c.getServerVirtualAddress())) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return this.getServerVirtualAddress().hashCode() ^ this.getClass().getName().hashCode();
+	}
 }

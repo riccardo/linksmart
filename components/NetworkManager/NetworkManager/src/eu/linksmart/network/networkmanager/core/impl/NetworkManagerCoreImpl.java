@@ -38,10 +38,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	/** The used backbone router **/
 	protected BackboneRouter backboneRouter;
 	/** The used connection manager **/
-	protected ConnectionManager connectionManager = new ConnectionManager();
+	protected ConnectionManager connectionManager = new ConnectionManager(this);
 	/** The VirtualAddress of this NetworkManager and IdentityManager **/
 	protected VirtualAddress myVirtualAddress;
-
 	protected String myDescription;
 
 	/* Constants */
@@ -93,11 +92,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 	protected void bindIdentityManager(IdentityManager identityManager) {
 		this.identityManager = identityManager;
+		this.connectionManager.setIdentityManager(identityManager);
 	}
 
 	protected void unbindIdentityManager(IdentityManager identityMgr) {
 		this.identityManager = null;
-
+		this.connectionManager.setIdentityManager(null);
 	}
 
 	protected void bindBackboneRouter(BackboneRouter backboneRouter) {
@@ -136,7 +136,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					"PANIC - RemoteException thrown on local access of own method",
 					e);
 		}
-		connectionManager.setOwnerVirtualAddress(myVirtualAddress);
 
 		// Init Servlets
 		// TODO implement servlet registration with HttpService in Declarative
@@ -222,7 +221,14 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					conn = connectionManager.getBroadcastConnection(senderVirtualAddress);
 				} else {
 					// to get proper connection use my VirtualAddress
-					conn = connectionManager.getConnection(myVirtualAddress, senderVirtualAddress);
+					conn = getConnection(myVirtualAddress, senderVirtualAddress, data);
+					//no common connection parameters could be established with the other end
+					if(conn == null) {
+						NMResponse response = new NMResponse();
+						response.setStatus(NMResponse.STATUS_ERROR);
+						response.setMessage("No common connection parameters could be established with remote service");
+						return response;
+					}
 				}
 			} catch (Exception e) {
 				LOG.warn(
@@ -237,12 +243,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			}
 
 			Message msg = conn.processData(senderVirtualAddress, receiverVirtualAddress, data);
-			
+
 			//drop error messages from further processing
 			if(msg instanceof ErrorMessage) {
 				NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
 				if(msg.getData() != null) {
-				response.setMessage(new String(msg.getData()));
+					response.setMessage(new String(msg.getData()));
 				}
 				return response;
 			}
@@ -328,8 +334,14 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					// broadcast message
 					conn = connectionManager.getBroadcastConnection(senderVirtualAddress);
 				} else {
-					conn = connectionManager.getConnection(receiverVirtualAddress,
-							senderVirtualAddress);
+					conn = getConnection(myVirtualAddress, senderVirtualAddress, data);
+					//no common connection parameters could be established with the other end
+					if(conn == null) {
+						NMResponse response = new NMResponse();
+						response.setStatus(NMResponse.STATUS_ERROR);
+						response.setMessage("No common connection parameters could be established with remote service");
+						return response;
+					}
 				}
 			} catch (Exception e) {
 				LOG.warn(
@@ -479,8 +491,16 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			VirtualAddress receiverVirtualAddress) {
 		byte[] data = null;
 		try {
-			Connection connection = this.connectionManager.getConnection(
-					receiverVirtualAddress, senderVirtualAddress);
+			Connection connection = getConnection(
+					receiverVirtualAddress, myVirtualAddress, message.getData());
+			
+			//no common connection parameters could be established with the other end
+			if(connection == null) {
+				NMResponse response = new NMResponse();
+				response.setStatus(NMResponse.STATUS_ERROR);
+				response.setMessage("No common connection parameters could be established with remote service");
+				return response;
+			}
 			data = connection.processMessage(message);
 		} catch (Exception e) {
 			LOG.warn("Could not create packet from message from VirtualAddress: "
@@ -517,16 +537,23 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		Message tempMessage = message;
 
 		try {
-			Connection connection = this.connectionManager.getConnection(
-					receiverVirtualAddress, senderVirtualAddress);
+			Connection connection = getConnection(
+					receiverVirtualAddress, myVirtualAddress, message.getData());
 
+			//no common connection parameters could be established with the other end
+			if(connection == null) {
+				response.setStatus(NMResponse.STATUS_ERROR);
+				response.setMessage("No common connection parameters could be established with remote service");
+				return response;
+			}
 			// process outgoing message
 			data = connection.processMessage(tempMessage);
 			response = this.backboneRouter.sendDataSynch(senderVirtualAddress,
 					receiverVirtualAddress, data);
 			if(response.getStatus() == NMResponse.STATUS_SUCCESS) {
-				// process response message with logical endpoints in connection
-				// with physical endpoints
+				// process response where message contains logical endpoints and
+				// connection contains physical endpoints
+				//turn around sender and receiver of the message as this is a response
 				tempMessage = connection.processData(
 						message.getReceiverVirtualAddress(),
 						message.getSenderVirtualAddress(),
@@ -540,6 +567,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					response = this.backboneRouter.sendDataSynch(senderVirtualAddress,
 							receiverVirtualAddress, connection.processMessage(tempMessage));
 					if(response.getStatus() == NMResponse.STATUS_SUCCESS) {
+						//turn around sender and receiver of the message as this is a response
 						tempMessage = connection.processData(message.getReceiverVirtualAddress(),
 								message.getSenderVirtualAddress(), response.getMessage()
 								.getBytes());
@@ -651,7 +679,23 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			// register VirtualAddress with backbone policies in connection manager
 			this.connectionManager.registerServicePolicy(virtualAddress, properties);
 		}
-
 	}
-
+	
+	private Connection getConnection(
+			VirtualAddress receiverVirtualAddress,
+			VirtualAddress senderVirtualAddress,
+			byte[] data) {
+		Connection con = this.connectionManager.getConnection(receiverVirtualAddress, senderVirtualAddress);
+		if(con == null) {
+			try {
+				con = this.connectionManager.createConnection(receiverVirtualAddress, senderVirtualAddress, data);
+			} catch (Exception e) {
+				LOG.error(
+						"Error getting connection for entities " 
+				+ receiverVirtualAddress + " " + senderVirtualAddress,
+						e);
+			}
+		}
+		return con;
+	}
 }

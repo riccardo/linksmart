@@ -16,6 +16,7 @@ import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.Message;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.CryptoException;
+import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.security.communication.SecurityProtocol;
 import eu.linksmart.security.communication.VerificationFailureException;
 import eu.linksmart.utils.Base64;
@@ -58,7 +59,7 @@ public class Connection {
 	protected Connection(VirtualAddress serverVirtualAddress) {
 		if (serverVirtualAddress == null) {
 			throw new IllegalArgumentException(
-			"Cannot set null for required fields.");
+					"Cannot set null for required fields.");
 		}
 		this.serverVirtualAddress = serverVirtualAddress;
 	}
@@ -66,7 +67,7 @@ public class Connection {
 	public Connection(VirtualAddress clientVirtualAddress, VirtualAddress serverVirtualAddress) {
 		if (clientVirtualAddress == null || serverVirtualAddress == null) {
 			throw new IllegalArgumentException(
-			"Cannot set null for required fields.");
+					"Cannot set null for required fields.");
 		}
 		this.clientVirtualAddress = clientVirtualAddress;
 		this.serverVirtualAddress = serverVirtualAddress;
@@ -107,12 +108,12 @@ public class Connection {
 		if (securityProtocol != null && securityProtocol.isInitialized()) {
 			// if protocol is initialized than open message with it
 			try {
-				message = unserializeMessage(data, false, senderVirtualAddress, receiverVirtualAddress);
+				message = MessageSerializerUtiliy.unserializeMessage(data, false, senderVirtualAddress, receiverVirtualAddress);
 				message = securityProtocol.unprotectMessage(message);
 				//use data field of message to reconstruct original message
 				if(!message.getTopic().
 						equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
-					message = unserializeMessage(message.getData(), true, senderVirtualAddress, receiverVirtualAddress);
+					message = MessageSerializerUtiliy.unserializeMessage(message.getData(), true, senderVirtualAddress, receiverVirtualAddress);
 				}
 			} catch (Exception e) {
 				logger.debug("Cannot unprotect message from VirtualAddress: "
@@ -123,7 +124,22 @@ public class Connection {
 						e.getMessage().getBytes());
 			}
 		} else { 
-			message = unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress);
+			message = MessageSerializerUtiliy.unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress);
+			//check if this is the handshake message which created this connection 
+			//because then we have to respond to it with an accept message
+			if(message.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
+				String usedSecurity = ConnectionManager.HANDSHAKE_ACCEPT;
+				usedSecurity = usedSecurity.concat(
+						(comSecMgr != null) ? 
+								comSecMgr.getClass().getName() :
+									SecurityProperty.NoSecurity.name());
+				Message msg = new Message(
+						Message.TOPIC_CONNECTION_HANDSHAKE,
+						receiverVirtualAddress,
+						senderVirtualAddress,
+						usedSecurity.getBytes());
+				return msg;
+			}
 			if (securityProtocol != null
 					&& !securityProtocol.isInitialized()) {
 				// if protocol not initialized then pass it for processing			
@@ -186,6 +202,10 @@ public class Connection {
 	 *             When message cannot be processed for sending
 	 */
 	public byte[] processMessage(Message msg) throws Exception {
+		//connection handshake messeages are passed through
+		if(msg.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
+			return MessageSerializerUtiliy.serializeMessage(msg, true);
+		}
 		SecurityProtocol securityProtocol = getSecurityProtocol(msg.getSenderVirtualAddress(), msg.getReceiverVirtualAddress());
 		if (securityProtocol != null && !securityProtocol.isInitialized()) {
 			// set the message to be sent by security protocol
@@ -195,7 +215,7 @@ public class Connection {
 		}
 
 		//serialize the message into one stream to protect it
-		byte[] serializedCommand = serializeMessage(msg, true);
+		byte[] serializedCommand = MessageSerializerUtiliy.serializeMessage(msg, true);
 		//protect the stream if should be
 		if (securityProtocol != null
 				&& securityProtocol.isInitialized()
@@ -209,89 +229,10 @@ public class Connection {
 			msg.setData(serializedCommand);
 			msg = securityProtocol.protectMessage(msg);
 			//serialize the propertyless created protected dummy message
-			return serializeMessage(msg, false);
+			return MessageSerializerUtiliy.serializeMessage(msg, false);
 		} else {
 			return serializedCommand;
 		}
-	}
-
-	/**
-	 * Creates a stream from the provided message
-	 * @param msg to be serialized
-	 * @param includeProperties
-	 * @return
-	 */
-	private byte[] serializeMessage(Message msg, boolean includeProperties) {
-		Properties props = new Properties();
-		if(includeProperties) {
-			// read the properties of the message and put it into the properties
-			Iterator<String> i = msg.getKeySet().iterator();
-			while (i.hasNext()) {
-				String key = i.next();
-				props.put(key, msg.getProperty(key));
-			}
-		}
-		// put application data into properties
-		props.put(APPLICATION_DATA, Base64.encodeBytes(msg.getData()));
-		props.put(TOPIC, msg.getTopic());
-		//convert properties to xml and put it into stream
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		byte[] serializedCommand = null;
-		try {
-			props.storeToXML(bos, null);
-			serializedCommand = bos.toByteArray();
-		} catch (IOException e) {
-			logger.warn("Message to be sent cannot be parsed!");
-		} finally {
-			try {
-				bos.close();
-			} catch (IOException e) {
-				logger.error("Error closing stream", e);
-			}
-		}
-		return serializedCommand;
-	}
-
-	/**
-	 * Creates message from received byte stream.
-	 * @param serializedMsg Stream to read from
-	 * @param includeProps Fill properties fields of msg
-	 * @param senderVirtualAddress
-	 * @param receiverVirtualAddress
-	 * @return
-	 */
-	private Message unserializeMessage(byte[] serializedMsg, boolean includeProps, VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress) {
-		// open data and divide it into properties of the message and
-		// application data
-		Properties properties = new Properties();
-		try {
-			properties.loadFromXML(new ByteArrayInputStream(serializedMsg));
-		} catch (InvalidPropertiesFormatException e) {
-			logger.error(
-					"Unable to load properties from XML data. Data is not valid XML: "
-					+ new String(serializedMsg), e);
-			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
-					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());
-		} catch (IOException e) {
-			logger.error("Unable to load properties from XML data: "
-					+ new String(serializedMsg), e);
-			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
-					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());
-		}
-
-		// create real message
-		Message message = new Message((String) properties.remove(TOPIC),
-				senderVirtualAddress, receiverVirtualAddress, (Base64.decode((String) properties
-						.remove(APPLICATION_DATA))));
-		if(includeProps) {
-			// go through the properties and add them to the message
-			Iterator<Object> i = properties.keySet().iterator();
-			while (i.hasNext()) {
-				String key = (String) i.next();
-				message.setProperty(key, properties.getProperty(key));
-			}
-		}
-		return message;
 	}
 
 	class VirtualAddressTuple {
@@ -329,5 +270,29 @@ public class Connection {
 			//returned hash must be indifferent for tuples with same two addresses
 			return virtualAddress1Hash & virtualAddress2Hash;
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Connection) {
+			Connection c = (Connection)obj;
+			if(c.getClientVirtualAddress() != null) {
+				if((c.getClientVirtualAddress().equals(this.clientVirtualAddress) && c.getServerVirtualAddress().equals(c.serverVirtualAddress))
+						|| (c.getClientVirtualAddress().equals(this.serverVirtualAddress) && c.getServerVirtualAddress().equals(this.clientVirtualAddress))) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return this.clientVirtualAddress.hashCode() ^ this.serverVirtualAddress.hashCode() ^ this.getClass().getName().hashCode();
 	}
 }
