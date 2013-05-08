@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -89,7 +90,7 @@ public class ConnectionManager {
 		timer = new Timer(true);
 		timer.schedule(new ConnectionClearer(), 0, timeoutMinutes * 60 * 1000 / 2);
 	}
-	
+
 	public void setIdentityManager(IdentityManager idM) {
 		this.idM = idM;
 	}
@@ -278,7 +279,15 @@ public class ConnectionManager {
 
 		//create the connection
 		//if there was no connection that means that the sender is the client and the receiver is the server
-		Connection conn = new Connection(senderVirtualAddress, receiverVirtualAddress);
+
+		//check if connection should be a no encoding connection
+		Connection conn = null;
+		if(servicePolicies.get(remoteEndpoint).contains(SecurityProperty.NoEncoding)) {
+			//if no encoding were not a match the matching part would have already failed
+			conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
+		} else {
+			conn = new Connection(senderVirtualAddress, receiverVirtualAddress);
+		}
 		if (agreedComSecMgr != null) {
 			conn.setCommunicationSecMgr(agreedComSecMgr);
 		}
@@ -348,54 +357,61 @@ public class ConnectionManager {
 	}
 
 	private String findMatchingCommunicationSecurityManager(
-			List<SecurityProperty> list, String[] requiredSecProps,
-			String[] availableComSecMgrs) {
-		//	//policies only apply for connections between this NM and other entity
-		//		List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
-		//		if(receiverVirtualAddress.equals(nmCore.getService()) || senderVirtualAddress.equals(nmCore.getService())) {
-		//			//get virtual address of remote entity
-		//			VirtualAddress remoteVirtualAddress = nmCore.getService().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
-		//			//check if there are policies for the VirtualAddress
-		//			if(this.servicePolicies.containsKey(remoteVirtualAddress)){
-		//				//add policies to requirement list
-		//				policies = servicePolicies.get(remoteVirtualAddress);
-		//			}
-		//
-		//			//check if requirements are not colliding
-		//			boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
-		//			boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
-		//			boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
-		//			//if there are more requirements and noEnc or noSec is included it must be colliding
-		//			if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
-		//				throw new Exception("Colliding policies for services");
-		//			}
-		//		}
-		//
-		//		
-		//		//check if an active connection or a dummy connectin is needed
-		//		Connection conn = null;
-		//		if(policies.contains(SecurityProperty.NoEncoding)) {
-		//			conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
-		//		} else {
-		//			conn = new Connection(senderVirtualAddress, receiverVirtualAddress);
-		//		}
-		//
-		//		boolean foundComSecMgr = false;
-		//		if (!this.communicationSecurityManagers.isEmpty()) {
-		//			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
-		//				if (matchingPolicies(policies, comSecMgr.getProperties())){
-		//					conn.setCommunicationSecMgr(comSecMgr);
-		//					foundComSecMgr = true;
-		//					break;
-		//				}
-		//			}
-		//		}
-		//		if (!foundComSecMgr 
-		//				&& policies.size() != 0 
-		//				&& !policies.contains(SecurityProperty.NoSecurity)) {
-		//			//no available communication security manager although required
-		//			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
-		//		}
+			List<SecurityProperty> policies, String[] requiredSecProps,
+			String[] availableComSecMgrs) throws Exception {
+		String foundMatchingComSecMgr = null;
+		
+		//check if requirements are not colliding in local policies
+		boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
+		boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
+		boolean justNoEncNoSec = policies.size() == 2 && noEncoding && noSecurity;
+		//if there are more requirements and noEnc or noSec is included it must be colliding
+		if (!justNoEncNoSec && (policies.size() > 1 && (noEncoding || noSecurity))) {
+			throw new Exception("Colliding policies for services");
+		}
+
+		//parse received security properties
+		List<SecurityProperty> requiredSecPropsList = new ArrayList<SecurityProperty>();
+		for(String secProp : requiredSecProps) {
+			requiredSecPropsList.add(SecurityProperty.valueOf(secProp));
+		}
+		//check if requirements are not colliding on requiring side
+		boolean noEncodingRequired = requiredSecPropsList.contains(SecurityProperty.NoEncoding);
+		boolean noSecurityRequired = requiredSecPropsList.contains(SecurityProperty.NoSecurity);
+		boolean justNoEncNoSecRequired = requiredSecPropsList.size() == 2 && noEncoding && noSecurity;
+		//if there are more requirements and noEnc or noSec is included it must be colliding
+		if (!justNoEncNoSecRequired &&
+				(requiredSecPropsList.size() > 1 && (noEncodingRequired || noSecurityRequired))) {
+			throw new Exception("Colliding policies for services");
+		}
+
+		//ensure that the two sides agree on encoding or no encoding
+		if(noEncodingRequired != noEncoding) {
+			return null;
+		}
+		
+		//go through the available comSecMgrs and check whether they can fulfill both requirements
+		if (!this.communicationSecurityManagers.isEmpty()) {
+			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
+				//first check against local policies
+				if (matchingPolicies(policies, comSecMgr.getProperties())){
+					//now check against received policies
+					if(matchingPolicies(requiredSecPropsList, comSecMgr.getProperties())) {
+						return comSecMgr.getClass().getName();
+					}
+				}
+			}
+		}
+		
+		//there was no matching comSecMgr so check whether no security is an option
+		if ((policies.size() != 0 && !noSecurity)) {
+			//no available communication security manager although required locally - that is a problem
+			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
+		}
+		if(noSecurity && noSecurityRequired) {
+			return SecurityProperty.NoSecurity.name();
+		}
+
 		return null;
 	}
 
@@ -535,7 +551,7 @@ public class ConnectionManager {
 	}
 
 	/**
-	 * Checks whether to sets of policies math each other.
+	 * Checks whether two sets of policies math each other.
 	 * @param required List of required properties
 	 * @param provided List of provided properties
 	 * @return
@@ -561,14 +577,14 @@ public class ConnectionManager {
 	private void handleUnsuccesfulHandshake(VirtualAddress remoteEndpoint, HandshakeConnection tempCon) {
 		connections.remove(tempCon);
 		tempCon.setFailed();
-		
+
 		Connection bannedConnection;
 		try {
-		bannedConnection = new Connection(nmCore.getService(), remoteEndpoint);
-		if(!bannedConnections.contains(bannedConnection)) {
-			this.bannedConnections.add(bannedConnection);	
-		}
-		this.timeouts.put(bannedConnection, Calendar.getInstance().getTime());
+			bannedConnection = new Connection(nmCore.getService(), remoteEndpoint);
+			if(!bannedConnections.contains(bannedConnection)) {
+				this.bannedConnections.add(bannedConnection);	
+			}
+			this.timeouts.put(bannedConnection, Calendar.getInstance().getTime());
 		} catch(RemoteException e) {
 			//local invocation
 		}

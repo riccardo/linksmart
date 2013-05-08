@@ -128,7 +128,7 @@ public class Connection {
 			//check if this is the handshake message which created this connection 
 			//because then we have to respond to it with an accept message
 			if(message.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
-				String usedSecurity = ConnectionManager.HANDSHAKE_ACCEPT;
+				String usedSecurity = ConnectionManager.HANDSHAKE_ACCEPT + " ";
 				usedSecurity = usedSecurity.concat(
 						(comSecMgr != null) ? 
 								comSecMgr.getClass().getName() :
