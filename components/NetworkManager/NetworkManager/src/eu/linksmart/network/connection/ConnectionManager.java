@@ -157,6 +157,7 @@ public class ConnectionManager {
 							|| (c.getClientVirtualAddress().equals(senderVirtualAddress) && c.getServerVirtualAddress().equals(receiverVirtualAddress)))){
 				//set last use date of connection
 				timeouts.put(c, cal.getTime());
+				setNotBusy();
 				return c;
 			}
 		}
@@ -166,6 +167,7 @@ public class ConnectionManager {
 			Connection conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
 			connections.add(conn);
 			timeouts.put(conn, cal.getTime());
+			setNotBusy();
 			return conn;
 		}
 		return null;
@@ -202,22 +204,21 @@ public class ConnectionManager {
 		Registration receiverRegInfo = idM.getServiceInfo(remoteEndpoint);
 		//check if the remote side is a local service and than do not start the handshake
 		if(receiverRegInfo != null && idM.getLocalServices().contains(receiverRegInfo)) {
+			setNotBusy();
 			return createConnectionForLocalServices(receiverVirtualAddress, senderVirtualAddress);
 		}
 
 		//this connection is temporal until the handshake is able to resolve the proper connection
 		HandshakeConnection tempCon = new HandshakeConnection(senderVirtualAddress, receiverVirtualAddress, this);
 		if(bannedConnections.contains(tempCon)) {
+			setNotBusy();
 			return null;
 		} else {
 			connections.add(tempCon);
 		}
 		
 		//it is possible to release the lock now as the handshake connection is created
-		synchronized(this) {
-			setNotBusy();
-			this.notifyAll();
-		}
+		setNotBusy();
 
 		//try to open message in standard way
 		Message handshakeMessage = 
@@ -613,6 +614,9 @@ public class ConnectionManager {
 	
 	public void setNotBusy() {
 		this.busy = false;
+		synchronized(this) {
+			this.notifyAll();
+		}
 	}
 
 	/**
