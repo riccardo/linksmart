@@ -159,7 +159,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		return isInitialized;
 	}
 
-	public Message processMessage(Message msg) throws CryptoException, VerificationFailureException, IOException{
+	public synchronized Message processMessage(Message msg) throws CryptoException, VerificationFailureException, IOException{
 		if(msg == lastSent)
 			return msg;
 		if(!isInitialized){
@@ -321,13 +321,13 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 		return msg;
 	}
 
-	public Message protectMessage(Message msg) throws Exception {
+	public synchronized Message protectMessage(Message msg) throws Exception {
 		String encryptedMessage = asymEncrypt(new String(msg.getData()), msg.getReceiverVirtualAddress().toString());
 		msg.setData(encryptedMessage.getBytes());
 		return msg;
 	}
 
-	public Message unprotectMessage(Message msg) throws Exception {
+	public synchronized Message unprotectMessage(Message msg) throws Exception {
 		String decryptedMessage = asymDecrypt(new String(msg.getData()));
 		msg.setData(decryptedMessage.getBytes());
 		return msg;

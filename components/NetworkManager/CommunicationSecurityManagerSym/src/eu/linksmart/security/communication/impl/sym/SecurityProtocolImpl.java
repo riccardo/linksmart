@@ -227,7 +227,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		return isInitialized;
 	}
 
-	public Message processMessage(Message msg) throws CryptoException, VerificationFailureException, IOException{
+	public synchronized Message processMessage(Message msg) throws CryptoException, VerificationFailureException, IOException{
 		if(lastSent == msg)
 			return msg;
 		if(!isInitialized){
@@ -301,7 +301,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		return msg;
 	}
 
-	public Message protectMessage(Message msg) throws Exception {
+	public synchronized Message protectMessage(Message msg) throws Exception {
 		if(!isInitialized){
 			throw new Exception("Cannot protect message as not initialized");
 		}
@@ -380,7 +380,7 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		return msg;
 	}
 
-	public Message unprotectMessage(Message msg) throws Exception {
+	public synchronized Message unprotectMessage(Message msg) throws Exception {
 		//check if this is a handshake message because then the protocol should restart
 		if(msg.getTopic().equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
 			Command cmd = getCommand(msg);
