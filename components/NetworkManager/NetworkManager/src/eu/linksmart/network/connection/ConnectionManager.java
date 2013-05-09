@@ -82,6 +82,7 @@ public class ConnectionManager {
 
 	private NetworkManagerCore nmCore;
 	private IdentityManager idM;
+	private boolean busy;
 
 
 	public ConnectionManager(NetworkManagerCore nmCore){
@@ -210,6 +211,12 @@ public class ConnectionManager {
 			return null;
 		} else {
 			connections.add(tempCon);
+		}
+		
+		//it is possible to release the lock now as the handshake connection is created
+		synchronized(this) {
+			setNotBusy();
+			this.notifyAll();
 		}
 
 		//try to open message in standard way
@@ -574,7 +581,12 @@ public class ConnectionManager {
 		connections.remove(con);
 		timeouts.remove(con);
 	}
-
+	
+	/**
+	 * Puts the remote endpoint on the banned list until the connection timeout expires.
+	 * @param remoteEndpoint The remote side of the communication
+	 * @param tempCon The created handshake connection
+	 */
 	private void handleUnsuccesfulHandshake(VirtualAddress remoteEndpoint, HandshakeConnection tempCon) {
 		connections.remove(tempCon);
 		tempCon.setFailed();
@@ -589,6 +601,18 @@ public class ConnectionManager {
 		} catch(RemoteException e) {
 			//local invocation
 		}
+	}
+	
+	public void setBusy() {
+		this.busy = true;
+	}
+	
+	public boolean isBusy() {
+		return this.busy;
+	}
+	
+	public void setNotBusy() {
+		this.busy = false;
 	}
 
 	/**
