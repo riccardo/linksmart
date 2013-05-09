@@ -15,7 +15,7 @@ public class HandshakeConnection extends Connection{
 	}
 
 	@Override
-	public synchronized Message processData(VirtualAddress senderVirtualAddress,
+	public Message processData(VirtualAddress senderVirtualAddress,
 			VirtualAddress receiverVirtualAddress, byte[] data) {
 		Message msg = MessageSerializerUtiliy.unserializeMessage(
 				data,
@@ -28,20 +28,22 @@ public class HandshakeConnection extends Connection{
 		if(msg.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
 			return msg;
 		} else {
-			while(!resolved) {
-				try {
-					this.wait(10000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+			synchronized(this) {
+				while(!resolved) {
+					try {
+						this.wait(10000);
+					} catch (InterruptedException e) {
+						//nothing to handle
+					}
 				}
 			}
 			if(!failed) {
-			//get the newly created properly set up connection to process the messages
-			return conMgr.
-					getConnection(
-							this.getServerVirtualAddress(),
-							this.getClientVirtualAddress()).
-							processData(senderVirtualAddress, receiverVirtualAddress, data);
+				//get the newly created properly set up connection to process the messages
+				return conMgr.
+						getConnection(
+								this.getServerVirtualAddress(),
+								this.getClientVirtualAddress()).
+								processData(senderVirtualAddress, receiverVirtualAddress, data);
 			} else {
 				return null;
 			}
@@ -53,20 +55,22 @@ public class HandshakeConnection extends Connection{
 		if(msg.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
 			return MessageSerializerUtiliy.serializeMessage(msg, true);
 		} else {
-			while(!resolved) {
-				try {
-					this.wait(2500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+			synchronized(this) {
+				while(!resolved) {
+					try {
+						this.wait(2500);
+					} catch (InterruptedException e) {
+						//nothing to handle
+					}
 				}
 			}
 			if(!failed) {
-			//get the newly created properly set up connection to process the messages
-			return conMgr.
-					getConnection(
-							this.getServerVirtualAddress(),
-							this.getClientVirtualAddress())
-							.processMessage(msg);
+				//get the newly created properly set up connection to process the messages
+				return conMgr.
+						getConnection(
+								this.getServerVirtualAddress(),
+								this.getClientVirtualAddress())
+								.processMessage(msg);
 			} else {
 				return null;
 			}
@@ -77,11 +81,11 @@ public class HandshakeConnection extends Connection{
 		resolved = true;
 		notifyAll();
 	}
-	
+
 	public synchronized void setFailed() {
 		failed = true;
 		setStateResolved();
 	}
-	
-	
+
+
 }
