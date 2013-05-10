@@ -198,7 +198,6 @@ public class ConnectionManager {
 		if(receiverVirtualAddress.equals(nmCore.getService()) || senderVirtualAddress.equals(nmCore.getService())) {
 			//get virtual address of remote entity
 			remoteEndpoint = nmCore.getService().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
-
 		}
 
 		Registration receiverRegInfo = idM.getServiceInfo(remoteEndpoint);
@@ -216,9 +215,14 @@ public class ConnectionManager {
 		} else {
 			connections.add(tempCon);
 		}
-		
+
 		//it is possible to release the lock now as the handshake connection is created
 		setNotBusy();
+		
+		//if the policies are not there yet add the endpoint
+		if(!servicePolicies.containsKey(remoteEndpoint)) {	
+			nmCore.addRemoteVirtualAddress(remoteEndpoint, remoteEndpoint);
+		}
 
 		//try to open message in standard way
 		Message handshakeMessage = 
@@ -250,7 +254,7 @@ public class ConnectionManager {
 
 			String[] availableComSecMgrs = properties.getProperty(HANDSHAKE_COMSECMGRS_KEY).split(";");
 			String[] requiredSecProps = properties.getProperty(HANDSHAKE_SECPROPS_KEY).split(";");
-
+			
 			//find common agreement of provided CommunicationSecurityManagers and required policies
 			comSecMgrName = findMatchingCommunicationSecurityManager(
 					servicePolicies.get(remoteEndpoint),
@@ -367,7 +371,7 @@ public class ConnectionManager {
 	private String findMatchingCommunicationSecurityManager(
 			List<SecurityProperty> policies, String[] requiredSecProps,
 			String[] availableComSecMgrs) throws Exception {
-		
+
 		//check if requirements are not colliding in local policies
 		boolean noEncoding = policies.contains(SecurityProperty.NoEncoding);
 		boolean noSecurity = policies.contains(SecurityProperty.NoSecurity);
@@ -396,7 +400,7 @@ public class ConnectionManager {
 		if(noEncodingRequired != noEncoding) {
 			return null;
 		}
-		
+
 		//go through the available comSecMgrs and check whether they can fulfill both requirements
 		boolean ownRequirementsOk = false;
 		if (!this.communicationSecurityManagers.isEmpty()) {
@@ -411,7 +415,7 @@ public class ConnectionManager {
 				}
 			}
 		}
-		
+
 		//there was no matching comSecMgr so check whether no security is an option
 		if ((policies.size() != 0 && !noSecurity && !ownRequirementsOk)) {
 			//no available communication security manager although required locally - that is a problem
@@ -435,8 +439,7 @@ public class ConnectionManager {
 			comSecMgrNames.append(comSecMgr.getClass().getName() + ";");
 		}
 
-		//compose list of security properties required by own configuration
-		//as we initiate the communication we already know the server
+		//compose list of security properties required by own configuration		
 		StringBuilder secProperties = new StringBuilder();
 		for (SecurityProperty prop : servicePolicies.get(receiverVirtualAddress)) {
 			secProperties.append(prop.name() + ";");
@@ -582,7 +585,7 @@ public class ConnectionManager {
 		connections.remove(con);
 		timeouts.remove(con);
 	}
-	
+
 	/**
 	 * Puts the remote endpoint on the banned list until the connection timeout expires.
 	 * @param remoteEndpoint The remote side of the communication
@@ -603,15 +606,15 @@ public class ConnectionManager {
 			//local invocation
 		}
 	}
-	
+
 	public void setBusy() {
 		this.busy = true;
 	}
-	
+
 	public boolean isBusy() {
 		return this.busy;
 	}
-	
+
 	public void setNotBusy() {
 		this.busy = false;
 		synchronized(this) {
