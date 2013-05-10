@@ -53,7 +53,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	public final static String SERVICE_ATTR_RESOLVE_ID = "RequestIdentifier";
 
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
-	.getSimpleName();
+			.getSimpleName();
 
 	protected static long SERVICE_KEEP_ALIVE_MS = (long)(2*60*1000);
 
@@ -278,7 +278,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			// once, which is the
 			// desired behavior
 			for (Iterator<Registration> it = allDescriptions.iterator(); it
-			.hasNext();) {
+					.hasNext();) {
 				Registration serviceInfo = it.next();
 				try {
 					oneDescription = serviceInfo.getDescription();
@@ -555,7 +555,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		Random rand = new Random();
 		long respRandom = rand.nextLong();
 		List<AttributeResolveResponse> matchesFilterList = 
-			new ArrayList<AttributeResolveResponse>();
+				new ArrayList<AttributeResolveResponse>();
 		//create Bloom-filters for all matches
 		for(Registration serviceInfo : matches) {
 			//collect queried attributes
@@ -575,9 +575,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			//create bloom filter with new random
 			String[] values = new String[attributes.size()];
 			boolean[] bloom = 
-				BloomFilterFactory.createBloomFilter(attributes.toArray(values), respRandom);
+					BloomFilterFactory.createBloomFilter(attributes.toArray(values), respRandom);
 			AttributeResolveFilter match = 
-				new AttributeResolveFilter(bloom, attrKeys, respRandom, filter.getIsStrictRequest());
+					new AttributeResolveFilter(bloom, attrKeys, respRandom, filter.getIsStrictRequest());
 			//put filter of match into collection of matches
 			matchesFilterList.add(new AttributeResolveResponse(serviceInfo.getVirtualAddress(), match));
 		}
@@ -653,14 +653,14 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					ByteArrayInputStream bis = new ByteArrayInputStream(resp.getData());
 					ObjectInputStream ois = new ObjectInputStream(bis);
 					filterResponses = 
-						(List<AttributeResolveResponse>) ois.readObject();
+							(List<AttributeResolveResponse>) ois.readObject();
 				} catch (IOException e) {
 					LOG.warn("Could not read attribute resolve response.",e);
 					return null;
 				} catch (ClassNotFoundException e) {
 					LOG.warn(
 							"Attribute resolve response contained wrong object from VirtualAddress:"
-							+ msg.getSenderVirtualAddress(),e);
+									+ msg.getSenderVirtualAddress(),e);
 				}
 
 				//check all Services in message which possibly match
@@ -685,7 +685,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					if(checkAttributesAgainstFilter(filter, attributes)) {
 						//only include attributes in Registration which matched
 						Part[] foundAttr = 
-							new Part[filter.getAttributeKeys().split(";").length];
+								new Part[filter.getAttributeKeys().split(";").length];
 						int nrAttrs = 0;
 						for(Part part : attributes) {
 							if(filter.getAttributeKeys().contains(part.getKey())) {
@@ -745,7 +745,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		//compose the message
 		AttributeResolveFilter attrRF = 
-			new AttributeResolveFilter(bloomFilter, attrKeys, random, isStrictRequest);
+				new AttributeResolveFilter(bloomFilter, attrKeys, random, isStrictRequest);
 
 		//serialize query
 		byte[] serializedMsg = null;
@@ -783,9 +783,13 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						Iterator<Registration> i = serviceInfos.iterator();
 						while (i.hasNext()) {
 							Registration oneServiceInfo = i.next();
-							addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo);
-							// Add the backbone route for this remote VirtualAddress
-							networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(), oneServiceInfo.getVirtualAddress());
+							//only update information if it is not equal to last value
+							Registration heldRegistration = remoteServices.get(oneServiceInfo.getVirtualAddress());
+							if (heldRegistration != null && !heldRegistration.equals(oneServiceInfo)) {
+								addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo);
+								// Add the backbone route for this remote VirtualAddress
+								networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(), oneServiceInfo.getVirtualAddress());
+							}
 						}
 					}
 				}
@@ -890,7 +894,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected Registration removeRemoteService(VirtualAddress virtualAddress) {
 		serviceLastUpdate.remove(virtualAddress);
 		Registration removal = remoteServices.remove(virtualAddress);
-		
+
 		//if this check were not here this would result an infinite loop 
 		if(removal != null) {
 			try {
@@ -1067,7 +1071,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						if(networkManagerCore != null) {
 							try {
 								LOG.debug("Removing VirtualAddress " + virtualAddress.toString() + 
-								"as it was not updated recently.");
+										"as it was not updated recently.");
 								networkManagerCore.removeService(virtualAddress);
 							} catch(RemoteException e) {
 								//local access
