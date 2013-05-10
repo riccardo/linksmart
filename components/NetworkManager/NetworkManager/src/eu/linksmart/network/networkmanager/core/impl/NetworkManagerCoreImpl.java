@@ -179,7 +179,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					.getBackboneSecurityProperties(backboneName);
 			if(properties != null) {
 				// register VirtualAddress with backbone policies in connection manager
-				this.connectionManager.registerServicePolicy(newRegistration.getVirtualAddress(), properties);
+				this.connectionManager.registerServicePolicy(newRegistration.getVirtualAddress(), properties, true);
 			}
 			// add route to selected backbone
 			this.backboneRouter.addRouteToBackbone(newRegistration.getVirtualAddress(), backboneName,
@@ -642,7 +642,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		String backbone = this.backboneRouter.getRouteBackbone(remoteVirtualAddress);
 		List<SecurityProperty> secProps = this.backboneRouter.getBackboneSecurityProperties(backbone);
 		if(secProps != null) {
-			connectionManager.registerServicePolicy(remoteVirtualAddress, secProps);
+			connectionManager.registerServicePolicy(remoteVirtualAddress, secProps, false);
 		}
 	}
 
@@ -699,7 +699,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			List<SecurityProperty> properties) {
 		for(VirtualAddress virtualAddress : virtualAddressesToUpdate) {
 			// register VirtualAddress with backbone policies in connection manager
-			this.connectionManager.registerServicePolicy(virtualAddress, properties);
+			this.connectionManager.registerServicePolicy(virtualAddress, properties, true);
 		}
 	}
 

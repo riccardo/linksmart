@@ -108,27 +108,34 @@ public class ConnectionManager {
 	 * Saves this VirtualAddress to always use a specific configuration.
 	 * This includes for example type of security to use.
 	 * @param regulatedVirtualAddress 
+	 * @param forceChange if true and the policy existed before it is overwritten
 	 */
-	public void registerServicePolicy(VirtualAddress regulatedVirtualAddress, List<SecurityProperty> properties){
+	public void registerServicePolicy(
+			VirtualAddress regulatedVirtualAddress, List<SecurityProperty> properties, boolean forceChange){
 		synchronized(policyModificationLock){
-			/*remove all connections which have this virtual address*/
-			List<Connection> toRemove = new ArrayList<Connection>();
-			//find the relevant connections
-			for(Connection con : connections) {
-				if(con.getServerVirtualAddress().equals(regulatedVirtualAddress) 
-						|| (!(con instanceof BroadcastConnection) 
-								&& con.getClientVirtualAddress().equals(regulatedVirtualAddress))) {
-					toRemove.add(con);
+			if (!servicePolicies.containsKey(regulatedVirtualAddress)) {
+				//add new policy
+				this.servicePolicies.put(regulatedVirtualAddress, properties);
+			} else if (forceChange) {
+				/*remove all connections which have this virtual address*/
+				List<Connection> toRemove = new ArrayList<Connection>();
+				//find the relevant connections
+				for(Connection con : connections) {
+					if(con.getServerVirtualAddress().equals(regulatedVirtualAddress) 
+							|| (!(con instanceof BroadcastConnection) 
+									&& con.getClientVirtualAddress().equals(regulatedVirtualAddress))) {
+						toRemove.add(con);
+					}
 				}
-			}
-			if(toRemove.size() != 0) {
-				//remove collected connections
-				for(Connection con : toRemove) {
-					deleteConnection(con);
+				if(toRemove.size() != 0) {
+					//remove collected connections
+					for(Connection con : toRemove) {
+						deleteConnection(con);
+					}
 				}
+				//add new policy
+				this.servicePolicies.put(regulatedVirtualAddress, properties);
 			}
-			//add new policy
-			this.servicePolicies.put(regulatedVirtualAddress, properties);
 		}
 	}
 
