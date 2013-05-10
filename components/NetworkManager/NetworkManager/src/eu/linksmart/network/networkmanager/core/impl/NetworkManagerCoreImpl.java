@@ -224,10 +224,15 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					conn = getConnection(myVirtualAddress, senderVirtualAddress, data);
 					//no common connection parameters could be established with the other end
 					if(conn == null) {
-						NMResponse response = new NMResponse();
-						response.setStatus(NMResponse.STATUS_ERROR);
-						response.setMessage("No common connection parameters could be established with remote service");
-						return response;
+						if(this.connectionManager.isHandshakeMessage(
+								data, senderVirtualAddress, receiverVirtualAddress)) {
+							return this.connectionManager.getDeclineHandshakeMessage(
+									this.getService(), receiverVirtualAddress);
+						} else {
+							NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
+							response.setMessage("Could not establish common communication parameters");
+							return response;
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -337,10 +342,15 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					conn = getConnection(myVirtualAddress, senderVirtualAddress, data);
 					//no common connection parameters could be established with the other end
 					if(conn == null) {
-						NMResponse response = new NMResponse();
-						response.setStatus(NMResponse.STATUS_ERROR);
-						response.setMessage("No common connection parameters could be established with remote service");
-						return response;
+						if(this.connectionManager.isHandshakeMessage(
+								data, senderVirtualAddress, receiverVirtualAddress)) {
+							return this.connectionManager.getDeclineHandshakeMessage(
+									this.getService(), receiverVirtualAddress);
+						} else {
+							NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
+							response.setMessage("Could not establish common communication parameters");
+							return response;
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -493,13 +503,18 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		try {
 			Connection connection = getConnection(
 					receiverVirtualAddress, myVirtualAddress, message.getData());
-			
+
 			//no common connection parameters could be established with the other end
 			if(connection == null) {
-				NMResponse response = new NMResponse();
-				response.setStatus(NMResponse.STATUS_ERROR);
-				response.setMessage("No common connection parameters could be established with remote service");
-				return response;
+				if(this.connectionManager.isHandshakeMessage(
+						message.getData(), senderVirtualAddress, receiverVirtualAddress)) {
+					return this.connectionManager.getDeclineHandshakeMessage(
+							this.getService(), receiverVirtualAddress);
+				} else {
+					NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
+					response.setMessage("Could not establish common communication parameters");
+					return response;
+				}	
 			}
 			data = connection.processMessage(message);
 		} catch (Exception e) {
@@ -542,9 +557,15 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 
 			//no common connection parameters could be established with the other end
 			if(connection == null) {
-				response.setStatus(NMResponse.STATUS_ERROR);
-				response.setMessage("No common connection parameters could be established with remote service");
-				return response;
+				if(this.connectionManager.isHandshakeMessage(
+						message.getData(), senderVirtualAddress, receiverVirtualAddress)) {
+					return this.connectionManager.getDeclineHandshakeMessage(
+							this.getService(), receiverVirtualAddress);
+				} else {
+					response.setStatus(NMResponse.STATUS_ERROR);
+					response.setMessage("Could not establish common communication parameters");
+					return response;
+				}
 			}
 			// process outgoing message
 			data = connection.processMessage(tempMessage);
@@ -680,7 +701,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			this.connectionManager.registerServicePolicy(virtualAddress, properties);
 		}
 	}
-	
+
 	private Connection getConnection(
 			VirtualAddress receiverVirtualAddress,
 			VirtualAddress senderVirtualAddress,
@@ -697,7 +718,6 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			}
 			connectionManager.setBusy();
 		}
-		
 		Connection con = this.connectionManager.getConnection(receiverVirtualAddress, senderVirtualAddress);
 		if(con == null) {
 			try {
@@ -705,8 +725,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			} catch (Exception e) {
 				LOG.error(
 						"Error getting connection for entities " 
-				+ receiverVirtualAddress + " " + senderVirtualAddress,
-						e);
+								+ receiverVirtualAddress + " " + senderVirtualAddress,
+								e);
 			}
 		}
 		return con;

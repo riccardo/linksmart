@@ -108,12 +108,14 @@ public class Connection {
 		if (securityProtocol != null && securityProtocol.isInitialized()) {
 			// if protocol is initialized than open message with it
 			try {
-				message = MessageSerializerUtiliy.unserializeMessage(data, false, senderVirtualAddress, receiverVirtualAddress);
+				message = MessageSerializerUtiliy.unserializeMessage(
+						data, false, senderVirtualAddress, receiverVirtualAddress, true);
 				message = securityProtocol.unprotectMessage(message);
 				//use data field of message to reconstruct original message
 				if(!message.getTopic().
 						equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
-					message = MessageSerializerUtiliy.unserializeMessage(message.getData(), true, senderVirtualAddress, receiverVirtualAddress);
+					message = MessageSerializerUtiliy.unserializeMessage(
+							message.getData(), true, senderVirtualAddress, receiverVirtualAddress, true);
 				}
 			} catch (Exception e) {
 				logger.debug("Cannot unprotect message from VirtualAddress: "
@@ -124,7 +126,8 @@ public class Connection {
 						e.getMessage().getBytes());
 			}
 		} else { 
-			message = MessageSerializerUtiliy.unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress);
+			message = MessageSerializerUtiliy.unserializeMessage(
+					data, true, senderVirtualAddress, receiverVirtualAddress, true);
 			//check if this is the handshake message which created this connection 
 			//because then we have to respond to it with an accept message
 			if(message.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
@@ -204,7 +207,7 @@ public class Connection {
 	public byte[] processMessage(Message msg) throws Exception {
 		//connection handshake messeages are passed through
 		if(msg.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
-			return MessageSerializerUtiliy.serializeMessage(msg, true);
+			return MessageSerializerUtiliy.serializeMessage(msg, true, true);
 		}
 		SecurityProtocol securityProtocol = getSecurityProtocol(msg.getSenderVirtualAddress(), msg.getReceiverVirtualAddress());
 		if (securityProtocol != null && !securityProtocol.isInitialized()) {
@@ -215,7 +218,7 @@ public class Connection {
 		}
 
 		//serialize the message into one stream to protect it
-		byte[] serializedCommand = MessageSerializerUtiliy.serializeMessage(msg, true);
+		byte[] serializedCommand = MessageSerializerUtiliy.serializeMessage(msg, true, true);
 		//protect the stream if should be
 		if (securityProtocol != null
 				&& securityProtocol.isInitialized()
@@ -229,7 +232,7 @@ public class Connection {
 			msg.setData(serializedCommand);
 			msg = securityProtocol.protectMessage(msg);
 			//serialize the propertyless created protected dummy message
-			return MessageSerializerUtiliy.serializeMessage(msg, false);
+			return MessageSerializerUtiliy.serializeMessage(msg, false, true);
 		} else {
 			return serializedCommand;
 		}
@@ -274,7 +277,7 @@ public class Connection {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Connection) {
+		if(obj.getClass().equals(this.getClass())) {
 			Connection c = (Connection)obj;
 			if(c.getClientVirtualAddress() != null) {
 				if((c.getClientVirtualAddress().equals(this.clientVirtualAddress) && c.getServerVirtualAddress().equals(c.serverVirtualAddress))

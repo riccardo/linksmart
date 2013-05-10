@@ -218,23 +218,23 @@ public class ConnectionManager {
 
 		//it is possible to release the lock now as the handshake connection is created
 		setNotBusy();
-		
+
 		//if the policies are not there yet add the endpoint
 		if(!servicePolicies.containsKey(remoteEndpoint)) {	
 			nmCore.addRemoteVirtualAddress(remoteEndpoint, remoteEndpoint);
 		}
 
-		//try to open message in standard way
-		Message handshakeMessage = 
-				MessageSerializerUtiliy.
-				unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress);
+
 
 		//if the message could not be opened or it was opened and it is not a handshake message we start the handshake
-		if(handshakeMessage instanceof ErrorMessage 
-				|| !handshakeMessage.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
+		if(!isHandshakeMessage(data, senderVirtualAddress, receiverVirtualAddress)) {
 			comSecMgrName = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress);
-		} else if (handshakeMessage.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)){
+		} else {
 			//we received a handshake message
+			//try to open message in standard way
+			Message handshakeMessage = 
+					MessageSerializerUtiliy.
+					unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress, true);
 			//open handshake body
 			Properties properties = new Properties();
 			try {
@@ -254,7 +254,7 @@ public class ConnectionManager {
 
 			String[] availableComSecMgrs = properties.getProperty(HANDSHAKE_COMSECMGRS_KEY).split(";");
 			String[] requiredSecProps = properties.getProperty(HANDSHAKE_SECPROPS_KEY).split(";");
-			
+
 			//find common agreement of provided CommunicationSecurityManagers and required policies
 			comSecMgrName = findMatchingCommunicationSecurityManager(
 					servicePolicies.get(remoteEndpoint),
@@ -386,6 +386,9 @@ public class ConnectionManager {
 		for(String secProp : requiredSecProps) {
 			requiredSecPropsList.add(SecurityProperty.valueOf(secProp));
 		}
+		//parse received ComSecMgrs
+		List<String> requiredComSecMgrList = Arrays.asList(availableComSecMgrs);
+
 		//check if requirements are not colliding on requiring side
 		boolean noEncodingRequired = requiredSecPropsList.contains(SecurityProperty.NoEncoding);
 		boolean noSecurityRequired = requiredSecPropsList.contains(SecurityProperty.NoSecurity);
@@ -409,7 +412,8 @@ public class ConnectionManager {
 				if (matchingPolicies(policies, comSecMgr.getProperties())){
 					ownRequirementsOk = true;
 					//now check against received policies
-					if(matchingPolicies(requiredSecPropsList, comSecMgr.getProperties())) {
+					if(requiredComSecMgrList.contains(comSecMgr.getClass().getName()) &&
+							matchingPolicies(requiredSecPropsList, comSecMgr.getProperties())) {
 						return comSecMgr.getClass().getName();
 					}
 				}
@@ -650,5 +654,85 @@ public class ConnectionManager {
 				}
 			}
 		}	
+	}
+
+	/**
+	 * Returns the declining handshake message for the provided entities.
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
+	 * @return
+	 */
+	public NMResponse getDeclineHandshakeMessage(
+			VirtualAddress senderVirtualAddress,
+			VirtualAddress receiverVirtualAddress) {
+		String declineMessage = HANDSHAKE_DECLINE + " ";
+		VirtualAddress nmVA = null;
+		try {
+			nmVA = nmCore.getService();
+		} catch (RemoteException e1) {
+			//local invocation
+		}
+		//find the policies which would have been required
+		//the remote side of this connection
+		VirtualAddress remoteEndpoint = null;
+		if(receiverVirtualAddress.equals(nmVA) || senderVirtualAddress.equals(nmVA)) {
+			//get virtual address of remote entity
+			remoteEndpoint = nmVA.equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
+		}
+		//add the policies
+		if(servicePolicies.containsKey(remoteEndpoint)) {
+			StringBuilder secProperties = new StringBuilder();
+			for (SecurityProperty prop : servicePolicies.get(remoteEndpoint)) {
+				secProperties.append(prop.name() + ";");
+			}
+			declineMessage = declineMessage.concat(secProperties.toString());
+		}
+
+		NMResponse resp = new NMResponse(NMResponse.STATUS_ERROR);
+		Connection tempCon = null;
+		for(Connection c : bannedConnections) {
+			if(!(c instanceof BroadcastConnection) &&
+					((c.getClientVirtualAddress().equals(nmVA) && c.getServerVirtualAddress().equals(remoteEndpoint))
+							|| (c.getClientVirtualAddress().equals(remoteEndpoint) && c.getServerVirtualAddress().equals(nmVA)))){
+				tempCon = c;
+			}
+		}
+		if(tempCon != null) {
+			ErrorMessage errorMsg = 
+					new ErrorMessage(
+							ErrorMessage.TOPIC_CONNECTION_HANDSHAKE,
+							senderVirtualAddress, receiverVirtualAddress, 
+							declineMessage.getBytes());
+			try {
+				resp.setMessage(new String(tempCon.processMessage(errorMsg)));
+			} catch (Exception e) {
+				resp.setMessage(declineMessage);
+			}
+		} else {
+			resp.setMessage(declineMessage);
+		}
+		return resp;
+	}
+
+	/**
+	 * Checks whether the data contains a message with handshake topic
+	 * @param data
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
+	 * @return
+	 */
+	public boolean isHandshakeMessage(byte[] data, 
+			VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress) {
+		//try to open message in standard way
+		Message handshakeMessage = 
+				MessageSerializerUtiliy.
+				unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress, false);
+		if(handshakeMessage instanceof ErrorMessage 
+				|| !handshakeMessage.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
+			return false;
+		} else if (handshakeMessage.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)){
+			return true;
+		}
+		return false;
 	}
 }

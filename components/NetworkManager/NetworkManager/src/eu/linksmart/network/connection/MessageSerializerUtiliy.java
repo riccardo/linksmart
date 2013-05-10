@@ -31,7 +31,8 @@ public class MessageSerializerUtiliy {
 	 * @param includeProperties
 	 * @return
 	 */
-	public static byte[] serializeMessage(Message msg, boolean includeProperties) {
+	public static byte[] serializeMessage(Message msg, boolean includeProperties,
+			boolean showException) {
 		Properties props = new Properties();
 		if(includeProperties) {
 			// read the properties of the message and put it into the properties
@@ -51,7 +52,7 @@ public class MessageSerializerUtiliy {
 			props.storeToXML(bos, null);
 			serializedCommand = bos.toByteArray();
 		} catch (IOException e) {
-			logger.warn("Message to be sent cannot be parsed!");
+			if(showException)logger.warn("Message to be sent cannot be parsed!");
 		} finally {
 			try {
 				bos.close();
@@ -70,20 +71,22 @@ public class MessageSerializerUtiliy {
 	 * @param receiverVirtualAddress
 	 * @return
 	 */
-	public static Message unserializeMessage(byte[] serializedMsg, boolean includeProps, VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress) {
+	public static Message unserializeMessage(byte[] serializedMsg,
+			boolean includeProps, VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
+			boolean showException) {
 		// open data and divide it into properties of the message and
 		// application data
 		Properties properties = new Properties();
 		try {
 			properties.loadFromXML(new ByteArrayInputStream(serializedMsg));
 		} catch (InvalidPropertiesFormatException e) {
-			logger.warn(
+			if(showException)logger.warn(
 					"Unable to load properties from XML data. Data is not valid XML: "
 					+ new String(serializedMsg));
 			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
 					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());
 		} catch (IOException e) {
-			logger.warn("Unable to load properties from XML data: "
+			if(showException)logger.warn("Unable to load properties from XML data: "
 					+ new String(serializedMsg));
 			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
 					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());

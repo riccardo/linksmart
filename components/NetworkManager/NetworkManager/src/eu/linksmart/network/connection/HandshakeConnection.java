@@ -21,7 +21,7 @@ public class HandshakeConnection extends Connection{
 				data,
 				true,
 				senderVirtualAddress,
-				receiverVirtualAddress);
+				receiverVirtualAddress, true);
 		if(msg instanceof ErrorMessage) {
 			return msg;
 		}
@@ -53,7 +53,7 @@ public class HandshakeConnection extends Connection{
 	@Override
 	public byte[] processMessage(Message msg) throws Exception {
 		if(msg.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
-			return MessageSerializerUtiliy.serializeMessage(msg, true);
+			return MessageSerializerUtiliy.serializeMessage(msg, true, true);
 		} else {
 			synchronized(this) {
 				while(!resolved) {
