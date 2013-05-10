@@ -49,6 +49,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
 	private static final String STARTING_MESSAGE = "Starting"
 			+ NETWORK_MGR_CORE;
+	private static final String COMMUNICATION_PARAMETERS_ERROR = "Could not establish common communication parameters with remote endpoint";
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
 	private static String NETWORK_MGR_ENDPOINT = "http://localhost:9090/cxf/services/NetworkManager";
@@ -227,10 +228,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 						if(this.connectionManager.isHandshakeMessage(
 								data, senderVirtualAddress, receiverVirtualAddress)) {
 							return this.connectionManager.getDeclineHandshakeMessage(
-									this.getService(), receiverVirtualAddress);
+									senderVirtualAddress, getService());
 						} else {
 							NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
-							response.setMessage("Could not establish common communication parameters");
+							response.setMessage(COMMUNICATION_PARAMETERS_ERROR);
 							return response;
 						}
 					}
@@ -345,10 +346,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 						if(this.connectionManager.isHandshakeMessage(
 								data, senderVirtualAddress, receiverVirtualAddress)) {
 							return this.connectionManager.getDeclineHandshakeMessage(
-									this.getService(), receiverVirtualAddress);
+									senderVirtualAddress, getService());
 						} else {
 							NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
-							response.setMessage("Could not establish common communication parameters");
+							response.setMessage(COMMUNICATION_PARAMETERS_ERROR);
 							return response;
 						}
 					}
@@ -512,7 +513,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 							this.getService(), receiverVirtualAddress);
 				} else {
 					NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
-					response.setMessage("Could not establish common communication parameters");
+					response.setMessage(COMMUNICATION_PARAMETERS_ERROR);
 					return response;
 				}	
 			}
@@ -563,7 +564,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 							this.getService(), receiverVirtualAddress);
 				} else {
 					response.setStatus(NMResponse.STATUS_ERROR);
-					response.setMessage("Could not establish common communication parameters");
+					response.setMessage(COMMUNICATION_PARAMETERS_ERROR);
 					return response;
 				}
 			}
