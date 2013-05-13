@@ -785,7 +785,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 							Registration oneServiceInfo = i.next();
 							//only update information if it is not equal to last value
 							Registration heldRegistration = remoteServices.get(oneServiceInfo.getVirtualAddress());
-							if (heldRegistration != null && !heldRegistration.equals(oneServiceInfo)) {
+							if (heldRegistration == null || (heldRegistration != null && !heldRegistration.equals(oneServiceInfo))) {
 								addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo);
 								// Add the backbone route for this remote VirtualAddress
 								networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(), oneServiceInfo.getVirtualAddress());
