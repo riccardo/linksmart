@@ -118,7 +118,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 				if(!header.toLowerCase().startsWith("http")) {
 					String[] headerParts = header.split(":");
 					if(headerParts.length == 2) {
-						response.setHeader(headerParts[0], headerParts[1]);
+						response.setHeader(headerParts[0], headerParts[1].trim());
 					}
 				}
 				i++;
