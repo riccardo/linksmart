@@ -178,7 +178,7 @@ namespace EventManager
             string resultAddress = string.Empty;
             try
             {
-                if (Properties.Settings.Default.EventManagerVersion.Equals("2.0"))
+                if (Properties.Settings.Default.NetworkManagerVersion.Equals("2.0"))
                 {
                        NetworkManager20ServiceReference.NetworkManager nm = new NetworkManager20ServiceReference.NetworkManager();
                     NetworkManager20ServiceReference.Part a = new NetworkManager20ServiceReference.Part();
@@ -235,7 +235,7 @@ namespace EventManager
         public static void DeregisterOtherDescriptionsAtNetworkManager()
         {
             Console.WriteLine("Removing other registered HIDs for {0} at Network Manager",EventManagerImplementation.Description);
-            if (Properties.Settings.Default.EventManagerVersion.Equals("2.0"))
+            if (Properties.Settings.Default.NetworkManagerVersion.Equals("2.0"))
             {
                 NetworkManager20ServiceReference.NetworkManager nm = new NetworkManager20ServiceReference.NetworkManager();
                 var registrations = nm.getServiceByDescription(EventManagerImplementation.Description);
@@ -303,7 +303,7 @@ namespace EventManager
             {
                 if (IsRegisteredAtNetworkManager)
                 {
-                    if (Properties.Settings.Default.EventManagerVersion.Equals("2.0"))
+                    if (Properties.Settings.Default.NetworkManagerVersion.Equals("2.0"))
                     {
                         NetworkManager20ServiceReference.NetworkManager nm = new NetworkManager20ServiceReference.NetworkManager();
 
@@ -347,7 +347,7 @@ namespace EventManager
         {
             try
             {
-                if (Properties.Settings.Default.EventManagerVersion.Equals("2.0"))
+                if (Properties.Settings.Default.NetworkManagerVersion.Equals("2.0"))
                 {
                     NetworkManager20ServiceReference.NetworkManager nm = new NetworkManager20ServiceReference.NetworkManager();
                     NetworkManager20ServiceReference.Part a = new NetworkManager20ServiceReference.Part();
@@ -401,7 +401,7 @@ namespace EventManager
                 {
                     try
                     {
-                        if (Properties.Settings.Default.EventManagerVersion.Equals("2.0"))
+                        if (Properties.Settings.Default.NetworkManagerVersion.Equals("2.0"))
                         {
                             NetworkManager20ServiceReference.NetworkManager nm = new NetworkManager20ServiceReference.NetworkManager();
                             NetworkManager20ServiceReference.Part a = new NetworkManager20ServiceReference.Part();

@@ -107,5 +107,14 @@ namespace EventManager.Properties {
                 return ((string)(this["SOAPTunnelingEndpointTemplate"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.3")]
+        public string NetworkManagerVersion {
+            get {
+                return ((string)(this["NetworkManagerVersion"]));
+            }
+        }
     }
 }
