@@ -22,6 +22,7 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.connection.BroadcastConnection;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
 import eu.linksmart.network.connection.NOPConnection;
@@ -56,8 +57,15 @@ public class NetworkManagerCoreImplTest {
 		// Mocked classes
 		nmCoreImpl.backboneRouter = mock(BackboneRouter.class);
 		nmCoreImpl.identityManager = mock(IdentityManager.class);
+		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
 
 		// Mocked methods
+		try {
+			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress)))
+			.thenReturn(new BroadcastConnection(senderVirtualAddress));
+		} catch (Exception e) { /*NOP*/}
+		when(nmCoreImpl.connectionManager.getConnection(eq(receiverVirtualAddress), eq(nmCoreImpl.myVirtualAddress)))
+		.thenReturn(new NOPConnection(senderVirtualAddress, receiverVirtualAddress));
 		when(nmCoreImpl.backboneRouter.broadcastData(any(VirtualAddress.class), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		when(nmCoreImpl.backboneRouter.sendDataSynch(eq(nmCoreImpl.myVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
@@ -71,7 +79,7 @@ public class NetworkManagerCoreImplTest {
 		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(VirtualAddress.class), eq(senderVirtualAddress), any(byte[].class))).
 			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 	}
-
+	
 	/**
 	 * Tests broadcastMessage of NetworkManagerCoreImpl. 
 	 */

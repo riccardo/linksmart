@@ -154,7 +154,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	}
 
 	@Override
+	@Deprecated
 	public VirtualAddress getService() {
+		return this.myVirtualAddress;
+	}
+	
+	public VirtualAddress getVirtualAddress() {
 		return this.myVirtualAddress;
 	}
 

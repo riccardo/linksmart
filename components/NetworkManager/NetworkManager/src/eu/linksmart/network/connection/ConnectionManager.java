@@ -46,7 +46,7 @@ public class ConnectionManager {
 	/**
 	 * List of stored connections.
 	 */
-	private List<Connection> connections = new ArrayList<Connection>();
+	protected List<Connection> connections = new ArrayList<Connection>();
 	/**
 	 * List of connections where the handshake failed.
 	 */
