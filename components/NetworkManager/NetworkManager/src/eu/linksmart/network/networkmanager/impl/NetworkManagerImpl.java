@@ -37,9 +37,17 @@ import eu.linksmart.utils.Part;
 			return this.core.sendData(sender, receiver, data, synch);
 		}
 
+		/**
+		 * @deprecated getVirtualAddress() should be used instead.
+		 */
 		@Override
+		@Deprecated
 		public VirtualAddress getService() throws RemoteException {
 			return this.core.getService();
+		}
+		
+		public VirtualAddress getVirtualAddress() throws RemoteException {
+			return this.core.getVirtualAddress();
 		}
 
 		@Override

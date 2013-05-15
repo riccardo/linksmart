@@ -2,6 +2,7 @@ package eu.linksmart.network.networkmanager.client;
 
 import java.rmi.RemoteException;
 
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.client.Registration;
 import eu.linksmart.network.client.converter.NMResponseConverter;
 import eu.linksmart.network.client.converter.RegistrationConverter;
@@ -113,5 +114,10 @@ public class NetworkManagerEncapsulation implements NetworkManager {
 		}
 		
 		return regsApi;
+	}
+
+	@Override
+	public VirtualAddress getVirtualAddress() throws RemoteException {
+		return VirtualAddressConverter.toApi(nmPortType.getService());
 	}
 }

@@ -153,6 +153,9 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		}
 	}
 
+	/**
+	 * @deprecated getVirtualAddress() should be used instead.
+	 */
 	@Override
 	@Deprecated
 	public VirtualAddress getService() {

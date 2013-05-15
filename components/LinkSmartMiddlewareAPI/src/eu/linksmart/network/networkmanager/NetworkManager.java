@@ -29,10 +29,18 @@ public interface NetworkManager extends java.rmi.Remote {
 			throws RemoteException;
 		
 	/**
-	 * Retrieves VirtualAddress of NetworkManagerCore instance.
+	 * @deprecated getVirtualAddress() should be used instead.
 	 * @return
 	 */
+	@Deprecated
 	public VirtualAddress getService() throws RemoteException;
+	
+	/**
+	 * Retrieves VirtualAddress of NetworkManagerCore instance.
+	 * @throws RemoteException
+	 * @return
+	 */
+	public VirtualAddress getVirtualAddress() throws RemoteException;
 	
 	/**
 	 * Creates a VirtualAddress for a particular service.

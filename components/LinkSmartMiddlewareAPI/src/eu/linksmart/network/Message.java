@@ -1,5 +1,6 @@
 package eu.linksmart.network;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
@@ -21,11 +22,11 @@ public class Message {
 	private byte[] data = null;
 	private VirtualAddress senderVirtualAddress = null;
 	private VirtualAddress receiverVirtualAddress = null;
-	
+
 	public final static String TOPIC_APPLICATION = "eu.linksmart.application";
 	public final static String TOPIC_CONNECTION_HANDSHAKE = "eu.linksmart.network.connection.handshake";
-	
-	
+
+
 	/**
 	 * 
 	 * @param topic the topic of this message
@@ -109,5 +110,26 @@ public class Message {
 				getSenderVirtualAddress()).append(", Receiver: ").append(getReceiverVirtualAddress())
 				.append(", Data: ").append(new String(data));
 		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null) return false;
+		if(obj == this) return true;
+		if(!obj.getClass().equals(this.getClass())) return false;
+		Message msg = (Message)obj;
+		boolean fieldsEqual = this.getTopic().equals(msg.getTopic()) &&
+				Arrays.equals(this.getData(), msg.getData()) &&
+				this.getSenderVirtualAddress().equals(msg.getSenderVirtualAddress());
+		if(!fieldsEqual) return false;
+		//receiver could be null in case of broadcast so we check it separately
+		if(this.getReceiverVirtualAddress() != null && msg.getReceiverVirtualAddress() != null) {
+			return  this.getReceiverVirtualAddress().equals(msg.getReceiverVirtualAddress());
+		} else if (this.getReceiverVirtualAddress() != msg.getReceiverVirtualAddress() ){
+			return false;
+		} else {
+			//this case means both should be null but we check it
+			return this.getReceiverVirtualAddress() == null && msg.getReceiverVirtualAddress() == null;
+		}
 	}
 }

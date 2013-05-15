@@ -59,6 +59,5 @@ public interface NetworkManagerCore extends NetworkManager {
 	 * @param virtualAddressesToUpdate
 	 * @param properties
 	 */
-	public void updateSecurityProperties(List<VirtualAddress> virtualAddressesToUpdate, List<SecurityProperty> properties);
-	
+	public void updateSecurityProperties(List<VirtualAddress> virtualAddressesToUpdate, List<SecurityProperty> properties);	
 }

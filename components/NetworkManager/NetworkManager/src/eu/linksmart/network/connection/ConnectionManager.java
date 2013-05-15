@@ -63,7 +63,7 @@ public class ConnectionManager {
 	 * Required properties stored by VirtualAddress. These {@link SecurityProperty} have to
 	 * be provided by {@link Connection} between these services.
 	 */
-	private HashMap<VirtualAddress, List<SecurityProperty>> servicePolicies = new HashMap<VirtualAddress, List<SecurityProperty>>();
+	protected HashMap<VirtualAddress, List<SecurityProperty>> servicePolicies = new HashMap<VirtualAddress, List<SecurityProperty>>();
 	/**
 	 * List of available managers to use for connection protection.
 	 */
@@ -75,9 +75,9 @@ public class ConnectionManager {
 	 */
 	private Object policyModificationLock = new Object();
 
-	private static final String HANDSHAKE_COMSECMGRS_KEY = "CommunicationSecurityManagers";
-	private static final String HANDSHAKE_SECPROPS_KEY = "SecurityProperties";
-	private static final String HANDSHAKE_DECLINE = "CommunicationDeclined";
+	protected static final String HANDSHAKE_COMSECMGRS_KEY = "CommunicationSecurityManagers";
+	protected static final String HANDSHAKE_SECPROPS_KEY = "SecurityProperties";
+	protected static final String HANDSHAKE_DECLINE = "CommunicationDeclined";
 	protected static final String HANDSHAKE_ACCEPT = "CommunicationAccepted";
 
 	private NetworkManagerCore nmCore;
@@ -486,13 +486,13 @@ public class ConnectionManager {
 		NMResponse response = nmCore.sendMessage(handshakeMsg, true);
 		Message respMsg = response.getMessageObject();
 
-		if(new String(respMsg.getData()).startsWith(HANDSHAKE_ACCEPT)){
+		if(respMsg != null && new String(respMsg.getData()).startsWith(HANDSHAKE_ACCEPT)){
 			//take the matching ComSecMgr and return it
 			String comSecMgrName = new String(respMsg.getData()).
 					substring(HANDSHAKE_ACCEPT.length() + 1);
 			return comSecMgrName;
 		} else {
-			if(new String(response.getMessage().getBytes()).contains(HANDSHAKE_DECLINE)){
+			if(respMsg != null && new String(response.getMessage().getBytes()).contains(HANDSHAKE_DECLINE)){
 				//decline message looks like HANDSHAKE_DECLINED [PropertiesOfOtherEndpoint]
 				logger.warn("Could not establish common parameters with " + receiverVirtualAddress + " as it required:" +
 						new String(response.getMessage().getBytes()).substring(HANDSHAKE_DECLINE.length() + 1));
