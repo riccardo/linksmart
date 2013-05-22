@@ -714,6 +714,7 @@ namespace eu.linksmart.eventing.EventManagerStub {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://eventmanager.linksmart.eu")]
+    [System.Runtime.Serialization.DataContractAttribute(Name = "Part", Namespace = "http://eventmanager.linksmart.eu")]
     public partial class Part {
         
         private string keyField;
@@ -722,6 +723,7 @@ namespace eu.linksmart.eventing.EventManagerStub {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=true)]
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string key {
             get {
                 return this.keyField;
@@ -733,6 +735,7 @@ namespace eu.linksmart.eventing.EventManagerStub {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=true)]
+        [System.Runtime.Serialization.DataMemberAttribute()]  
         public string value {
             get {
                 return this.valueField;

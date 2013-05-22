@@ -102,10 +102,10 @@ namespace eu.linksmart.eventing
                     {
                         try
                         {
-                            EventSubscriberHid = nm.createHIDwDesc("EventSubscriber:" + System.Environment.MachineName, EventSubscriberUrl).Trim();
+                            EventSubscriberHid = nm.createHIDwDesc(subscriberDesc, EventSubscriberUrl).Trim();
                             retry++;
-                            if (EventSubscriberHid.Equals("")) 
-                                Log.Debug("re-trying to create HID for  EventSubscriber:" + System.Environment.MachineName + " in " + retry_delay+ " ms ....(" + retry + "x)");
+                            if (EventSubscriberHid.Equals(""))
+                                Log.Debug("re-trying to create HID for " + subscriberDesc + " in " + retry_delay + " ms ....(" + retry + "x)");
                             else 
                                 Log.Info("Found EventSubscriberHid : " + EventSubscriberHid);
                             Thread.Sleep(retry_delay);
