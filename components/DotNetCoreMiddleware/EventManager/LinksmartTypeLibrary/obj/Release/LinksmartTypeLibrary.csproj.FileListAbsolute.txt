@@ -1,5 +1,0 @@
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\LinksmartTypeLibrary\bin\Release\LinksmartTypeLibrary.dll
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\LinksmartTypeLibrary\bin\Release\LinksmartTypeLibrary.pdb
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\LinksmartTypeLibrary\obj\Release\ResolveAssemblyReference.cache
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\LinksmartTypeLibrary\obj\Release\LinksmartTypeLibrary.dll
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\LinksmartTypeLibrary\obj\Release\LinksmartTypeLibrary.pdb

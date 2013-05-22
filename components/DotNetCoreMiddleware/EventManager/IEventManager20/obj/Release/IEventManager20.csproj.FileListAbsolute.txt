@@ -1,6 +1,0 @@
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\IEventManager20\bin\Release\IEventManager20.dll.config
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\IEventManager20\bin\Release\IEventManager20.dll
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\IEventManager20\bin\Release\IEventManager20.pdb
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\IEventManager20\obj\Release\ResolveAssemblyReference.cache
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\IEventManager20\obj\Release\IEventManager20.dll
-C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\IEventManager20\obj\Release\IEventManager20.pdb

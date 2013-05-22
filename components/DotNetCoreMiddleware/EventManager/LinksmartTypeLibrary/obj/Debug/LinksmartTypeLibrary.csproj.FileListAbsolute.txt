@@ -1,4 +1,0 @@
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\LinksmartTypeLibrary\bin\Debug\LinksmartTypeLibrary.dll
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\LinksmartTypeLibrary\bin\Debug\LinksmartTypeLibrary.pdb
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\LinksmartTypeLibrary\obj\Debug\LinksmartTypeLibrary.dll
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\LinksmartTypeLibrary\obj\Debug\LinksmartTypeLibrary.pdb

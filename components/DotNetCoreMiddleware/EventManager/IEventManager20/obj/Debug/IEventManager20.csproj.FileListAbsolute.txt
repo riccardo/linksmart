@@ -1,6 +1,0 @@
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\bin\Debug\IEventManager20.dll.config
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\bin\Debug\IEventManager20.dll
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\bin\Debug\IEventManager20.pdb
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\obj\Debug\IEventManager20.dll
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\obj\Debug\IEventManager20.pdb
-C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\obj\Debug\IEventManager20.csprojResolveAssemblyReference.cache
