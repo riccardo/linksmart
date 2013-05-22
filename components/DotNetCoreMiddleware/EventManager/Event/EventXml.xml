@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Event xmlns="http://events.ebbits.org/Event">
+  <EventMeta>
+    <EventType modelRef="EbbitsEventOntology">Alarm/*|Trace/*|System/*|...</EventType>
+    <EventID>1</EventID>
+    <Topic modelRef="OntologyID">Energy/*|Movement/*|Process/*</Topic><!-- Optional Topic (channel or #tag) -->
+    <Timestamp>2012-02-02T13:30:31.089</Timestamp>
+    <Source>EPA</Source><!--The creator of the event-->
+    <Location modelRef="SWEREF 99">6121020,743013</Location><!--Location (if available)-->
+    <Description>Pants on Fire</Description><!--Description (if available)-->
+    <ObjectID modelRef="ebbits.id">F69023A8-DA07-4339-8BA3-4E113AE29CAF</ObjectID><!-- The entity that the event concerns (if available)-->
+    <ProcessID modelRef="http://www.omg.org/spec/BPMN/20100524/MODEL">sid-70ec3d5d-6c91-4dc3-86d5-d6729bc6e15e</ProcessID><!-- The entity that the event concerns (if available)-->
+  </EventMeta>
+  <Content modelRef="ISO-11788">
+    <!--modelRef examples: ISO ADED, ISA-95 manufacturing standard, EBBITS system events -->
+    <Whatever/>
+  </Content>
+</Event>

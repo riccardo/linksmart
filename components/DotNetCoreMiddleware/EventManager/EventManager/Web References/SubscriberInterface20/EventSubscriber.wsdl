@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://eventmanager.linksmart.eu/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="EventSubscriber" targetNamespace="http://eventmanager.linksmart.eu/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns:tns="http://eventmanager.linksmart.eu" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://eventmanager.linksmart.eu">
+      <xsd:complexType name="ArrayOfPart">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Part" nillable="true" type="tns:Part" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="Part">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="key" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" name="value" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+    <xsd:schema xmlns:ns0="http://eventmanager.linksmart.eu" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://eventmanager.linksmart.eu/">
+      <xsd:import namespace="http://eventmanager.linksmart.eu" />
+      <xsd:element name="notifyXmlEvent" type="tns:notifyXmlEvent" />
+      <xsd:complexType name="notifyXmlEvent">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="arg0" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="notifyXmlEventResponse" type="tns:notifyXmlEventResponse" />
+      <xsd:complexType name="notifyXmlEventResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="return" nillable="true" type="xsd:boolean" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="notify" type="tns:notify" />
+      <xsd:complexType name="notify">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="arg0" nillable="true" type="xsd:string" />
+          <xsd:element name="arg1" nillable="true" type="ns0:ArrayOfPart" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="notifyResponse" type="tns:notifyResponse" />
+      <xsd:complexType name="notifyResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="return" nillable="true" type="xsd:boolean" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="notify">
+    <wsdl:part name="parameters" element="tns:notify" />
+  </wsdl:message>
+  <wsdl:message name="notifyResponse">
+    <wsdl:part name="parameters" element="tns:notifyResponse" />
+  </wsdl:message>
+  <wsdl:message name="notifyXmlEvent">
+    <wsdl:part name="parameters" element="tns:notifyXmlEvent" />
+  </wsdl:message>
+  <wsdl:message name="notifyXmlEventResponse">
+    <wsdl:part name="parameters" element="tns:notifyXmlEventResponse" />
+  </wsdl:message>
+  <wsdl:portType name="EventSubscriberPortType">
+    <wsdl:operation name="notifyXmlEvent">
+      <wsdl:input name="notifyXmlEvent" message="tns:notifyXmlEvent" />
+      <wsdl:output name="notifyXmlEventResponse" message="tns:notifyXmlEventResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="notify">
+      <wsdl:input name="notify" message="tns:notify" />
+      <wsdl:output name="notifyResponse" message="tns:notifyResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="EventSubscriberSoapBinding" type="tns:EventSubscriberPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="notifyXmlEvent">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="notifyXmlEvent">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="notifyXmlEventResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="notify">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="notify">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="notifyResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EventSubscriber">
+    <wsdl:port name="EventSubscriberPort" binding="tns:EventSubscriberSoapBinding">
+      <soap:address location="http://localhost:9090/cxf/services/EventSubscriber:ExampleSubscriber" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

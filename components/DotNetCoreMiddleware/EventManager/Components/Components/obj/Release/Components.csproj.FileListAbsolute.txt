@@ -1,0 +1,5 @@
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Components\Components\bin\Release\Components.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Components\Components\bin\Release\Components.pdb
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Components\Components\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Components\Components\obj\Release\Components.dll
+C:\Users\Admin-MoKnow-Demo\Desktop\LS2.0\EventManager2.0\EventManagerSource\Components\Components\obj\Release\Components.pdb

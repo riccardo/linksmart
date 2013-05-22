@@ -1,0 +1,9 @@
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\LinksmartTypeLibrary\bin\Debug\LinksmartTypeLibrary.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\LinksmartTypeLibrary\bin\Debug\LinksmartTypeLibrary.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\LinksmartTypeLibrary\obj\Debug\LinksmartTypeLibrary.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\LinksmartTypeLibrary\obj\Debug\LinksmartTypeLibrary.pdb
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\LinksmartTypeLibrary\bin\Debug\LinksmartTypeLibrary.dll
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\LinksmartTypeLibrary\bin\Debug\LinksmartTypeLibrary.pdb
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\LinksmartTypeLibrary\obj\Debug\ResolveAssemblyReference.cache
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\LinksmartTypeLibrary\obj\Debug\LinksmartTypeLibrary.dll
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\LinksmartTypeLibrary\obj\Debug\LinksmartTypeLibrary.pdb

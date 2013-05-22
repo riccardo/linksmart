@@ -1,0 +1,12 @@
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\bin\Debug\Event.dll.config
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\bin\Debug\Event.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\bin\Debug\Event.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\obj\Debug\Event.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\obj\Debug\Event.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\Event\obj\Debug\Event.csprojResolveAssemblyReference.cache
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\Event\bin\Debug\Event.dll.config
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\Event\bin\Debug\Event.dll
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\Event\bin\Debug\Event.pdb
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\Event\obj\Debug\ResolveAssemblyReference.cache
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\Event\obj\Debug\Event.dll
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\Event\obj\Debug\Event.pdb

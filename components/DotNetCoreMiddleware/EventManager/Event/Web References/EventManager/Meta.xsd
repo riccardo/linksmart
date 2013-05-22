@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://127.0.0.1:8124/Service/Meta?xsd=xsd0" namespace="http://eventmanager.linksmart.eu" />
+  <xs:element name="getSubscriptionsReturn" type="ArrayOfSubscription" />
+  <xs:complexType name="ArrayOfSubscription">
+    <xs:sequence>
+      <xs:element xmlns:q1="http://eventmanager.linksmart.eu" minOccurs="0" maxOccurs="unbounded" form="unqualified" name="item" type="q1:Subscription" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="topic" type="xs:string" />
+  <xs:element name="in1" type="ArrayOfPart" />
+  <xs:complexType name="ArrayOfPart">
+    <xs:sequence>
+      <xs:element xmlns:q2="http://eventmanager.linksmart.eu" minOccurs="0" maxOccurs="unbounded" form="unqualified" name="item" type="q2:Part" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="publishReturn" type="xs:boolean" />
+</xs:schema>

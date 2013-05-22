@@ -1,0 +1,12 @@
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\bin\Debug\IEventManager20.dll.config
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\bin\Debug\IEventManager20.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\bin\Debug\IEventManager20.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\obj\Debug\IEventManager20.dll
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\obj\Debug\IEventManager20.pdb
+C:\Users\mathias.axling\Desktop\LinkSmartSVN\em\IEventManager20\obj\Debug\IEventManager20.csprojResolveAssemblyReference.cache
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\IEventManager20\bin\Debug\IEventManager20.dll.config
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\IEventManager20\bin\Debug\IEventManager20.dll
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\IEventManager20\bin\Debug\IEventManager20.pdb
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\IEventManager20\obj\Debug\ResolveAssemblyReference.cache
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\IEventManager20\obj\Debug\IEventManager20.dll
+C:\Opt\linksmart\trunk\components\DotNetCoreMiddleware\EventManagerSource\IEventManager20\obj\Debug\IEventManager20.pdb
