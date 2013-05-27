@@ -166,7 +166,7 @@ namespace EventManager
                     catch (Exception e)
                     {
                         //Console.WriteLine(e.Message + e.StackTrace);
-                        Console.WriteLine("Error: Cannot call SubscriberService: {0}", subscription.Description);
+                        //Console.WriteLine("Error: Cannot call SubscriberService: {0}", subscription.Description);
                         //retryQueue.queue(subscription, request); Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                     }
                 }
