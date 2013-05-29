@@ -97,27 +97,26 @@ public class SOAPTunnelServlet extends HttpServlet {
 			throws IOException{		
 		// split path - path contains virtual addresses and maybe "wsdl" separated by "/"
 		String path = request.getPathInfo();
-		String parts[] = path.split("/", 6);
+		String parts[] = path.split("/", 4);
 		// extract virtual addresses from path
 		VirtualAddress sVirtualAddress = (parts[1].contentEquals("0")) ? nmCore.getService() : new VirtualAddress(parts[1]);
 		VirtualAddress rVirtualAddress = new VirtualAddress(parts[2]);
-
+		//add additional path
+		StringBuilder additionalPath = new StringBuilder();
+		if (parts.length == 4 && !parts[3].equals("wsdl") && !parts[3].endsWith("0/hola")) {
+			additionalPath.append(parts[3].replace("0/hola/", "").replace("/wsdl", ""));
+		}
+		
 		// build parameter string
 		StringBuilder queryBuilder = new StringBuilder();
-		//parts[5] is checked for compatibility e.g. ../hola/0/wsdl
-		if ((parts.length > 3 && parts[3].equals("wsdl")) 
-				|| (parts.length == 6 && parts[5].equals("wsdl"))) {
-			queryBuilder.append("wsdl");
+		//check if path requests wsdl or has some additional query - not possible to have both
+		if (parts.length == 4 && parts[3].endsWith("wsdl")) {
+			queryBuilder.append("?wsdl");
 		} else {
 			//if attributes were passed with the url add them
-			if (parts.length > 3) {
-				queryBuilder.append(parts[3]);
-			}
 			String originalQuery = request.getQueryString();
-			if (originalQuery != null) {
-				if (queryBuilder.length() > 0) {
-					queryBuilder.append("?");
-				}
+			if (originalQuery != null && originalQuery.length() != 0) {
+				queryBuilder.append("?");
 				queryBuilder.append(originalQuery);
 			}
 		}
@@ -126,8 +125,12 @@ public class SOAPTunnelServlet extends HttpServlet {
 		StringBuilder requestBuilder = new StringBuilder();
 		// append request line
 		requestBuilder.append(request.getMethod()).append(" /");
+		if (additionalPath.length() > 0) {
+			requestBuilder.append(additionalPath.toString());
+		}
+		
 		if (queryBuilder.length() > 0) {
-			requestBuilder.append("?").append(queryBuilder.toString());
+			requestBuilder.append(queryBuilder.toString());
 		}
 		requestBuilder.append(" ").append(request.getProtocol()).append("\r\n");
 
