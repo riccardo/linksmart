@@ -203,7 +203,7 @@ public class TunnelServlet extends HttpServlet{
 		}
 
 		if (registrations.length > 1 && !getDefault) {
-			throw new MultipleMatchException("Number of found services: " + registrations.length);
+			throw new MultipleMatchException("No default switch provided although the number of found services was " + registrations.length);
 		} else if (registrations != null && registrations.length != 0) {
 			//there is only one element or the default has been required
 			return registrations[0];
