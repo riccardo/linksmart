@@ -235,7 +235,15 @@ public class ConnectionManager {
 
 		//if the message could not be opened or it was opened and it is not a handshake message we start the handshake
 		if(!isHandshakeMessage(data, senderVirtualAddress, receiverVirtualAddress)) {
-			comSecMgrName = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress);
+			/*we only start the handshake if we are the initiator of the communication
+			 * if the remote endpoint did not start with a handshake message than it is not working correctly
+			 */
+			if(!remoteEndpoint.equals(senderVirtualAddress)) {
+				comSecMgrName = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress);
+			} else {
+				logger.warn("Remote endpoint did not start with communication handshake");
+				return null;
+			}
 		} else {
 			//we received a handshake message
 			//try to open message in standard way
