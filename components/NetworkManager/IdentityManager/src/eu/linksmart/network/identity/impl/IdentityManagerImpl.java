@@ -189,14 +189,38 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 
 		Set<Registration> matchingServices = new HashSet<Registration>();
 		//first collect local Services that match
-		for(Registration serviceInfo : getLocalServices()) {
+		matchingServices.addAll(checkAttributes(getLocalServices(), attributes, isStrict));
+
+		//only search remotely if required
+		if(matchingServices.size() == 0 || !returnFirst) {
+			//check if attributes have already been retrieved
+			matchingServices.addAll(checkAttributes(getRemoteServices(), attributes, isStrict));
+			//only do discovery if required
+			if(matchingServices.size() == 0 || !returnFirst) {
+				//discover remote services
+				Set<Registration> remoteServices = sendResolveAttributesMsg(
+						attributes, timeOut, returnFirst, isStrict);
+				if(remoteServices != null) {
+					matchingServices.addAll(remoteServices);
+				}
+			}
+		}
+		//create array from matches
+		Registration[] serviceInfos = new Registration[matchingServices.size()];
+		matchingServices.toArray(serviceInfos);
+		return serviceInfos;
+	}
+
+	HashSet<Registration> checkAttributes(Set<Registration> listOfServices, Part[] searchedAttributes, boolean isStrict) {
+		HashSet<Registration> matchingServices = new HashSet<Registration>();
+		for(Registration serviceInfo : listOfServices) {
 			//check if all searched keys are available
 			Part[] attrs = serviceInfo.getAttributes();
 			boolean foundAllKeys = true;
 			boolean attrsMatched = true;
 			//used to say that at least one of the attribute keys was found
 			boolean atLeastOneMatch = false;
-			for(Part searchedAttr : attributes) {
+			for(Part searchedAttr : searchedAttributes) {
 				boolean foundKey = false;
 				for(Part attr : attrs) {
 					if(searchedAttr.getKey().equals(attr.getKey())) {
@@ -221,20 +245,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				matchingServices.add(serviceInfo);
 			}
 		}
-
-		//only search remotely if required
-		if(matchingServices.size() == 0 || !returnFirst) {		
-			//search remotely for Services
-			Set<Registration> remoteServices = sendResolveAttributesMsg(
-					attributes, timeOut, returnFirst, isStrict);
-			if(remoteServices != null) {
-				matchingServices.addAll(remoteServices);
-			}
-		}
-		//create array from matches
-		Registration[] serviceInfos = new Registration[matchingServices.size()];
-		matchingServices.toArray(serviceInfos);
-		return serviceInfos;
+		return matchingServices;
 	}
 
 	@Override
@@ -699,7 +710,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			}
 			//put found Services in remoteService store
 			for(Registration serviceInfo : foundServices) {
-				//descriptions are usually available before put may not
+				//descriptions are usually available before but may not
 				//have been queried - so include them
 				if(serviceInfo.getDescription() == null) {
 					//check if description was available before
