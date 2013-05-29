@@ -65,6 +65,7 @@
         <ant dir="NetworkManager/BackboneJXTA" target="make" />
         <ant dir="NetworkManager/BackboneSOAP" target="make" />
         <ant dir="NetworkManager/SOAPTunneling" target="make" />
+		<ant dir="NetworkManager/Tunneling" target="make" />
         <ant dir="CryptoManager" target="make" />
         <ant dir="TrustManager" target="make" />
 	</target>
