@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="BackboneData">
+   <implementation class="eu.linksmart.network.backbone.impl.data.BackboneData"/>
+   <service>
+      <provide interface="eu.linksmart.network.backbone.Backbone"/>
+   </service><reference bind="bindBackboneRouter" unbind="unbindBackboneRouter" cardinality="1..1" interface="eu.linksmart.network.routing.BackboneRouter" name="BackboneRouter" policy="static"/>
+             <reference bind="addDataEndpoint" cardinality="0..n" interface="eu.linksmart.network.backbone.data.DataEndpoint" name="DataEndpoint" policy="dynamic" unbind="removeDataEndpoint"/>
+</scr:component>
