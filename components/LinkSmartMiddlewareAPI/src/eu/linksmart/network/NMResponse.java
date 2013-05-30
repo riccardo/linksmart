@@ -16,12 +16,17 @@ public class NMResponse  implements java.io.Serializable {
 	private byte[] messageBytes = null;
 	private Message messageObject = null;
 	private int status;
+	private boolean bytesPrimary = false;
 
 	public NMResponse() {
 	}
 
 	public NMResponse(int status) {
 		this.status = status;
+	}
+
+	public void setBytesPrimary(boolean bytesPrimary) {
+		this.bytesPrimary = bytesPrimary;
 	}
 
 	public Message getMessageObject() {
@@ -38,7 +43,11 @@ public class NMResponse  implements java.io.Serializable {
 	 * @return message if no msg object else null
 	 */
 	public java.lang.String getMessage() {
-		return message;
+		if(bytesPrimary) {
+			return new String(messageBytes);
+		} else {
+			return message;
+		}
 	}
 
 
@@ -49,20 +58,24 @@ public class NMResponse  implements java.io.Serializable {
 	 */
 	public void setMessage(java.lang.String message) {
 		this.message = message;
-		if(this.messageBytes == null) {
-			this.messageBytes = message.getBytes();
+		if(!bytesPrimary) {
+			messageBytes = message.getBytes();
 		}
 	}
 
 	public void setMessageBytes(byte[] messageBytes) {
 		this.messageBytes = messageBytes;
-		if(this.message == null || this.message.length() == 0) {
+		if(bytesPrimary) {
 			this.message = new String(messageBytes);
 		}
 	}
 
 	public byte[] getMessageBytes() {
-		return this.messageBytes;
+		if(bytesPrimary) {
+			return this.messageBytes;
+		} else {
+			return message.getBytes();
+		}
 	}
 
 

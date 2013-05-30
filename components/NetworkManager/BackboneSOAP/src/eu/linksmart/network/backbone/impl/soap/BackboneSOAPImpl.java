@@ -269,7 +269,7 @@ public class BackboneSOAPImpl implements Backbone {
 
 			LOG.debug("Response:\n" + response);	
 			resp.setStatus(NMResponse.STATUS_SUCCESS);
-			resp.setMessage(new String(response));
+			resp.setBytesPrimary(true);
 			resp.setMessageBytes(response);
 		} catch (IllegalArgumentException e) {
 			LOG.debug("Error delivering the data to destination:\n"
