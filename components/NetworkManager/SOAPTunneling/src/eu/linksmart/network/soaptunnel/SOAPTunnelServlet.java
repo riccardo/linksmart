@@ -35,6 +35,7 @@ package eu.linksmart.network.soaptunnel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 
@@ -224,15 +225,29 @@ public class SOAPTunnelServlet extends HttpServlet {
 	private void sendRequest(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, String requestString,
 			HttpServletResponse response) throws IOException {
 		NMResponse r = this.nmCore.sendData(senderVirtualAddress, receiverVirtualAddress, requestString.getBytes(), true);
-		String body = new String();
+		int bodyStartIndex = 0;
+		byte[] byteData = null;
+		byte[] body = null;
 		//check response status and if error response BAD_GATEWAY else parse response for client
 		if (!r.getMessage().startsWith("HTTP/1.1 200 OK")) {
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			//set whole response data as body
-			body = r.getMessage();
+			body = r.getMessage().getBytes();
 		} else {		
 			//take headers from data and add them to response
-			String[] headers = r.getMessage().split("(?<=\r\n)");
+			byteData = r.getMessageBytes();
+			byte[] headerEnd = new String("\r\n\r\n").getBytes();
+			//find end of header
+			for(;bodyStartIndex < byteData.length; bodyStartIndex++) {
+				if(Arrays.equals(
+						Arrays.copyOfRange(byteData, bodyStartIndex, bodyStartIndex + headerEnd.length),
+						headerEnd)) {
+					bodyStartIndex = bodyStartIndex + headerEnd.length;
+					break;
+				}
+			}
+			byte[] headersBytes = Arrays.copyOf(byteData, bodyStartIndex);
+			String[] headers = new String(headersBytes).split("(?<=\r\n)");
 			//use it to get index of data element
 			int i = 0;
 			//go through headers and put them to response until empty line is reached
@@ -250,12 +265,14 @@ public class SOAPTunnelServlet extends HttpServlet {
 				i++;
 			}
 			//concat remaining elements of 'headers' array (the real data) into response body
-			for(i++;i < headers.length;i++) {
-				body = body.concat(headers[i]);
-			}
+//			for(i++;i < headers.length;i++) {
+//				body = body.concat(headers[i]);
+//			}
+			body = Arrays.copyOfRange(byteData, bodyStartIndex, byteData.length);
 		}
-		//write body data
-		response.setContentLength(body.getBytes().length);
-		response.getWriter().write(body);
+		//write body data	
+		response.setContentLength(body.length);
+		response.getOutputStream().write(body);
+		response.getOutputStream().close();
 	}
 }

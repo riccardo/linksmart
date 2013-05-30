@@ -13,6 +13,7 @@ public class NMResponse  implements java.io.Serializable {
 	public static final int STATUS_TIMEOUT = 2;
 	
     private java.lang.String message;
+    private byte[] messageBytes;
     private Message messageObject;
     private int status;
 
@@ -48,6 +49,14 @@ public class NMResponse  implements java.io.Serializable {
      */
     public void setMessage(java.lang.String message) {
         this.message = message;
+    }
+    
+    public void setMessageBytes(byte[] messageBytes) {
+    	this.messageBytes = messageBytes;
+    }
+    
+    public byte[] getMessageBytes() {
+    	return this.messageBytes;
     }
 
 

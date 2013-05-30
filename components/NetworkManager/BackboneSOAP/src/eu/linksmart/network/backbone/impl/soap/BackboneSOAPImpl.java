@@ -1,5 +1,6 @@
 package eu.linksmart.network.backbone.impl.soap;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -258,9 +259,9 @@ public class BackboneSOAPImpl implements Backbone {
 					.getPort()), TIMEOUT);
 
 			flushMessage(dataproc, clientSocket);
-			String response = parseResponse(resp, clientSocket);
+			byte[] response = parseResponse(resp, clientSocket);
 
-			if (response.length() == 0) {
+			if (response.length == 0) {
 				// In case the SOAP response from the service is empty.
 				resp.setStatus(NMResponse.STATUS_ERROR);
 				resp.setMessage("HTTP/1.1 204 No Content\r\n");
@@ -268,7 +269,8 @@ public class BackboneSOAPImpl implements Backbone {
 
 			LOG.debug("Response:\n" + response);	
 			resp.setStatus(NMResponse.STATUS_SUCCESS);
-			resp.setMessage(response);
+			resp.setMessage(new String(response));
+			resp.setMessageBytes(response);
 		} catch (IllegalArgumentException e) {
 			LOG.debug("Error delivering the data to destination:\n"
 					+ e.getMessage()); 
@@ -312,9 +314,10 @@ public class BackboneSOAPImpl implements Backbone {
 	 * @return
 	 * @throws IOException
 	 */
-	private String parseResponse(NMResponse resp, Socket socket)
+	private byte[] parseResponse(NMResponse resp, Socket socket)
 			throws IOException {
 		byte[] buffer = new byte[BUFFSIZE];
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		String response = "";
 		InputStream cis = socket.getInputStream();
 		String soapMsg;
@@ -345,11 +348,13 @@ public class BackboneSOAPImpl implements Backbone {
 			bytesRead = cis.read(buffer);
 			if (bytesRead > 0) {
 				numRetries = 0;
-				response = response.concat(new String(buffer, 0, bytesRead));
+				bos.write(buffer, 0, bytesRead);
 			}
 		} while (bytesRead != -1);
 		cis.close();
-		return response;
+		byte[] responseBytes = bos.toByteArray();
+		bos.close();
+		return responseBytes;
 	}
 
 	/**
