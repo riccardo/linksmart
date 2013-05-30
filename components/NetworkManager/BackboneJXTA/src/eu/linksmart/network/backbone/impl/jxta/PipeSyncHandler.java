@@ -556,6 +556,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 						+ sourceVirtualAddress.toString() + " to VirtualAddress=" + destVirtualAddress.toString());
 				if(synch) {
 					// reverse source and destination because we (dest) send response back to source
+					if(r.getMessage() == null) r.setMessage("");
 					sendMessageResponse(destVirtualAddress, sourceVirtualAddress, r.getMessage().getBytes(), requestId);
 				}
 
