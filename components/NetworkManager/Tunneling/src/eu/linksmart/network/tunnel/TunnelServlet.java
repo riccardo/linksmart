@@ -28,7 +28,7 @@ public class TunnelServlet extends HttpServlet{
 	private static final Logger logger = Logger
 			.getLogger(TunnelServlet.class.getName());
 	private static final String NO_SERVICE = "Did not find matching service";
-	private static final int SERVICE_DISCOVERY_TIMEOUT = 10*1000;
+	protected static final int SERVICE_DISCOVERY_TIMEOUT = 10*1000;
 
 	protected TunnelServlet(Tunnel tunnel) {
 		this.tunnel = tunnel;

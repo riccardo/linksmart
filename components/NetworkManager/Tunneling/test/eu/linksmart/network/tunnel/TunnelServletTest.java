@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,12 +35,12 @@ public class TunnelServletTest {
 	private HttpServletResponse response;
 	private String receiverString = "0.0.0.6986094776732394497";
 	private String urlShort = "/0?description=\"CalculatorForBeginners\"";
-	private String urlLong = "/0.0.0.1/some/addition?description=\"CalculatorForBeginners\"&pid=\"010\"#default";
+	private String urlLong = "/0.0.0.1/default/some/addition?description=\"CalculatorForBeginners\"&pid=\"010\"";
 	private String urlWsdl = "/0/wsdl?description=\"CalculatorForBeginners\"";
 	private VirtualAddress nmAddress;
 	private String nmAddressString = "0.0.0.0";
 	private NMResponse nmResponse;
-	private PrintWriter pWriter;
+	private ServletOutputStream outStream;
 	private Tunnel tunnel;
 	private Part[] descriptionOnly;
 	private Part[] descNPid;
@@ -52,10 +53,10 @@ public class TunnelServletTest {
 		
 		this.tunnelServlet = new TunnelServlet(this.tunnel);
 		this.response = mock(HttpServletResponse.class);
-		this.pWriter = new PrintWriter(new ByteArrayOutputStream());
+		this.outStream = mock(ServletOutputStream.class);
 		try {
 			when(tunnel.getNM()).thenReturn(this.nmCore);
-			when(response.getWriter()).thenReturn(pWriter);
+			when(response.getOutputStream()).thenReturn(outStream);
 		} catch (IOException e1) {
 			//NOP
 		}
@@ -82,6 +83,9 @@ public class TunnelServletTest {
 		
 		try {
 			when(this.nmCore.getServiceByAttributes(any(Part[].class))).
+			thenReturn(new Registration[]{
+					new Registration(new VirtualAddress(this.receiverString), "CalculatorForBeginners")});
+			when(this.nmCore.getServiceByAttributes(any(Part[].class), any(int.class), any(boolean.class), any(boolean.class))).
 			thenReturn(new Registration[]{
 					new Registration(new VirtualAddress(this.receiverString), "CalculatorForBeginners")});
 		} catch (RemoteException e) {
@@ -135,7 +139,7 @@ public class TunnelServletTest {
 			// NOP
 		}
 		try {
-			Mockito.verify(nmCore).getServiceByAttributes(this.descNPid);
+			Mockito.verify(nmCore).getServiceByAttributes(this.descNPid, TunnelServlet.SERVICE_DISCOVERY_TIMEOUT, true, false);
 			Mockito.verify(nmCore).sendData(
 					new VirtualAddress("0.0.0.1"),
 					new VirtualAddress(receiverString),
