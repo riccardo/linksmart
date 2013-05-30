@@ -55,8 +55,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected static String IDENTITY_MGR = IdentityManagerImpl.class
 			.getSimpleName();
 
-	protected static long SERVICE_KEEP_ALIVE_MS = (long)(2*60*1000);
-
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
 	protected ConcurrentHashMap<VirtualAddress, Registration> localServices;
@@ -81,6 +79,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected Thread advertisingThread;
 	/** Time in milliseconds to wait between advertisements. */
 	protected int advertisementSleepMillis = 60000;
+	/** Time in milliseconds before node is deleted if not updated.*/
+	protected static long SERVICE_KEEP_ALIVE_MS = (long)(2*60000);
 
 	/** Flag controlling advertising thread.*/
 	private boolean advertisingThreadRunning;
@@ -794,13 +794,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						Iterator<Registration> i = serviceInfos.iterator();
 						while (i.hasNext()) {
 							Registration oneServiceInfo = i.next();
-							//only update information if it is not equal to last value
-							Registration heldRegistration = remoteServices.get(oneServiceInfo.getVirtualAddress());
-							if (heldRegistration == null || (heldRegistration != null && !heldRegistration.equals(oneServiceInfo))) {
-								addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo);
-								// Add the backbone route for this remote VirtualAddress
-								networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(), oneServiceInfo.getVirtualAddress());
-							}
+							addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo);
+							// Add the backbone route for this remote VirtualAddress
+							networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(), oneServiceInfo.getVirtualAddress());
 						}
 					}
 				}
@@ -832,8 +828,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						Registration newInfo = new Registration(newVirtualAddress, updateData[2]);
 						// Add the remoteService to the internal map of remote Services
 						addRemoteService(newVirtualAddress, newInfo);
-						// Add the backbone route for this remote VirtualAddress
-						networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(),newVirtualAddress);
 					} else if (updateData[0].equals("D")) {
 						VirtualAddress toRemoveVirtualAddress = new VirtualAddress(updateData[1]);
 						removeRemoteService(toRemoveVirtualAddress);
@@ -878,7 +872,12 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * @return The previous value associated with that VirtualAddress, null otherwise
 	 */
 	protected Registration addRemoteService(VirtualAddress virtualAddress, Registration info) {
-		Registration prev = remoteServices.put(virtualAddress, info);
+		//only update information if it is not equal to last value
+		Registration prev = null;
+		Registration heldRegistration = remoteServices.get(info.getVirtualAddress());
+		if (heldRegistration == null || (heldRegistration != null && !heldRegistration.equals(info))) {
+			prev = remoteServices.put(virtualAddress, info);
+		}
 		serviceLastUpdate.put(virtualAddress, Calendar.getInstance().getTimeInMillis());
 		return prev;
 	}
