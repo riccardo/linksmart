@@ -107,7 +107,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 		if (parts.length == 4 && !parts[3].equals("wsdl") && !parts[3].endsWith("0/hola")) {
 			additionalPath.append(parts[3].replace("0/hola/", "").replace("/wsdl", ""));
 		}
-		
+
 		// build parameter string
 		StringBuilder queryBuilder = new StringBuilder();
 		//check if path requests wsdl or has some additional query - not possible to have both
@@ -129,7 +129,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 		if (additionalPath.length() > 0) {
 			requestBuilder.append(additionalPath.toString());
 		}
-		
+
 		if (queryBuilder.length() > 0) {
 			requestBuilder.append(queryBuilder.toString());
 		}
@@ -239,10 +239,15 @@ public class SOAPTunnelServlet extends HttpServlet {
 			byte[] headerEnd = new String("\r\n\r\n").getBytes();
 			//find end of header
 			for(;bodyStartIndex < byteData.length; bodyStartIndex++) {
-				if(Arrays.equals(
-						Arrays.copyOfRange(byteData, bodyStartIndex, bodyStartIndex + headerEnd.length),
-						headerEnd)) {
-					bodyStartIndex = bodyStartIndex + headerEnd.length;
+				if(bodyStartIndex + headerEnd.length < byteData.length) {
+					if(Arrays.equals(
+							Arrays.copyOfRange(byteData, bodyStartIndex, bodyStartIndex + headerEnd.length),
+							headerEnd)) {
+						bodyStartIndex = bodyStartIndex + headerEnd.length;
+						break;
+					}
+				} else {
+					bodyStartIndex = byteData.length;
 					break;
 				}
 			}
@@ -265,9 +270,9 @@ public class SOAPTunnelServlet extends HttpServlet {
 				i++;
 			}
 			//concat remaining elements of 'headers' array (the real data) into response body
-//			for(i++;i < headers.length;i++) {
-//				body = body.concat(headers[i]);
-//			}
+			//			for(i++;i < headers.length;i++) {
+			//				body = body.concat(headers[i]);
+			//			}
 			body = Arrays.copyOfRange(byteData, bodyStartIndex, byteData.length);
 		}
 		//write body data	

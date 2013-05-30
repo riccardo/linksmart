@@ -7,10 +7,12 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,7 +41,7 @@ public class SOAPTunnelServletTest {
 	private VirtualAddress nmAddress;
 	private String nmAddressString = "0.0.0.0";
 	private NMResponse nmResponse;
-	private PrintWriter pWriter;
+	private ServletOutputStream outStream;
 
 
 	@Before
@@ -47,9 +49,9 @@ public class SOAPTunnelServletTest {
 		this.nmCore = mock(NetworkManagerCore.class);
 		this.soapTunnelServlet = new SOAPTunnelServlet(nmCore);
 		this.response = mock(HttpServletResponse.class);
-		this.pWriter = new PrintWriter(new ByteArrayOutputStream());
+		this.outStream = mock(ServletOutputStream.class);
 		try {
-			when(response.getWriter()).thenReturn(pWriter);
+			when(response.getOutputStream()).thenReturn(outStream);
 		} catch (IOException e1) {
 			//NOP
 		}
