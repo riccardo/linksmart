@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.regex.*;
 
@@ -15,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.Registration;
+import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.utils.Part;
@@ -26,6 +28,7 @@ public class TunnelServlet extends HttpServlet{
 	private static final Logger logger = Logger
 			.getLogger(TunnelServlet.class.getName());
 	private static final String NO_SERVICE = "Did not find matching service";
+	private static final int SERVICE_DISCOVERY_TIMEOUT = 10*1000;
 
 	protected TunnelServlet(Tunnel tunnel) {
 		this.tunnel = tunnel;
@@ -59,10 +62,16 @@ public class TunnelServlet extends HttpServlet{
 			}
 		}
 		
+		boolean getDefault = path.startsWith("/default");
+		if(getDefault) {
+			//remove default switch similarly to sender
+			path = path.substring(8);
+		}
+		
 		//get service
 		Registration registration = null;
 		try {
-			registration = getSearchedService(request.getQueryString());
+			registration = getSearchedService(request.getQueryString(), getDefault);
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
 			return;
@@ -125,10 +134,15 @@ public class TunnelServlet extends HttpServlet{
 			}
 		}
 
+		boolean getDefault = path.startsWith("/default");
+		if(getDefault) {
+			//remove default switch similarly to sender
+			path = path.substring(8);
+		}
 		//get service
 		Registration registration = null;
 		try {
-			registration = getSearchedService(request.getQueryString());
+			registration = getSearchedService(request.getQueryString(), getDefault);
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
 			return;
@@ -165,21 +179,26 @@ public class TunnelServlet extends HttpServlet{
 		}
 	}
 
-	private Registration getSearchedService(String query) throws MultipleMatchException, Exception {
-		ArrayList<Part> attributes = new ArrayList<Part>();
-		boolean getDefault = false;
-		if(query.contains("#default")) {
-			//cut off default switch from end as it is not part of the query
-			query = query.substring(0, query.indexOf("#default"));
-			getDefault = true;
-		}
-		
+	private Registration getSearchedService(String query, boolean getDefault) throws MultipleMatchException, Exception {
+		ArrayList<Part> attributes = new ArrayList<Part>();		
 		//divide query into individual attributes
 		String[] queryAttrs = query.split("&");
 
 		for(String queryAttr : queryAttrs) {
 			int separatorIndex = queryAttr.indexOf("=");
 			String attributeName = queryAttr.substring(0, separatorIndex).toUpperCase();
+			ServiceAttribute attributeNameCheck = null;
+			//FIXME should this be here?
+			//check if the searched service attribute exists
+//			try {
+//				attributeNameCheck = ServiceAttribute.valueOf(attributeName);
+//			} catch (Exception e) {
+//				throw new Exception("Unknown service attribute key");
+//			}
+//			if(attributeNameCheck == null) {
+//				throw new Exception("Unknown service attribute key");
+//			}
+			
 			String attributeValue = queryAttr.substring(separatorIndex + 1);
 			if(attributeValue.startsWith("\"") && attributeValue.endsWith("\"")) {
 				//cut off quotation symbols
@@ -196,8 +215,13 @@ public class TunnelServlet extends HttpServlet{
 		//find service matching attributes
 		Registration[] registrations = null;
 		try {
+			if(getDefault) {
+				registrations = tunnel.getNM().
+						getServiceByAttributes(attributes.toArray(new Part[]{}), SERVICE_DISCOVERY_TIMEOUT, true, false);
+			} else {
 			registrations = tunnel.getNM().
 					getServiceByAttributes(attributes.toArray(new Part[]{}));
+			}
 		} catch (RemoteException e) {
 			//local invocation
 		}
@@ -240,16 +264,35 @@ public class TunnelServlet extends HttpServlet{
 	 */
 	private void sendRequest(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, String requestString,
 			HttpServletResponse response) throws IOException {
-		NMResponse r = tunnel.getNM().sendData(senderVirtualAddress, receiverVirtualAddress, requestString.getBytes(), true);
-		String body = new String();
+		NMResponse r = this.tunnel.getNM().sendData(senderVirtualAddress, receiverVirtualAddress, requestString.getBytes(), true);
+		int bodyStartIndex = 0;
+		byte[] byteData = null;
+		byte[] body = null;
 		//check response status and if error response BAD_GATEWAY else parse response for client
 		if (!r.getMessage().startsWith("HTTP/1.1 200 OK")) {
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			//set whole response data as body
-			body = r.getMessage();
+			body = r.getMessage().getBytes();
 		} else {		
 			//take headers from data and add them to response
-			String[] headers = r.getMessage().split("(?<=\r\n)");
+			byteData = r.getMessageBytes();
+			byte[] headerEnd = new String("\r\n\r\n").getBytes();
+			//find end of header
+			for(;bodyStartIndex < byteData.length; bodyStartIndex++) {
+				if(bodyStartIndex + headerEnd.length < byteData.length) {
+					if(Arrays.equals(
+							Arrays.copyOfRange(byteData, bodyStartIndex, bodyStartIndex + headerEnd.length),
+							headerEnd)) {
+						bodyStartIndex = bodyStartIndex + headerEnd.length;
+						break;
+					}
+				} else {
+					bodyStartIndex = byteData.length;
+					break;
+				}
+			}
+			byte[] headersBytes = Arrays.copyOf(byteData, bodyStartIndex);
+			String[] headers = new String(headersBytes).split("(?<=\r\n)");
 			//use it to get index of data element
 			int i = 0;
 			//go through headers and put them to response until empty line is reached
@@ -267,13 +310,15 @@ public class TunnelServlet extends HttpServlet{
 				i++;
 			}
 			//concat remaining elements of 'headers' array (the real data) into response body
-			for(i++;i < headers.length;i++) {
-				body = body.concat(headers[i]);
-			}
+			//			for(i++;i < headers.length;i++) {
+			//				body = body.concat(headers[i]);
+			//			}
+			body = Arrays.copyOfRange(byteData, bodyStartIndex, byteData.length);
 		}
-		//write body data
-		response.setContentLength(body.getBytes().length);
-		response.getWriter().write(body);
+		//write body data	
+		response.setContentLength(body.length);
+		response.getOutputStream().write(body);
+		response.getOutputStream().close();
 	}
 
 	class MultipleMatchException extends Exception {
