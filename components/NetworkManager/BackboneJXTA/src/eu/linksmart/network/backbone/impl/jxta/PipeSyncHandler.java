@@ -387,7 +387,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					return resp;
 				}
 			} else {
-				Message message = createRequestMessage(source, dest, data, i.toString(), bbjxta.getPeerID(), true);
+				Message message = createRequestMessage(source, dest, data, i.toString(), bbjxta.getPeerID(), synch);
 
 				try {
 
