@@ -10,6 +10,7 @@ import static org.mockito.Matchers.any;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -17,6 +18,7 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.linksmart.network.ErrorMessage;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.VirtualAddress;
@@ -31,8 +33,10 @@ public class ConnectionManagerTest {
 	private ConnectionManager connectionMgr;
 	private Connection con;
 	private BroadcastConnection bCon;
-	NetworkManagerCoreImpl nmCore;
-	IdentityManager idM;
+	private NetworkManagerCoreImpl nmCore;
+	private IdentityManager idM;
+	private NMResponse handshakeResp;
+	private NMResponse handshakeRespDecline;
 
 	@Before
 	public void setUp(){
@@ -50,10 +54,24 @@ public class ConnectionManagerTest {
 		policy.add(SecurityProperty.NoSecurity);
 		connectionMgr.servicePolicies.put(receiverVirtualAddress, policy);
 
+		//Create handshake response message
+		String usedSecurity = ConnectionManager.HANDSHAKE_ACCEPT + " ";
+		usedSecurity = usedSecurity.concat(SecurityProperty.NoSecurity.name());
+		Message msg = new Message(
+				Message.TOPIC_CONNECTION_HANDSHAKE,
+				receiverVirtualAddress,
+				senderVirtualAddress,
+				usedSecurity.getBytes());
+		handshakeResp = new NMResponse(NMResponse.STATUS_SUCCESS);
+		handshakeResp.setMessageObject(msg);
+		
+		//Create handshake response message for declined
+		handshakeRespDecline = new NMResponse(NMResponse.STATUS_SUCCESS);
+		handshakeRespDecline.setMessage(ConnectionManager.HANDSHAKE_DECLINE + " ");		
+
 		when(idM.getServiceInfo(any(VirtualAddress.class))).thenReturn(null);
 		when(nmCore.getService()).thenReturn(senderVirtualAddress);
 		when(nmCore.getVirtualAddress()).thenReturn(senderVirtualAddress);
-		when(nmCore.sendMessage(any(Message.class), any(boolean.class))).thenReturn(new NMResponse(NMResponse.STATUS_ERROR));
 	}
 
 	/**
@@ -80,10 +98,11 @@ public class ConnectionManagerTest {
 	}
 
 	/**
-	 * Tests if a stored connection is returned on request.
+	 * Tests whether when creating a new connection an appropriate handshake is sent out
 	 */
 	@Test
 	public void testStartHandshake() {
+		when(nmCore.sendMessage(any(Message.class), any(boolean.class))).thenReturn(handshakeResp);
 		//convert properties to xml and put it into stream
 		Properties props = new Properties();
 		props.put(ConnectionManager.HANDSHAKE_COMSECMGRS_KEY, "");
@@ -109,12 +128,45 @@ public class ConnectionManagerTest {
 				receiverVirtualAddress,
 				serializedPayload);
 		try {
-			con = connectionMgr.createConnection(receiverVirtualAddress, senderVirtualAddress, new byte[0]);
+			connectionMgr.createConnection(receiverVirtualAddress, senderVirtualAddress, new byte[0]);
 			verify(nmCore).sendMessage(handshakeMsg, true);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
 	}
 
+	/**
+	 * Check whether after successful handshake connection is returned
+	 */
+	@Test
+	public void testRetrieveAgreedConnection() {
+		when(nmCore.sendMessage(any(Message.class), any(boolean.class))).thenReturn(handshakeResp);
+		Connection con = null;
+		try {
+			con = connectionMgr.createConnection(receiverVirtualAddress, senderVirtualAddress, new byte[0]);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+		if(con != null) {
+			assertEquals(Connection.class, con.getClass());
+			assertEquals(null, con.comSecMgr);
+		} else {
+			fail("Create connection returned null!");
+		}
+	}
 
+	/**
+	 * Check whether after unsuccessful handshake null is returned
+	 */
+	@Test
+	public void testFailedHandshake() {
+		when(nmCore.sendMessage(any(Message.class), any(boolean.class))).thenReturn(handshakeRespDecline);
+		Connection con = null;
+		try {
+			con = connectionMgr.createConnection(receiverVirtualAddress, senderVirtualAddress, new byte[0]);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+		assertEquals(null, con);
+	}
 }

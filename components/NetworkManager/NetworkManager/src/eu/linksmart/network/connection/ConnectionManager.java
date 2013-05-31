@@ -202,9 +202,9 @@ public class ConnectionManager {
 
 		//the remote side of this connection
 		VirtualAddress remoteEndpoint = null;
-		if(receiverVirtualAddress.equals(nmCore.getService()) || senderVirtualAddress.equals(nmCore.getService())) {
+		if(receiverVirtualAddress.equals(nmCore.getVirtualAddress()) || senderVirtualAddress.equals(nmCore.getVirtualAddress())) {
 			//get virtual address of remote entity
-			remoteEndpoint = nmCore.getService().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
+			remoteEndpoint = nmCore.getVirtualAddress().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
 		}
 
 		Registration receiverRegInfo = idM.getServiceInfo(remoteEndpoint);
@@ -330,9 +330,9 @@ public class ConnectionManager {
 	private Connection createConnectionForLocalServices(VirtualAddress receiverVirtualAddress, VirtualAddress senderVirtualAddress) throws Exception{
 		//policies only apply for connections between this NM and other entity
 		List<SecurityProperty> policies = new ArrayList<SecurityProperty>();
-		if(receiverVirtualAddress.equals(nmCore.getService()) || senderVirtualAddress.equals(nmCore.getService())) {
+		if(receiverVirtualAddress.equals(nmCore.getVirtualAddress()) || senderVirtualAddress.equals(nmCore.getVirtualAddress())) {
 			//get virtual address of remote entity
-			VirtualAddress remoteVirtualAddress = nmCore.getService().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
+			VirtualAddress remoteVirtualAddress = nmCore.getVirtualAddress().equals(receiverVirtualAddress)? senderVirtualAddress : receiverVirtualAddress;
 			//check if there are policies for the VirtualAddress
 			if(this.servicePolicies.containsKey(remoteVirtualAddress)){
 				//add policies to requirement list
@@ -532,7 +532,7 @@ public class ConnectionManager {
 
 		//there was no connection found so create new connection	
 		List<SecurityProperty> policies = null;
-		if(!senderVirtualAddress.equals(nmCore.getService())) {
+		if(!senderVirtualAddress.equals(nmCore.getVirtualAddress())) {
 			policies = this.servicePolicies.get(senderVirtualAddress);
 		}
 		//check if an active connection or a dummy connection is needed
@@ -615,7 +615,7 @@ public class ConnectionManager {
 
 		Connection bannedConnection;
 		try {
-			bannedConnection = new HandshakeConnection(nmCore.getService(), remoteEndpoint, this);
+			bannedConnection = new HandshakeConnection(nmCore.getVirtualAddress(), remoteEndpoint, this);
 			if(!bannedConnections.contains(bannedConnection)) {
 				this.bannedConnections.add(bannedConnection);	
 			}
@@ -685,7 +685,7 @@ public class ConnectionManager {
 		String declineMessage = HANDSHAKE_DECLINE + " ";
 		VirtualAddress nmVA = null;
 		try {
-			nmVA = nmCore.getService();
+			nmVA = nmCore.getVirtualAddress();
 		} catch (RemoteException e1) {
 			//local invocation
 		}
