@@ -231,8 +231,6 @@ public class ConnectionManager {
 			nmCore.addRemoteVirtualAddress(remoteEndpoint, remoteEndpoint);
 		}
 
-
-
 		//if the message could not be opened or it was opened and it is not a handshake message we start the handshake
 		if(!isHandshakeMessage(data, senderVirtualAddress, receiverVirtualAddress)) {
 			/*we only start the handshake if we are the initiator of the communication
@@ -242,6 +240,7 @@ public class ConnectionManager {
 				comSecMgrName = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress);
 			} else {
 				logger.warn("Remote endpoint did not start with communication handshake");
+				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
 				return null;
 			}
 		} else {
@@ -494,7 +493,7 @@ public class ConnectionManager {
 		NMResponse response = nmCore.sendMessage(handshakeMsg, true);
 		Message respMsg = response.getMessageObject();
 
-		if(respMsg != null && new String(respMsg.getData()).startsWith(HANDSHAKE_ACCEPT)){
+		if (respMsg != null && new String(respMsg.getData()).startsWith(HANDSHAKE_ACCEPT)) {
 			//take the matching ComSecMgr and return it
 			String comSecMgrName = new String(respMsg.getData()).
 					substring(HANDSHAKE_ACCEPT.length() + 1);
@@ -616,7 +615,7 @@ public class ConnectionManager {
 
 		Connection bannedConnection;
 		try {
-			bannedConnection = new Connection(nmCore.getService(), remoteEndpoint);
+			bannedConnection = new HandshakeConnection(nmCore.getService(), remoteEndpoint, this);
 			if(!bannedConnections.contains(bannedConnection)) {
 				this.bannedConnections.add(bannedConnection);	
 			}

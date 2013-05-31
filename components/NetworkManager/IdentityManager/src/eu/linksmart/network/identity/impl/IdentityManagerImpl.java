@@ -882,7 +882,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		//only update information if it is not equal to last value
 		Registration prev = null;
 		Registration heldRegistration = remoteServices.get(virtualAddress);
-		if (heldRegistration == null || (heldRegistration != null && !heldRegistration.equals(info))) {
+		if (shouldUpdate(heldRegistration, info)) {
 			prev = remoteServices.put(virtualAddress, info);
 			if(owner != null) {
 				// Add the backbone route for this remote VirtualAddress
@@ -890,6 +890,38 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			}
 		}
 		return prev;
+	}
+
+	/**
+	 * Checks whether two Registrations represent the same entity and whether the
+	 * current Registration holds more information
+	 * @return true if services are absolutely different or current holds more information
+	 * e.g. more attributes
+	 */
+	protected boolean shouldUpdate(Registration previous, Registration current) {
+		if(previous == null) return true;
+		if(previous.equals(current)) return false;
+		for (Part currentAttr : current.getAttributes()) {
+			//get matching attribute from previous Registration
+			boolean missing = true;
+			for (Part prevAttr : previous.getAttributes()) {
+				if(prevAttr.getKey().equals(currentAttr.getKey())) {
+					if(!prevAttr.getValue().equals(currentAttr.getValue())) {
+						//an attribute has changed so update
+						return true;
+					} else {
+						//this attribute matches so move on to next attribute
+						missing = false;
+						break;
+					}
+				}
+			}
+			if(missing) {
+				//there is an attribute in current which was not there in previous
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*

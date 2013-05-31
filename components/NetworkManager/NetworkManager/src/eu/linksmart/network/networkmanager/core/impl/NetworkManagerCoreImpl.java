@@ -161,7 +161,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	public VirtualAddress getService() {
 		return this.myVirtualAddress;
 	}
-	
+
 	public VirtualAddress getVirtualAddress() {
 		return this.myVirtualAddress;
 	}
@@ -648,9 +648,11 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		this.backboneRouter.addRouteForRemoteService(senderVirtualAddress, remoteVirtualAddress);
 		//add the security properties of the backbone to the new virtual address
 		String backbone = this.backboneRouter.getRouteBackbone(remoteVirtualAddress);
-		List<SecurityProperty> secProps = this.backboneRouter.getBackboneSecurityProperties(backbone);
-		if(secProps != null) {
-			connectionManager.registerServicePolicy(remoteVirtualAddress, secProps, false);
+		if(backbone != null) {
+			List<SecurityProperty> secProps = this.backboneRouter.getBackboneSecurityProperties(backbone);
+			if(secProps != null) {
+				connectionManager.registerServicePolicy(remoteVirtualAddress, secProps, false);
+			}
 		}
 	}
 
