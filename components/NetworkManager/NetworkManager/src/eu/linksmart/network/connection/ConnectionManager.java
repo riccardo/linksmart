@@ -666,6 +666,9 @@ public class ConnectionManager {
 					} else if (bannedConnections.contains(con)) {
 						bannedConnections.remove(con);
 					}
+					if(con instanceof HandshakeConnection) {
+						((HandshakeConnection) con).setFailed();
+					}
 				}
 			}
 		}	

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -561,61 +562,64 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				matches.add(serviceInfo);
 			}
 		}
-
-		//return message confirming VirtualAddress
-		Random rand = new Random();
-		long respRandom = rand.nextLong();
-		List<AttributeResolveResponse> matchesFilterList = 
-				new ArrayList<AttributeResolveResponse>();
-		//create Bloom-filters for all matches
-		for(Registration serviceInfo : matches) {
-			//collect queried attributes
-			String attrKeys = null;
-			List<String> attributes = new ArrayList<String>();
-			StringBuilder sb = new StringBuilder();
-			for(Part part : serviceInfo.getAttributes()) {
-				//only include attributes which were searched
-				if(filter.getAttributeKeys().contains(part.getKey())) {
-					sb.append(part.getKey()+";");
-					attributes.add(part.getValue());
+		//if there are matches respond
+		if(matches.size() != 0) {
+			//return message confirming VirtualAddress
+			Random rand = new Random();
+			long respRandom = rand.nextLong();
+			List<AttributeResolveResponse> matchesFilterList = 
+					new ArrayList<AttributeResolveResponse>();
+			//create Bloom-filters for all matches
+			for(Registration serviceInfo : matches) {
+				//collect queried attributes
+				String attrKeys = null;
+				List<String> attributes = new ArrayList<String>();
+				StringBuilder sb = new StringBuilder();
+				for(Part part : serviceInfo.getAttributes()) {
+					//only include attributes which were searched
+					if(filter.getAttributeKeys().contains(part.getKey())) {
+						sb.append(part.getKey()+";");
+						attributes.add(part.getValue());
+					}
 				}
+				attrKeys = sb.toString();
+				//remove last ';' separator
+				attrKeys = attrKeys.substring(0, attrKeys.length()-1);
+				//create bloom filter with new random
+				String[] values = new String[attributes.size()];
+				boolean[] bloom = 
+						BloomFilterFactory.createBloomFilter(attributes.toArray(values), respRandom);
+				AttributeResolveFilter match = 
+						new AttributeResolveFilter(bloom, attrKeys, respRandom, filter.getIsStrictRequest());
+				//put filter of match into collection of matches
+				matchesFilterList.add(new AttributeResolveResponse(serviceInfo.getVirtualAddress(), match));
 			}
-			attrKeys = sb.toString();
-			//remove last ';' separator
-			attrKeys = attrKeys.substring(0, attrKeys.length()-1);
-			//create bloom filter with new random
-			String[] values = new String[attributes.size()];
-			boolean[] bloom = 
-					BloomFilterFactory.createBloomFilter(attributes.toArray(values), respRandom);
-			AttributeResolveFilter match = 
-					new AttributeResolveFilter(bloom, attrKeys, respRandom, filter.getIsStrictRequest());
-			//put filter of match into collection of matches
-			matchesFilterList.add(new AttributeResolveResponse(serviceInfo.getVirtualAddress(), match));
-		}
 
-		//create message from collected matches
-		byte[] serializedResp = null;
-		try{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
-			oos.writeObject(matchesFilterList);
-			serializedResp = bos.toByteArray();
-		} catch(IOException e) {
-			LOG.warn("Cannot create response to attribute resolve.",e);
-			return null;
-		}
 
-		try {
-			Message respMsg = new Message(
-					IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP,
-					networkManagerCore.getService(),
-					msg.getSenderVirtualAddress(),
-					serializedResp);
-			//put in request id so requester knows this is response
-			respMsg.setProperty(SERVICE_ATTR_RESOLVE_ID, String.valueOf(reqId));
-			return respMsg;
-		} catch(RemoteException e) {
-			//local call
+			//create message from collected matches
+			byte[] serializedResp = null;
+			try{
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(bos);
+				oos.writeObject(matchesFilterList);
+				serializedResp = bos.toByteArray();
+			} catch(IOException e) {
+				LOG.warn("Cannot create response to attribute resolve.",e);
+				return null;
+			}
+
+			try {
+				Message respMsg = new Message(
+						IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP,
+						networkManagerCore.getService(),
+						msg.getSenderVirtualAddress(),
+						serializedResp);
+				//put in request id so requester knows this is response
+				respMsg.setProperty(SERVICE_ATTR_RESOLVE_ID, String.valueOf(reqId));
+				return respMsg;
+			} catch(RemoteException e) {
+				//local call
+			}
 		}
 		return null;
 	}
@@ -657,6 +661,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			List<Message> resps = resolveResponses.remove(attrReqId);
 			//go over each found message
 			Set<Registration> foundServices = new HashSet<Registration>();
+			Map<Registration, VirtualAddress> owners = new HashMap<Registration, VirtualAddress>();
 			for(Message resp : resps) {
 				//open message
 				List<AttributeResolveResponse> filterResponses = null;
@@ -704,7 +709,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 								nrAttrs++;
 							}
 						}
-						foundServices.add(new Registration(response.getService(), foundAttr));
+						Registration reg = new Registration(response.getService(), foundAttr);
+						foundServices.add(reg);
+						owners.put(reg, msg.getSenderVirtualAddress());
 					}
 				}
 			}
@@ -722,7 +729,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						}
 					}
 				}
-				addRemoteService(serviceInfo.getVirtualAddress(), serviceInfo);
+				addRemoteService(serviceInfo.getVirtualAddress(), serviceInfo, owners.get(serviceInfo));
 			}
 			//return found services
 			return foundServices;
@@ -794,9 +801,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						Iterator<Registration> i = serviceInfos.iterator();
 						while (i.hasNext()) {
 							Registration oneServiceInfo = i.next();
-							addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo);
-							// Add the backbone route for this remote VirtualAddress
-							networkManagerCore.addRemoteVirtualAddress(msg.getSenderVirtualAddress(), oneServiceInfo.getVirtualAddress());
+							addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo, msg.getSenderVirtualAddress());
 						}
 					}
 				}
@@ -827,7 +832,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 						VirtualAddress newVirtualAddress = new VirtualAddress(updateData[1]);
 						Registration newInfo = new Registration(newVirtualAddress, updateData[2]);
 						// Add the remoteService to the internal map of remote Services
-						addRemoteService(newVirtualAddress, newInfo);
+						addRemoteService(newVirtualAddress, newInfo, msg.getSenderVirtualAddress());
 					} else if (updateData[0].equals("D")) {
 						VirtualAddress toRemoveVirtualAddress = new VirtualAddress(updateData[1]);
 						removeRemoteService(toRemoveVirtualAddress);
@@ -871,14 +876,19 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	 * 
 	 * @return The previous value associated with that VirtualAddress, null otherwise
 	 */
-	protected Registration addRemoteService(VirtualAddress virtualAddress, Registration info) {
+	protected Registration addRemoteService(VirtualAddress virtualAddress, Registration info, VirtualAddress owner) {
+		//timestamp always has to be updated
+		serviceLastUpdate.put(virtualAddress, Calendar.getInstance().getTimeInMillis());
 		//only update information if it is not equal to last value
 		Registration prev = null;
-		Registration heldRegistration = remoteServices.get(info.getVirtualAddress());
+		Registration heldRegistration = remoteServices.get(virtualAddress);
 		if (heldRegistration == null || (heldRegistration != null && !heldRegistration.equals(info))) {
 			prev = remoteServices.put(virtualAddress, info);
+			if(owner != null) {
+				// Add the backbone route for this remote VirtualAddress
+				networkManagerCore.addRemoteVirtualAddress(owner, virtualAddress);
+			}
 		}
-		serviceLastUpdate.put(virtualAddress, Calendar.getInstance().getTimeInMillis());
 		return prev;
 	}
 

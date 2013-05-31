@@ -58,7 +58,7 @@ public class HandshakeConnection extends Connection{
 			synchronized(this) {
 				while(!resolved) {
 					try {
-						this.wait(2500);
+						this.wait(10000);
 					} catch (InterruptedException e) {
 						//nothing to handle
 					}
@@ -86,6 +86,4 @@ public class HandshakeConnection extends Connection{
 		failed = true;
 		setStateResolved();
 	}
-
-
 }

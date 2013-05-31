@@ -253,8 +253,6 @@ public class SOAPTunnelServlet extends HttpServlet {
 			}
 			byte[] headersBytes = Arrays.copyOf(byteData, bodyStartIndex);
 			String[] headers = new String(headersBytes).split("(?<=\r\n)");
-			//use it to get index of data element
-			int i = 0;
 			//go through headers and put them to response until empty line is reached
 			for (String header : headers) {	
 				if(header.contentEquals("\r\n")) {
@@ -267,12 +265,7 @@ public class SOAPTunnelServlet extends HttpServlet {
 						response.setHeader(headerParts[0], headerParts[1].trim());
 					}
 				}
-				i++;
 			}
-			//concat remaining elements of 'headers' array (the real data) into response body
-			//			for(i++;i < headers.length;i++) {
-			//				body = body.concat(headers[i]);
-			//			}
 			body = Arrays.copyOfRange(byteData, bodyStartIndex, byteData.length);
 		}
 		//write body data	
