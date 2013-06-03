@@ -36,7 +36,10 @@ namespace EventManager
                 else
                     ipAddress = Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily == AddressFamily.InterNetworkV6).First().ToString();
 
-                string address = string.Format("http://{0}:{1}/Service", ipAddress, "8124"); //Change localhost to your own ip-address
+                string address = string.Format("http://{0}:{1}/Service", "127.0.0.1", "8124"); //Change localhost to your own ip-address
+
+                //We want to bind on all avaialable addresses 
+                string bindingAddress = string.Format("http://{0}:{1}/Service", "0.0.0.0", "8124");
                 Uri[] BaseAddresses = new Uri[] { new Uri(address) };
                 //Turn off 100-continue
                 System.Net.ServicePointManager.Expect100Continue = false;

@@ -53,7 +53,8 @@ namespace WindowsEventManager
                     StartEventManager();
                 }
             }
-            catch { Console.WriteLine("Error with autostart config setting."); }
+            catch(Exception ex)
+            { Console.WriteLine("Error with autostart config setting."+ex.Message); }
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
