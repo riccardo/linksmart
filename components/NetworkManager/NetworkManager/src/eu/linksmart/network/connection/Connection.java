@@ -282,7 +282,7 @@ public class Connection {
 		if(obj.getClass().equals(this.getClass())) {
 			Connection c = (Connection)obj;
 			if(c.getClientVirtualAddress() != null) {
-				if((c.getClientVirtualAddress().equals(this.clientVirtualAddress) && c.getServerVirtualAddress().equals(c.serverVirtualAddress))
+				if((c.getClientVirtualAddress().equals(this.clientVirtualAddress) && c.getServerVirtualAddress().equals(this.serverVirtualAddress))
 						|| (c.getClientVirtualAddress().equals(this.serverVirtualAddress) && c.getServerVirtualAddress().equals(this.clientVirtualAddress))) {
 					return true;
 				} else {
