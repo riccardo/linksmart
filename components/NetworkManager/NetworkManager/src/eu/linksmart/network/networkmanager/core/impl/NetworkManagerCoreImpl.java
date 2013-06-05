@@ -136,6 +136,8 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			LOG.error(
 					"PANIC - RemoteException thrown on local access of own method",
 					e);
+		} catch (Exception e) {
+			LOG.error("Error creating registraiton for NetworkManager. This will cause serious problems!", e);
 		}
 
 		// Init Servlets
