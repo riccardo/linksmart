@@ -138,6 +138,14 @@ public class ConnectionManager {
 			}
 		}
 	}
+	
+	/**
+	 * Removes the policies registered for a given VirtualAddress.
+	 * @param virtualAddress
+	 */
+	public void removeServicePolicy(VirtualAddress virtualAddress) {
+		servicePolicies.remove(virtualAddress);
+	}
 
 	/**
 	 * Removes the VirtualAddress's policy. After this call the VirtualAddress
@@ -221,6 +229,8 @@ public class ConnectionManager {
 			return null;
 		} else {
 			connections.add(tempCon);
+			//this ensures that if worse comes to worse the connection is removed
+			timeouts.put(tempCon, Calendar.getInstance().getTime());
 		}
 
 		//it is possible to release the lock now as the handshake connection is created
@@ -322,6 +332,7 @@ public class ConnectionManager {
 		timeouts.put(conn, cal.getTime());
 		//remove temporary connection as proper connection has been added now
 		connections.remove(tempCon);
+		timeouts.remove(tempCon);
 		tempCon.setStateResolved();
 
 		return conn;
@@ -611,6 +622,7 @@ public class ConnectionManager {
 	 */
 	private void handleUnsuccesfulHandshake(VirtualAddress remoteEndpoint, HandshakeConnection tempCon) {
 		connections.remove(tempCon);
+		timeouts.remove(tempCon);
 		tempCon.setFailed();
 
 		Connection bannedConnection;

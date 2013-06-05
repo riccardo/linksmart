@@ -190,10 +190,18 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				this.connectionManager.registerServicePolicy(newRegistration.getVirtualAddress(), properties, true);
 			}
 			// add route to selected backbone
-			this.backboneRouter.addRouteToBackbone(newRegistration.getVirtualAddress(), backboneName,
-					endpoint);
+			if(this.backboneRouter.addRouteToBackbone(newRegistration.getVirtualAddress(), backboneName,
+					endpoint)) {
+				return newRegistration;
+			} else {
+				//adding route to backbone failed so cleanup what has been done
+				this.identityManager.removeService(newRegistration.getVirtualAddress());
+				this.connectionManager.removeServicePolicy(newRegistration.getVirtualAddress());
+				return null;
+			}
+		} else {
+			return null;
 		}
-		return newRegistration;
 	}
 
 	@Override

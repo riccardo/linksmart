@@ -1,25 +1,19 @@
 package eu.linksmart.network.connection;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.InvalidPropertiesFormatException;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
 import eu.linksmart.network.ErrorMessage;
-import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.Message;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.security.communication.CommunicationSecurityManager;
 import eu.linksmart.security.communication.CryptoException;
 import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.security.communication.SecurityProtocol;
 import eu.linksmart.security.communication.VerificationFailureException;
-import eu.linksmart.utils.Base64;
 
 /**
  * Holds properties and objects relevant for a connection between two services.
