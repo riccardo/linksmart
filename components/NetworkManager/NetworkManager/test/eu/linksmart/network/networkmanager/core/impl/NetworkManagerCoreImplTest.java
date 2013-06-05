@@ -34,7 +34,7 @@ import eu.linksmart.utils.Part;
  * Test class for NetworkManagerCoreImpl 
  */
 public class NetworkManagerCoreImplTest {
-	
+
 	private NetworkManagerCoreImpl nmCoreImpl;
 	private VirtualAddress senderVirtualAddress;
 	private VirtualAddress receiverVirtualAddress;
@@ -53,7 +53,7 @@ public class NetworkManagerCoreImplTest {
 		data = "LinkSmart rocks".getBytes();
 		nmCoreImpl = new NetworkManagerCoreImpl();
 		nmCoreImpl.myVirtualAddress = new VirtualAddress("124.3235.346234.3456");
-		
+
 		// Mocked classes
 		nmCoreImpl.backboneRouter = mock(BackboneRouter.class);
 		nmCoreImpl.identityManager = mock(IdentityManager.class);
@@ -67,19 +67,21 @@ public class NetworkManagerCoreImplTest {
 		when(nmCoreImpl.connectionManager.getConnection(eq(receiverVirtualAddress), eq(nmCoreImpl.myVirtualAddress)))
 		.thenReturn(new NOPConnection(senderVirtualAddress, receiverVirtualAddress));
 		when(nmCoreImpl.backboneRouter.broadcastData(any(VirtualAddress.class), any(byte[].class))).
-			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
+		thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		when(nmCoreImpl.backboneRouter.sendDataSynch(eq(nmCoreImpl.myVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
-			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
+		thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		when(nmCoreImpl.identityManager.getServiceInfo(receiverVirtualAddress)).
-			thenReturn(new Registration(receiverVirtualAddress, new Part[]{}));
+		thenReturn(new Registration(receiverVirtualAddress, new Part[]{}));
 		when(nmCoreImpl.backboneRouter.sendDataSynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class))).
-			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
+		thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(VirtualAddress.class), eq(receiverVirtualAddress), any(byte[].class))).
-			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
+		thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
 		when(nmCoreImpl.backboneRouter.sendDataAsynch(any(VirtualAddress.class), eq(senderVirtualAddress), any(byte[].class))).
-			thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
+		thenReturn(new NMResponse(NMResponse.STATUS_SUCCESS));
+		when(nmCoreImpl.backboneRouter.addRouteToBackbone(any(VirtualAddress.class), any(String.class), any(String.class))).
+		thenReturn(true);
 	}
-	
+
 	/**
 	 * Tests broadcastMessage of NetworkManagerCoreImpl. 
 	 */
@@ -87,9 +89,9 @@ public class NetworkManagerCoreImplTest {
 	public void testBroadcastMessage() {
 		byte [] data = "LinkSmart rocks".getBytes();
 		Message message = new Message(topic, senderVirtualAddress, receiverVirtualAddress, data);
-		
+
 		NMResponse response = nmCoreImpl.broadcastMessage(message);
-		
+
 		assertNotNull("Response should not be null", response);
 		assertEquals(NMResponse.STATUS_SUCCESS, response.getStatus());
 	}
@@ -101,11 +103,11 @@ public class NetworkManagerCoreImplTest {
 	public void testSendMessageSync() {
 		byte [] data = "LinkSmart rocks".getBytes();
 		Message message = new Message(topic, senderVirtualAddress, receiverVirtualAddress, data);
-		
+
 		NMResponse response = nmCoreImpl.sendMessage(message, true);
-		
+
 		verify(nmCoreImpl.backboneRouter).
-			sendDataSynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class));
+		sendDataSynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class));
 		assertNotNull("Response should not be null", response);
 	}
 
@@ -116,14 +118,14 @@ public class NetworkManagerCoreImplTest {
 	public void testSendMessageAsync() {
 		byte [] data = "LinkSmart rocks".getBytes();
 		Message message = new Message(topic, senderVirtualAddress, receiverVirtualAddress, data);
-		
+
 		NMResponse response = nmCoreImpl.sendMessage(message, false);
-		
+
 		verify(nmCoreImpl.backboneRouter).
-			sendDataAsynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class));
+		sendDataAsynch(eq(senderVirtualAddress), eq(receiverVirtualAddress), any(byte[].class));
 		assertNotNull("Response should not be null", response);
 	}
-	
+
 	/**
 	 * Tests receiveDataSync else-case, which occurs if neither the receiverVirtualAddress 
 	 * is null, nor does the identity manager contain the receiver registration object.
@@ -137,16 +139,16 @@ public class NetworkManagerCoreImplTest {
 			e.printStackTrace();
 			fail("Exception occurred: " + e);
 		}
-		
-		
+
+
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, receiverVirtualAddress, rawData);
-		
+
 		// Check if the response is as expected
 		assertEquals("The response was not successful.",  
 				NMResponse.STATUS_SUCCESS, response.getStatus());
 	}
-	
+
 	/**
 	 * Tests receiveDataSync where processing is not successful.
 	 */
@@ -155,10 +157,10 @@ public class NetworkManagerCoreImplTest {
 		Registration receiverRegistration = new Registration(receiverVirtualAddress, new Part[]{});
 		Set<Registration> infos = new HashSet<Registration>();
 		infos.add(receiverRegistration);
-		
+
 		when(nmCoreImpl.identityManager.getLocalServices()).
-			thenReturn(infos);
-		
+		thenReturn(infos);
+
 		byte rawData[] = null;
 		try {
 			rawData = getData();
@@ -166,34 +168,34 @@ public class NetworkManagerCoreImplTest {
 			e.printStackTrace();
 			fail("Exception occurred: " + e);
 		}
-		
+
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, receiverVirtualAddress, rawData);
-		
+
 		// Check if the response is as expected
 		assertEquals("The request should not be successful.",  
 				NMResponse.STATUS_ERROR, response.getStatus());
 	}
-	
+
 	/**
 	 * Tests receiveDataSync with broadcasting message, but without processing it
 	 * Because it is not processed, an exception should occur.
 	 */
 	@Test
 	public void  testReceiveDataSyncBroadcastUnsucessful() {
-		
+
 		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
 		Connection connection = mock(Connection.class);
 		try {
 			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress))).
-				thenReturn(connection);
+			thenReturn(connection);
 			when(connection.processData(eq(senderVirtualAddress), any(VirtualAddress.class), any(byte[].class))).
-				thenReturn(new Message(topic, senderVirtualAddress, null, data));
+			thenReturn(new Message(topic, senderVirtualAddress, null, data));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception occured " +e);
 		}
-		
+
 		byte rawData[] = null;
 		try {
 			rawData = getData();
@@ -201,23 +203,23 @@ public class NetworkManagerCoreImplTest {
 			e.printStackTrace();
 			fail("Exception occurred: " + e);
 		}
-		
+
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, null, rawData);
-		
+
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
 				NMResponse.STATUS_ERROR, response.getStatus());
 		assertEquals("Received a message which has not been processed", response.getMessage());
 	}
-	
+
 	/**
 	 * Tests receiveDataSync with broadcasting message as there is no receiver VirtualAddress
 	 */
 	@Test
 	public void  testReceiveDataSyncBroadcast() {
 		mockForSucessfulReceiveData();
-		
+
 		byte rawData[] = null;
 		try {
 			rawData = getData();
@@ -225,22 +227,22 @@ public class NetworkManagerCoreImplTest {
 			e.printStackTrace();
 			fail("Exception occurred: " + e);
 		}
-		
+
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, null, rawData);
-		
+
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
 				NMResponse.STATUS_SUCCESS, response.getStatus());
 	}
-	
+
 	/**
 	 * Tests receiveData with broadcasting message as there is no receiver VirtualAddress
 	 */
 	@Test
 	public void  testReceiveDataAsyncBroadcast() {
 		mockForSucessfulReceiveData();
-		
+
 		byte rawData[] = null;
 		try {
 			rawData = getData();
@@ -248,15 +250,15 @@ public class NetworkManagerCoreImplTest {
 			e.printStackTrace();
 			fail("Exception occurred: " + e);
 		}
-		
+
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataAsynch(senderVirtualAddress, null, rawData);
-		
+
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
 				NMResponse.STATUS_SUCCESS, response.getStatus());
 	}
-	
+
 	/**
 	 * Tests receiveData with broadcasting message as there is no receiver VirtualAddress
 	 * and with an empty return message
@@ -264,7 +266,7 @@ public class NetworkManagerCoreImplTest {
 	@Test
 	public void  testReceiveDataAsyncBroadcastEmtpyMessage() {
 		mockForSucessfulReceiveData();
-		
+
 		byte rawData[] = null;
 		try {
 			rawData = getData();
@@ -272,15 +274,15 @@ public class NetworkManagerCoreImplTest {
 			e.printStackTrace();
 			fail("Exception occurred: " + e);
 		}
-		
+
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataAsynch(senderVirtualAddress, null, rawData);
-		
+
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
 				NMResponse.STATUS_SUCCESS, response.getStatus());
 	}
-	
+
 	/**
 	 * Tests receiveDataSync else-case, which occurs if neither the receiverVirtualAddress 
 	 * is null, nor does the identity manager contain the receiverRegistration object.
@@ -296,31 +298,31 @@ public class NetworkManagerCoreImplTest {
 		}
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataAsynch(senderVirtualAddress, receiverVirtualAddress, rawData);
-			
+
 		// Check if the response is as expected
 		assertEquals("The response was not successful.",  
 				NMResponse.STATUS_SUCCESS, response.getStatus());
 	}
-	
+
 	/**
 	 * Tests receiveDataAsync with broadcasting message, but without processing it
 	 * Because it is not processed, an exception should occur.
 	 */
 	@Test
 	public void  testReceiveDataAsyncBroadcastUnsucessful() {
-		
+
 		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
 		Connection connection = mock(Connection.class);
 		try {
 			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress))).
-				thenReturn(connection);
+			thenReturn(connection);
 			when(connection.processData(eq(senderVirtualAddress), any(VirtualAddress.class), any(byte[].class))).
-				thenReturn(new Message(topic, senderVirtualAddress, null, data));
+			thenReturn(new Message(topic, senderVirtualAddress, null, data));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception occured " +e);
 		}
-		
+
 		byte rawData[] = null;
 		try {
 			rawData = getData();
@@ -328,10 +330,10 @@ public class NetworkManagerCoreImplTest {
 			e.printStackTrace();
 			fail("Exception occurred: " + e);
 		}
-		
+
 		// Call the method in test
 		NMResponse response = nmCoreImpl.receiveDataSynch(senderVirtualAddress, null, rawData);
-		
+
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
 				NMResponse.STATUS_ERROR, response.getStatus());
@@ -344,12 +346,12 @@ public class NetworkManagerCoreImplTest {
 	@Test
 	public void  testAddRemoteVirtualAddress() {
 		VirtualAddress remoteVirtualAddress = new VirtualAddress("354.453.111.323");
-		
+
 		nmCoreImpl.addRemoteVirtualAddress(senderVirtualAddress, remoteVirtualAddress);
-		
+
 		verify(nmCoreImpl.backboneRouter).addRouteForRemoteService(senderVirtualAddress, remoteVirtualAddress);
 	}
-	
+
 	/**
 	 * Tests getServiceByDescription
 	 */
@@ -357,7 +359,7 @@ public class NetworkManagerCoreImplTest {
 	public void testGetServiceByDescription() {
 		String description = "description";
 		String query = ("(DESCRIPTION==description)");
-		
+
 		Registration[] foundServiceInfos = nmCoreImpl.getServiceByDescription(description);
 		verify(nmCoreImpl.identityManager).getServiceByAttributes(new Part[]{
 				new Part(ServiceAttribute.DESCRIPTION.name(), description)},
@@ -365,7 +367,7 @@ public class NetworkManagerCoreImplTest {
 				false,
 				false);
 	}
-	
+
 	/**
 	 * Tests getServiceByPID
 	 */
@@ -380,11 +382,11 @@ public class NetworkManagerCoreImplTest {
 				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false,
 				false)).thenReturn(infos);
-		
+
 		Registration foundServiceInfo = nmCoreImpl.getServiceByPID(PID);
 		assertEquals(infos[0].getVirtualAddress(), foundServiceInfo.getVirtualAddress());
 	}
-	
+
 	/**
 	 * Tests if there are more than one Registration returned for getServiceByPID
 	 */
@@ -392,7 +394,7 @@ public class NetworkManagerCoreImplTest {
 	public void testGetServiceByPIDWithExceptionSeveralRegistrations() {
 		String PID = "Unique PID";
 		String query = ("(PID==Unique PID)");
-		
+
 		// Return more than one VirtualAddress so that an exception is thrown
 		Registration[] infos = new Registration[2];
 		infos[0] = new Registration(new VirtualAddress(), new Part[0]);
@@ -402,7 +404,7 @@ public class NetworkManagerCoreImplTest {
 				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false,
 				false)).thenReturn(infos);
-		
+
 		try {
 			nmCoreImpl.getServiceByPID(PID);
 			// if we get here, there was no exception
@@ -413,14 +415,14 @@ public class NetworkManagerCoreImplTest {
 			assertEquals("More than one service registration found to passed PID", e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Tests if there was no PID given for getServiceByPID
 	 */
 	@Test
 	public void testGetServiceByPIDWithExceptionNoPID() {
 		String PID = "";
-		
+
 		try {
 			nmCoreImpl.getServiceByPID(PID);
 			// if we get here, there was no exception
@@ -432,7 +434,7 @@ public class NetworkManagerCoreImplTest {
 		// Checks that method was not called
 		verify(nmCoreImpl.identityManager, times(0)).getServicesByAttributes(any(String.class));
 	}
-	
+
 	/**
 	 * Tests registerService and checks if a Registration object is returned.
 	 */
@@ -448,8 +450,8 @@ public class NetworkManagerCoreImplTest {
 				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false, false)).thenReturn(new Registration[0]);
 		when(nmCoreImpl.identityManager.createServiceByAttributes(attributes)).
-			thenReturn(new Registration(new VirtualAddress(), attributes));
-		
+		thenReturn(new Registration(new VirtualAddress(), attributes));
+
 		try {
 			// call the method in test
 			Registration registration = nmCoreImpl.registerService(attributes, endpoint, backboneName);
@@ -460,7 +462,7 @@ public class NetworkManagerCoreImplTest {
 			fail("Exception occured " + e);
 		}
 	}
-	
+
 	/**
 	 * Tests registerService, throws exception because PID already exists for another VirtualAddress
 	 */
@@ -471,18 +473,18 @@ public class NetworkManagerCoreImplTest {
 		Part[] attributes = new Part[] { 
 				new Part("DESCRIPTION", "description"), 
 				new Part("PID", "Unique PID")};
-		
+
 		Registration registration = new Registration(new VirtualAddress(), attributes);
 		Registration[] returnedRegistrations = new Registration[1];
 		returnedRegistrations[0] = registration;
-		
+
 		// "returning" that PID already exists
 		when(nmCoreImpl.identityManager.getServiceByAttributes(
 				new Part[]{attributes[1]},
 				IdentityManager.SERVICE_RESOLVE_TIMEOUT,
 				false, false)).
-			thenReturn(returnedRegistrations);
-		
+				thenReturn(returnedRegistrations);
+
 		try {
 			// call the method under test
 			nmCoreImpl.registerService(attributes, endpoint, backboneName);
@@ -497,8 +499,8 @@ public class NetworkManagerCoreImplTest {
 					e.getMessage());
 		}
 	}
-	
-	
+
+
 	/**
 	 * Gets test data needed in tests
 	 * @return byte[] from processed message
@@ -514,13 +516,13 @@ public class NetworkManagerCoreImplTest {
 		Connection connection = mock(Connection.class);
 		try {
 			when(nmCoreImpl.connectionManager.getConnection(any(VirtualAddress.class), any(VirtualAddress.class))).
-				thenReturn(connection);
+			thenReturn(connection);
 			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress))).
-				thenReturn(connection);
+			thenReturn(connection);
 			when(connection.processData(eq(senderVirtualAddress), any(VirtualAddress.class), any(byte[].class))).
-				thenReturn(new Message(topic, senderVirtualAddress, senderVirtualAddress, data));
+			thenReturn(new Message(topic, senderVirtualAddress, senderVirtualAddress, data));
 			when(connection.processMessage(any(Message.class))).
-				thenReturn(data);
+			thenReturn(data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception occured " +e);
