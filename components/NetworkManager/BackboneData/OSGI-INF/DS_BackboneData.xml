@@ -4,5 +4,4 @@
    <service>
       <provide interface="eu.linksmart.network.backbone.Backbone"/>
    </service><reference bind="bindBackboneRouter" unbind="unbindBackboneRouter" cardinality="1..1" interface="eu.linksmart.network.routing.BackboneRouter" name="BackboneRouter" policy="static"/>
-             <reference bind="addDataEndpoint" cardinality="0..n" interface="eu.linksmart.network.backbone.data.DataEndpoint" name="DataEndpoint" policy="dynamic" unbind="removeDataEndpoint"/>
 </scr:component>

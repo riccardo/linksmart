@@ -38,26 +38,8 @@ public class BackboneData implements Backbone {
 		bRouter = null;
 	}
 
-	// Maps the LS virtual address to OSGi "service.id" property
+	// Maps the LS virtual address to OSGi "component.name" property
 	private Map<VirtualAddress, String> addressEndpointMap = new ConcurrentHashMap<VirtualAddress, String>();
-
-	// Maps the LS virtual address to OSGi service
-	private Map<VirtualAddress, DataEndpoint> addressServiceMap = new ConcurrentHashMap<VirtualAddress, DataEndpoint>();
-
-	protected void addDataEndpoint(DataEndpoint endpoint, Map properties) {
-		addDataEndpoint(endpoint, properties.get(Constants.SERVICE_ID)
-				.toString());
-	}
-
-	protected void addDataEndpoint(DataEndpoint endpoint, String id) {
-		addressEndpointMap.put(endpoint.getVirtualAddress(), id);
-		addressServiceMap.put(endpoint.getVirtualAddress(), endpoint);
-	}
-
-	protected void removeDataEndpoint(DataEndpoint endpoint) {
-		addressEndpointMap.remove(endpoint.getVirtualAddress());
-		addressServiceMap.remove(endpoint.getVirtualAddress());
-	}
 
 	@Override
 	public NMResponse sendDataSynch(VirtualAddress senderVirtualAddress,
@@ -102,12 +84,46 @@ public class BackboneData implements Backbone {
 			VirtualAddress receiverVirtualAddress, byte[] data) {
 		NMResponse resp = new NMResponse(NMResponse.STATUS_ERROR);
 
-		if (!this.addressServiceMap.containsKey(receiverVirtualAddress)) {
+		if (!this.addressEndpointMap.containsKey(receiverVirtualAddress)) {
 			resp.setMessage(ENDPOINT_UNREACHABLE);
 			return resp;
 		}
-		addressServiceMap.get(receiverVirtualAddress).receive(data);
+
+		// Try to resolve service and pass data
+		DataEndpoint service = resolveEndpointComponent(receiverVirtualAddress);
+		if (service == null)
+			// Error
+			return resp;
+
+		service.receive(data);
 		return new NMResponse(NMResponse.STATUS_SUCCESS);
+	}
+
+	private DataEndpoint resolveEndpointComponent(VirtualAddress virtualAddress) {
+
+		String endpoint = addressEndpointMap.get(virtualAddress);
+
+		DataEndpoint service = null;
+
+		if (endpoint != null) {
+			try {
+				// Assuming usage of SCR for DataEndpoints
+				String filter = "(component.name=" + endpoint + ")";
+
+				ServiceReference[] ref = context.getBundleContext()
+						.getServiceReferences(DataEndpoint.class.getName(),
+								filter);
+
+				// Should be exactly one, if at all.
+				if (ref != null && ref.length > 0)
+					service = (DataEndpoint) context.getBundleContext()
+							.getService(ref[0]);
+
+			} catch (Exception e) {
+				LOG.error(e.getMessage());
+			}
+		}
+		return service;
 	}
 
 	@Override
@@ -139,13 +155,16 @@ public class BackboneData implements Backbone {
 		}
 	}
 
-	@Override
-	public NMResponse broadcastData(VirtualAddress senderVirtualAddress,
+	// Clarify exclusion of JXTA broadcast messages sent via this method
+	private NMResponse _broadcastData(VirtualAddress senderVirtualAddress,
 			byte[] data) {
 		boolean success = true;
 		try {
-			for (VirtualAddress a : addressServiceMap.keySet())
-				addressServiceMap.get(a).receive(data);
+			for (VirtualAddress a : addressEndpointMap.keySet()) {
+				DataEndpoint service = resolveEndpointComponent(a);
+				if (a != null)
+					service.receive(data);
+			}
 		} catch (Exception e) {
 			success = false;
 		}
@@ -156,55 +175,43 @@ public class BackboneData implements Backbone {
 		}
 	}
 
-	/**
-	 * Retrieves the "service.id" property as service's unique end-point within
-	 * the local OSGi registry. Applies to {@link DataEndpoint} services only.
-	 */
 	@Override
-	public String getEndpoint(VirtualAddress virtualAddress) {
-		// Filter according to availability of the service itself
-		if (addressServiceMap.containsKey(virtualAddress))
-			return this.addressEndpointMap.get(virtualAddress);
-		return null;
+	public NMResponse broadcastData(VirtualAddress senderVirtualAddress,
+			byte[] data) {
+		return new NMResponse(NMResponse.STATUS_SUCCESS);
 	}
 
 	/**
-	 * Registers an end-point only when it is a valid "service.id" property of a
-	 * {@link DataEndpoint} service registered within the service registry.
+	 * Retrieves the "component.name" property as components's unique,
+	 * user-given end-point identifier within the local OSGi registry.
+	 */
+	@Override
+	public String getEndpoint(VirtualAddress virtualAddress) {
+		return addressEndpointMap.get(virtualAddress);
+	}
+
+	/**
+	 * Registers a mapping of the LS virtual address to the {@link DataEndpoint}
+	 * 's component name.
 	 */
 	@Override
 	public boolean addEndpoint(VirtualAddress virtualAddress, String endpoint) {
-		DataEndpoint service = null;
-		if (!addressServiceMap.containsKey(virtualAddress)) {
-			try {
-				String filter = "(service.id=" + endpoint + ")";
-				ServiceReference[] ref = context.getBundleContext()
-						.getServiceReferences(DataEndpoint.class.getName(),
-								filter);
-
-				if (ref != null && ref.length > 0)
-					service = (DataEndpoint) context.getBundleContext()
-							.getService(ref[0]);
-
-			} catch (Exception e) {
-				LOG.error(e.getMessage());
-			}
-			if (service != null
-					&& service.getVirtualAddress().equals(virtualAddress)) {
-				addDataEndpoint(service, endpoint);
-				return true;
-			}
-			return false;
+		if (endpoint != null) {
+			/*
+			 * TODO: test for endpoint's existence. Tricky, since DataEndpoint
+			 * (always) registered within DS "activate" method. At this time it
+			 * is not registered/resolvable yet. I.e. resolveEndpointComponent()
+			 * will return null!
+			 */
+			addressEndpointMap.put(virtualAddress, endpoint);
+			return true;
 		}
-		// Endpoint already registered
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean removeEndpoint(VirtualAddress virtualAddress) {
-		if (addressServiceMap.containsKey(virtualAddress)) {
-			DataEndpoint endpoint = addressServiceMap.get(virtualAddress);
-			removeDataEndpoint(endpoint);
+		if (addressEndpointMap.containsKey(virtualAddress)) {
 			addressEndpointMap.remove(virtualAddress);
 			return true;
 		}
