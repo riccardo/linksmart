@@ -56,6 +56,10 @@ namespace EventManager
                     BasicHttpBinding myBinding = new BasicHttpBinding(BasicHttpSecurityMode.None);
                     myBinding.MaxReceivedMessageSize = int.MaxValue;
                     myBinding.MaxBufferSize = int.MaxValue;
+                    myBinding.ReaderQuotas.MaxArrayLength = int.MaxValue;
+                    myBinding.ReaderQuotas.MaxStringContentLength = int.MaxValue;
+                    myBinding.ReaderQuotas.MaxDepth = int.MaxValue;
+                    myBinding.ReaderQuotas.MaxBytesPerRead = int.MaxValue;
 
                     myBinding.Namespace = "http://eventmanager.linksmart.eu";
                     serviceHost.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexHttpBinding(), address + "mex");
