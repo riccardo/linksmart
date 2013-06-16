@@ -99,6 +99,10 @@ namespace EventManager
         public void queue(Components.Subscription @event, publishRequest request)
         {
             @event.Parts = request.in1;
+            if (EventManagerImplementation.failedEventList.Count > 100)
+            {
+                EventManagerImplementation.failedEventList = new List<Components.Subscription>(); // QUICK FIX, OTHERWISE THIS WILL CONSUME ALL MEMORY.
+            }
             EventManagerImplementation.failedEventList.Add(@event);
         }
         /// <summary>
