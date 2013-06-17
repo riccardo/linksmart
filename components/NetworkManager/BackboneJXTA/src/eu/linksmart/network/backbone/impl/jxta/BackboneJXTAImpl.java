@@ -799,7 +799,7 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 					logger.warn(getName() + ": Unable to receive data in "
 							+ m.toString(), e2);
 					//increase buffer length until maximum is reached
-					if (bufferLength >= maxBufferLength) {
+					if (bufferLength <= maxBufferLength) {
 						bufferLength += 16000;
 						logger.info("Increasing multicast buffer length.");
 					} else if(!bufferReported){
