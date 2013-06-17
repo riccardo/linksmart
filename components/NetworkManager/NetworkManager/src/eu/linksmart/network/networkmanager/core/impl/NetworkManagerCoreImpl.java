@@ -317,13 +317,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 						// create response with connection and etc
 						nmresp.setStatus(NMResponse.STATUS_SUCCESS);
 						try {
-							nmresp.setMessage(new String(conn
-									.processMessage(msg)));
+							nmresp.setBytesPrimary(true);
+							nmresp.setMessageBytes(conn.processMessage(msg));
 						} catch (Exception e) {
 							nmresp.setStatus(NMResponse.STATUS_ERROR);
 						}
 					} else {
-
 						nmresp.setStatus(NMResponse.STATUS_ERROR);
 						nmresp.setMessage("Error in processing request");
 					}
@@ -633,6 +632,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			response.setStatus(NMResponse.STATUS_SUCCESS);
 		}
 		response.setMessageObject(tempMessage);
+		response.setBytesPrimary(true);
 		response.setMessageBytes(tempMessage.getData());
 		return response;
 	}
