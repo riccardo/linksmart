@@ -597,7 +597,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				tempMessage = connection.processData(
 						message.getReceiverVirtualAddress(),
 						message.getSenderVirtualAddress(),
-						(response.getMessage() != null)? response.getMessage().getBytes(): new byte[0]);
+						(response.getMessage() != null)? response.getMessageBytes() : new byte[0]);
 				// repeat sending and receiving until security protocol is over
 				while (tempMessage != null
 						&& tempMessage
@@ -633,7 +633,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			response.setStatus(NMResponse.STATUS_SUCCESS);
 		}
 		response.setMessageObject(tempMessage);
-		response.setMessage(new String(tempMessage.getData()));
+		response.setMessageBytes(tempMessage.getData());
 		return response;
 	}
 
