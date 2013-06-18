@@ -282,7 +282,8 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			// must also be called
 
 			logger.debug("Received response in " + requestID);
-			resp.setMessage(new String(data));
+			resp.setBytesPrimary(true);
+			resp.setMessageBytes(data);
 			synchronized (requestID) {
 				requestID.notify();
 			}
@@ -402,6 +403,10 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					resp.setStatus(NMResponse.STATUS_ERROR);
 					resp.setMessage("<Response>Error sending data to VirtualAddress = "
 							+ dest.toString() + "</Response>");
+					//there was an error with the pipe so we remove it
+					//this will enforce the recreation at next invocation
+					outPipe.close();
+					pipeTable.remove(pID);
 				}
 
 				pipeTable.get(pID).setTime(System.currentTimeMillis());
