@@ -792,17 +792,13 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected Message processNMAdvertisement(Message msg) {
 		try {
 			if (!msg.getSenderVirtualAddress().equals(networkManagerCore.getService())) {
-				//check if we already know this network manager
-				if(!getRemoteServices().contains(msg.getSenderVirtualAddress())){
-					//if we do not know it add services reachable through it
-					@SuppressWarnings("unchecked")
-					Set<Registration> serviceInfos = (Set<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
-					if (serviceInfos != null) {
-						Iterator<Registration> i = serviceInfos.iterator();
-						while (i.hasNext()) {
-							Registration oneServiceInfo = i.next();
-							addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo, msg.getSenderVirtualAddress());
-						}
+				@SuppressWarnings("unchecked")
+				Set<Registration> serviceInfos = (Set<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+				if (serviceInfos != null) {
+					Iterator<Registration> i = serviceInfos.iterator();
+					while (i.hasNext()) {
+						Registration oneServiceInfo = i.next();
+						addRemoteService(oneServiceInfo.getVirtualAddress(), oneServiceInfo, msg.getSenderVirtualAddress());
 					}
 				}
 			}
