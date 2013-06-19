@@ -137,6 +137,13 @@ public class BackboneManagerApplication
 	private ThreadNMAnnounce nmAnnounceThread; 
 
 	private int counter = 0;
+	
+	/** Length of multicast buffer.	 */
+	private int bufferLength = 64000;
+	/** Maximum length until multicast buffer is increased.	 */
+	private int maxBufferLength = 128000;
+	/** Only report maximum size reached once. */
+	private boolean bufferReported = false;
 
 	/**
 	 * Constructor
@@ -772,13 +779,20 @@ public class BackboneManagerApplication
 			String sw;
 			PeerID id;
 			while (running) {
-					buffer =  new byte[64000];
+					buffer =  new byte[bufferLength];
 					receivedData = new DatagramPacket(buffer, buffer.length);
 					
 					try {
 						m.receive(receivedData);
 					} catch (IOException e2) {
-						logger.error(getName() + ": Unable to receive data in " + m.toString(), e2);
+						logger.warn(getName() + ": Unable to receive data in " + m.toString() + ". Increasing message buffer size to " + (bufferLength + 16000), e2);
+						if (bufferLength <= maxBufferLength) {
+							bufferLength += 16000;
+							logger.info("Increasing multicast buffer length.");
+						} else if(!bufferReported){
+							bufferReported = true;
+							logger.error("Multicast buffer reached maximum length of " + maxBufferLength + ".");
+						}
 					}
 					
 					sw = new String(receivedData.getData(), 0, receivedData.getLength());
