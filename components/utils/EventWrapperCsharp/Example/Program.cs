@@ -27,12 +27,13 @@ namespace ConsoleApplication1
             p.value = "testValue";
             eu.linksmart.eventing.EventManagerStub.Part[] parts = new eu.linksmart.eventing.EventManagerStub.Part[]{ p };
 
-            Console.ReadLine();
-            
-            //while(true){
-            //    publisher.PublishEvent("EventManager:FIT:Test", "EVENT/TEST", parts);
-              //  System.Threading.Thread.Sleep(2000);
-            //}            
+            //Console.ReadLine();
+
+            while (true)
+            {
+                publisher.PublishEvent("EventManager:FIT:Test", "EVENT/TEST", parts);
+                System.Threading.Thread.Sleep(2000);
+            }            
         }
 
         static bool notify(string topic, eu.linksmart.eventing.EventManagerStub.Part[] parts) {
