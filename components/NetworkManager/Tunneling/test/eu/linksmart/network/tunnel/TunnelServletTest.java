@@ -37,6 +37,7 @@ public class TunnelServletTest {
 	private String urlShort = "/0?description=\"CalculatorForBeginners\"";
 	private String urlLong = "/0.0.0.1/default/some/addition?description=\"CalculatorForBeginners\"&pid=\"010\"";
 	private String urlWsdl = "/0/wsdl?description=\"CalculatorForBeginners\"";
+	private String urlOld = "/0/0.0.0.6986094776732394497";
 	private VirtualAddress nmAddress;
 	private String nmAddressString = "0.0.0.0";
 	private NMResponse nmResponse;
@@ -44,6 +45,7 @@ public class TunnelServletTest {
 	private Tunnel tunnel;
 	private Part[] descriptionOnly;
 	private Part[] descNPid;
+	private HttpServletRequest requestOld;
 
 
 	@Before
@@ -110,6 +112,12 @@ public class TunnelServletTest {
 		when(this.requestWsdl.getMethod()).thenReturn("GET");
 		when(this.requestWsdl.getProtocol()).thenReturn("HTTP/1.1");
 		when(this.requestWsdl.getQueryString()).thenReturn(this.urlWsdl.substring(urlWsdl.indexOf("?") + 1));
+		this.requestOld = mock(HttpServletRequest.class);
+		when(this.requestOld.getHeaderNames()).thenReturn(new Hashtable<String, String>().elements());
+		when(this.requestOld.getPathInfo()).thenReturn(urlOld);
+		when(this.requestOld.getMethod()).thenReturn("POST");
+		when(this.requestOld.getProtocol()).thenReturn("HTTP/1.1");
+		when(this.requestOld.getQueryString()).thenReturn("");
 	}
 
 	@Test
@@ -164,6 +172,24 @@ public class TunnelServletTest {
 					nmAddress,
 					new VirtualAddress(receiverString),
 					new String("GET /?wsdl HTTP/1.1\r\n").getBytes(),
+					true);
+		} catch (RemoteException e) {
+			//NOP
+		}
+	}
+	
+	@Test
+	public void testValidUrlOld(){	
+		try {
+			this.tunnelServlet.doPost(requestOld, response);
+		} catch (IOException e1) {
+			// NOP
+		}
+		try {
+			Mockito.verify(nmCore).sendData(
+					nmAddress,
+					new VirtualAddress(receiverString),
+					new String("POST / HTTP/1.1\r\n\r\n").getBytes(),
 					true);
 		} catch (RemoteException e) {
 			//NOP

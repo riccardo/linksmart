@@ -36,82 +36,15 @@ public class TunnelServlet extends HttpServlet{
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws IOException {
-		processDatalessRequest(request, response);
+		processRequest(request, response, false);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-		//path without query
-		String path = request.getPathInfo();
-		//get sender address and check if path contained default switch
-		VirtualAddress senderVirtualAddress = null;
-		if (path.startsWith("/0/") || path.equals("/0")) {
-			senderVirtualAddress = tunnel.getNM().getService();
-			//remove sender virtual address part from path
-			path = path.substring(2);
-		} else {
-			Pattern pat = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
-			Matcher matcher = pat.matcher(path);
-			if(matcher.find()) {
-				senderVirtualAddress = new VirtualAddress(matcher.group());
-				//remove sender virtual address part from path
-				path = path.substring(matcher.group().length() + 1);
-			} else {
-				response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Bad format of sender VirtualAddress");
-				return;
-			}
-		}
-		
-		boolean getDefault = path.startsWith("/default");
-		if(getDefault) {
-			//remove default switch similarly to sender
-			path = path.substring(8);
-		}
-		
-		//get service
-		Registration registration = null;
-		try {
-			registration = getSearchedService(request.getQueryString(), getDefault);
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
-			return;
-		}
-
-		if(registration != null) {
-			StringBuilder requestBuilder = new StringBuilder();
-			VirtualAddress receiverVirtualAddress = registration.getVirtualAddress();
-
-			// build request
-			// append request line
-			requestBuilder.append(request.getMethod()).append(" /");
-			//append path
-			requestBuilder.append((path.startsWith("/")? path.substring(1) : path));
-			requestBuilder.append(" ").append(request.getProtocol()).append("\r\n");
-			// append headers and blank line for end of headers
-			requestBuilder.append(buildHeaders(request));
-			requestBuilder.append("\r\n");
-
-			// append content
-			if ((request.getContentLength() > 0)) {
-				try {
-					BufferedReader reader = request.getReader();
-					for (String line = null; (line = reader.readLine()) != null;)
-						requestBuilder.append(line);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			// send request to NetworkManagerCore
-			sendRequest(senderVirtualAddress, receiverVirtualAddress, requestBuilder.toString(), response);
-			logger.debug("Sending soap request through tunnel");
-		} else {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, NO_SERVICE);
-			return;
-		}
+		processRequest(request, response, true);
 	}
 
-	private void processDatalessRequest(HttpServletRequest request, HttpServletResponse response)
+	private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean hasData)
 			throws IOException{		
 		//path without query
 		String path = request.getPathInfo();
@@ -133,24 +66,36 @@ public class TunnelServlet extends HttpServlet{
 				return;
 			}
 		}
-
-		boolean getDefault = path.startsWith("/default");
-		if(getDefault) {
-			//remove default switch similarly to sender
-			path = path.substring(8);
+		//check if a receiver address is provided
+		Pattern pat = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
+		Matcher matcher = pat.matcher(path);
+		VirtualAddress receiverVirtualAddress = null;
+		if(matcher.find()) {
+			receiverVirtualAddress = new VirtualAddress(matcher.group());
+			//remove sender virtual address part from path
+			path = path.substring(matcher.group().length() + 1);
+		} else {
+			boolean getDefault = path.startsWith("/default");
+			if(getDefault) {
+				//remove default switch similarly to sender
+				path = path.substring(8);
+			}
+			//get service
+			Registration registration = null;
+			try {
+				registration = getSearchedService(request.getQueryString(), getDefault);
+			} catch (Exception e) {
+				response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
+				return;
+			}
+			if(registration != null) {
+				receiverVirtualAddress = registration.getVirtualAddress();
+			}
 		}
-		//get service
-		Registration registration = null;
-		try {
-			registration = getSearchedService(request.getQueryString(), getDefault);
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
-			return;
-		}
 
-		if(registration != null) {
+		if(receiverVirtualAddress != null) {
 			boolean isWsdl = false;		
-			if (path.endsWith("wsdl")) {
+			if (!hasData && path.endsWith("wsdl")) {
 				isWsdl = true;
 				//remove wsdl from path
 				path = path.substring(0, path.length() - 5);
@@ -162,17 +107,30 @@ public class TunnelServlet extends HttpServlet{
 			requestBuilder.append(request.getMethod()).append(" /");
 			//append path
 			requestBuilder.append((path.startsWith("/")? path.substring(1) : path));
-			if(isWsdl) {
+			if(!hasData && isWsdl) {
 				requestBuilder.append("?wsdl");
 			}
 			requestBuilder.append(" ").append(request.getProtocol()).append("\r\n");
 
-			// append headers - no body because this is a GET request
+			// append headers
 			requestBuilder.append(buildHeaders(request));
+			if(hasData) {
+				requestBuilder.append("\r\n");
+			}
 
+			// append content if necessary
+			if (hasData && request.getContentLength() > 0) {
+				try {
+					BufferedReader reader = request.getReader();
+					for (String line = null; (line = reader.readLine()) != null;)
+						requestBuilder.append(line);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
 			// send request to NetworkManagerCore
-			sendRequest(senderVirtualAddress, registration.getVirtualAddress(), requestBuilder.toString(), response);
+			sendRequest(senderVirtualAddress, receiverVirtualAddress, requestBuilder.toString(), response);
 		} else {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, NO_SERVICE);
 			return;
@@ -187,18 +145,18 @@ public class TunnelServlet extends HttpServlet{
 		for(String queryAttr : queryAttrs) {
 			int separatorIndex = queryAttr.indexOf("=");
 			String attributeName = queryAttr.substring(0, separatorIndex).toUpperCase();
-			ServiceAttribute attributeNameCheck = null;
-			//FIXME should this be here?
+			//FIXME should we have this check?
 			//check if the searched service attribute exists
-//			try {
-//				attributeNameCheck = ServiceAttribute.valueOf(attributeName);
-//			} catch (Exception e) {
-//				throw new Exception("Unknown service attribute key");
-//			}
-//			if(attributeNameCheck == null) {
-//				throw new Exception("Unknown service attribute key");
-//			}
-			
+			//			ServiceAttribute attributeNameCheck = null;
+			//			try {
+			//				attributeNameCheck = ServiceAttribute.valueOf(attributeName);
+			//			} catch (Exception e) {
+			//				throw new Exception("Unknown service attribute key");
+			//			}
+			//			if(attributeNameCheck == null) {
+			//				throw new Exception("Unknown service attribute key");
+			//			}
+
 			String attributeValue = queryAttr.substring(separatorIndex + 1);
 			if(attributeValue.startsWith("\"") && attributeValue.endsWith("\"")) {
 				//cut off quotation symbols
@@ -219,8 +177,8 @@ public class TunnelServlet extends HttpServlet{
 				registrations = tunnel.getNM().
 						getServiceByAttributes(attributes.toArray(new Part[]{}), SERVICE_DISCOVERY_TIMEOUT, true, false);
 			} else {
-			registrations = tunnel.getNM().
-					getServiceByAttributes(attributes.toArray(new Part[]{}));
+				registrations = tunnel.getNM().
+						getServiceByAttributes(attributes.toArray(new Part[]{}));
 			}
 		} catch (RemoteException e) {
 			//local invocation
