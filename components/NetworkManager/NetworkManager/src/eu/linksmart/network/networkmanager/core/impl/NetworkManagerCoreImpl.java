@@ -622,7 +622,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					+ message.getSenderVirtualAddress() + "to VirtualAddress: " + message.getReceiverVirtualAddress());
 			response = new NMResponse();
 			response.setStatus(NMResponse.STATUS_ERROR);
-			response.setMessage("Error while sending message: " + e.getMessage());
+			response.setMessage("Error while sending message: " + e.getClass().getName() + ":" + e.getMessage());
 			return response;
 		}
 

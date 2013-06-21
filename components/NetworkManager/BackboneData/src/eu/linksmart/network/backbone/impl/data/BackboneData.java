@@ -53,13 +53,7 @@ public class BackboneData implements Backbone {
 			VirtualAddress receiverVirtualAddress, byte[] data) {
 		// make call look asynchronous by return the status and separately
 		// sending response
-		NMResponse resp = executeServiceCall(receiverVirtualAddress, data);
-		if (bRouter != null) {
-			Thread sender = new Thread(new ResponseSender(senderVirtualAddress,
-					receiverVirtualAddress, resp));
-			sender.start();
-		}
-		return new NMResponse(NMResponse.STATUS_SUCCESS);
+		return executeServiceCall(receiverVirtualAddress, data);
 	}
 
 	private class ResponseSender implements Runnable {
@@ -76,7 +70,7 @@ public class BackboneData implements Backbone {
 
 		public void run() {
 			bRouter.sendDataAsynch(senderVirtualAddress,
-					receiverVirtualAddress, response.getMessage().getBytes());
+					receiverVirtualAddress, response.getMessageBytes());
 		}
 	}
 
