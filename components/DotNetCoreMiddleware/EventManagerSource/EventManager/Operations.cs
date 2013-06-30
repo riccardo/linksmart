@@ -140,7 +140,7 @@ namespace EventManager
         //else
         //{
         /// </summary>
-        public void eventNotification(Components.Subscription subscription, publishRequest request)
+        public void eventNotification(Components.Subscription subscription, Components.LinkSmartEvent request)
         {
             bool notifyResult = false;
             bool notifyResultSpecified = false;            
@@ -155,19 +155,22 @@ namespace EventManager
                     eventSubscriberService.Url = GetEventSubscriberServiceUrl(subscription);
                     try
                     {
-                        SubscriberInterface.Part[] parts = CopyPartArray(request);
-                        eventSubscriberService.notify(request.topic, parts, out notifyResult, out notifyResultSpecified);
-                        subscription.Parts = request.in1;
+                        SubscriberInterface.Part[] parts = CopyPartArray(request.Parts.ToArray());
+                        eventSubscriberService.notify(request.Topic, parts, out notifyResult, out notifyResultSpecified);
+                        //subscription.Parts = request.Parts.ToArray();
                         //es.storeEvent(subscription);
                         // to many logging. maybe change this to Log4Net in the future.
                         //Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                         //eventSubscriberService.notifyAsync(request.topic, parts);
+                        subscription.NotifyWasSuccessful();
                     }
                     catch (Exception e)
                     {
                         //Console.WriteLine(e.Message + e.StackTrace);
                         Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber is overloaded, or the subscriber service does not fulfill the notify contract! ");
-                        retryQueue.queue(subscription, request); Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                        subscription.NotifyFailed();
+                        retryQueue.queue(subscription, request); 
+                        Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                     }
                 }
                 else if (emVersion >= 2.0) {
@@ -175,18 +178,21 @@ namespace EventManager
                     eventSubscriberService20.Url = GetEventSubscriberServiceUrl(subscription);
                     try
                     {
-                        SubscriberInterface20.Part[] parts = CopyPart20Array(request);
-                        eventSubscriberService20.notify(request.topic, parts, out notifyResultNullable, out notifyResultSpecified);
-                        subscription.Parts = request.in1;
+                        SubscriberInterface20.Part[] parts = CopyPart20Array(request.Parts.ToArray());
+                        eventSubscriberService20.notify(request.Topic, parts, out notifyResultNullable, out notifyResultSpecified);
+                        //subscription.Parts = request.Parts.ToArray();
                         // to many logging. maybe change this to Log4Net in the future.
                         //es.storeEvent(subscription);
                         //Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                         //eventSubscriberService.notifyAsync(request.topic, parts);
+                        subscription.NotifyWasSuccessful();
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber is overloaded, or the subscriber service does not fulfill the notify contract! ");
-                        retryQueue.queue(subscription, request); Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                        subscription.NotifyFailed();
+                        retryQueue.queue(subscription, request); 
+                        Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                     }
                 }
                
@@ -205,13 +211,15 @@ namespace EventManager
                 try
                 {
                     eventSubscriberService20.notifyXmlEvent(xmlEventString, out notifyResult, out notifyResultSpecified);
-                    subscription.Parts = request.in1;
+                    //subscription.Parts = request.in1;
                     //es.storeEvent(subscription);
                     Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                     //eventSubscriberService.notifyXmlEventAsync(xmlEventString);
+                    subscription.NotifyWasSuccessful();
                 }
                 catch { 
                     //retryQueue.queue(subscription, request); 
+                    subscription.NotifyFailed();
                     Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description)))); 
                 }
             }
@@ -241,41 +249,41 @@ namespace EventManager
             return eventSubscriberServiceUrl;
         }
 
-        private static SubscriberInterface.Part[] CopyPartArray(publishRequest request)
+        private static SubscriberInterface.Part[] CopyPartArray(Components.Part[] partArray)
         {
-            SubscriberInterface.Part[] parts = new SubscriberInterface.Part[request.in1.Length];
+            SubscriberInterface.Part[] parts = new SubscriberInterface.Part[partArray.Length];
             SubscriberInterface.Part p;
             //SubscriberInterface.Part p1 = new SubscriberInterface.Part();
             //SubscriberInterface.Part p2 = new SubscriberInterface.Part();
             int i = 0;
-            foreach (Components.Part a in request.in1)//SubscriberInterface.Part p in parts)
+            foreach (Components.Part a in partArray)//SubscriberInterface.Part p in parts)
             {
                 p = new SubscriberInterface.Part();
                 p.key = "";
                 p.value = "";
                 parts[i] = p;
-                parts[i].key = request.in1[i].key;
-                parts[i].value = request.in1[i].value;
+                parts[i].key = partArray[i].key;
+                parts[i].value = partArray[i].value;
                 i++;
             }
             return parts;
         }
 
-        private static SubscriberInterface20.Part[] CopyPart20Array(publishRequest request)
+        private static SubscriberInterface20.Part[] CopyPart20Array(Components.Part[] partArray)
         {
-            SubscriberInterface20.Part[] parts = new SubscriberInterface20.Part[request.in1.Length];
+            SubscriberInterface20.Part[] parts = new SubscriberInterface20.Part[partArray.Length];
             SubscriberInterface20.Part p;
             //SubscriberInterface.Part p1 = new SubscriberInterface.Part();
             //SubscriberInterface.Part p2 = new SubscriberInterface.Part();
             int i = 0;
-            foreach (Components.Part a in request.in1)//SubscriberInterface.Part p in parts)
+            foreach (Components.Part a in partArray)//SubscriberInterface.Part p in parts)
             {
                 p = new SubscriberInterface20.Part();
                 p.key = "";
                 p.value = "";
                 parts[i] = p;
-                parts[i].key = request.in1[i].key;
-                parts[i].value = request.in1[i].value;
+                parts[i].key = partArray[i].key;
+                parts[i].value = partArray[i].value;
                 i++;
             }
             return parts;

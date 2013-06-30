@@ -97,8 +97,9 @@ namespace Components
     public class Subscription //: IComparable<Subscription>
     {
         /// <summary>
-        /// Topic connected to an event (or rather, the expression used to match a topic)
+        /// Topic connected to an event (or rather, the filter expression used to match a topic from an event)
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         private string topic;
         /// <summary>
         /// Subscriber endpoint
@@ -106,32 +107,42 @@ namespace Components
         /// <summary>
         /// Topic connected to an event
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         private string protocol = "WebService";
+        [System.Xml.Serialization.XmlIgnore]
         private string endpoint;
         /// <summary>
         /// Subscriber description (as registered with Network Manager)
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         private string description;
         /// <summary>
         /// Subscriber HID
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         private string hid;
         /// <summary>
         /// Priority of the event
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         private int priority;
         /// <summary>
-        /// Data genereted by the event stored in a Components.Part[]
+        /// The filter expression used to match the content in an event
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         private Components.Part[] data;
         /// <summary>
         /// Number of retries
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         private int numberOfRetries;
         /// <summary>
         /// DateTime for when the event was published (recieved by the EventManager)
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         private Nullable<DateTime> dateTime;
+
+  
 
         //#region IComparable
         ///// <summary>
@@ -214,7 +225,7 @@ namespace Components
             set { description = value; }
         }
         /// <summary>
-        /// Priority of the event, higher value means higher priority
+        /// Priority of the subscription, higher value means higher priority
         /// </summary>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false, Order = 4)]
         public int Priority
@@ -223,7 +234,7 @@ namespace Components
             set { priority = value; }
         }
         /// <summary>
-        /// Part that contains the data of an event
+        /// Part array that contains the content subscription
         /// </summary>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, IsNullable = true, Order = 5)]
         public Components.Part[] Parts
@@ -234,7 +245,8 @@ namespace Components
         /// <summary>
         /// Number of retries
         /// </summary>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false, Order = 6)]
+        //[System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false, Order = 6)]
+        [System.Xml.Serialization.XmlIgnore]
         public int NumberOfRetries
         {
             get { return numberOfRetries; }
@@ -243,7 +255,8 @@ namespace Components
         /// <summary>
         /// DateTime for when the EventManager receives the publish call
         /// </summary>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = true, Order = 7)]
+        //[System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = true, Order = 7)]
+        [System.Xml.Serialization.XmlIgnore]
         public Nullable<DateTime> @DateTime
         {
             get { return dateTime; }
@@ -339,6 +352,31 @@ namespace Components
         }
 
         /// <summary>
+        /// Determines whether [is content match] [the specified attributes]. I.e., if all the key-value pairs in the attributes match the content in the event.
+        /// </summary>
+        /// <param name="attributes">The attributes.</param>
+        /// <returns>
+        ///   <c>true</c> if [is content match] [the specified attributes]; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsContentMatch(Components.Part[] eventContent)
+        {
+            bool isMatch = true;
+            if (null != this.Parts&&this.Parts.Length>0)
+            {
+                foreach (var p in this.Parts)
+                {
+                    isMatch = isMatch && eventContent.Where(x => x.key.Equals(p.key) && x.value.Equals(p.value)).Any();
+                }
+            }
+            else
+            {
+                isMatch = false;
+            }
+            return isMatch;
+        }
+        
+
+        /// <summary>
         /// Method to create an object. Can be used as an element in a list
         /// </summary>
         public Subscription(string topic, string hid, string endpoint, string description, int priority, Components.Part[] data, int numberOfRetries, Nullable<DateTime> dateTime)
@@ -377,8 +415,68 @@ namespace Components
             this.description = String.Empty;
             this.priority = int.MaxValue;
             this.data = null;
-            this.numberOfRetries = int.MaxValue;
+            this.numberOfRetries = 0;
             this.dateTime = null;
+        }
+
+        public void NotifyWasSuccessful()
+        {
+            this.LastSuccessfulNotifyCall = System.DateTime.Now;
+            this.NumberOfRetries = 0;
+            this.NumberOfFailedNotifyCalls = 0;
+        }
+
+        [System.Xml.Serialization.XmlIgnore]
+        private System.DateTime lastSuccessfulNotifyCall = System.DateTime.MinValue;
+
+        [System.Xml.Serialization.XmlIgnore]
+        public System.DateTime LastSuccessfulNotifyCall { get { return lastSuccessfulNotifyCall; } set { lastSuccessfulNotifyCall = value; } }
+
+        [System.Xml.Serialization.XmlIgnore]
+        private int numberOfFailedNotifyCalls = 0;
+
+        [System.Xml.Serialization.XmlIgnore]
+        public int NumberOfFailedNotifyCalls { get { return numberOfFailedNotifyCalls; } set { numberOfFailedNotifyCalls = value; } }
+
+        public void NotifyFailed()
+        {
+            NumberOfFailedNotifyCalls++;
+        }
+
+        public void AddFailedEvent(LinkSmartEvent failedEvent)
+        {
+            if (this.FailedEvents.Count < 10)
+            {
+                if (!FailedEvents.Where(x => x.InternalId.Equals(failedEvent.InternalId)).Any())
+                {
+                    FailedEvents.Add(failedEvent);
+                }
+            } else {
+                this.FailedEvents = new List<LinkSmartEvent>();
+                Console.WriteLine("Subscription [{0}   |   {1}   |   {2}   |   {3}] has more than 100 failed events, resetting resend list.", this.Topic, this.Description, this.Endpoint, this.HID);
+            }
+        }
+
+        [System.Xml.Serialization.XmlIgnore]
+        public List<LinkSmartEvent> FailedEvents = new List<LinkSmartEvent>();
+
+        public bool IsSameAs(Subscription otherSubscription) {
+            if (null==this.Parts) { this.Parts= new Part[0];}
+            if (null==otherSubscription.Parts) { otherSubscription.Parts= new Part[0];}
+            bool isTheSame = 
+                this.topic.Equals(otherSubscription.topic);
+            isTheSame = isTheSame && (this.Parts.Length == otherSubscription.Parts.Length);
+            foreach (var p in this.Parts) {
+                isTheSame = isTheSame && otherSubscription.Parts.Where(x => x.key.Equals(p.key) && x.value.Equals(p.value)).Any();
+            }
+            isTheSame = isTheSame && this.Description.Equals(otherSubscription.Description) && this.Endpoint.Equals(otherSubscription.Endpoint) && this.HID.Equals(otherSubscription.HID);
+            return isTheSame;
+        }
+
+
+        public bool HasContentFilter()
+        {
+            return (null != this.Parts && this.Parts.Length > 0);
         }
     }
 }

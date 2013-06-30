@@ -88,11 +88,12 @@ using System.Web.Services;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using EventStorage;
+using EventManager20Interface;
 
 namespace EventManager
 {
     [ServiceBehavior(Name = "EventManagerImplementation", Namespace = "http://eventmanager.linksmart.eu", IncludeExceptionDetailInFaults=true)]
-    public partial class EventManagerImplementation : EventManagerPort
+    public partial class EventManagerImplementation : EventManagerPort, IEventManager20
     {
         private readonly string XMLEVENT = "###XMLEVENT###";
         EventStorage.EventStorage ess = new EventStorage.EventStorage();
@@ -100,10 +101,6 @@ namespace EventManager
         /// Instance of the SubscriberInterface web service
         /// </summary>
         SubscriberInterface.EventSubscriberService eventSubscriberService = new SubscriberInterface.EventSubscriberService();
-        /// <summary>
-        /// Failed notifications is added to a queue in order to be called later on. This queue is ordered according to priority
-        /// </summary>
-        RetryQueue retryQueue = new RetryQueue();
 
         /// <summary>
         /// Instance of Operations.cs
@@ -135,6 +132,35 @@ namespace EventManager
                 return true;
             }
             catch { return false; }
+        }
+
+        public void AddSubscription(Components.Subscription subscription)
+        {
+            try
+            {
+                if (EventManagerImplementation.subscriptionList.Exists(f => f.IsSameAs(subscription)))
+                { Console.WriteLine("Subscription already exists"); }
+                else
+                {
+                    Subscribe subscribeClass = new Subscribe(subscription);
+                    Thread subscribeThread = new Thread(new ThreadStart(subscribeClass.subscribe));
+                    subscribeThread.Start();
+                    //subscribeThread.Join();
+                }
+                
+            }
+            catch (Exception e) { Console.WriteLine("AddSubscription: " + e.Message + e.StackTrace); }
+        }
+
+        public void RemoveSubscription(Components.Subscription subscription)
+        {
+            try
+            {
+                var sub = EventManagerImplementation.subscriptionList.Where(f => f.IsSameAs(subscription)).FirstOrDefault();
+                EventManagerImplementation.subscriptionList.Remove(sub);
+
+            }
+            catch (Exception e) { Console.WriteLine("RemoveSubscription: " + e.Message + e.StackTrace); }
         }
 
         /// <summary>
@@ -268,14 +294,7 @@ namespace EventManager
             catch { return false; }
         }
 
-        public bool triggerRetryQueue()
-        {
-            Thread retryThread = new Thread(new ThreadStart(callRetryQueue));
-            retryThread.Start();
-            //retryThread.Join();
-            callRetryQueue();
-            return true;
-        }
+       
 
         /// <summary>
         /// Send the published event to all subscribers to the specified topic.
@@ -287,9 +306,23 @@ namespace EventManager
         /// <param name="request">Request that contains topic and values regarding the event</param>
         public publishResponse publish(publishRequest request)
         {
-            if (request.topic.Equals(this.XMLEVENT))
+            // Create a local event to use internally and store this in the eventstore
+            Components.LinkSmartEvent publishedEvent = new Components.LinkSmartEvent(request.topic, request.in1);
+            var store = new EventStorage.EventStorage();
+            store.storeEvent(publishedEvent);
+
+            PublishEvent(publishedEvent);
+
+            publishResponse p = new publishResponse();
+            p.publishReturn = true;
+            return p;
+        }
+
+        private void PublishEvent(Components.LinkSmartEvent publishedEvent)
+        {
+            if (publishedEvent.Topic.Equals(this.XMLEVENT))
             {
-                var xmlContent = (from part in request.in1 where part.key.Equals("value") select part.value).FirstOrDefault();
+                var xmlContent = (from part in publishedEvent.Parts where part.key.Equals("value") select part.value).FirstOrDefault();
                 if (!string.IsNullOrEmpty(xmlContent))
                 {
                     publishXmlEvent(xmlContent);
@@ -299,46 +332,28 @@ namespace EventManager
             {
                 //Make a copy of the list in order to avoid it being changed during the forea.ch loop. As long as copy is used, foreach can stay here. Otherwise -> Notification.cs
                 //Parallel.ForEach(Components.Subscription subscription in Program.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList(), 
-                foreach (Components.Subscription subscription in EventManagerImplementation.subscriptionList.Where(f => f.IsMatch(request.topic)).ToList())
+                foreach (Components.Subscription subscription in EventManagerImplementation.subscriptionList.Where(f =>
+                    f.IsMatch(publishedEvent.Topic) && !f.HasContentFilter()
+                    ||
+                    f.IsMatch(publishedEvent.Topic) && f.IsContentMatch(publishedEvent.Parts.ToArray())
+                    ).ToList())
                 {
-                    subscription.NumberOfRetries = 0;
-                    if (subscription.DateTime != null) { }
-                    else { subscription.DateTime = DateTime.Now; }
-                    Notification notification = new Notification(subscription, request);
-                    Thread notificationThread = new Thread(new ThreadStart(notification.notify));
-                    notificationThread.Start();
+                    PublishEventToSubscription(publishedEvent, subscription);
                 }
             }
-
-            publishResponse p = new publishResponse();
-            p.publishReturn = true;
-            return p;
         }
 
-        /// <summary>
-        /// Method for calling the RetryQueue. Failed notifications will be repeated
-        /// </summary>
-        public void callRetryQueue()
+        private static void PublishEventToSubscription(Components.LinkSmartEvent publishedEvent, Components.Subscription subscription)
         {
-            Notification notification;
-            while (true)
-            {
-                Components.Subscription subscription = retryQueue.dequeue();
-                if (subscription != null)
-                {
-                    Console.WriteLine("Retry: {0}\nTimestamp: {1}\n\n\n\n", subscription.Topic, subscription.DateTime);
-                    publishRequest request = new publishRequest();
-                    request.topic = subscription.Topic;
-                    request.in1 = subscription.Parts;
-                    notification = new Notification(subscription, request);
-                    Thread retryThread = new Thread(new ThreadStart(notification.notify));
-                    retryThread.Start();
-                    //retryThread.Join();
-                }
-                else
-                    break;
-            }
+            //subscription.NumberOfRetries = 0;
+            if (subscription.DateTime != null) { }
+            else { subscription.DateTime = DateTime.Now; }
+            Notification notification = new Notification(subscription, publishedEvent);
+            Thread notificationThread = new Thread(new ThreadStart(notification.notify));
+            notificationThread.Start();
         }
+
+     
 
 
     }

@@ -82,79 +82,62 @@ If the Library as you received it specifies that a proxy can decide whether futu
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Web.Services;
+using System.ServiceModel;
+using System.Threading.Tasks;
+using EventStorage;
 
 namespace EventManager
 {
-    public class Notification
+    public partial class EventManagerImplementation : EventManagerPort
     {
-        public string EventString;
-        public EventFormat EventFormat = EventFormat.Part;
-        private EventStorage.EventStorage es = new EventStorage.EventStorage();
-        private Components.LinkSmartEvent request = null;
-        private Components.Subscription subscription = null;
-        private readonly Object m_lock = new Object();
-        Operations operations = new Operations();
+      
         /// <summary>
-        /// Initiation of variables needed for notification using a publishRequest structure
+        /// Failed notifications is added to a queue in order to be called later on. This queue is ordered according to priority
         /// </summary>
-        public Notification(Components.Subscription subscription, Components.LinkSmartEvent request)
+        RetryQueue retryQueue = new RetryQueue();
+
+        public bool triggerRetryQueue()
         {
-            lock (m_lock)
-            {
-                this.subscription = subscription;
-                this.request = request;
-            }
-        }
+            Thread retryThread = new Thread(new ThreadStart(callRetryQueue));
+            retryThread.Start();
+            //retryThread.Join();
+            //callRetryQueue();
+            return true;
+        }     
+
         /// <summary>
-        /// Initiation of variables needed for notification using an Xml event as a string
+        /// Method for calling the RetryQueue. Failed notifications will be repeated
         /// </summary>
-        public Notification(Components.Subscription subscription, string xmlEventString)
+        public void callRetryQueue()
         {
-            lock (m_lock)
+            Notification notification;
+            while (true)
             {
-                this.subscription = subscription;
-                this.EventFormat = EventFormat.Xml;
-                this.EventString = xmlEventString;
+                Components.Subscription subscription = retryQueue.dequeue();
+                if (subscription != null)
+                {
+                   
+                    //Components.LinkSmartEvent request = new Components.LinkSmartEvent();
+                    //request.Topic = subscription.Topic;
+                    //request.Parts = subscription.Parts.ToList();
+                    var theEvent = subscription.FailedEvents.ElementAt(0);
+                    if (null != theEvent)
+                    {
+                        Console.WriteLine("Retry: {0}\nEvent topic: {1}\nEventID: {2}\nTimestamp: {3}\nLastSuccessfulCall: {4}", subscription.Topic, theEvent.Topic, theEvent.InternalId.ToString(), subscription.DateTime, subscription.LastSuccessfulNotifyCall);
+                        subscription.FailedEvents.RemoveAt(0);
+                        notification = new Notification(subscription, theEvent);
+                        Thread retryThread = new Thread(new ThreadStart(notification.notify));
+                        retryThread.Start();
+                        //retryThread.Join();
+                    }
+                }
+                Thread.Sleep(EventManager.Properties.Settings.Default.RetryQueueInterval);
             }
         }
 
-        public void notify() 
-        {
-            if (subscription.NumberOfRetries <= 5)
-            {
-                if (this.EventFormat.Equals(EventFormat.Part)) {
-                    operations.eventNotification(subscription, request);
-                } else {
-                    operations.eventNotification(subscription, this.EventString, this.EventFormat);
-                }
-            }
-            else
-            {
-                try
-                {
-                    var sub = new Components.Subscription()
-                    {
-                        Topic = request.Topic,
-                        Parts = request.Parts.ToArray(),
-                         DateTime=subscription.DateTime,
-                           Description=subscription.Description,
-                           Endpoint = subscription.Endpoint,
-                            HID=subscription.HID,
-                             LastSuccessfulNotifyCall=subscription.LastSuccessfulNotifyCall,
-                              NumberOfFailedNotifyCalls= subscription.NumberOfFailedNotifyCalls,
-                               NumberOfRetries=subscription.NumberOfRetries,
-                                Priority=subscription.Priority,
-                    };
-                    es.storeFailedEvent(sub);
-                    //EventStorageService.EventStorageService ess = new EventStorageService.EventStorageService();
-                    //ess.WriteDatabaseSqlLite(subscription);
-                    subscription.NumberOfRetries=0;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Retry Database failed. "+e.Message+e.StackTrace);
-                }
-            }
-        }
+
     }
 }

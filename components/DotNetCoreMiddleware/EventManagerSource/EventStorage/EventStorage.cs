@@ -82,6 +82,7 @@ If the Library as you received it specifies that a proxy can decide whether futu
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Components;
 
 namespace EventStorage
 {
@@ -96,11 +97,44 @@ namespace EventStorage
             else
                 ess.WriteDatabaseSqlLite(failedEventNotification);
         }
-        public void storeEvent(string topic, Components.Part[] parts)
+        public Guid storeEvent(string topic, Components.Part[] parts)
         {
             EventStorageService.EventStorageService ess = new EventStorageService.EventStorageService();
             ess.Init(global::EventStorage.Properties.Settings.Default.ProjectInUse);
-            ess.WriteToDB(topic, parts);
+            var result =  ess.WriteToDB(topic, parts);
+            ess.CloseConnection();
+            return result;
+        }
+
+        public LinkSmartEvent storeEvent(LinkSmartEvent theEvent)
+        {
+            try
+            {
+                theEvent.InternalId = storeEvent(theEvent.Topic, theEvent.Parts.ToArray());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Event storage failed: "+e.Message + e.StackTrace);
+            }
+            return theEvent;
+        }
+
+        public LinkSmartEvent getEvent(Guid theEventId)
+        {
+            EventStorageService.EventStorageService ess = new EventStorageService.EventStorageService();
+            ess.Init(global::EventStorage.Properties.Settings.Default.ProjectInUse);
+            var result =  ess.GetEventById(theEventId);
+            ess.CloseConnection();
+            return result;
+        }
+
+        public List<LinkSmartEvent> ListEvents(DateTime start, DateTime end)
+        {
+            EventStorageService.EventStorageService ess = new EventStorageService.EventStorageService();
+            ess.Init(global::EventStorage.Properties.Settings.Default.ProjectInUse);
+            var result =  ess.ListEvents(start, end);
+            ess.CloseConnection();
+            return result;
         }
     }
 }

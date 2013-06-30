@@ -47,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="EventStorageTest.cs" />
     <Compile Include="SubscriptionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -54,6 +56,10 @@
     <ProjectReference Include="..\Components\Components\Components.csproj">
       <Project>{2D6C8F0E-B2FB-4327-B157-98FC2A17B9DA}</Project>
       <Name>Components</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EventStorage\EventStorage.csproj">
+      <Project>{21928A6A-40EA-42A5-BCE6-65155BA4AD20}</Project>
+      <Name>EventStorage</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

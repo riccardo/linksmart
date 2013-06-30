@@ -96,43 +96,55 @@ namespace EventManager
         /// <summary>
         /// Add the failed event notification to the queue
         /// </summary>
-        public void queue(Components.Subscription @event, publishRequest request)
+        public void queue(Components.Subscription subscription, Components.LinkSmartEvent failedEvent)
         {
-            @event.Parts = request.in1;
-            if (EventManagerImplementation.failedEventList.Count > 100)
+            if (EventManager.Properties.Settings.Default.UseRetryQueue)
             {
-                EventManagerImplementation.failedEventList = new List<Components.Subscription>(); // QUICK FIX, OTHERWISE THIS WILL CONSUME ALL MEMORY.
+                var sub = EventManagerImplementation.subscriptionList.Where(s => s.Topic.Equals(subscription.Topic) && s.Endpoint.Equals(subscription.Endpoint) && s.Description.Equals(s.Description)).FirstOrDefault();
+                if (null != sub)
+                {
+                    sub.AddFailedEvent(failedEvent);
+                }
             }
-            EventManagerImplementation.failedEventList.Add(@event);
+
+
+            EventStorage.SubscriptionStore.Store.AddFailedNotification(subscription, failedEvent);
         }
+
+       
         /// <summary>
         /// Retrieve and remove the first element of the queue
         /// </summary>
         public Components.Subscription dequeue()
         {
-            /// <summary>
-            /// Method to sort the list, ascending order of NumberOfRetries descending order of Priority.
-            /// </summary>
-            EventManagerImplementation.failedEventList.Sort(delegate(Components.Subscription s1, Components.Subscription s2)
+            if (EventManager.Properties.Settings.Default.UseRetryQueue)
             {
-                int retriesComparison = s2.NumberOfRetries.CompareTo(s1.NumberOfRetries);
-                // If NumberOfRetries are the same we sort on Priority
-                if (retriesComparison == 0)     
-                    return s2.Priority.CompareTo(s1.Priority);
-                else if (retriesComparison > 0)
-                    return -1;
-                else
-                    return 1;
-            });
-            try 
-            {
-                //Program.failedEventList = Program.failedEventList.OrderBy(q => q.NumberOfRetries).ThenByDescending(q => q.Priority).ToList();
-                Components.Subscription @return = EventManagerImplementation.failedEventList.First();
-                @return.NumberOfRetries++;
-                EventManagerImplementation.failedEventList.RemoveAt(0);
-                return @return;
+                /// <summary>
+                /// Method to sort the list, ascending order of NumberOfRetries descending order of Priority.
+                /// </summary>
+                var resendList = EventManagerImplementation.subscriptionList.Where(s => null != s.FailedEvents && s.FailedEvents.Count > 0).ToList();
+                resendList.Sort(delegate(Components.Subscription s1, Components.Subscription s2)
+                {
+                    int retriesComparison = s2.NumberOfRetries.CompareTo(s1.NumberOfRetries);
+                    // If NumberOfRetries are the same we sort on Priority
+                    if (retriesComparison == 0)
+                        return s2.Priority.CompareTo(s1.Priority);
+                    else if (retriesComparison > 0)
+                        return -1;
+                    else
+                        return 1;
+                });
+                try
+                {
+                    //Program.failedEventList = Program.failedEventList.OrderBy(q => q.NumberOfRetries).ThenByDescending(q => q.Priority).ToList();
+                    Components.Subscription @return = resendList.First();
+                    @return.NumberOfRetries++;
+                    //EventManagerImplementation.failedEventList.RemoveAt(0);
+                    return @return;
+                }
+                catch { return null; }
             }
-            catch { return null; }
+            return null;
         }
     }
 }

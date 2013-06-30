@@ -208,6 +208,42 @@ namespace EventManager
             return resultAddress;
         }
 
+        public static string GetServiceByAttributes(string description)
+        {
+
+            string resultAddress = string.Empty;
+            try
+            {
+                if (Properties.Settings.Default.NetworkManagerVersion.Equals("2.0"))
+                {
+                    NetworkManager20ServiceReference.NetworkManager nm = new NetworkManager20ServiceReference.NetworkManager();
+                    NetworkManager20ServiceReference.Part a = new NetworkManager20ServiceReference.Part();
+                    //a.key = "DESCRIPTION";
+                    //a.value = description;
+                    //NetworkManager20ServiceReference.NetworkManager.Part[] b = new NetworkManager20ServiceReference.NetworkManager.Part[2];
+                    ////b[0] = a;
+                    //a = new NetworkManager20ServiceReference.NetworkManager.Part();
+                    //a.key = "EVENTMANAGER_VERSION";
+                    //a.value = "2.0";
+                    var registrations = nm.getServiceByDescription(description);
+
+                    resultAddress = GetNetworkManagerLocalEndpointForHid((registrations != null && registrations.Count() > 0) ? registrations[0].virtualAddressAsString : string.Empty);
+                }
+                else
+                {
+                    string hid = string.Empty;
+                    var emHidList = GetHidsByDescription(description);
+                    hid = (null != emHidList && emHidList.Count() > 0) ? emHidList.FirstOrDefault() : string.Empty;
+                    resultAddress = GetNetworkManagerLocalEndpointForHid(hid);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Subscription description->hid lookup at Network Manager failed: {0}", e.Message);
+            }
+            return resultAddress;
+        }
+
         public static List<string> GetHidsByDescription(string description)
         {
             var result = new List<string>();

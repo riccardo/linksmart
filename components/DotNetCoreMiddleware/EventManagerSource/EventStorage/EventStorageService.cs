@@ -109,6 +109,7 @@ namespace EventStorageService
         }
         public void Init(string type)
         {
+    
             switch (type)
             {
                 case "seam4us":
@@ -121,7 +122,7 @@ namespace EventStorageService
 
                         eventDB.Open();
                     }
-                    catch (Exception e) { Console.WriteLine(e.Message); }
+                    catch (Exception e) { Console.WriteLine("EventStorageService.Init"+e.Message); }
                     break;
                 case "retry":
                     try
@@ -133,7 +134,7 @@ namespace EventStorageService
 
                         eventDB.Open();
                     }
-                    catch (Exception e) { Console.WriteLine(e.Message); }
+                    catch (Exception e) { Console.WriteLine("EventStorageService.Init" + e.Message); }
                     break;
                 case "ebbits":
                     try
@@ -145,11 +146,55 @@ namespace EventStorageService
 
                         eventDB.Open();
                     }
-                    catch (Exception e) { Console.WriteLine(e.Message); }
+                    catch (Exception e) { Console.WriteLine("EventStorageService.Init" + e.Message); }
                     break;
+                default:
+                    try
+                    {
+                        //// Event database with Callback address (Endpoint or HID)
+                        //eventDB.ConnectionString = "Data Source=EbbitsEventDB.s3db;Pooling=true;FailIfMissing=true;Journal Mode=Off";
+                        // Event databese without callback address, just event topic
+                        eventDB.ConnectionString = "Data Source=EventStoreDB.s3db; Pooling=true; FailIfMissing=false; Journal Mode=Off";
+
+                        eventDB.Open();
+                    }
+                    catch (Exception e) { Console.WriteLine("EventStorageService.Init" + e.Message + e.StackTrace); }
+                    break;
+                  
             }
-      
+            CreateEventTableIfNotExists();
+          
         }
+
+        virtual public void CreateEventTableIfNotExists()
+        {
+            using (DbCommand cmd = eventDB.CreateCommand())
+            {
+                cmd.CommandText =
+                 @"SELECT count(name) FROM sqlite_master WHERE type='table' AND tbl_name='Events';";
+                int noTables = Convert.ToInt32(cmd.ExecuteScalar());
+                if (0 == noTables)
+                {
+                    Console.WriteLine("Creating Event Table...");
+                    cmd.CommandText = @" CREATE TABLE [Events] (
+                Topic nvarchar(4000)
+                , [ID]  nvarchar(200)
+                , [Priority]  integer
+                , stored_timestamp nvarchar(200)
+                , IntId integer primary key  autoincrement);";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @" CREATE TABLE [KeyValuePairs]  (
+                 [EventId]  nvarchar(200)
+                ,[Key] nvarchar(4000)
+                , [Value] nvarchar(4000)                
+                , IntId integer primary key  autoincrement);";
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        
         /// <summary>
         /// Static method for adding an entry to a log file including a time stamp
         /// </summary>
@@ -301,7 +346,7 @@ namespace EventStorageService
             catch (Exception e) { System.Console.WriteLine(e.Message); }
         }
 
-        public void WriteToDB(string eventTopic, Components.Part[] eventParts)
+        public Guid WriteToDB(string eventTopic, Components.Part[] eventParts)
         {
             try
             {
@@ -309,7 +354,8 @@ namespace EventStorageService
                 Nullable<DateTime> timestamp = DateTime.Now;
                 Components.Part[] parts = eventParts;
 
-                string myId = System.Guid.NewGuid().ToString();
+                Guid guidId =  System.Guid.NewGuid();
+                string myId = guidId.ToString();
                 DbCommand dbcommand = eventDB.CreateCommand();
                 dbcommand.Connection = eventDB;
                 dbcommand.CommandType = CommandType.Text;
@@ -337,8 +383,10 @@ namespace EventStorageService
                     AddParameter(ref dbcommand2, "@Value", DbType.String, sVal);
                     dbcommand2.ExecuteScalar();
                 }
+                return guidId;
             }
             catch (Exception e) { System.Console.WriteLine(e.Message); }
+            return Guid.Empty;
         }
 
         /// <summary>
@@ -395,6 +443,86 @@ namespace EventStorageService
             }
             catch (Exception e) { System.Console.WriteLine(e.Message); }
         }
+
+        virtual public List<Components.LinkSmartEvent> ListEvents(DateTime start, DateTime end)
+        {
+            var result = new List<Components.LinkSmartEvent>();
+            DbCommand cmd = eventDB.CreateCommand();
+
+            cmd.Connection = eventDB;
+            cmd.CommandType = CommandType.Text;
+
+            cmd.CommandText = @"SELECT [ID],stored_timestamp,Topic, key, value FROM [Events] 
+LEFT JOIN [KeyValuePairs] ON[KeyValuePairs].EventId=[Events].ID
+                        WHERE stored_timestamp<@End and stored_timestamp>@Start 
+order by [ID]; ";
+            AddParameter(ref cmd, "@Start", DbType.String, start.ToString("yyyy-MM-dd HH:mm:ss"));
+            AddParameter(ref cmd, "@End", DbType.String, end.ToString("yyyy-MM-dd HH:mm:ss"));
+
+            DbDataReader dbr = cmd.ExecuteReader();
+            Components.LinkSmartEvent e = new Components.LinkSmartEvent();
+            while (dbr.Read()) // Read() returns true if there is still a result line to read
+            {
+                Guid id = Guid.Parse(dbr["ID"] as string);
+
+                if (!e.InternalId.Equals(id))
+                {
+                    e = new Components.LinkSmartEvent();
+                    e.InternalId = id;
+                    e.Topic = dbr["Topic"] as string;
+                    e.Timestamp = Convert.ToDateTime(dbr["stored_timestamp"] ?? DateTime.Now.ToString());
+                    result.Add(e);
+                }
+                string key = dbr["Key"] as string;
+                string value = dbr["Value"] as string;
+
+                if (!(string.IsNullOrEmpty(key) && string.IsNullOrEmpty(value)))
+                {
+                    Components.Part p = new Components.Part();
+                    p.key = key;
+                    p.value = value;
+                    e.Parts.Add(p);
+                }
+            }
+
+            return result;
+        }
+
+        virtual public Components.LinkSmartEvent GetEventById(Guid theEventDbId)
+        {
+            var result = new List<Components.LinkSmartEvent>();
+            using (DbCommand cmd = eventDB.CreateCommand())
+            {
+                cmd.CommandText = @"SELECT [ID],stored_timestamp,Topic FROM [Events] where ID='" + theEventDbId.ToString()+"'";
+                //AddParameter(ref cmd, "@EventID", DbType.String, theEventDbId.ToString());
+                DbDataReader dbr = cmd.ExecuteReader();
+                while (dbr.Read()) // Read() returns true if there is still a result line to read
+                {
+                    Components.LinkSmartEvent e = new Components.LinkSmartEvent();
+                    e.Topic = dbr["Topic"] as string;
+                   e.InternalId = Guid.Parse(dbr["ID"] as string);
+                   e.Timestamp = Convert.ToDateTime(dbr["stored_timestamp"]??DateTime.Now.ToString());
+                    result.Add(e);
+
+                    using (DbCommand pCmd = eventDB.CreateCommand())
+                    {
+                        pCmd.CommandText = @"SELECT [EventId],[Key],[Value] FROM [KeyValuePairs] where [EventId]='" + theEventDbId.ToString() + "'";
+                        //AddParameter(ref pCmd, "@EventID", DbType.String,  e.InternalId.ToString());
+                        DbDataReader pDbr = pCmd.ExecuteReader();
+                        while (pDbr.Read()) // Read() returns true if there is still a result line to read
+                        {
+                            Components.Part p = new Components.Part();
+                            p.key = pDbr["Key"] as string;
+                            p.value = pDbr["Value"] as string;
+                        
+                            e.Parts.Add(p);
+                        }
+                    }
+                }
+            }
+            return result.FirstOrDefault() ;
+        }
+
         /// <summary>
         /// Adds a parameter to supplied dbcommand
         /// </summary>
@@ -402,8 +530,13 @@ namespace EventStorageService
         /// <param name="paramenterName">Name of the parameter to be added</param>
         /// <param name="dbType">The database datatype of the parameter</param>
         /// <param name="value">The actual value</param>
-    
-      
 
+
+
+
+        internal void CloseConnection()
+        {
+            eventDB.Close();
+        }
     }
 }

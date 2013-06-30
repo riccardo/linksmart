@@ -16,6 +16,7 @@ namespace EventManager
     using System.Net.Sockets;
     using System.ServiceModel.Description;
     using EventStorage;
+    using EventManager20Interface;
 
     /// <summary>
     /// TODO: Update summary.
@@ -68,6 +69,7 @@ namespace EventManager
                     myBinding.Namespace = "http://eventmanager.linksmart.eu";
                     serviceHost.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexHttpBinding(), address + "mex");
                     serviceHost.AddServiceEndpoint(typeof(EventManagerPort), myBinding, "");
+                    serviceHost.AddServiceEndpoint(typeof(IEventManager20), myBinding, "/20");
                     serviceHost.Open();
 
                     Console.WriteLine("Event manager listening at: {0}", address);

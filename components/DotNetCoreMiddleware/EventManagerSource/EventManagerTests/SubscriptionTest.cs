@@ -63,7 +63,7 @@ namespace EventManagerTests
 
             Assert.That(!s3.IsMatch(publishedTopic3));
         }
-        
+
 
         [Test]
         public void TestSubscribeIsCaseSensitive()
@@ -186,5 +186,41 @@ namespace EventManagerTests
             Assert.That(!s.IsMatch(publishedTopic));
         }
 
+
+        [Test]
+        public void ContentSubscription()
+        {
+            string subscriptionTopic = "event/sensor/sensor1/temperature";
+            Subscription s = new Subscription()
+            {
+                Topic = subscriptionTopic,
+                Parts = new Part[] { new Part() { key = "testar", value = "storage" } }
+            };
+
+
+            Assert.That(s.IsContentMatch(new Part[] { new Part() { key = "testar", value = "storage" } }));
+            Assert.That(s.IsContentMatch(new Part[] { new Part() { key = "testar", value = "storage" }, new Part() { key = "testarAtt", value = "HaEnTill" } }));
+            Assert.That(!s.IsContentMatch(new Part[] { new Part() { key = "testar", value = "storage2" } }));
+            Assert.That(!s.IsContentMatch(new Part[] { }));
+        }
+
+        [Test]
+        public void ContentSubscriptionEmptyShouldNotMatchAnything()
+        {
+            string subscriptionTopic = "event/sensor/sensor1/temperature";
+            Subscription s = new Subscription()
+            {
+                Topic = subscriptionTopic,
+                Parts = new Part[] { }
+            };
+
+
+            Assert.That(!s.IsContentMatch(new Part[] { new Part() { key = "testar", value = "storage" } }));
+            Assert.That(!s.IsContentMatch(new Part[] { new Part() { key = "testar", value = "storage" }, new Part() { key = "testarAtt", value = "HaEnTill" } }));
+            Assert.That(!s.IsContentMatch(new Part[] { new Part() { key = "testar", value = "storage2" } }));
+            Assert.That(!s.IsContentMatch(new Part[] { }));
+        }
     }
+
+    
 }

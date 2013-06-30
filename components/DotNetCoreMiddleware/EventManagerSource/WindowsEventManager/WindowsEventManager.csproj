@@ -122,6 +122,10 @@
       <Project>{21928A6A-40EA-42A5-BCE6-65155BA4AD20}</Project>
       <Name>EventStorage</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IEventManager20\IEventManager20.csproj">
+      <Project>{F0A828E8-ACDA-45A7-9E36-4D0631AEC93E}</Project>
+      <Name>IEventManager20</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
