@@ -6,6 +6,6 @@
    </service>
    <property name="service.exported.interfaces" value="*"/>
    <property name="service.exported.configs" value="org.apache.cxf.ws"/>
-   <property name="org.apache.cxf.ws.address" value="http://localhost:9090/cxf/services/RemoteWSClientProvider"/>
+   <property name="org.apache.cxf.ws.address" value="http://0.0.0.0:9090/cxf/services/RemoteWSClientProvider"/>
 </scr:component>
 
