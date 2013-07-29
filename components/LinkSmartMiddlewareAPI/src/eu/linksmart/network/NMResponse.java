@@ -12,8 +12,8 @@ public class NMResponse  implements java.io.Serializable {
 	public static final int STATUS_ERROR = 1;
 	public static final int STATUS_TIMEOUT = 2;
 
-	private java.lang.String message = null;
-	private byte[] messageBytes = null;
+	private java.lang.String message = "";
+	private byte[] messageBytes = new byte[]{};
 	private Message messageObject = null;
 	private int status;
 	private boolean bytesPrimary = false;

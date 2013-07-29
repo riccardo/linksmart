@@ -338,7 +338,6 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			while (numRetries < MAXNUMRETRIES) {
 				try {
 					pID = bbjxta.getPeerID(dest);
-					bbjxta.getPeerID(source);
 					if (pID != null) {
 						if (pipeTable.containsKey(pID))
 							outPipe = pipeTable.get(pID).getOutputPipe();

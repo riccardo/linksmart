@@ -226,12 +226,15 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			byte[] data) {
 		// open message only if it is for local entity or is broadcast
 		Registration receiverRegistrationInfo = null;
+		Registration senderRegistrationInfo = identityManager.getServiceInfo(senderVirtualAddress);
 		if (receiverVirtualAddress != null) {
 			receiverRegistrationInfo = identityManager.getServiceInfo(receiverVirtualAddress);
 		}
 		if (receiverVirtualAddress == null
 				|| (receiverRegistrationInfo != null && identityManager.getLocalServices()
-				.contains(receiverRegistrationInfo))) {
+				.contains(receiverRegistrationInfo))
+				|| (senderRegistrationInfo != null && identityManager.getLocalServices()
+				.contains(senderRegistrationInfo))) {
 			// get connection belonging to services
 			Connection conn;
 			try {
@@ -309,7 +312,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 						// response
 						// here the response message should include a message
 						// object
-						msg = sendMessageSynch(msg, this.myVirtualAddress,
+						msg = sendMessageSynch(msg, msg.getSenderVirtualAddress(),
 								msg.getReceiverVirtualAddress()).getMessageObject();
 					}
 					NMResponse nmresp = new NMResponse();
@@ -344,12 +347,15 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			byte[] data) {
 		// open message only if it is for local entity or is broadcast
 		Registration receiverRegistrationInfo = null;
+		Registration senderRegistrationInfo = identityManager.getServiceInfo(senderVirtualAddress);
 		if (receiverVirtualAddress != null) {
 			receiverRegistrationInfo = identityManager.getServiceInfo(receiverVirtualAddress);
 		}
 		if (receiverVirtualAddress == null
 				|| (receiverRegistrationInfo != null && identityManager.getLocalServices()
-				.contains(receiverRegistrationInfo))) {
+				.contains(receiverRegistrationInfo))
+				|| (senderRegistrationInfo != null && identityManager.getLocalServices()
+				.contains(senderRegistrationInfo))) {
 			// get connection belonging to services
 			Connection conn;
 			try {
@@ -417,7 +423,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				 * send message over sendMessage method of this and return
 				 * response of it
 				 */
-				return sendMessageAsynch(msg, this.myVirtualAddress, msg.getReceiverVirtualAddress());
+				return sendMessageAsynch(msg, msg.getSenderVirtualAddress(), msg.getReceiverVirtualAddress());
 			} else {
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_SUCCESS);

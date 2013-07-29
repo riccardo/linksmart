@@ -138,7 +138,7 @@ public class ConnectionManager {
 			}
 		}
 	}
-	
+
 	/**
 	 * Removes the policies registered for a given VirtualAddress.
 	 * @param virtualAddress
@@ -236,24 +236,14 @@ public class ConnectionManager {
 		//it is possible to release the lock now as the handshake connection is created
 		setNotBusy();
 
-		//if the policies are not there yet add the endpoint
+		//if the policies are not there yet  the networkmanager has not met this endpoint before
 		if(!servicePolicies.containsKey(remoteEndpoint)) {	
 			nmCore.addRemoteVirtualAddress(remoteEndpoint, remoteEndpoint);
 		}
 
 		//if the message could not be opened or it was opened and it is not a handshake message we start the handshake
-		if(!isHandshakeMessage(data, senderVirtualAddress, receiverVirtualAddress)) {
-			/*we only start the handshake if we are the initiator of the communication
-			 * if the remote endpoint did not start with a handshake message than it is not working correctly
-			 */
-			if(!remoteEndpoint.equals(senderVirtualAddress)) {
-				comSecMgrName = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress);
-			} else {
-				logger.warn("Remote endpoint did not start with communication handshake");
-				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
-				return null;
-			}
-		} else {
+		boolean isHandshakeMsg = isHandshakeMessage(data, senderVirtualAddress, receiverVirtualAddress);
+		if(isHandshakeMsg) {
 			//we received a handshake message
 			//try to open message in standard way
 			Message handshakeMessage = 
@@ -284,7 +274,18 @@ public class ConnectionManager {
 					servicePolicies.get(remoteEndpoint),
 					requiredSecProps,
 					availableComSecMgrs);
-
+		} else {
+			/*we only start the handshake if we are the initiator of the communication
+			 * if the remote endpoint did not start with a handshake message than it is not working correctly
+			 */
+			if(!remoteEndpoint.equals(senderVirtualAddress)) {
+				comSecMgrName = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress);
+			} else {
+				logger.info("Remote endpoint did not start with communication handshake: " + senderVirtualAddress);
+				//we check whether we can open message with standard settings
+				comSecMgrName = findMatchingCommunicationSecurityManager(
+						servicePolicies.get(remoteEndpoint), null, null);
+			}
 		}
 
 		if(comSecMgrName == null) {
@@ -326,6 +327,16 @@ public class ConnectionManager {
 		}
 		if (agreedComSecMgr != null) {
 			conn.setCommunicationSecMgr(agreedComSecMgr);
+		}
+
+		//if this was only a trial check if message is plausible
+		if(!isHandshakeMsg && remoteEndpoint.equals(senderVirtualAddress)) {
+			Message msg = conn.processData(senderVirtualAddress, receiverVirtualAddress, data);
+			if(msg instanceof ErrorMessage) {
+				//connection did not work out
+				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
+				return null;
+			}
 		}
 		//add connection to list
 		connections.add(conn);
@@ -408,34 +419,42 @@ public class ConnectionManager {
 
 		//parse received security properties
 		List<SecurityProperty> requiredSecPropsList = new ArrayList<SecurityProperty>();
-		for(String secProp : requiredSecProps) {
-			requiredSecPropsList.add(SecurityProperty.valueOf(secProp));
-		}
-		//parse received ComSecMgrs
-		List<String> requiredComSecMgrList = Arrays.asList(availableComSecMgrs);
+		List<String> requiredComSecMgrList = null;
+		boolean noSecurityRequired = false;
+		if (requiredSecProps != null) {
+			for(String secProp : requiredSecProps) {
+				requiredSecPropsList.add(SecurityProperty.valueOf(secProp));
+			}
+			//parse received ComSecMgrs
+			requiredComSecMgrList = Arrays.asList(availableComSecMgrs);
 
-		//check if requirements are not colliding on requiring side
-		boolean noEncodingRequired = requiredSecPropsList.contains(SecurityProperty.NoEncoding);
-		boolean noSecurityRequired = requiredSecPropsList.contains(SecurityProperty.NoSecurity);
-		boolean justNoEncNoSecRequired = requiredSecPropsList.size() == 2 && noEncoding && noSecurity;
-		//if there are more requirements and noEnc or noSec is included it must be colliding
-		if (!justNoEncNoSecRequired &&
-				(requiredSecPropsList.size() > 1 && (noEncodingRequired || noSecurityRequired))) {
-			throw new Exception("Colliding policies for services");
-		}
 
-		//ensure that the two sides agree on encoding or no encoding
-		if(noEncodingRequired != noEncoding) {
-			return null;
-		}
+			//check if requirements are not colliding on requiring side
+			boolean noEncodingRequired = requiredSecPropsList.contains(SecurityProperty.NoEncoding);
+			noSecurityRequired = requiredSecPropsList.contains(SecurityProperty.NoSecurity);
+			boolean justNoEncNoSecRequired = requiredSecPropsList.size() == 2 && noEncoding && noSecurity;
+			//if there are more requirements and noEnc or noSec is included it must be colliding
+			if (!justNoEncNoSecRequired &&
+					(requiredSecPropsList.size() > 1 && (noEncodingRequired || noSecurityRequired))) {
+				throw new Exception("Colliding policies for services");
+			}
 
+			//ensure that the two sides agree on encoding or no encoding
+			if(noEncodingRequired != noEncoding) {
+				return null;
+			}
+		}
 		//go through the available comSecMgrs and check whether they can fulfill both requirements
 		boolean ownRequirementsOk = false;
 		if (!this.communicationSecurityManagers.isEmpty()) {
 			for (CommunicationSecurityManager comSecMgr : this.communicationSecurityManagers) {
 				//first check against local policies
 				if (matchingPolicies(policies, comSecMgr.getProperties())){
-					ownRequirementsOk = true;
+					if (requiredComSecMgrList == null) {
+						return comSecMgr.getClass().getName();
+					} else {
+						ownRequirementsOk = true;
+					}
 					//now check against received policies
 					if(requiredComSecMgrList.contains(comSecMgr.getClass().getName()) &&
 							matchingPolicies(requiredSecPropsList, comSecMgr.getProperties())) {
@@ -450,7 +469,7 @@ public class ConnectionManager {
 			//no available communication security manager although required locally - that is a problem
 			throw new Exception("Required properties not fulfilled by ConnectionSecurityManagers");
 		}
-		if(noSecurity && noSecurityRequired) {
+		if((noSecurity && requiredComSecMgrList == null) || (noSecurity && noSecurityRequired)) {
 			return SecurityProperty.NoSecurity.name();
 		}
 		//no match found so just return
