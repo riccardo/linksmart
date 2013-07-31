@@ -67,13 +67,13 @@ public abstract class Configurator implements ManagedService{
 	private ServiceRegistration managedServiceReg;
 	public BundleContext context;
 	public Hashtable unsavedConfigs = new Hashtable();
-	
+
 	/** Configuration PID */
 	public String pid;
 
 	/** Default Configuration Location */
 	public String configurationFilePath;
-	
+
 	/**
 	 * Constructor
 	 * @param context the context
@@ -83,22 +83,22 @@ public abstract class Configurator implements ManagedService{
 	 */
 	public Configurator(BundleContext context, Logger logger, 
 			String pid, String configurationFilePath) {
-		
+
 		this.context = context;
 		this.pid = pid;
 		this.configurationFilePath = configurationFilePath;
 		this.logger = logger;
-		
+
 		ServiceReference ref = context.getServiceReference(
-			ConfigurationAdmin.class.getName());
+				ConfigurationAdmin.class.getName());
 		if (ref != null) {
 			this.cm = (ConfigurationAdmin) context.getService(ref);
 		}
-		
+
 		init();
 		initiated = true;
 	}
-	
+
 	/**
 	 * Sets the Configuration Admin, thats is a service for administer 
 	 * configuration data
@@ -111,7 +111,7 @@ public abstract class Configurator implements ManagedService{
 			setConfiguration(null, null);
 		}
 	}
-	
+
 	/**
 	 * Unsets the Configuration Admin.
 	 * 
@@ -123,25 +123,25 @@ public abstract class Configurator implements ManagedService{
 		}
 		this.cm = null;
 	}
-	
+
 	/**
 	 * Initializes the configuration of the framework
 	 */
 	public void init() {
 		try {
 			configuration = null;
-			
+
 			if (cm != null) {
 				// We check if there is already a persistent configuration
 				// in the framework.
 				Configuration config = cm.getConfiguration(pid);
 				configuration = config.getProperties();
-				
+
 				// If there is no configuration, we will use the properties 
 				// file in the jar
 				if (configuration == null) {
 					logger.info("No persistent configuration for PID " + pid
-						+ " available");
+							+ " available");
 					configuration = loadDefaults();
 					config.update(configuration);
 				}
@@ -150,7 +150,7 @@ public abstract class Configurator implements ManagedService{
 				// If the configuration admin is not yet available, just use the 
 				// default configuration from the Jar
 				logger.warn("Configuration=" + pid
-					+ " - ConfigurationAdmin not found... loading defaults...");
+						+ " - ConfigurationAdmin not found... loading defaults...");
 				configuration = loadDefaults();
 			}
 		} catch (IOException e) {
@@ -158,7 +158,7 @@ public abstract class Configurator implements ManagedService{
 			// TODO: What should we do here? Can we also load the defaults?
 		}
 	}
-	
+
 	/**
 	 * Registers a configuration
 	 */
@@ -167,10 +167,10 @@ public abstract class Configurator implements ManagedService{
 			Dictionary d  = new Hashtable();
 			d.put(Constants.SERVICE_PID, pid);
 			managedServiceReg = context.registerService(
-				ManagedService.class.getName(), this, d);
+					ManagedService.class.getName(), this, d);
 		}
 	}
-	
+
 	/**
 	 * Stop method 
 	 */
@@ -180,7 +180,7 @@ public abstract class Configurator implements ManagedService{
 		configuration = null;
 		unsavedConfigs = null;
 	}
-	
+
 	/**
 	 * Updates the configuration with the properties parameter
 	 * 
@@ -188,37 +188,40 @@ public abstract class Configurator implements ManagedService{
 	 */
 	public synchronized final void updated(Dictionary properties) 
 			throws ConfigurationException {
-		
+
 		if (properties == null) {
 			// The configuration has been deleted, load the default one 
 			// (internally from the JAR)
 			try {
 				Configuration config = cm.getConfiguration(pid);
-					
+
 				configuration = config.getProperties();
 				if (configuration == null) {
 					configuration = loadDefaults();
 					config.update(configuration);
+					return;
+				} else {
+					//ignore the update as configuration is still available
 					return;
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				return;
 			}
-		}
+		} else {
+			Hashtable updates = ConfigurationTools.getConfigurationChanges(
+					this.configuration, properties);
 
-		Hashtable updates = ConfigurationTools.getConfigurationChanges(
-			this.configuration, properties);
-		
-		// We update now the configuration with the new configuration dictionary
-		this.configuration = properties;
-		if (!updates.isEmpty()) {
-			// If there is an update in properties, we update our bundle's 
-			// configuration
-			applyConfigurations(updates);
+			// We update now the configuration with the new configuration dictionary
+			this.configuration = properties;
+			if (!updates.isEmpty()) {
+				// If there is an update in properties, we update our bundle's 
+				// configuration
+				applyConfigurations(updates);
+			}	
 		}
 	}
-	
+
 	/**
 	 * Gets the configuration
 	 * 
@@ -227,14 +230,14 @@ public abstract class Configurator implements ManagedService{
 	public Dictionary getConfiguration() {
 		return configuration;
 	}
-	
+
 	/**
 	 * Apply the configuration changes
 	 * 
 	 * @param updates the configuration changes
 	 */
 	public abstract void applyConfigurations(Hashtable updates);
-	
+
 	/**
 	 * Sets a new configuration pair (key, value) in the configuration
 	 * 
@@ -243,7 +246,7 @@ public abstract class Configurator implements ManagedService{
 	 */
 	public synchronized final void setConfiguration(String key, String value) {
 		Configuration config;
-		
+
 		if (cm == null) {
 			if (configuration == null) {
 				configuration = loadDefaults();
@@ -251,10 +254,10 @@ public abstract class Configurator implements ManagedService{
 			configuration.put(key, value);
 			unsavedConfigs.put(key, value);
 			logger.error("setConfiguration: Could not save configuration "
-				+ "properties into CM. CM not available");
+					+ "properties into CM. CM not available");
 			return;
 		}
-		
+
 		if (key != null) {
 			unsavedConfigs.put(key, value);
 			configuration.put(key, value);
@@ -266,7 +269,7 @@ public abstract class Configurator implements ManagedService{
 			if (config != null) {
 				config.getProperties();
 			}
-			
+
 			if (storedConfig == null) {
 				/*
 				 * Only when there is still no configuration, take the current 
@@ -281,7 +284,7 @@ public abstract class Configurator implements ManagedService{
 					storedConfig.put(k, value);
 				}
 			}
-			
+
 			if (config != null) {
 				config.update(storedConfig);
 			}
@@ -290,11 +293,11 @@ public abstract class Configurator implements ManagedService{
 			logger.info("setConfiguration: Saved configuration into CM");
 		} catch (IOException e) {
 			logger.error("setConfiguration: Could not save configuration "
-				+ "properties into CM");
+					+ "properties into CM");
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Returns the value associated to the key "key"
 	 * 
@@ -307,7 +310,7 @@ public abstract class Configurator implements ManagedService{
 		}
 		return (String) configuration.get(key);
 	}
-	
+
 	/**
 	 * Loads the default configuration from the configuration file
 	 * 
@@ -324,7 +327,7 @@ public abstract class Configurator implements ManagedService{
 		} catch(IOException e) {
 			logger.error(e.getMessage(), e);
 		}	
-		
+
 		return properties;
 	}
 
