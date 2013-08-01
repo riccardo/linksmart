@@ -44,7 +44,7 @@ public class BackboneData implements Backbone {
 	@Override
 	public NMResponse sendDataSynch(VirtualAddress senderVirtualAddress,
 			VirtualAddress receiverVirtualAddress, byte[] data) {
-		NMResponse r = executeServiceCall(receiverVirtualAddress, data);
+		NMResponse r = executeServiceCall(senderVirtualAddress, receiverVirtualAddress, data);
 		return r;
 	}
 
@@ -53,7 +53,7 @@ public class BackboneData implements Backbone {
 			VirtualAddress receiverVirtualAddress, byte[] data) {
 		// make call look asynchronous by return the status and separately
 		// sending response
-		return executeServiceCall(receiverVirtualAddress, data);
+		return executeServiceCall(senderVirtualAddress, receiverVirtualAddress, data);
 	}
 
 	private class ResponseSender implements Runnable {
@@ -75,6 +75,7 @@ public class BackboneData implements Backbone {
 	}
 
 	private NMResponse executeServiceCall(
+			VirtualAddress senderVirtualAddress,
 			VirtualAddress receiverVirtualAddress, byte[] data) {
 		NMResponse resp = new NMResponse(NMResponse.STATUS_ERROR);
 
@@ -89,7 +90,8 @@ public class BackboneData implements Backbone {
 			// Error
 			return resp;
 
-		service.receive(data);
+		//service.receive(data);
+		service.receive(data, senderVirtualAddress);
 		return new NMResponse(NMResponse.STATUS_SUCCESS);
 	}
 
@@ -157,7 +159,8 @@ public class BackboneData implements Backbone {
 			for (VirtualAddress a : addressEndpointMap.keySet()) {
 				DataEndpoint service = resolveEndpointComponent(a);
 				if (a != null)
-					service.receive(data);
+					//service.receive(data);
+					service.receive(data, senderVirtualAddress);
 			}
 		} catch (Exception e) {
 			success = false;
