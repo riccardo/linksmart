@@ -115,7 +115,7 @@ public class NetworkManagerEncapsulation implements NetworkManager {
 		
 		return regsApi;
 	}
-
+	@Override
 	public VirtualAddress getVirtualAddress() throws RemoteException {
 		return VirtualAddressConverter.toApi(nmPortType.getService());
 	}
