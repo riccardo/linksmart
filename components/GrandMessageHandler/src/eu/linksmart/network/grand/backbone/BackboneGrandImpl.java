@@ -271,7 +271,7 @@ public class BackboneGrandImpl implements Backbone {
 			int packetNr = parseResponse(resp, clientSocket, uuid, clientVA, serverVA);
 			LOG.debug("Closed processing of GRAND request to " + urlEndpoint.toString());	
 
-			if (packetNr <= 0) {
+			if (packetNr < 0) {
 				// In case the response from the service is empty.
 				resp.setStatus(NMResponse.STATUS_ERROR);
 				return resp;

@@ -305,6 +305,9 @@ public class GrandTunnelServlet extends HttpServlet{
 
 	private boolean allMessagesAvailable(String uuid, int largestIndex) {
 		Vector<byte[]> mergedPackets = sessionBuffers.get(uuid);
+		if(mergedPackets.size() < largestIndex - 1 || mergedPackets.size() == 0) {
+			return false;
+		}
 		for(int i=0; i <= largestIndex; i++) {
 			if (mergedPackets.get(i) == null) {
 				return false;
@@ -320,8 +323,9 @@ public class GrandTunnelServlet extends HttpServlet{
 		try {
 			//wait for delayed packets for max timeout
 			long startTime = Calendar.getInstance().getTimeInMillis();
+			boolean allMsgsAvailable = false;
 			while (Calendar.getInstance().getTimeInMillis() - startTime < GRAND_MESSAGE_RETRIEVE_TIMEOUT &&
-					!allMessagesAvailable(uuid, largestIndex)) {
+					!(allMsgsAvailable = allMessagesAvailable(uuid, largestIndex))) {
 				try {
 					synchronized(sessionBuffers.get(uuid)) {
 						sessionBuffers.get(uuid).wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT);
@@ -330,7 +334,10 @@ public class GrandTunnelServlet extends HttpServlet{
 					//nothing to handle
 				}
 			}
-
+			
+			if(!allMsgsAvailable) {
+				return null;
+			}
 			//merge all packets together
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			for(byte[] packet : sessionBuffers.get(uuid)) {
@@ -381,6 +388,7 @@ public class GrandTunnelServlet extends HttpServlet{
 		byte[] headersBytes = Arrays.copyOf(data, bodyStartIndex);
 		String header = new String(headersBytes);
 		//take uuid and packet nr from header
+		if(!header.contains(":")) return;
 		String uuid = header.substring(0, header.indexOf(":"));
 		header = header.substring(header.indexOf(":") + 1);
 		int index = Integer.parseInt(header.replace(";", ""));
