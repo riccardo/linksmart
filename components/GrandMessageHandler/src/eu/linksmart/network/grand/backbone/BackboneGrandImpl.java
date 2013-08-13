@@ -39,7 +39,7 @@ public class BackboneGrandImpl implements Backbone {
 	private Logger LOG = Logger.getLogger(BackboneGrandImpl.class.getName());
 	private static final int MAXNUMRETRIES = 15;
 	private static final long SLEEPTIME = 20;
-	private static final int BUFFSIZE = 10; //16384;
+	private static final int BUFFSIZE = 10; //65450;
 	public static final String GRAND_TUNNEL_HEADER = "GrandTunnelUUID ";
 
 	/**

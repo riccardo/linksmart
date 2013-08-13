@@ -243,12 +243,12 @@ public class GrandTunnelServlet extends HttpServlet{
 		//if response is success look into data
 		if(r.getStatus() == NMResponse.STATUS_SUCCESS) {
 			int largestIndex = Integer.parseInt(r.getMessage());
-			byte[] byteData = getSessonData(uuid, largestIndex);
+			byte[] byteData = getSessionData(uuid, largestIndex);
 			closeSession(uuid);
 			int bodyStartIndex = 0;
 			byte[] body = null;
 			//check response status and if error response BAD_GATEWAY else parse response for client
-			if (!new String(byteData).startsWith("HTTP/1.1 200 OK") || byteData == null) {
+			if (byteData == null || !new String(byteData).startsWith("HTTP/1.1 200 OK")) {
 				response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 				//set whole response data as body
 				if(byteData == null) {
@@ -316,7 +316,7 @@ public class GrandTunnelServlet extends HttpServlet{
 		return true;
 	}
 
-	private byte[] getSessonData(String uuid, int largestIndex) {
+	private byte[] getSessionData(String uuid, int largestIndex) {
 		if(!sessionBuffers.containsKey(uuid)) {
 			throw new IllegalArgumentException(SESSION_CLOSED_EXCEPTION);
 		}
