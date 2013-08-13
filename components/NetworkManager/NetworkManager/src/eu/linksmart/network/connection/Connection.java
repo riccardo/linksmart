@@ -48,7 +48,14 @@ public class Connection {
 	 * The called entity of this communication
 	 */
 	private VirtualAddress serverVirtualAddress = null;
+	/**
+	 * CommunicationSecurityManager used to secure this communication.
+	 */
 	protected CommunicationSecurityManager comSecMgr;
+	/**
+	 * Session id identifying this connection.
+	 */
+	protected String sessionId;
 
 	protected Connection(VirtualAddress serverVirtualAddress) {
 		if (serverVirtualAddress == null) {
@@ -135,6 +142,10 @@ public class Connection {
 						receiverVirtualAddress,
 						senderVirtualAddress,
 						usedSecurity.getBytes());
+
+				if(sessionId != null) {
+					msg.setProperty(Message.SESSION_ID_KEY, sessionId);
+				}
 				return msg;
 			}
 			if (securityProtocol != null
@@ -211,6 +222,11 @@ public class Connection {
 			// code
 		}
 
+		//set session id into message
+		if (sessionId != null)
+		{
+			msg.setProperty(Message.SESSION_ID_KEY, this.sessionId);
+		}
 		//serialize the message into one stream to protect it
 		byte[] serializedCommand = MessageSerializerUtiliy.serializeMessage(msg, true, true);
 		//protect the stream if should be
@@ -225,7 +241,9 @@ public class Connection {
 			// set all data of the message as data part and protect it
 			msg.setData(serializedCommand);
 			msg = securityProtocol.protectMessage(msg);
-			//serialize the propertyless created protected dummy message
+			//set session id into message as it was hidden by encryption
+			msg.setProperty(Message.SESSION_ID_KEY, this.sessionId);
+			//serialize the created protected dummy message
 			return MessageSerializerUtiliy.serializeMessage(msg, false, true);
 		} else {
 			return serializedCommand;

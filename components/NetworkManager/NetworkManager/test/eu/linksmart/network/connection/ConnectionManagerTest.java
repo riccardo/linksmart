@@ -8,15 +8,18 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.any;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import eu.linksmart.network.ErrorMessage;
 import eu.linksmart.network.Message;
@@ -107,29 +110,37 @@ public class ConnectionManagerTest {
 		Properties props = new Properties();
 		props.put(ConnectionManager.HANDSHAKE_COMSECMGRS_KEY, "");
 		props.put(ConnectionManager.HANDSHAKE_SECPROPS_KEY, SecurityProperty.NoSecurity.name() + ";");
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		byte[] serializedPayload = null;
+		
 		try {
-			props.storeToXML(bos, null);
-			serializedPayload = bos.toByteArray();
-		} catch (IOException e) {
-			fail(e.getMessage());
-		} finally {
+			connectionMgr.createConnection(receiverVirtualAddress, senderVirtualAddress, new byte[0]);
+			ArgumentCaptor<Message> argument = ArgumentCaptor.forClass(Message.class);
+			verify(nmCore).sendMessage(argument.capture(), any(boolean.class));
+			
+			//check if communication entities are equal
+			assertEquals(receiverVirtualAddress, argument.getValue().getReceiverVirtualAddress());
+			assertEquals(senderVirtualAddress, argument.getValue().getSenderVirtualAddress());
+			
+			//check if contents are equal
+			byte[] sentData = argument.getValue().getData();
+			
+			Properties properties = new Properties();
 			try {
-				bos.close();
+				properties.loadFromXML(new ByteArrayInputStream(sentData));
+			} catch (InvalidPropertiesFormatException e) {
+				fail(e.getMessage());
 			} catch (IOException e) {
 				fail(e.getMessage());
 			}
-		}
-		//finally create the actual message to be sent
-		Message handshakeMsg = new Message(
-				Message.TOPIC_CONNECTION_HANDSHAKE,
-				senderVirtualAddress,
-				receiverVirtualAddress,
-				serializedPayload);
-		try {
-			connectionMgr.createConnection(receiverVirtualAddress, senderVirtualAddress, new byte[0]);
-			verify(nmCore).sendMessage(handshakeMsg, true);
+			
+			if(properties.containsKey(ConnectionManager.HANDSHAKE_COMSECMGRS_KEY)
+					&& properties.containsKey(ConnectionManager.HANDSHAKE_SECPROPS_KEY)
+					&& properties.containsKey(Message.SESSION_ID_KEY)) {
+			assertEquals("", properties.get(ConnectionManager.HANDSHAKE_COMSECMGRS_KEY));
+			assertEquals(SecurityProperty.NoSecurity.name() + ";", properties.get(ConnectionManager.HANDSHAKE_SECPROPS_KEY));
+			} else {
+				fail("Sent handshake message misses fields!");
+			}
+
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}

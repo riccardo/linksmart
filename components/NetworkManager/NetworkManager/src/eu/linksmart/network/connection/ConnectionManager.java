@@ -12,10 +12,12 @@ import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -71,6 +73,11 @@ public class ConnectionManager {
 			new ArrayList<CommunicationSecurityManager>();
 
 	/**
+	 * Connections which are not used but serve as placeholder to find proper connection.
+	 */
+	private List<Connection> aliases = new ArrayList<Connection>();
+
+	/**
 	 * Used to avoid access and change of policies
 	 */
 	private Object policyModificationLock = new Object();
@@ -83,6 +90,7 @@ public class ConnectionManager {
 	private NetworkManagerCore nmCore;
 	private IdentityManager idM;
 	private boolean busy;
+	private Map<String, Connection> sessions = new HashMap<String, Connection>();
 
 
 	public ConnectionManager(NetworkManagerCore nmCore){
@@ -177,6 +185,20 @@ public class ConnectionManager {
 			}
 		}
 
+		//if there was no connection look if there is an alias set up
+		for(Connection c : aliases){
+			if(!(c instanceof BroadcastConnection) &&
+					((c.getClientVirtualAddress().equals(receiverVirtualAddress) && c.getServerVirtualAddress().equals(senderVirtualAddress))
+							|| (c.getClientVirtualAddress().equals(senderVirtualAddress) && c.getServerVirtualAddress().equals(receiverVirtualAddress)))){
+				//if we found one we take the the real connection based on the session id
+				Connection con = sessions.get(c.sessionId);				
+				//set last use date of connection
+				timeouts.put(con, cal.getTime());
+				setNotBusy();
+				return con;
+			}
+		}
+
 		if(receiverVirtualAddress.equals(senderVirtualAddress)){
 			//add nopconnection to list as this is a reflection message
 			Connection conn = new NOPConnection(senderVirtualAddress, receiverVirtualAddress);
@@ -243,31 +265,39 @@ public class ConnectionManager {
 
 		//if the message could not be opened or it was opened and it is not a handshake message we start the handshake
 		boolean isHandshakeMsg = isHandshakeMessage(data, senderVirtualAddress, receiverVirtualAddress);
+		//open message in standard way
+		Message message = 
+				MessageSerializerUtiliy.
+				unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress, true);
+		String sessionId = null;
 		if(isHandshakeMsg) {
 			//we received a handshake message
-			//try to open message in standard way
-			Message handshakeMessage = 
-					MessageSerializerUtiliy.
-					unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress, true);
 			//open handshake body
 			Properties properties = new Properties();
 			try {
-				properties.loadFromXML(new ByteArrayInputStream(handshakeMessage.getData()));
+				properties.loadFromXML(new ByteArrayInputStream(message.getData()));
 			} catch (InvalidPropertiesFormatException e) {
 				logger.error(
 						"Unable to load properties from XML data. Data is not valid XML: "
-								+ new String(handshakeMessage.getData()), e);
+								+ new String(message.getData()), e);
 				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
 				return null;
 			} catch (IOException e) {
 				logger.error("Unable to load properties from XML data: "
-						+ new String(handshakeMessage.getData()), e);
+						+ new String(message.getData()), e);
 				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
 				return null;
 			}
 
 			String[] availableComSecMgrs = properties.getProperty(HANDSHAKE_COMSECMGRS_KEY).split(";");
 			String[] requiredSecProps = properties.getProperty(HANDSHAKE_SECPROPS_KEY).split(";");
+			sessionId = properties.getProperty(Message.SESSION_ID_KEY);
+			//if the session id is colliding we create another one - two collisions are improbable
+			if(sessions.containsKey(sessionId)) {
+				do {
+					sessionId = UUID.randomUUID().toString();
+				} while(sessions.containsKey(sessionId));
+			}
 
 			//find common agreement of provided CommunicationSecurityManagers and required policies
 			comSecMgrName = findMatchingCommunicationSecurityManager(
@@ -275,16 +305,62 @@ public class ConnectionManager {
 					requiredSecProps,
 					availableComSecMgrs);
 		} else {
-			/*we only start the handshake if we are the initiator of the communication
-			 * if the remote endpoint did not start with a handshake message than it is not working correctly
-			 */
-			if(!remoteEndpoint.equals(senderVirtualAddress)) {
-				comSecMgrName = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress);
+			//we only start the handshake if we are the initiator of the communication
+			if(remoteEndpoint.equals(receiverVirtualAddress)) {
+				do {
+					sessionId = UUID.randomUUID().toString();
+				} while(sessions.containsKey(sessionId));
+
+				String[] handshakeResults = null;
+				handshakeResults = startHandshakeOnCommunicationProperties(receiverVirtualAddress, senderVirtualAddress, sessionId);
+				if(handshakeResults != null) {
+					comSecMgrName = handshakeResults[0];
+					if(handshakeResults.length > 1) {
+						//the other end wished to change the session id as it already has a connection
+						sessionId = handshakeResults[1];
+						//if we have a connection with this session id we use it also for this entities
+						if (sessions.containsKey(sessionId)) {
+							Connection dummy = new Connection(receiverVirtualAddress, senderVirtualAddress);
+							dummy.sessionId = sessionId;
+							aliases.add(dummy);
+							//use connection as stored for this session id
+							Connection conn = sessions.get(sessionId);
+							timeouts.put(conn, cal.getTime());
+							//remove temporary connection as proper connection has been added now
+							connections.remove(tempCon);
+							timeouts.remove(tempCon);
+							tempCon.setStateResolved();
+							return conn;
+						}
+					}
+				}
 			} else {
-				logger.info("Remote endpoint did not start with communication handshake: " + senderVirtualAddress);
-				//we check whether we can open message with standard settings
-				comSecMgrName = findMatchingCommunicationSecurityManager(
-						servicePolicies.get(remoteEndpoint), null, null);
+				//check whether the message already contains a valid session id
+				if (message.getKeySet().contains(Message.SESSION_ID_KEY)
+						&& sessions.containsKey(message.getProperty(Message.SESSION_ID_KEY))) {
+					//use same connection as stored for this session id
+					Connection conn = sessions.get(message.getProperty(Message.SESSION_ID_KEY));
+					timeouts.put(conn, cal.getTime());
+					//remove temporary connection as proper connection has been added now
+					connections.remove(tempCon);
+					timeouts.remove(tempCon);
+					tempCon.setStateResolved();
+					return conn;
+				}
+				else
+				{
+					logger.warn("Remote endpoint did not start with communication handshake: " + senderVirtualAddress);
+					//this is only allowed if there is no security required
+					if(servicePolicies.containsKey(remoteEndpoint) 
+							&& servicePolicies.get(remoteEndpoint).contains(SecurityProperty.NoSecurity)) {
+						//we check whether we can open message with standard settings
+						comSecMgrName = findMatchingCommunicationSecurityManager(
+								servicePolicies.get(remoteEndpoint), null, null);
+					} else {
+						//ignore message
+						comSecMgrName = null;
+					}
+				}
 			}
 		}
 
@@ -328,6 +404,7 @@ public class ConnectionManager {
 		if (agreedComSecMgr != null) {
 			conn.setCommunicationSecMgr(agreedComSecMgr);
 		}
+		conn.sessionId = sessionId;
 
 		//if this was only a trial check if message is plausible
 		if(!isHandshakeMsg && remoteEndpoint.equals(senderVirtualAddress)) {
@@ -340,6 +417,7 @@ public class ConnectionManager {
 		}
 		//add connection to list
 		connections.add(conn);
+		sessions.put(sessionId, conn);
 		timeouts.put(conn, cal.getTime());
 		//remove temporary connection as proper connection has been added now
 		connections.remove(tempCon);
@@ -477,9 +555,11 @@ public class ConnectionManager {
 	}
 
 	//Compose message of communication properties and send it to other end. Wait for answer of handshake. 
-	private String startHandshakeOnCommunicationProperties(
+	private String[] startHandshakeOnCommunicationProperties(
 			VirtualAddress receiverVirtualAddress,
-			VirtualAddress senderVirtualAddress) {
+			VirtualAddress senderVirtualAddress,
+			String sessionId) {
+		List<String> handshakeResults = new ArrayList<String>(); 
 		//compose message with communication parameters
 		//collect list of available communication security managers
 		StringBuilder comSecMgrNames = new StringBuilder();
@@ -494,6 +574,7 @@ public class ConnectionManager {
 		}
 
 		Properties props = new Properties();
+		props.put(Message.SESSION_ID_KEY, sessionId);
 		props.put(HANDSHAKE_COMSECMGRS_KEY, comSecMgrNames.toString());
 		props.put(HANDSHAKE_SECPROPS_KEY, secProperties.toString());
 
@@ -527,10 +608,17 @@ public class ConnectionManager {
 			//take the matching ComSecMgr and return it
 			String comSecMgrName = new String(respMsg.getData()).
 					substring(HANDSHAKE_ACCEPT.length() + 1);
-			return comSecMgrName;
+			handshakeResults.add(comSecMgrName);
+			if(respMsg.getKeySet().contains(Message.SESSION_ID_KEY)) {
+				if(!respMsg.getProperty(Message.SESSION_ID_KEY).equals(sessionId)) {
+					//the other end had a collision and changed the session id
+					handshakeResults.add(respMsg.getProperty(Message.SESSION_ID_KEY));				
+				}
+			}
+			return handshakeResults.toArray(new String[]{});
 		} else {
-			if(respMsg != null && new String(response.getMessage().getBytes()).contains(HANDSHAKE_DECLINE)){
-				//decline message looks like HANDSHAKE_DECLINED [PropertiesOfOtherEndpoint]
+			if(respMsg != null && new String(response.getMessage().getBytes()).contains(HANDSHAKE_DECLINE)) {
+				//decline message looks like "HANDSHAKE_DECLINED [PropertiesOfOtherEndpoint]"
 				logger.warn("Could not establish common parameters with " + receiverVirtualAddress + " as it required:" +
 						new String(response.getMessage().getBytes()).substring(HANDSHAKE_DECLINE.length() + 1));
 			} else {
@@ -690,14 +778,24 @@ public class ConnectionManager {
 				Connection con = i.next();
 				if(calendar.getTimeInMillis() - timeouts.get(con).getTime() > timeoutMinutes * 60 * 1000){
 					//timeout has expired so delete it
+					String sessionId = con.sessionId;
 					i.remove();
 					if(connections.contains(con)) {
+						sessions.remove(con.sessionId);
 						connections.remove(con);
 					} else if (bannedConnections.contains(con)) {
 						bannedConnections.remove(con);
 					}
 					if(con instanceof HandshakeConnection) {
 						((HandshakeConnection) con).setFailed();
+					}
+					//check if there was an alias using this connection
+					Iterator<Connection> it = aliases.iterator();
+					while(it.hasNext()) {
+						Connection c = it.next();
+						if(c.sessionId.equals(sessionId)) {
+							it.remove();
+						}
 					}
 				}
 			}

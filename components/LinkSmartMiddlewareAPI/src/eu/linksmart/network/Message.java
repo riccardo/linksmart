@@ -25,6 +25,7 @@ public class Message {
 
 	public final static String TOPIC_APPLICATION = "eu.linksmart.application";
 	public final static String TOPIC_CONNECTION_HANDSHAKE = "eu.linksmart.network.connection.handshake";
+	public final static String SESSION_ID_KEY = "sessionId";
 
 
 	/**
