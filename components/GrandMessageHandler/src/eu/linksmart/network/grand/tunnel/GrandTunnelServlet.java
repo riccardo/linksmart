@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
@@ -40,6 +41,7 @@ public class GrandTunnelServlet extends HttpServlet{
 	protected static final String SESSION_CLOSED_EXCEPTION = 
 			"Session does not exist or has already been closed!";
 	protected Map<String, Vector<byte[]>> sessionBuffers = new HashMap<String, Vector<byte[]>>();
+	protected Map<String, LinkedList<Integer>> workingThreads = new HashMap<String, LinkedList<Integer>>();
 
 	public GrandTunnelServlet(GrandMessageHandlerImpl tunnel) {
 		this.tunnel = tunnel;
@@ -334,7 +336,7 @@ public class GrandTunnelServlet extends HttpServlet{
 					//nothing to handle
 				}
 			}
-			
+
 			if(!allMsgsAvailable) {
 				return null;
 			}
@@ -353,14 +355,27 @@ public class GrandTunnelServlet extends HttpServlet{
 	protected String openSession() {
 		UUID uuid = UUID.randomUUID();
 		sessionBuffers.put(uuid.toString(), new Vector<byte[]>());
+		workingThreads.put(uuid.toString(), new LinkedList<Integer>());
 		return uuid.toString();
 	}
 
 	protected void closeSession(String uuid) {
 		if(sessionBuffers.containsKey(uuid)) {
-			synchronized (sessionBuffers.get(uuid)) {
-				sessionBuffers.remove(uuid);
+			
+			synchronized(workingThreads.get(uuid)) {
+				synchronized(this) {
+					sessionBuffers.remove(uuid);
+				}
+				while(workingThreads.get(uuid).size() > 0) {
+					try {
+						workingThreads.get(uuid).wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT);
+					} catch (InterruptedException e) {
+						//nothing to handle
+					}
+				}
 			}
+			workingThreads.get(uuid).clear();
+			workingThreads.remove(uuid);
 		} else {
 			throw new IllegalArgumentException(SESSION_CLOSED_EXCEPTION);
 		}
@@ -393,15 +408,24 @@ public class GrandTunnelServlet extends HttpServlet{
 		header = header.substring(header.indexOf(":") + 1);
 		int index = Integer.parseInt(header.replace(";", ""));
 
+		//check if session has not been closed - after that no threads should be waiting
+		Integer boxedIndex = new Integer(index);
+		synchronized(this) {
+			if(!sessionBuffers.containsKey(uuid)) return;
+			workingThreads.get(uuid).add(boxedIndex);
+		}
 		//put data into session buffer
-		if(!sessionBuffers.containsKey(uuid)) return;
-		Vector<byte[]> mergingData = sessionBuffers.get(uuid);
-		//increase array size if necessary
-		if(mergingData.size() <= index) mergingData.setSize(index + 1);
-		//set data
-		mergingData.set(index, Arrays.copyOfRange(data, bodyStartIndex, data.length));
-		//notify threads as they may wait for delayed packets
-		synchronized(sessionBuffers.get(uuid)) {
+		synchronized(workingThreads.get(uuid)) {
+			if(sessionBuffers.containsKey(uuid)) {
+				Vector<byte[]> mergingData = sessionBuffers.get(uuid);
+				//increase array size if necessary
+				if(mergingData.size() <= index) mergingData.setSize(index + 1);
+				//set data
+				mergingData.set(index, Arrays.copyOfRange(data, bodyStartIndex, data.length));
+			} else {
+				workingThreads.get(uuid).remove((Object)boxedIndex);
+			}
+			//notify threads as they may wait for delayed packets
 			sessionBuffers.get(uuid).notify();
 		}
 	}
