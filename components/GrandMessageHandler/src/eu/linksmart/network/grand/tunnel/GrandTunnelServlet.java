@@ -329,8 +329,9 @@ public class GrandTunnelServlet extends HttpServlet{
 			while (Calendar.getInstance().getTimeInMillis() - startTime < GRAND_MESSAGE_RETRIEVE_TIMEOUT &&
 					!(allMsgsAvailable = allMessagesAvailable(uuid, largestIndex))) {
 				try {
-					synchronized(sessionBuffers.get(uuid)) {
-						sessionBuffers.get(uuid).wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT);
+					Object lock = workingThreads.get(uuid);
+					synchronized(lock) {
+						lock.wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT);
 					}
 				} catch(InterruptedException e) {
 					//nothing to handle
@@ -361,14 +362,14 @@ public class GrandTunnelServlet extends HttpServlet{
 
 	protected void closeSession(String uuid) {
 		if(sessionBuffers.containsKey(uuid)) {
-			
-			synchronized(workingThreads.get(uuid)) {
+			Object lock = workingThreads.get(uuid);
+			synchronized(lock) {
 				synchronized(this) {
 					sessionBuffers.remove(uuid);
 				}
 				while(workingThreads.get(uuid).size() > 0) {
 					try {
-						workingThreads.get(uuid).wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT);
+						lock.wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT);
 					} catch (InterruptedException e) {
 						//nothing to handle
 					}
@@ -415,18 +416,18 @@ public class GrandTunnelServlet extends HttpServlet{
 			workingThreads.get(uuid).add(boxedIndex);
 		}
 		//put data into session buffer
-		synchronized(workingThreads.get(uuid)) {
+		Object lock = workingThreads.get(uuid);
+		synchronized(lock) {
 			if(sessionBuffers.containsKey(uuid)) {
 				Vector<byte[]> mergingData = sessionBuffers.get(uuid);
 				//increase array size if necessary
 				if(mergingData.size() <= index) mergingData.setSize(index + 1);
 				//set data
 				mergingData.set(index, Arrays.copyOfRange(data, bodyStartIndex, data.length));
-			} else {
-				workingThreads.get(uuid).remove((Object)boxedIndex);
 			}
+			workingThreads.get(uuid).remove((Object)boxedIndex);
 			//notify threads as they may wait for delayed packets
-			sessionBuffers.get(uuid).notify();
+			lock.notify();
 		}
 	}
 
