@@ -57,17 +57,22 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 		//register with network manager
 		try {
 			String[] backbones = nmCore.getAvailableBackbones();
-			for (String backbone : backbones) {
+			String backbone = null;
+			for (String b : backbones) {
 				if(backbone.toLowerCase().contains("backbonedata")) {
-					// Register this peer
-					Part[] attributes = new Part[] {
-							new Part(ServiceAttribute.DESCRIPTION.name(), OSGI_COMPONENT_NAME),
-							new Part("LOCATION", nmCore.getVirtualAddress().toString())
-					};
-					registration = nmCore.registerService(attributes, OSGI_COMPONENT_NAME, backbone);
+					backbone = b;
 					break;
 				}
 			}
+			if(backbone == null) {
+				backbone = "eu.linksmart.network.grand.impl.GrandMessageHandlerImpl";
+			}
+			// Register this peer
+			Part[] attributes = new Part[] {
+					new Part(ServiceAttribute.DESCRIPTION.name(), OSGI_COMPONENT_NAME),
+					new Part("LOCATION", nmCore.getVirtualAddress().toString())
+			};
+			registration = nmCore.registerService(attributes, OSGI_COMPONENT_NAME, backbone);
 		} catch (RemoteException e) {
 			//local invocation
 		}
