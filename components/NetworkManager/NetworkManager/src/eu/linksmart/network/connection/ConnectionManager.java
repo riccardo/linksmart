@@ -121,10 +121,7 @@ public class ConnectionManager {
 	public void registerServicePolicy(
 			VirtualAddress regulatedVirtualAddress, List<SecurityProperty> properties, boolean forceChange){
 		synchronized(policyModificationLock){
-			if (!servicePolicies.containsKey(regulatedVirtualAddress)) {
-				//add new policy
-				this.servicePolicies.put(regulatedVirtualAddress, properties);
-			} else if (forceChange) {
+			if (forceChange) {
 				/*remove all connections which have this virtual address*/
 				List<Connection> toRemove = new ArrayList<Connection>();
 				//find the relevant connections
@@ -143,7 +140,10 @@ public class ConnectionManager {
 				}
 				//add new policy
 				this.servicePolicies.put(regulatedVirtualAddress, properties);
-			}
+			} else if (!servicePolicies.containsKey(regulatedVirtualAddress)) {
+				//add new policy as there was none before
+				this.servicePolicies.put(regulatedVirtualAddress, properties);
+			} 
 		}
 	}
 
