@@ -59,7 +59,7 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 			String[] backbones = nmCore.getAvailableBackbones();
 			String backbone = null;
 			for (String b : backbones) {
-				if(backbone.toLowerCase().contains("backbonedata")) {
+				if(b.toLowerCase().contains("backbonedata")) {
 					backbone = b;
 					break;
 				}
