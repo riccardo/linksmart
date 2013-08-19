@@ -65,7 +65,7 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 				}
 			}
 			if(backbone == null) {
-				backbone = "eu.linksmart.network.grand.impl.GrandMessageHandlerImpl";
+				backbone = "eu.linksmart.network.backbone.impl.data.BackboneData";
 			}
 			// Register this peer
 			Part[] attributes = new Part[] {
