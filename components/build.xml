@@ -69,6 +69,7 @@
 		<ant dir="NetworkManager/Tunneling" target="make" />
         <ant dir="CryptoManager" target="make" />
         <ant dir="TrustManager" target="make" />
+		<ant dir="GrandMessageHandler" target="make" />
 	</target>
 	
 	<!--

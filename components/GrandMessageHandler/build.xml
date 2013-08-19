@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="BackboneSOAP" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="GrandMessageHandler" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
-	<property name="moduleName" value="eu.linksmart.network.backbone.soap" />
+	<property name="moduleName" value="eu.linksmart.network.grand" />
 	<property name="revision" value="2.0.0" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
