@@ -87,6 +87,8 @@ public class Command extends Properties {
 
 	public static final String DEVICE_DESCRIPTION = "deviceDescription";
 
+	public static final Object TOPIC = "topic";
+
 	/**
 	 * Create a new Command with no information given.
 	 */

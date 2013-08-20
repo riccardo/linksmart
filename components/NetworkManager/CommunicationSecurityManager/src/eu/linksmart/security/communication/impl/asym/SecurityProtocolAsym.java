@@ -238,6 +238,33 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 							//add stored message if there is one
 							if(storedMessage != null){
 								try{
+									//put whole message into data field - is independent from connection
+									Properties props = new Properties();
+									// read the properties of the message and put it into the properties
+									Iterator<String> i = storedMessage.getKeySet().iterator();
+									while (i.hasNext()) {
+										String key = i.next();
+										props.put(key, storedMessage.getProperty(key));
+									}
+									// put application data into properties
+									props.put(Command.APPLICATION_MESSAGE, Base64.encodeBytes(storedMessage.getData()));
+									props.put(Command.TOPIC, storedMessage.getTopic());
+									//convert properties to xml and put it into stream
+									ByteArrayOutputStream boss = new ByteArrayOutputStream();
+									byte[] serializedCommand = null;
+									try {
+										props.storeToXML(boss, null);
+										serializedCommand = boss.toByteArray();
+									} catch (IOException e) {
+										logger.warn("Message to be sent cannot be parsed!");
+									} finally {
+										try {
+											bos.close();
+										} catch (IOException e) {
+											logger.error("Error closing stream", e);
+										}
+									}
+									storedMessage.setData(serializedCommand);
 									Message protectedMessage = protectMessage(storedMessage);
 									cmd.setProperty(Command.APPLICATION_MESSAGE, new String(protectedMessage.getData()));
 									storedMessage = null;
@@ -298,6 +325,31 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 								String data = command.getProperty(Command.APPLICATION_MESSAGE);
 								Message message = new Message(SecurityProtocol.CIPHER_TEXT, clientVirtualAddress, serverVirtualAddress, data.getBytes());
 								message = unprotectMessage(message);
+								// open data and divide it into properties of the message and
+								// application data
+								byte[] serializedMsg = message.getData();
+								Properties properties = new Properties();
+								try {
+									properties.loadFromXML(new ByteArrayInputStream(serializedMsg));
+								} catch (InvalidPropertiesFormatException e) {
+									logger.error(
+											"Unable to load properties from XML data. Data is not valid XML: "
+											+ new String(serializedMsg), e);
+								} catch (IOException e) {
+									logger.error("Unable to load properties from XML data: "
+											+ new String(serializedMsg), e);
+								}
+
+								// create real message
+								message = new Message((String) properties.remove(Command.TOPIC),
+										message.getSenderVirtualAddress(), message.getReceiverVirtualAddress(), (Base64.decode((String) properties
+												.remove(Command.APPLICATION_MESSAGE))));
+								// go through the properties and add them to the message
+								Iterator<Object> i = properties.keySet().iterator();
+								while (i.hasNext()) {
+									String key = (String) i.next();
+									message.setProperty(key, properties.getProperty(key));
+								}
 								return message;
 							}catch(Exception e){
 								resetProtocol();
@@ -322,14 +374,14 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	}
 
 	public synchronized Message protectMessage(Message msg) throws Exception {
-		String encryptedMessage = asymEncrypt(new String(msg.getData()), msg.getReceiverVirtualAddress().toString());
+		String encryptedMessage = asymEncrypt(Base64.encodeBytes(msg.getData()), msg.getReceiverVirtualAddress().toString());
 		msg.setData(encryptedMessage.getBytes());
 		return msg;
 	}
 
 	public synchronized Message unprotectMessage(Message msg) throws Exception {
-		String decryptedMessage = asymDecrypt(new String(msg.getData()));
-		msg.setData(decryptedMessage.getBytes());
+		String decryptedMessage = asymDecrypt(msg.getData());
+		msg.setData(Base64.decode(decryptedMessage));
 		return msg;
 	}
 
@@ -482,7 +534,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 	 * @throws Exception All kinds of exceptions
 	 * @throws CryptoException
 	 */
-	public String asymDecrypt(String encrData) throws Exception, CryptoException {
+	public String asymDecrypt(byte[] encrData) throws Exception, CryptoException {
 		String result = "";
 		try {
 			// Convert input string to XML document
@@ -490,7 +542,7 @@ public class SecurityProtocolAsym implements SecurityProtocol {
 			dbf.setNamespaceAware(true);
 			javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
 
-			ByteArrayInputStream bis = new ByteArrayInputStream(encrData.getBytes());
+			ByteArrayInputStream bis = new ByteArrayInputStream(encrData);
 			Document document = db.parse(bis);
 
 			// Get the "EncryptedData" element from DOM tree.
