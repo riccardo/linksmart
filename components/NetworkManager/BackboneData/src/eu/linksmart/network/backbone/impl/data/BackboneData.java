@@ -3,13 +3,9 @@ package eu.linksmart.network.backbone.impl.data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 
@@ -44,7 +40,8 @@ public class BackboneData implements Backbone {
 	@Override
 	public NMResponse sendDataSynch(VirtualAddress senderVirtualAddress,
 			VirtualAddress receiverVirtualAddress, byte[] data) {
-		NMResponse r = executeServiceCall(senderVirtualAddress, receiverVirtualAddress, data);
+		NMResponse r = executeServiceCall(senderVirtualAddress,
+				receiverVirtualAddress, data);
 		return r;
 	}
 
@@ -53,29 +50,11 @@ public class BackboneData implements Backbone {
 			VirtualAddress receiverVirtualAddress, byte[] data) {
 		// make call look asynchronous by return the status and separately
 		// sending response
-		return executeServiceCall(senderVirtualAddress, receiverVirtualAddress, data);
+		return executeServiceCall(senderVirtualAddress, receiverVirtualAddress,
+				data);
 	}
 
-	private class ResponseSender implements Runnable {
-		NMResponse response;
-		private VirtualAddress senderVirtualAddress;
-		private VirtualAddress receiverVirtualAddress;
-
-		protected ResponseSender(VirtualAddress senderVirtualAddress,
-				VirtualAddress receiverVirtualAddress, NMResponse response) {
-			this.senderVirtualAddress = senderVirtualAddress;
-			this.receiverVirtualAddress = receiverVirtualAddress;
-			this.response = response;
-		}
-
-		public void run() {
-			bRouter.sendDataAsynch(senderVirtualAddress,
-					receiverVirtualAddress, response.getMessageBytes());
-		}
-	}
-
-	private NMResponse executeServiceCall(
-			VirtualAddress senderVirtualAddress,
+	private NMResponse executeServiceCall(VirtualAddress senderVirtualAddress,
 			VirtualAddress receiverVirtualAddress, byte[] data) {
 		NMResponse resp = new NMResponse(NMResponse.STATUS_ERROR);
 
@@ -90,9 +69,14 @@ public class BackboneData implements Backbone {
 			// Error
 			return resp;
 
-		//service.receive(data);
-		service.receive(data, senderVirtualAddress);
-		return new NMResponse(NMResponse.STATUS_SUCCESS);
+		// service.receive(data);
+		byte[] respData = service.receive(data, senderVirtualAddress);
+
+		// store result of method call (non-blocking by contract)
+		resp.setStatus(NMResponse.STATUS_SUCCESS);
+		resp.setBytesPrimary(true);
+		resp.setMessageBytes(respData);
+		return resp;
 	}
 
 	private DataEndpoint resolveEndpointComponent(VirtualAddress virtualAddress) {
@@ -159,7 +143,7 @@ public class BackboneData implements Backbone {
 			for (VirtualAddress a : addressEndpointMap.keySet()) {
 				DataEndpoint service = resolveEndpointComponent(a);
 				if (a != null)
-					//service.receive(data);
+					// service.receive(data);
 					service.receive(data, senderVirtualAddress);
 			}
 		} catch (Exception e) {
