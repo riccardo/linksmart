@@ -112,8 +112,9 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 	 */
 	
 	@Override
-	public void receive(byte[] data, VirtualAddress senderVirtualAddress) {
+	public byte[] receive(byte[] data, VirtualAddress senderVirtualAddress) {
 		grandTunnelServlet.receiveDataPacket(data);
+		return null;
 	}
 
 
