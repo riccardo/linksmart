@@ -14,6 +14,10 @@
  */
 package eu.linksmart.security.trustmanager.trustmodel.openpgp.config;
 
+/**
+ * Interface for OpenPGP trust model configuration 
+ *
+ */
 public interface OpenPGPTrustModelConfiguration {
 
 	/**

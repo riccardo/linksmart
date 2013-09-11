@@ -14,6 +14,9 @@
  */
 package eu.linksmart.security.trustmanager.trustmodel.password.config;
 
+/**
+ * Interface for password based trust model configuration 
+ */
 public interface PasswordTrustModelConfiguration {
 	/**
 	 * Stores passwords hash and uses password in future as trust token

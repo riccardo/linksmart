@@ -33,6 +33,9 @@
 
 package eu.linksmart.security.trustmanager.trustmodel.x509.config;
 
+/**
+ * Interface for the configuration of trust models based on the x509 standard 
+ */
 public interface X509TrustModelConfiguration {
 
 	/**
