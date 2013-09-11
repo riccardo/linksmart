@@ -22,23 +22,24 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * @param receiver The virtual address of the receiver
 	 * @param data The data to be sent
 	 * @param synch boolean indicating whether method call should be synchronous or asynchronous
-	 * @return Response instance
+	 * @return Instance of {@link NMResponse}
 	 * @throws RemoteException
 	 */
 	public NMResponse sendData(VirtualAddress sender, VirtualAddress receiver, byte [] data, boolean synch)	
 			throws RemoteException;
 		
 	/**
+	 * Returns the {@link VirtualAddress} of the NetworkManagerCore instance
 	 * @deprecated getVirtualAddress() should be used instead.
-	 * @return
+	 * @return {@link VirtualAddress} of the NetworkManagerCore instance
 	 */
 	@Deprecated
 	public VirtualAddress getService() throws RemoteException;
 	
 	/**
 	 * Retrieves VirtualAddress of NetworkManagerCore instance.
+	 * @return {@link VirtualAddress} of the NetworkManagerCore instance
 	 * @throws RemoteException
-	 * @return
 	 */
 	public VirtualAddress getVirtualAddress() throws RemoteException;
 	
@@ -47,7 +48,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * @param attributes Attributes such as PID (which should be unique) or description
 	 * @param endpoint Backbone specific endpoint for the service, e.g. URL or JXTA id
 	 * @param backboneName Class name of the Backbone from which this service is reachable
-	 * @return VirtualAddress instance.
+	 * @return {@link VirtualAddress} instance which was created for the service
 	 * @throws RemoteException
 	 */
 	public Registration registerService(Part[] attributes, String endpoint, String backboneName)
@@ -55,18 +56,18 @@ public interface NetworkManager extends java.rmi.Remote {
 	
 	/**
 	 * Removes a particular service from internal memory
-	 * @param virtualAddress for particular service.
-	 * @return TRUE if operation succeeded and FALSE if not.
+	 * @param virtualAddress {@link VirtualAddress} for particular service.
+	 * @return TRUE if operation succeeded and, FALSE if not.
 	 * @throws RemoteException
 	 */
 	boolean removeService(VirtualAddress virtualAddress) throws RemoteException;
 	
-	
 	/**
-	 * Provides the list of names of communication channels or backbones the 
+	 * Provides an Array of names of communication channels or backbones the 
 	 * NetworkManager supports. This information can be used by a service to 
 	 * decide which channel to register over.
 	 * @return Class names of the connected Backbones
+	 * @throws RemoteException
 	 */
 	public String[] getAvailableBackbones() throws RemoteException;
 	
@@ -98,7 +99,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * true - only services will be discovered which possess all attributes <br/>
 	 * false - attribute types which a service does not have are ignored as long there is at 
 	 * least one matching attribute
-	 * @return The services with matching attributes as registration objects. Even if 
+	 * @return The services with matching attributes as {@link Registration} objects. Even if 
 	 * returnFirst is set true more than one registration of services may be available.
 	 * @throws RemoteException 
 	 */
@@ -109,7 +110,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	/**
 	 * Gets the VirtualAddress for the available service with a given PID.
 	 * @param PID The persistent identifier of the service.
-	 * @return 	The Registration object, 
+	 * @return 	The {@link Registration} object, 
 	 * 			<code>null</code> if no VirtualAddress exists for the given PID.
 	 * @throws RemoteException 
 	 */
@@ -118,7 +119,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	/**
 	 * Gets the Registration for the available service(s) with a given description.
 	 * @param description The required service description.
-	 * @return The services with matching descriptions as registration objects
+	 * @return The services with matching descriptions as {@link Registration} objects
 	 * @throws RemoteException 
 	 */
 	public Registration [] getServiceByDescription(String description) throws RemoteException;
@@ -129,7 +130,7 @@ public interface NetworkManager extends java.rmi.Remote {
 	 * containing other attributes than 'description'. 
 	 * This method should only be used by advanced developers.
 	 * @param query The formulated query.
-	 * @return The matching services as registration objects
+	 * @return The matching services as {@link Registration} objects
 	 * @throws RemoteException 
 	 */
 	public Registration [] getServiceByQuery(String query) throws RemoteException;

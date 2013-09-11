@@ -11,7 +11,6 @@ import eu.linksmart.utils.Part;
 /**
  * The IdentityManager is responsible for creating and storing {@link VirtualAddress}.
  * 
- * 
  */
 public interface IdentityManager {
 	public static long SERVICE_RESOLVE_TIMEOUT = 30000;
@@ -36,7 +35,7 @@ public interface IdentityManager {
 	 * a description attribute
 	 * @param description
 	 *            the description
-	 * @return the VirtualAddress created
+	 * @return the {@link Registration} created
 	 */
 	@Deprecated
 	public Registration createServiceByDescription(String description);
@@ -45,17 +44,18 @@ public interface IdentityManager {
 	 * Updates the attributes of the given {@link VirtualAddress}.
 	 * 
 	 * @param virtualAddress
-	 *            The VirtualAddress for which the attributes should be changed.
+	 *            The {@link VirtualAddress} for which the attributes should be changed.
 	 * @param attributes
-	 *            New attributes that will replace the old ones.
+	 *            New {@link Properties} that will replace the old attributes.
 	 * @return true, if successful
 	 */
 	public boolean updateServiceInfo(VirtualAddress virtualAddress, Properties attributes);
 
 	/**
 	 * Returns the {@link Registration} for a given {@link VirtualAddress}.
-	 * 
-	 * @return the {@link Registration}
+	 * @param virtualAddress
+	 *            The {@link VirtualAddress} for which the attributes should be changed.
+	 * @return the  {@link Registration}
 	 */
 	public Registration getServiceInfo(VirtualAddress virtualAddress);
 
@@ -86,31 +86,30 @@ public interface IdentityManager {
 	public Set<Registration> getRemoteServices();
 
 	/**
-	 * Return all {@link Registration}s that match the given description. Wildcards
-	 * can be used. TODO Explain the use of wildcards
+	 * Return all {@link Registration}s that match the given description. 
+	 * Wildcards can be used.
 	 * 
 	 * @deprecated The more general getServicesByAttributes method should be used
 	 * with a description attribute
-	 * @param description
-	 * @return
+	 * @param description description of service
+	 * @return all {@link Registration}s that match the given description
 	 */
 	@Deprecated
 	public Set<Registration> getServicesByDescription(String description);
 
 	/**
 	 * Returns all locally available {@link Registration}s
-	 * that match the given query. TODO Explian the
-	 * query language
+	 * that match the given query. 
 	 * 
-	 * @param query
-	 * @param maxNum
-	 * @return
+	 * @param query A query can contain "(",")", "&&", "||", "==", and "!=". 
+	 * </br>Example: (description==service1)||(description==service2).
+	 * @return all {@link Registration}s that match the given query
 	 */
 	public Registration[] getServicesByAttributes(String query);
 
 	/**
-	 * Removes the given {@link VirtualAddress} from the internal VirtualAddress-store. Does nothing
-	 * if the virtual address is not stored by this IdentityManager
+	 * Removes the given {@link VirtualAddress} from the internal VirtualAddress-store. 
+	 * Does nothing if the virtual address is not stored by this IdentityManager.
 	 * 
 	 * @param virtualAddress
 	 * @return true, if {@link VirtualAddress} has been removed successfully.
@@ -131,7 +130,7 @@ public interface IdentityManager {
 	 * @param isStrictRequest <br/>
 	 * true - only services will be discovered which possess all attributes <br/>
 	 * false - attribute types which a service does not have are ignored
-	 * @return
+	 * @return all {@link Registration}s that belong to the found services
 	 */
 	Registration[] getServiceByAttributes(Part[] attributes, long timeOut,
 			boolean returnFirst, boolean isStrict);

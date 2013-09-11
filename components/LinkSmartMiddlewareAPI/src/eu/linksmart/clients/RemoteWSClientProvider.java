@@ -60,8 +60,6 @@ public interface RemoteWSClientProvider {
 	 * (for example, eu.linksmart.network.NetworkManagerApplication)
 	 * @param endpoint The endpoint to be used, or null if you want to use the 
 	 * default one
-	 * @param coreSecurityConfig true if you want use coreLinkSmartSecurity 
-	 * (will encrypt messages)
 	 * @throws Exception if there is an exception during code generation 
 	 * @return {@link java.rmi.Remote} containing the client stubs for 
 	 * the required service
