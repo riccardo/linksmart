@@ -45,12 +45,22 @@ public interface CryptoMessageFormatProcessor {
 	 * <code>encryptAsymmetric</code> method. <p> All relevant information for
 	 * decrypting the message should be included in the message itself. In the
 	 * case of an error, this method returns null.
+	 * 
+	 * @param encryptedData message to be decrypted
+	 * @return decrypted String
 	 */
 	public abstract String decrypt(String encryptedData);
 
 	/**
 	 * Encrypts a Linksmart message so it can be opened by the receiver using the
 	 * <code>decryptAsymmetric</code> method.
+	 * 
+	 * @param documentString String to be encrypted
+	 * @param identifier Identifier of key - either receiverVirtualAddress or key identifier
+	 * @param format The message format to be used. Currently, only
+	 *            <code>XMLEnc</code> is supported.
+	 * @return encrypted message
+	 * @throws Exception
 	 */
 	public abstract String encryptAsymmetric(String documentString,
 			String identifier, String format) throws Exception;
@@ -59,24 +69,22 @@ public interface CryptoMessageFormatProcessor {
 	 * Symmetrically encrypt a Linksmart message so it can be opened by the
 	 * receiver.
 	 * 
-	 * @param documentString
-	 * @param identifier
-	 * @param format
-	 * @return
+	 * @param documentString String to be encrypted
+	 * @param identifier Identifier of key
+	 * @param format The message format to be used. Currently, only
+	 *            <code>XMLEnc</code> is supported.
+	 * @return encrypted message
 	 * @throws Exception
 	 */
 	public String encryptSymmetric(String documentString, String identifier,
 			String format) throws Exception;
 
 	/**
-	 * Creates a signed Linksmart message
+	 * Creates a signed LinkSmart message
 	 * 
-	 * @param data
-	 * @param identifier
-	 * @param format
-	 *            The message format to be used. Currently, only
-	 *            <code>XMLEnc</code> is supported.
-	 * @return
+	 * @param data Message to be signed
+	 * @param format The message format to be used. 
+	 * @return Message with signature
 	 * @throws Exception
 	 */
 	public abstract String sign(String data, String format);
@@ -84,23 +92,24 @@ public interface CryptoMessageFormatProcessor {
 	/**
 	 * Retrieves a list of supported message formats.
 	 * 
-	 * @return
+	 * @return list of supported message formats
 	 */
 	public abstract String[] getSupportedFormats();
 
 	/**
 	 * Verifies a signed Linksmart message
-	 * 
+	 * @param data Message to be verified
+	 * @return Message
 	 */
 	public abstract String verify(String data);
 
 	/**
 	 * Creates a signed message.
 	 * 
-	 * @param data
-	 * @param format
-	 * @param identifier
-	 * @return
+	 * @param data Message to be signed
+	 * @param format The message format to be used. 
+	 * @param identifier Identifier of key
+	 * @return Message with signature
 	 */
 	public abstract String sign(String data, String format, String identifier);
 }

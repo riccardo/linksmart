@@ -56,14 +56,13 @@ import javax.crypto.SecretKey;
  * 
  */
 public interface KeyManager {
-
+	
 	/**
 	 * Creates a Key Encryption Key (KEK) and stores it for the specified
 	 * identifier. <p> A KEK is a self-signed certificate, i.e. a pair of public
 	 * and private key.
 	 * 
-	 * @param identifier
-	 * @param algorithm_name
+	 * @return Key Encryption Key
 	 * @throws SQLException
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
@@ -82,6 +81,7 @@ public interface KeyManager {
 
 	/**
 	 * Generates a certificate with provided attributes
+	 * 
 	 * @param xmlAttributes Attributes to include into certificate
 	 * @return Identifier of certificate
 	 * @throws SQLException
@@ -105,10 +105,11 @@ public interface KeyManager {
 	 * Generates a Key Encryption Key (KEK) and returns it <p> A KEK is a
 	 * self-signed certificate, i.e. a pair of  public and private key.
 	 * 
-	 * @param identifier
-	 * @param algorithm_name
-	 * @throws SQLException
+	 * @param keySize size of the key
+	 * @param algo algorithm name
+	 * @return Key Encryption Key
 	 * @throws NoSuchAlgorithmException
+	 * @throws SQLException
 	 */
 	abstract String generateSymmetricKey(int keySize, String algo) throws NoSuchAlgorithmException, SQLException;
 
@@ -124,10 +125,10 @@ public interface KeyManager {
 	abstract String createAndStoreKeyIdentifier();
 
 	/**
-	 * Returns all  public keys that belong to the <code>identifier</code>. <p>
+	 * Returns all public keys that belong to the <code>identifier</code>. <p>
 	 * 
 	 * @param identifier
-	 * @return
+	 * @return public keys belonging to the identifier
 	 * @throws KeyStoreException
 	 */
 	abstract byte[] getEncodedPublicKeyByIdentifier(String identifier)	throws KeyStoreException;
@@ -136,22 +137,20 @@ public interface KeyManager {
 	 * Stores a public key in the keystore and returns the identifier for this
 	 * key. <p>
 	 * 
-	 * @param encodedCert
-	 *            the DER-encoded certificate, either in binary or in printable
-	 *            (BASE64) format.
-	 * @param algorithm_id
-	 * @return
+	 * @param encodedCert 	the DER-encoded certificate, either in binary or in 
+	 * 						printable (BASE64) format.
+	 * @param algorithm_id might be used to identify the algorithm
+	 * @return  identifier for the key
 	 */
 	abstract String storePublicKey(String encodedCert,	String algorithm_id);
-
+	
 	/**
-	 * Stores a secret key in the keystore and returns the identifier for this
-	 * key
+	 * Stores a secret key in the keystore and returns the identifier for this key
 	 * 
-	 * @param key
-	 *            The key in the format as returned by
-	 *            <code>generateSymmetricKey</code>.
-	 * @return
+	 * @param algo the name of the secret-key algorithm to be associated with 
+	 * 			   the given key material
+	 * @param key The key in the format as returned by <code>generateSymmetricKey</code>.
+	 * @return identifier for key
 	 * @throws SQLException
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
@@ -170,9 +169,10 @@ public interface KeyManager {
 	NoSuchProviderException;
 
 	/**
+	 * Returns the attributes stored in a certificate
 	 * 
-	 * @param identifier
-	 * @return
+	 * @param identifier for certificate
+	 * @return attributes of the certificate
 	 * @throws SQLException
 	 * @throws KeyStoreException
 	 * @throws CertificateEncodingException
@@ -183,15 +183,15 @@ public interface KeyManager {
 
 	/**
 	 * Returns the private key stored under provided identifier
-	 * @param identifier
-	 * @return 
+	 * @param identifier for private key
+	 * @return private key
 	 */
 	abstract PrivateKey getPrivateKeyByIdentifier(String identifier);
 
 	/**
 	 * Returns the certificate stored under provided identifier
-	 * @param identifier
-	 * @return
+	 * @param identifier for certificate
+	 * @return certificate
 	 * @throws KeyStoreException
 	 */
 	abstract Certificate getCertificateByIdentifier(String identifier)
@@ -201,7 +201,7 @@ public interface KeyManager {
 	 * Associates an VirtualAddress with a stored private key
 	 * @param virtualAddress VirtualAddress to be associated to
 	 * @param certRef Identifier used in store for private key
-	 * @return
+	 * @return true if association was successful, false otherwise
 	 */
 	abstract boolean addPrivateKeyForService(String virtualAddress, String certRef);
 
@@ -209,7 +209,7 @@ public interface KeyManager {
 	 * Associates an VirtualAddress with a stored certificate
 	 * @param virtualAddress VirtualAddress to be associated to
 	 * @param certRef Identifier used in store for certificate
-	 * @return
+	 * @return true if association was successful, false otherwise
 	 */
 	abstract boolean addCertificateForService(String virtualAddress, String certRef);
 
@@ -218,34 +218,45 @@ public interface KeyManager {
 	 * exists for that VirtualAddress.
 	 * 
 	 * @param receiverVirtualAddress
-	 * @return
+	 * @return certificate reference for the VirtualAddres
 	 */
 	abstract String getCertRefByVirtualAddress(String receiverVirtualAddress);
 
 	/**
 	 * Returns the identifier of the private key for this VirtualAddress
 	 * @param virtualAddress
-	 * @return
+	 * @return identifier of the private key for this VirtualAddress
 	 */
 	abstract String getPrivateKeyRefByVirtualAddress(String virtualAddress);
 
 	/**
 	 * Removes an entry from local store
 	 * @param identifier
-	 * @return
+	 * @return true if an entry was deleted
 	 */
 	abstract boolean deleteEntry(String identifier);
-
+	
+	/**
+	 * Returns all identifiers
+	 * @return identifiers
+	 */
 	abstract String[] getIdentifier();
 
+	/**
+	 * Returns all identifiers with the information about the algorithm name
+	 * @return identifier information
+	 */
 	abstract Vector<Vector<String>> getIdentifierInfo();
 
+	/**
+	 * Close data resource
+	 */
 	abstract void close();
 
 	/**
 	 * Generates a symmetric key for given identifier
 	 * @param friendlyName Identifier to be stored under
-	 * @param keySize
+	 * @param keySize size of the key
 	 * @param algo Algorithm name according to JCE
 	 * @return True if key could be generated for this identifier
 	 * @throws NoSuchAlgorithmException
@@ -256,8 +267,8 @@ public interface KeyManager {
 
 	/**
 	 * Stores a key under provided identifier
-	 * @param friendlyName
-	 * @param algo
+	 * @param friendlyName identifier to be stored under
+	 * @param algo algorithm name according to JCE
 	 * @param key Base64 encoded key
 	 * @return True if key could be stored
 	 * @throws SQLException
@@ -267,10 +278,10 @@ public interface KeyManager {
 
 	/**
 	 * Stores an encoded certificate under provided identifier
-	 * @param friendlyName
-	 * @param encodedCert
-	 * @param algorithm_id
-	 * @return
+	 * @param friendlyName identifier to be stored under
+	 * @param encodedCert encoded certificate
+	 * @param algorithm_id might be used for the algorithm name
+	 * @return true if public key could be stored, false otherwise
 	 * @throws SQLException
 	 */
 	abstract boolean storePublicKey(String friendlyName,
@@ -283,7 +294,7 @@ public interface KeyManager {
 	 * @param password
 	 * @param keySize
 	 * @param algo Algorithm name according to JCE
-	 * @return
+	 * @return true if generating the key was successful
 	 * @throws SQLException
 	 * @throws KeyStoreException
 	 */
@@ -296,7 +307,7 @@ public interface KeyManager {
 	 * @param password
 	 * @param keySize
 	 * @param algo Algorithm name according to JCE
-	 * @return
+	 * @return identifier for the key
 	 */
 	abstract String generateKeyFromPassword(
 			String password, int keySize, String algo);
@@ -305,7 +316,7 @@ public interface KeyManager {
 	 * Returns the stored symmetric key
 	 * @param identifier Identifier of stored key
 	 * @param algorithm_name Algorithm name according to JCE
-	 * @return
+	 * @return stored symmetric key
 	 * @throws NoSuchAlgorithmException
 	 * @throws KeyStoreException
 	 */
@@ -313,9 +324,9 @@ public interface KeyManager {
 	throws NoSuchAlgorithmException,KeyStoreException;
 
 	/**
-	 * Tells whether the provided identifier exists
+	 * Tells whether the provided identifier exists in the system
 	 * @param identfier
-	 * @return
+	 * @return true if the provided identifier exists
 	 */
 	abstract boolean identifierExists(String identifier) throws SQLException;
 }
