@@ -38,6 +38,7 @@ public interface X509TrustModelConfiguration {
 	/**
 	 * Add a certificate to the certificate store.
 	 * 
+	 * @param alias Alias of the certificate to be stored
 	 * @param cert the to-be-added certificate, Base64 encoded
 	 * @return true if successful, false if not
 	 */
@@ -63,8 +64,8 @@ public interface X509TrustModelConfiguration {
 	public boolean removeCertificate(String cert);
 
 	/**
-	 * Get a list of trusted Root Certificates, stored in the Backend
-	 * @return list of trusted root certificates
+	 * Get all trusted Root Certificates stored in the back end
+	 * @return array of trusted root certificates
 	 */
 
 	public String[] getRootCertificates();

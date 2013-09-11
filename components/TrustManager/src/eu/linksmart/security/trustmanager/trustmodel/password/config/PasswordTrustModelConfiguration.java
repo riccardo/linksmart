@@ -17,8 +17,8 @@ package eu.linksmart.security.trustmanager.trustmodel.password.config;
 public interface PasswordTrustModelConfiguration {
 	/**
 	 * Stores passwords hash and uses password in future as trust token
-	 * @param pass
-	 * @return True if password has successfully been stored
+	 * @param password The password to be stored
+	 * @return true if storing was successful
 	 */
 	boolean setPassword(String password);
 }

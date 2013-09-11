@@ -50,8 +50,10 @@ public interface TrustModel {
 	 * 
 	 * @param token
 	 *            token to be evaluated
-	 * @return trust level as long (0...1)
+	 * @return trust level [0...1]
+	 * 			in case of an error the return value can be negative
 	 */
+
 	double getTrustValue(byte[] token);
 
 	/**
@@ -80,6 +82,7 @@ public interface TrustModel {
 	
 	/**
 	 * Returns the Trust Model specific trust token
+	 * @param identifier identifier for the trust token
 	 * @return Base64 encoded representation of the trust token
 	 */
 	String getTrustToken(String identifier);
