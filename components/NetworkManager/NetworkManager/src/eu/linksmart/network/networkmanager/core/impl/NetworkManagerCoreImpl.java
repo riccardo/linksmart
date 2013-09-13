@@ -735,16 +735,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			byte[] data) {
 		//only allow one thread at a time to get a connection
 		//this is necessary to avoid the creation of multiple handshake connections
-		synchronized(connectionManager) {
-			while(connectionManager.isBusy()) {
-				try {
-					connectionManager.wait(2500);
-				} catch (InterruptedException e) {
-					// nothing to handle
-				}
-			}
-			connectionManager.setBusy();
-		}
+		connectionManager.getLock();
 		Connection con = this.connectionManager.getConnection(receiverVirtualAddress, senderVirtualAddress);
 		if(con == null) {
 			try {

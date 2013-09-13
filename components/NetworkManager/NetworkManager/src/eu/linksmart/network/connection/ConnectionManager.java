@@ -758,50 +758,7 @@ public class ConnectionManager {
 			this.notifyAll();
 		}
 	}
-
-	/**
-	 * Clears not used connections from list.
-	 * @author Vinkovits
-	 *
-	 */
-	private class ConnectionClearer extends TimerTask{
-
-		/**
-		 * Runs through all referenced and banned connections and deletes them if timeout expired
-		 */
-		public void run() {
-			//go through all references and remove them when needed
-			Set<Connection> livingConns = timeouts.keySet();
-			Iterator<Connection> i = livingConns.iterator();
-			Calendar calendar = Calendar.getInstance();
-			while(i.hasNext()){
-				Connection con = i.next();
-				if(calendar.getTimeInMillis() - timeouts.get(con).getTime() > timeoutMinutes * 60 * 1000){
-					//timeout has expired so delete it
-					String sessionId = con.sessionId;
-					i.remove();
-					if(connections.contains(con)) {
-						sessions.remove(con.sessionId);
-						connections.remove(con);
-					} else if (bannedConnections.contains(con)) {
-						bannedConnections.remove(con);
-					}
-					if(con instanceof HandshakeConnection) {
-						((HandshakeConnection) con).setFailed();
-					}
-					//check if there was an alias using this connection
-					Iterator<Connection> it = aliases.iterator();
-					while(it.hasNext()) {
-						Connection c = it.next();
-						if(c.sessionId.equals(sessionId)) {
-							it.remove();
-						}
-					}
-				}
-			}
-		}	
-	}
-
+	
 	/**
 	 * Returns the declining handshake message for the provided entities.
 	 * @param senderVirtualAddress
@@ -880,5 +837,66 @@ public class ConnectionManager {
 			return true;
 		}
 		return false;
+	}
+
+	public void getLock() {
+		synchronized(this) {
+			while(isBusy()) {
+				try {
+					wait(2500);
+				} catch (InterruptedException e) {
+					// nothing to handle
+				}
+			}
+			setBusy();
+		}
+	}
+
+	/**
+	 * Clears not used connections from list.
+	 * @author Vinkovits
+	 *
+	 */
+	private class ConnectionClearer extends TimerTask{
+
+		/**
+		 * Runs through all referenced and banned connections and deletes them if timeout expired
+		 */
+		public void run() {
+			try{
+				getLock();
+				//go through all references and remove them when needed
+				Set<Connection> livingConns = timeouts.keySet();
+				Iterator<Connection> i = livingConns.iterator();
+				Calendar calendar = Calendar.getInstance();
+				while(i.hasNext()){
+					Connection con = i.next();
+					if(calendar.getTimeInMillis() - timeouts.get(con).getTime() > timeoutMinutes * 60 * 1000){
+						//timeout has expired so delete it
+						String sessionId = con.sessionId;
+						i.remove();
+						if(connections.contains(con)) {
+							sessions.remove(con.sessionId);
+							connections.remove(con);
+						} else if (bannedConnections.contains(con)) {
+							bannedConnections.remove(con);
+						}
+						if(con instanceof HandshakeConnection) {
+							((HandshakeConnection) con).setFailed();
+						}
+						//check if there was an alias using this connection
+						Iterator<Connection> it = aliases.iterator();
+						while(it.hasNext()) {
+							Connection c = it.next();
+							if(c.sessionId.equals(sessionId)) {
+								it.remove();
+							}
+						}
+					}
+				}
+			} finally {
+				setNotBusy();
+			}
+		}	
 	}
 }
