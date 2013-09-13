@@ -74,8 +74,10 @@ public class BackboneData implements Backbone {
 
 		// store result of method call (non-blocking by contract)
 		resp.setStatus(NMResponse.STATUS_SUCCESS);
-		resp.setBytesPrimary(true);
-		resp.setMessageBytes(respData);
+		if (respData != null) {
+			resp.setBytesPrimary(true);
+			resp.setMessageBytes(respData);
+		}
 		return resp;
 	}
 
@@ -97,7 +99,7 @@ public class BackboneData implements Backbone {
 				// Should be exactly one, if at all.
 				if (ref != null && ref.length > 0)
 					service = (DataEndpoint) context.getBundleContext()
-							.getService(ref[0]);
+					.getService(ref[0]);
 
 			} catch (Exception e) {
 				LOG.error(e.getMessage());
