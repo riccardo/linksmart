@@ -40,60 +40,66 @@ public interface CryptoManager {
 	/**
 	 * Decrypts a LinkSmart message that has been created using the <code>encryptAsymmetric</code> or <code>encryptSymmetric</code> method.
 	 * <p>
-	 * All relevant information for decrypting the message should be included in the message itself. In the case of an error, this method
-	 * returns null.
+	 * All relevant information for decrypting the message should be included in the message itself. 
+	 * @return In the case of an error, this method
+	 * returns null. Else it returns the decrypted data.
 	 */
 	public String decrypt(String encryptedData);
 
 	/**
-	 * Creates a signed LinkSmart message
+	 * Creates a signed LinkSmart message with the default local key.
 	 * 
-	 * @param data
+	 * @param data to be signed
 	 * @param format
 	 *            The message format to be used. Currently, only <code>XMLEnc</code> is supported.
-	 * @return
-	 * @throws Exception
+	 * @return Data signed with added meta-data or null if signing failed.
 	 */
 	public String sign(String data, String format);
 
 	/**
-	 * Creates a signed LinkSmart message
+	 * Creates a signed LinkSmart message for a service identified with a VirtualAddress.
 	 * 
-	 * @param data
+	 * @param data to be signed
 	 * @param format
 	 *            The message format to be used. Currently, only <code>XMLEnc</code> is supported.
-	 * @param identifier
-	 * @return
-	 * @throws Exception
+	 * @param identifier is the VirtualAddress of the service as string
+	 * @return Data signed with added meta-data or null if signing failed
 	 */
 	public String sign(String data, String format, String identifier);
 	
 	/**
-	 * Verifies a signed message.
-	 * 
+	 * Verifies a signed message. The string has to contain all relevant meta-data
+	 * e.g. as produced by the sign method.
+	 * @return The original data with meta-data removed or null if signature was invalid. 
 	 */
 	public String verify(String data);
 	
 	/**
 	 * Encrypts a LinkSmart message so it can be opened by the receiver using the <code>decrypt</code> method.
+	 * @param documentString String to be encrypted
+	 * @param identifier VirtualAddress of the receiver end
+	 * @param format is ignored but must not be null
+	 * @return enrypted data with added meta-data
+	 * @throws Exception different kinds of exceptions depending on the specific problem
 	 */
 	public String encryptAsymmetric(String documentString, String identifier, String format) throws Exception;
 
 	/**
-	 * Stores a public key in the keystore.
+	 * Stores a public key in the keystore with random identifier.
 	 * 
 	 * @param encodedCert
 	 *            The certificate containing the public key.
+	 * @param algorithm_id Not used at the moment as only X509 is supported
 	 */
 	public String storePublicKey(String encodedCert, String algorithm_id);
 	
 	/**
-	 * Stores a public key in the keystore with the provided identifier
+	 * Stores a public key in the keystore with the provided identifier.
 	 * @param friendlyName Chosen identifier of key
-	 * @param encodedCert
-	 * @param algorithmId
-	 * @return False if identifier is taken
-	 * @throws SQLException
+	 * @param encodedCert The certificate containing the public key.
+	 * @param algorithmId Not usedat the moment as only X509 is supported.
+	 * @return False if identifier is taken or true if storing succeeded
+	 * @throws SQLException When an exception using the underlying database occured
 	 */
 	public boolean storePublicKeyWithFriendlyName(String friendlyName, String encodedCert, String algorithmId) throws SQLException;
 		
@@ -101,13 +107,19 @@ public interface CryptoManager {
 	 * Returns the public key that is stored under a certain identifier.
 	 * 
 	 * @param identifier
-	 *            The identifier
+	 *            The identifier of the requested public key
 	 * @return The public key as a byte array or null if key could not be retrieved using the identifier
 	 * @throws KeyStoreException
 	 *             If an exception while accessing the key store occurred.
 	 */
 	public byte[] getEncodedPublicKeyByIdentifier(String identifier) throws KeyStoreException;
 
+	/**
+	 * Returns a public key certificate stored under given identifier.
+	 * @param identifier of the requested certificate
+	 * @return Certificate object or null if certificate is not found
+	 * @throws KeyStoreException
+	 */
 	public Certificate getCertificateByIdentifier(String identifier) throws KeyStoreException;
 
 	/**
@@ -119,6 +131,9 @@ public interface CryptoManager {
 	 * cryptoManager.setCertificateReference(certRef, virtualAddress);
 	 * </code>
 	 * 
+	 * @param xmlAttributes An xml containing the attributes to be put into the certificate
+	 * @param virtualAddress The VAD to be put into the certificate
+	 * 
 	 * @return Returns an identifier for this key pair.
 	 */
 	public String generateCertificateWithAttributes(String xmlAttributes, String virtualAddress) throws SQLException, NoSuchAlgorithmException, IOException,
@@ -127,18 +142,19 @@ public interface CryptoManager {
 
 	/**
 	 * Retrieves attributes that are contained within a certificate.
+	 * @return Properties object containing the attributes from the certificate
 	 */
 	public Properties getAttributesFromCertificate(String identifier) throws SQLException, KeyStoreException, CertificateEncodingException;
 
 	/**
 	 * Returns private key stored under identifier
-	 * @param identifier
-	 * @return
+	 * @param identifier VAD or other identifier for a private key
+	 * @return PrivateKey object or null if identifier did not exist
 	 */
 	public PrivateKey getPrivateKeyByIdentifier(String identifier);
 	
 	/**
-	 * Generates a symmetric key from a provided string by applying one-way hash function
+	 * Generates a symmetric key from a provided string by applying one-way hash functions
 	 * @param password String to use for key generation
 	 * @param keySize
 	 * @param algorithm String name according to JCE
@@ -149,7 +165,7 @@ public interface CryptoManager {
 	public String generateKeyFromPassword(String password, int keySize, String algorithm) throws SQLException, KeyStoreException;
 	
 	/**
-	 * Generates a symmetric key from a provided string by applying one-way hash function
+	 * Generates a symmetric key from a provided string by applying one-way hash functions
 	 * @param friendlyName identifier to store new key under
 	 * @param password String to use for key generation
 	 * @param keySize
@@ -218,6 +234,9 @@ public interface CryptoManager {
 	/**
 	 * Stores a symmetric key in the key store.
 	 * 
+	 * @param algo algorithm name according to JCE
+	 * @param Base64 encoded key data
+	 * 
 	 * @return Returns an identifier for this key.
 	 */
 	public String storeSymmetricKey(String algo, String key) throws SQLException, NoSuchAlgorithmException, IOException, KeyStoreException,
@@ -226,8 +245,8 @@ public interface CryptoManager {
 	
 	/**
 	 * Stores symmetric key under provided identifier
-	 * @param friendlyName
-	 * @param algo
+	 * @param friendlyName under which it gets stored
+	 * @param algo algorithm name according to JCE
 	 * @param key Base64 encoded string
 	 * @return
 	 * @throws SQLException
@@ -235,12 +254,12 @@ public interface CryptoManager {
 	public boolean storeSymmetricKeyWithFriendlyName(String friendlyName, String algorithm, String key) throws SQLException;
 	
 	/**
-	 * Symmetrically encrypt a LinkSmart message so it can be opened by the receiver.
+	 * Symmetrically encrypt a message so it can be opened by the receiver with decrypt.
 	 * 
-	 * @param documentString
-	 * @param identifier
-	 * @param format
-	 * @return
+	 * @param documentString to be protected
+	 * @param identifier of the key to be used
+	 * @param format not used at the moment but must not be null
+	 * @return A meta-data annotated protected string
 	 * @throws Exception
 	 */
 	public String encryptSymmetric(String documentString, String identifier, String format) throws Exception;
@@ -254,38 +273,38 @@ public interface CryptoManager {
 	/**
 	 * Assigns a VirtualAddress to an already existing certificate.
 	 * 
-	 * @param virtualAddress
-	 * @param certRef
-	 * @return true, if mapping has been created successfully. False otherwise (e.g., if certRef was invalid or does not exist).
+	 * @param virtualAddress Address to be assigned to
+	 * @param certRef The identifier of the certificate to be used
+	 * @return true, if mapping has been created successfully. False otherwise (e.g., if certRef was invalid or did not exist).
 	 * @throws SQLException 
 	 */
 	public boolean addCertificateForService(String virtualAddress, String certRef);
 	
 	/**
-	 * Assigns private key to VirtualAddress
+	 * Assigns private key to VirtualAddress.
 	 * 
-	 * @param virtualAddress
-	 * @param certRef
-	 * @return False if certificate reference does not exist
+	 * @param virtualAddress Address to be assigned to
+	 * @param certRef The identifier of the certificate to be used
+	 * @return False if certificate reference did not exist
 	 */
 	public boolean addPrivateKeyForService(String virtualAddress, String certRef);
 
 	/**
-	 * Returns certificate identifier for VirtualAddress
+	 * Returns certificate identifier for VirtualAddress.
 	 * @param virtualAddress
 	 * @return Identifier under which certificate is stored in keystore
 	 */
 	public String getCertificateReference(String virtualAddress);
 
 	/**
-	 * Returns private key identifier for service
+	 * Returns private key identifier for VirtualAddress
 	 * @param virtualAddress
 	 * @return Identifier under which private key is stored in keystore
 	 */
 	public String getPrivateKeyReference(String virtualAddress);
 	
 	/**
-	 * Get key size for algorithm on security level
+	 * Get key size for algorithm based on security level
 	 * @param level security level
 	 * @param algorithm Algorithm name according to JCE
 	 * @return key length in bits
@@ -296,8 +315,8 @@ public interface CryptoManager {
 	 * Calculates the MAC on a message with a key stored in the internal
 	 * keystore of the CryptoManager. This way keys don't leave the manager.
 	 * 
-	 * @param identifier
-	 * @param data
+	 * @param identifier of the key to be used
+	 * @param data for which to calculate MAC for
 	 * @param algorithm Algorithm identifier according to provider
 	 * @return The calculated MAC on the data
 	 * @throws KeystoreException 
@@ -316,7 +335,7 @@ public interface CryptoManager {
 	/**
 	 * Deletes an entry in the keystore as overwrites
 	 * should not be possible.
-	 * @param identifier
+	 * @param identifier to be removed
 	 * @return True if identifier was found and deleted.
 	 */
 	public boolean deleteEntry(String identifier);

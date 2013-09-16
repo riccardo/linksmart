@@ -5,21 +5,26 @@ import java.util.List;
 import eu.linksmart.network.VirtualAddress;
 
 /**
- * Returns implementation specific security protocol.
+ * Returns the security protocol specific to this implementation
+ * of the CommunicationSecurityManager.
  * @author Vinkovits
  *
  */
 public interface CommunicationSecurityManager {
 
+	/**
+	 * The topic used for handshake communication between instances of the Communication Managers.
+	 */
 	public static String SECURITY_PROTOCOL_TOPIC = "SecurityHandshake";
 	
 	/**
 	 * Provides a specific {@link SecurityProtocol} object
-	 * for protecting a connection between to entities.
+	 * for protecting a connection between two entities.
 	 * 
 	 * @param clientVirtualAddress The VirtualAddress which started the communication
 	 * @param serverVirtualAddress The VirtualAddress whose service is used
-	 * @return Object to use to protect messages belonging to one connection
+	 * @return Freshly initialized object to be used
+	 *  to protect messages belonging to one connection
 	 */
 	SecurityProtocol getSecurityProtocol(VirtualAddress clientVirtualAddress, VirtualAddress serverVirtualAddress);
 
@@ -43,7 +48,8 @@ public interface CommunicationSecurityManager {
 	 * for protecting a broadcast connection.
 	 * 
 	 * @param clientVirtualAddress The VirtualAddress which started the communication
-	 * @return Object to use to protect messages belonging to one connection
+	 * @return Freshly initialized object to be used
+	 *  to protect messages belonging to one connection
 	 */
 	SecurityProtocol getBroadcastSecurityProtocol(VirtualAddress clientVirtualAddress);
 }

@@ -8,7 +8,7 @@ import eu.linksmart.network.Message;
 /**
  * Represents a protocol which is used to protect
  * messages sent over a backbone. After getting a reference
- * to SecurityProtocol it has to be started
+ * to a SecurityProtocol implementation the protocol has to be started.
  */
 public interface SecurityProtocol {
 
@@ -52,7 +52,8 @@ public interface SecurityProtocol {
 	 * @throws CryptoException If cryptography specific exception occurred
 	 * @throws VerificationFailureException If a received signature is not valid
 	 * @throws IOException If received data cannot be interpreted
-	 * @return original Message object if it is not identified
+	 * @return original Message object if it is not identified or protocol message which has
+	 * to be sent to other party.
 	 */
 	Message processMessage(Message msg) throws CryptoException, VerificationFailureException, IOException;
 	
