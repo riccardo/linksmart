@@ -27,7 +27,6 @@
 		<dependency org="javax.servlet" name="com.springsource.javax.servlet.jsp" rev="2.1.0" />
 		<dependency org="javax.el" name="com.springsource.javax.el" rev="1.0.0" />
 		<dependency org="org.apache.servicemix.bundles" name="org.apache.servicemix.bundles.derby" rev="10.9.1.0_1" />
-		<dependency org="org.apache.derby" name="com.springsource.org.apache.derby.client" rev="10.5.1000001.764942" />
 		<dependency org="javax.transaction" name="com.springsource.javax.transaction" rev="1.1.0" />
 		<dependency org="org.apache.xalan" name="com.springsource.org.apache.xalan" rev="2.7.1" />
 		<dependency org="org.apache.xalan" name="com.springsource.org.apache.xml.serializer" rev="2.7.1" />
