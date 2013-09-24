@@ -359,6 +359,12 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			if ((outPipe == null)) {
 				if ((pID != null)) {
 					outPipe = createOutputPipe(pID);
+					if(outPipe == null) {
+						resp.setStatus(NMResponse.STATUS_ERROR);
+						resp.setMessage("Could not reach destination VirtualAddress "
+								+ dest.toString());
+						return resp;
+					}
 					logger.debug("The pipe to " + pID.toString()
 							+ " was closed or never created before");
 					Message message = createRequestMessage(source, dest, data, i.toString(), bbjxta.getPeerID(), synch);
@@ -446,7 +452,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			pipeTable.put(pID, new PipeInfo(outputPipe));
 		} else {
 			logger.error("Cannot create outputpipe to destination: " + pID);
-			throw new RuntimeException("Could not reach destination!");
+			return null;
 		}
 		return outputPipe;
 	}
@@ -561,7 +567,10 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 				if(synch) {
 					// reverse source and destination because we (dest) send response back to source
 					if(r.getMessage() == null) r.setMessage("");
-					sendMessageResponse(destVirtualAddress, sourceVirtualAddress, r.getMessageBytes(), requestId);
+					boolean success = sendMessageResponse(destVirtualAddress, sourceVirtualAddress, r.getMessageBytes(), requestId);
+					if(!success) {
+						logger.info("Unable to send response to message from " + sourceVirtualAddress.toString());
+					}
 				}
 
 			}else if (type.toString().equalsIgnoreCase(MESSAGE_ELEMENT_TYPE_RESPONSE)) {
@@ -622,6 +631,9 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 			if ((outPipe == null)) {
 				if ((pID != null)) {
 					outPipe = createOutputPipe(pID);
+					if(outPipe == null) {
+						return false;
+					}
 					logger.debug("The pipe to " + pID.toString()
 							+ " was closed or never created before");
 					Message message = createResponseMessage(source, destination, data, i);
@@ -633,8 +645,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 					}
 
 					return true;
-				}
-				else {
+				} else {
 					logger.error("Resp. Could not find destination VirtualAddress "
 							+ destination.toString() + ". Please try later...");
 					return false;
