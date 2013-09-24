@@ -732,16 +732,16 @@ public class ConnectionManager {
 		timeouts.remove(tempCon);
 		tempCon.setFailed();
 
-		Connection bannedConnection;
-		try {
-			bannedConnection = new HandshakeConnection(nmCore.getVirtualAddress(), remoteEndpoint, this);
-			if(!bannedConnections.contains(bannedConnection)) {
-				this.bannedConnections.add(bannedConnection);	
-			}
-			this.timeouts.put(bannedConnection, Calendar.getInstance().getTime());
-		} catch(RemoteException e) {
-			//local invocation
-		}
+//		Connection bannedConnection;
+//		try {
+//			bannedConnection = new HandshakeConnection(nmCore.getVirtualAddress(), remoteEndpoint, this);
+//			if(!bannedConnections.contains(bannedConnection)) {
+//				this.bannedConnections.add(bannedConnection);	
+//			}
+//			this.timeouts.put(bannedConnection, Calendar.getInstance().getTime());
+//		} catch(RemoteException e) {
+//			//local invocation
+//		}
 	}
 
 	public void setBusy() {
