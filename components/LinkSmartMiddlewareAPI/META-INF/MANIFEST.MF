@@ -19,8 +19,5 @@ Export-Package: eu.linksmart.clients;version="2.0.0",
  eu.linksmart.security.communication;version="2.0.0",
  eu.linksmart.security.cryptomanager;version="2.0.0",
  eu.linksmart.security.trustmanager;version="2.0.0",
- eu.linksmart.utils;version="2.0.0";uses:="org.apache.log4j,org.osgi.framework,org.osgi.service.cm",
- eu.linksmart.wsprovider;version="2.0.0",
- eu.linksmart.wsprovider.test;uses:="eu.linksmart.wsprovider.test.types,eu.linksmart.network",
- eu.linksmart.wsprovider.test.types
+ eu.linksmart.utils;version="2.0.0";uses:="org.apache.log4j,org.osgi.framework,org.osgi.service.cm"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

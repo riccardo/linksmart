@@ -46,7 +46,7 @@ import java.rmi.RemoteException;
 public interface TrustManager extends java.rmi.Remote {
 
 	/**
-	 * Evaluate the trust in a given token
+	 * Evaluate the trust in a given token.
 	 * 
 	 * @param token
 	 *            the to be evaluated token
@@ -70,14 +70,14 @@ public interface TrustManager extends java.rmi.Remote {
 			String trustModelIdentifier) throws RemoteException;
 
 	/**
-	 * Creates a token according to the active trust model
+	 * Creates a token according to the active trust model.
 	 * @return Identifier of created token
 	 * @throws RemoteException
 	 */
 	public String createTrustToken() throws RemoteException;
 	
 	/**
-	 * Creates a token according to the active trust model
+	 * Creates a token according to the active trust model.
 	 * @param identifier Tries to give the token provided identifier
 	 * @return False if identifier already taken
 	 * @throws RemoteException

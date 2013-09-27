@@ -44,24 +44,24 @@ package eu.linksmart.security.trustmanager;
 public interface TrustManagerConfiguration {
 
 	/**
-	 * Set the current Trust Model
+	 * Set the current Trust Model.
 	 * 
 	 * @param identifier
 	 *            Identifier of the Trust Model to be used as default
-	 * @return true if sucessfull, false if not
+	 * @return true if successful, false if not
 	 */
 
 	public boolean setCurrentTrustModel(String identifier);
 
 	/**
-	 * Get the identifier of the current trust model
+	 * Get the identifier of the current trust model.
 	 * 
 	 * @return Identifier of the current trust model
 	 */
 	public String getCurrentTrustModel();
 
 	/**
-	 * Get a list of identifiers of the supported and loaded Trust Models
+	 * Get a list of identifiers of the supported and loaded Trust Models.
 	 * 
 	 * @return List of identifiers of the supported and loaded Trust Models
 	 */

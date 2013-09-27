@@ -18,10 +18,22 @@ import java.util.Vector;
 
 public interface CryptoManagerAdmin {
 	
+	/**
+	 * Deletes an entry from the local key store.
+	 * @param identifier of the entity to be deleted
+	 * @return true if identifier exists - false if identifier is not found
+	 */
 	public boolean deleteEntry(String identifier);
 	
+	/** 
+	 * @return Returns all identifiers found in the key store.
+	 */
 	public Vector<String> getIdentifier();
 	
+	/**
+	 * Returns the information about the entities in the key store.
+	 * @return Entries of vectors containing the identifier and algorithm.
+	 */
 	public Vector<Vector<String>> getIdentifierInfo();
 
 }
