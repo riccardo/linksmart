@@ -261,16 +261,22 @@ public class ConnectionManager {
 		//if the policies are not there yet  the networkmanager has not met this endpoint before
 		if(!servicePolicies.containsKey(remoteEndpoint)) {	
 			nmCore.addRemoteVirtualAddress(remoteEndpoint, remoteEndpoint);
+			if(!servicePolicies.containsKey(remoteEndpoint)) {
+				//we do not know anything about the remote endpoint so we close this attempt
+				logger.warn("No information available of remote endpoint: " + remoteEndpoint.toString());
+				handleUnsuccesfulHandshake(remoteEndpoint, tempCon);
+				return null;
+			}
 		}
 
 		//if the message could not be opened or it was opened and it is not a handshake message we start the handshake
 		boolean isHandshakeMsg = isHandshakeMessage(data, senderVirtualAddress, receiverVirtualAddress);
-		//open message in standard way
-		Message message = 
-				MessageSerializerUtiliy.
-				unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress, true);
 		String sessionId = null;
 		if(isHandshakeMsg) {
+			//open message in standard way
+			Message message = 
+					MessageSerializerUtiliy.
+					unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress, false);
 			//we received a handshake message
 			//open handshake body
 			Properties properties = new Properties();
@@ -335,6 +341,13 @@ public class ConnectionManager {
 					}
 				}
 			} else {
+				//open message in standard way
+				Message message = 
+						MessageSerializerUtiliy.
+						unserializeMessage(data, true, senderVirtualAddress, receiverVirtualAddress, true);
+				if(message == null || message instanceof ErrorMessage) {
+					return null;
+				}
 				//check whether the message already contains a valid session id
 				if (message.getKeySet().contains(Message.SESSION_ID_KEY)
 						&& sessions.containsKey(message.getProperty(Message.SESSION_ID_KEY))) {
@@ -569,6 +582,7 @@ public class ConnectionManager {
 
 		//compose list of security properties required by own configuration		
 		StringBuilder secProperties = new StringBuilder();
+		//by now servicePolicies should have an entry
 		for (SecurityProperty prop : servicePolicies.get(receiverVirtualAddress)) {
 			secProperties.append(prop.name() + ";");
 		}
@@ -732,16 +746,16 @@ public class ConnectionManager {
 		timeouts.remove(tempCon);
 		tempCon.setFailed();
 
-//		Connection bannedConnection;
-//		try {
-//			bannedConnection = new HandshakeConnection(nmCore.getVirtualAddress(), remoteEndpoint, this);
-//			if(!bannedConnections.contains(bannedConnection)) {
-//				this.bannedConnections.add(bannedConnection);	
-//			}
-//			this.timeouts.put(bannedConnection, Calendar.getInstance().getTime());
-//		} catch(RemoteException e) {
-//			//local invocation
-//		}
+		//		Connection bannedConnection;
+		//		try {
+		//			bannedConnection = new HandshakeConnection(nmCore.getVirtualAddress(), remoteEndpoint, this);
+		//			if(!bannedConnections.contains(bannedConnection)) {
+		//				this.bannedConnections.add(bannedConnection);	
+		//			}
+		//			this.timeouts.put(bannedConnection, Calendar.getInstance().getTime());
+		//		} catch(RemoteException e) {
+		//			//local invocation
+		//		}
 	}
 
 	public void setBusy() {
@@ -758,7 +772,7 @@ public class ConnectionManager {
 			this.notifyAll();
 		}
 	}
-	
+
 	/**
 	 * Returns the declining handshake message for the provided entities.
 	 * @param senderVirtualAddress
