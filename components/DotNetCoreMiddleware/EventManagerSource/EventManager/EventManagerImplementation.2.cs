@@ -57,6 +57,14 @@ namespace EventManager
                         smb.HttpGetUrl = new Uri(address + "/Meta");
                         serviceHost.Description.Behaviors.Add(smb);
                     }
+                    ServiceThrottlingBehavior throttleBehavior = new ServiceThrottlingBehavior
+                    {
+                        MaxConcurrentCalls = int.MaxValue,
+                        MaxConcurrentInstances = int.MaxValue,
+                        MaxConcurrentSessions = int.MaxValue,
+                    };
+                    serviceHost.Description.Behaviors.Add(throttleBehavior);
+
                     BasicHttpBinding myBinding = new BasicHttpBinding(BasicHttpSecurityMode.None);
                     myBinding.MaxReceivedMessageSize = int.MaxValue;
                     myBinding.MaxBufferSize = int.MaxValue;
@@ -64,6 +72,7 @@ namespace EventManager
                     myBinding.ReaderQuotas.MaxStringContentLength = int.MaxValue;
                     myBinding.ReaderQuotas.MaxDepth = int.MaxValue;
                     myBinding.ReaderQuotas.MaxBytesPerRead = int.MaxValue;
+                    
                  
 
                     myBinding.Namespace = "http://eventmanager.linksmart.eu";
