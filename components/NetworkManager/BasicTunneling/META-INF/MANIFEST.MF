@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BasicTunneling
+Bundle-SymbolicName: eu.linksmart.network.tunneling
+Bundle-Version: 2.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: eu.linksmart.network;version="2.0.0",
+ eu.linksmart.network.networkmanager;version="2.0.0",
+ eu.linksmart.network.networkmanager.core;version="2.0.0",
+ eu.linksmart.utils;version="2.0.0",
+ javax.servlet;version="2.4.0",
+ javax.servlet.http,
+ org.apache.log4j;version="1.2.15",
+ org.junit;version="4.8.1",
+ org.mockito;version="1.9.0.rc1",
+ org.mockito.stubbing;version="1.9.0.rc1",
+ org.mockito.stubbing.answers;version="1.9.0.rc1",
+ org.osgi.service.component;version="1.1.0"
+Service-Component: OSGI-INF/DS_BasicTunneling.xml
+Bundle-Vendor: Fraunhofer FIT
+Export-Package: eu.linksmart.network.tunnel,
+ eu.linksmart.network.tunnel.impl
