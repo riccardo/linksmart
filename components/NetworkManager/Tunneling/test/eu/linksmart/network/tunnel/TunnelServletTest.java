@@ -28,23 +28,16 @@ public class TunnelServletTest {
 	private TunnelServlet tunnelServlet;
 	private Tunnel tunnel;
 	private HttpServletRequest requestShort;
-	private HttpServletRequest requestLong;
-	private HttpServletRequest requestWsdl;
 	private HttpServletResponse response;
 	private String receiverString = "0.0.0.6986094776732394497";
 	private VirtualAddress receiver = null;
 	private String urlShort = "/0?description=\"CalculatorForBeginners\"";
-	private String urlLong = "/0.0.0.1/default/some/addition?description=\"CalculatorForBeginners\"&pid=\"010\"";
-	private String urlWsdl = "/0/wsdl?description=\"CalculatorForBeginners\"";
-	private String urlOld = "/0/0.0.0.6986094776732394497";
 	private VirtualAddress nmAddress;
 	private String nmAddressString = "0.0.0.0";
 	private NMResponse nmResponse;
 	private ServletOutputStream outStream;
 	private BasicTunnelService basicTunnelService;
 	private Part[] descriptionOnly;
-	private Part[] descNPid;
-	private HttpServletRequest requestOld;
 
 
 	@Before
