@@ -1,10 +1,11 @@
-package eu.linksmart.network.tunnel;
+package eu.linksmart.network.tunnel.standard;
 
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.network.tunnel.BasicTunnelService;
 
 public class Tunnel {
 

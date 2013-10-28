@@ -1,4 +1,4 @@
-package eu.linksmart.network.tunnel;
+package eu.linksmart.network.tunnel.standard;
 
 import java.io.IOException;
 
@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.tunnel.BasicTunnelService;
 
 public class TunnelServlet extends HttpServlet{
 

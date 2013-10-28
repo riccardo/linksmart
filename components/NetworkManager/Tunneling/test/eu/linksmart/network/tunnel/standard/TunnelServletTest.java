@@ -1,4 +1,4 @@
-package eu.linksmart.network.tunnel;
+package eu.linksmart.network.tunnel.standard;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -20,6 +20,9 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.network.tunnel.BasicTunnelService;
+import eu.linksmart.network.tunnel.standard.Tunnel;
+import eu.linksmart.network.tunnel.standard.TunnelServlet;
 import eu.linksmart.utils.Part;
 
 public class TunnelServletTest {
