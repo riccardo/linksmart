@@ -9,10 +9,15 @@ import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 public class Tunnel {
 
 	private static Logger LOG = Logger.getLogger(Tunnel.class.getName());
-	private NetworkManagerCore nmCore;
+	protected NetworkManagerCore nmCore;
+	protected BasicTunnelService basicTunnelService;
 
 	protected NetworkManagerCore getNM() {
 		return this.nmCore;
+	}
+
+	public BasicTunnelService getBasicTunnelService() {
+		return basicTunnelService;
 	}
 	
 	protected void activate(ComponentContext context) {
@@ -42,6 +47,14 @@ public class Tunnel {
 	
 	protected void unbindNetworkManager(NetworkManagerCore nmCore) {
 		this.nmCore = null;
+	}
+	
+	protected void bindBasicTunneling(BasicTunnelService basicTunnelService) {
+		this.basicTunnelService = basicTunnelService;
+	}
+	
+	protected void unbindBasicTunneling(BasicTunnelService basicTunnelService) {
+		this.basicTunnelService = null;
 	}
 
 }

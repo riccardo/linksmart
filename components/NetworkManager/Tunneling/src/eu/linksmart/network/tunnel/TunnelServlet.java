@@ -1,12 +1,6 @@
 package eu.linksmart.network.tunnel;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.regex.*;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,11 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import eu.linksmart.network.NMResponse;
-import eu.linksmart.network.Registration;
-import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.VirtualAddress;
-import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
-import eu.linksmart.utils.Part;
 
 public class TunnelServlet extends HttpServlet{
 
@@ -27,8 +17,6 @@ public class TunnelServlet extends HttpServlet{
 	private Tunnel tunnel;
 	private static final Logger logger = Logger
 			.getLogger(TunnelServlet.class.getName());
-	private static final String NO_SERVICE = "Did not find matching service";
-	protected static final int SERVICE_DISCOVERY_TIMEOUT = 10*1000;
 
 	protected TunnelServlet(Tunnel tunnel) {
 		this.tunnel = tunnel;
@@ -36,256 +24,63 @@ public class TunnelServlet extends HttpServlet{
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws IOException {
+		logger.debug("Tunnel received GET request");
 		processRequest(request, response, false);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+		logger.debug("Tunnel received POST request");
 		processRequest(request, response, true);
 	}
 
-	private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean hasData)
-			throws IOException{		
-		//path without query
-		String path = request.getPathInfo();
-		//get sender address and check if path contained default switch
-		VirtualAddress senderVirtualAddress = null;
-		if (path.startsWith("/0/") || path.equals("/0")) {
-			senderVirtualAddress = tunnel.getNM().getService();
-			//remove sender virtual address part from path
-			path = path.substring(2);
-		} else {
-			Pattern pat = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
-			Matcher matcher = pat.matcher(path);
-			if(matcher.find()) {
-				senderVirtualAddress = new VirtualAddress(matcher.group());
-				//remove sender virtual address part from path
-				path = path.substring(matcher.group().length() + 1);
-			} else {
-				response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Bad format of sender VirtualAddress");
-				return;
-			}
-		}
-		//check if a receiver address is provided
-		Pattern pat = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
-		Matcher matcher = pat.matcher(path);
-		VirtualAddress receiverVirtualAddress = null;
-		if(matcher.find()) {
-			receiverVirtualAddress = new VirtualAddress(matcher.group());
-			//remove sender virtual address part from path
-			path = path.substring(matcher.group().length() + 1);
-		} else {
-			boolean getDefault = path.startsWith("/default");
-			if(getDefault) {
-				//remove default switch similarly to sender
-				path = path.substring(8);
-			}
-			//get service
-			Registration registration = null;
-			try {
-				registration = getSearchedService(request.getQueryString(), getDefault);
-			} catch (Exception e) {
-				response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
-				return;
-			}
-			if(registration != null) {
-				receiverVirtualAddress = registration.getVirtualAddress();
-			}
-		}
-
-		if(receiverVirtualAddress != null) {
-			boolean isWsdl = false;		
-			if (!hasData && path.endsWith("wsdl")) {
-				isWsdl = true;
-				//remove wsdl from path
-				path = path.substring(0, path.length() - 5);
-			}
-
-			// build request
-			StringBuilder requestBuilder = new StringBuilder();
-			// append request line
-			requestBuilder.append(request.getMethod()).append(" /");
-			//append path
-			requestBuilder.append((path.startsWith("/")? path.substring(1) : path));
-			if(!hasData && isWsdl) {
-				requestBuilder.append("?wsdl");
-			}
-			requestBuilder.append(" ").append(request.getProtocol()).append("\r\n");
-
-			// append headers
-			requestBuilder.append(buildHeaders(request));
-			if(hasData) {
-				requestBuilder.append("\r\n");
-			}
-
-			// append content if necessary
-			if (hasData && request.getContentLength() > 0) {
-				try {
-					BufferedReader reader = request.getReader();
-					for (String line = null; (line = reader.readLine()) != null;)
-						requestBuilder.append(line);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			// send request to NetworkManagerCore
-			sendRequest(senderVirtualAddress, receiverVirtualAddress, requestBuilder.toString(), response);
-		} else {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, NO_SERVICE);
+	private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean hasData) throws IOException {
+		//get sender and receiver from request path
+		VirtualAddress senderVirtualAddress = 
+				tunnel.getBasicTunnelService().
+				getSenderVirtualAddressFromPath(
+						request, tunnel.getNM().getVirtualAddress());
+		if(senderVirtualAddress == null) {
+			response.sendError(
+					HttpServletResponse.SC_BAD_REQUEST, BasicTunnelService.INVALID_VIRTUAL_ADDRESS_FORMAT);
 			return;
 		}
-	}
-
-	private Registration getSearchedService(String query, boolean getDefault) throws MultipleMatchException, Exception {
-		ArrayList<Part> attributes = new ArrayList<Part>();		
-		//divide query into individual attributes
-		String[] queryAttrs = query.split("&");
-
-		for(String queryAttr : queryAttrs) {
-			int separatorIndex = queryAttr.indexOf("=");
-			String attributeName = queryAttr.substring(0, separatorIndex).toUpperCase();
-			//FIXME should we have this check?
-			//check if the searched service attribute exists
-			//			ServiceAttribute attributeNameCheck = null;
-			//			try {
-			//				attributeNameCheck = ServiceAttribute.valueOf(attributeName);
-			//			} catch (Exception e) {
-			//				throw new Exception("Unknown service attribute key");
-			//			}
-			//			if(attributeNameCheck == null) {
-			//				throw new Exception("Unknown service attribute key");
-			//			}
-
-			String attributeValue = queryAttr.substring(separatorIndex + 1);
-			if(attributeValue.startsWith("\"") && attributeValue.endsWith("\"")) {
-				//cut off quotation symbols
-				attributeValue = attributeValue.substring(1, attributeValue.length() - 1);
-			} else if(attributeValue.startsWith("%22") && attributeValue.endsWith("%22")) {
-				//cut off quotation symbols
-				attributeValue = attributeValue.substring(3, attributeValue.length() - 3);
-			} else {
-				throw new Exception("False format of service query");
-			}
-			attributes.add(new Part(attributeName, attributeValue));
-		}
-
-		//find service matching attributes
-		Registration[] registrations = null;
+		VirtualAddress receiverVirtualAddress = null;
 		try {
-			if(getDefault) {
-				registrations = tunnel.getNM().
-						getServiceByAttributes(attributes.toArray(new Part[]{}), SERVICE_DISCOVERY_TIMEOUT, true, false);
-			} else {
-				registrations = tunnel.getNM().
-						getServiceByAttributes(attributes.toArray(new Part[]{}));
-			}
-		} catch (RemoteException e) {
-			//local invocation
+			receiverVirtualAddress = 
+					tunnel.getBasicTunnelService().
+					getReceiverVirtualAddressFromPath(request);
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+			return;
 		}
-
-		if (registrations.length > 1 && !getDefault) {
-			throw new MultipleMatchException("No default switch provided although the number of found services was " + registrations.length);
-		} else if (registrations != null && registrations.length != 0) {
-			//there is only one element or the default has been required
-			return registrations[0];
-		} else {
-			return null;
+		if(receiverVirtualAddress == null) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, BasicTunnelService.NO_SERVICE);
 		}
-	}
+		//compose request and headers
+		String requestString = tunnel.getBasicTunnelService().processRequest(
+				request,
+				response,
+				hasData);
 
-	/**
-	 * Builds the string that represents the headers of a HttpServletRequest
-	 * @param request the HttpServletRequest of which to extract the headers
-	 * @return the String representing the headers
-	 */
-	public String buildHeaders(HttpServletRequest request) {
-		StringBuilder builder = new StringBuilder();
-		Enumeration<?> headerNames = request.getHeaderNames();
+		//send over LinkSmart
+		NMResponse r = tunnel.getNM().sendData(
+				senderVirtualAddress,
+				receiverVirtualAddress,
+				requestString.getBytes(),
+				true);
 
-		while (headerNames.hasMoreElements()) {
-			String header = (String) headerNames.nextElement();
-			String value = request.getHeader(header);
-			builder.append(header + ": " + value + "\r\n");
-		}
-
-		return builder.toString();
-	}
-
-	/**
-	 * Sends a request via NetworkManagerCore and adds the response to the HttpServletResponse
-	 * @param senderVirtualAddress the sender VirtualAddress
-	 * @param receiverVirtualAddress the receiver VirtualAddress
-	 * @param requestString the request message, as a String
-	 * @param response the servlet response to add the response message to
-	 * @throws IOException
-	 */
-	private void sendRequest(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, String requestString,
-			HttpServletResponse response) throws IOException {
-		NMResponse r = this.tunnel.getNM().sendData(senderVirtualAddress, receiverVirtualAddress, requestString.getBytes(), true);
-		int bodyStartIndex = 0;
-		byte[] byteData = null;
 		byte[] body = null;
-		//check response status and if error response BAD_GATEWAY else parse response for client
 		if (!r.getMessage().startsWith("HTTP/1.1 200 OK")) {
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			//set whole response data as body
 			body = r.getMessage().getBytes();
-		} else {		
-			//take headers from data and add them to response
-			byteData = r.getMessageBytes();
-			byte[] headerEnd = new String("\r\n\r\n").getBytes();
-			//find end of header
-			for(;bodyStartIndex < byteData.length; bodyStartIndex++) {
-				if(bodyStartIndex + headerEnd.length < byteData.length) {
-					if(Arrays.equals(
-							Arrays.copyOfRange(byteData, bodyStartIndex, bodyStartIndex + headerEnd.length),
-							headerEnd)) {
-						bodyStartIndex = bodyStartIndex + headerEnd.length;
-						break;
-					}
-				} else {
-					bodyStartIndex = byteData.length;
-					break;
-				}
-			}
-			byte[] headersBytes = Arrays.copyOf(byteData, bodyStartIndex);
-			String[] headers = new String(headersBytes).split("(?<=\r\n)");
-			//use it to get index of data element
-			int i = 0;
-			//go through headers and put them to response until empty line is reached
-			for (String header : headers) {	
-				if(header.contentEquals("\r\n")) {
-					break;
-				}
-				if(!header.toLowerCase().startsWith("http")) {
-					header = header.replace("\r\n", "");
-					String[] headerParts = header.split(":");
-					if(headerParts.length == 2) {
-						response.setHeader(headerParts[0], headerParts[1].trim());
-					}
-				}
-				i++;
-			}
-			//concat remaining elements of 'headers' array (the real data) into response body
-			//			for(i++;i < headers.length;i++) {
-			//				body = body.concat(headers[i]);
-			//			}
-			body = Arrays.copyOfRange(byteData, bodyStartIndex, byteData.length);
+		} else {
+			body = tunnel.getBasicTunnelService().composeResponse(r.getMessageBytes(), response);
 		}
 		//write body data	
 		response.setContentLength(body.length);
 		response.getOutputStream().write(body);
 		response.getOutputStream().close();
-	}
-
-	class MultipleMatchException extends Exception {
-
-		public MultipleMatchException(String message) {
-			super(message);
-		}
-
-		private static final long serialVersionUID = 1028769408212148548L;
-
 	}
 }

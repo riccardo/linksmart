@@ -5,10 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.rmi.RemoteException;
 import java.util.Hashtable;
 
 import javax.servlet.ServletOutputStream;
@@ -29,11 +26,13 @@ public class TunnelServletTest {
 
 	private NetworkManagerCore nmCore;
 	private TunnelServlet tunnelServlet;
+	private Tunnel tunnel;
 	private HttpServletRequest requestShort;
 	private HttpServletRequest requestLong;
 	private HttpServletRequest requestWsdl;
 	private HttpServletResponse response;
 	private String receiverString = "0.0.0.6986094776732394497";
+	private VirtualAddress receiver = null;
 	private String urlShort = "/0?description=\"CalculatorForBeginners\"";
 	private String urlLong = "/0.0.0.1/default/some/addition?description=\"CalculatorForBeginners\"&pid=\"010\"";
 	private String urlWsdl = "/0/wsdl?description=\"CalculatorForBeginners\"";
@@ -42,7 +41,7 @@ public class TunnelServletTest {
 	private String nmAddressString = "0.0.0.0";
 	private NMResponse nmResponse;
 	private ServletOutputStream outStream;
-	private Tunnel tunnel;
+	private BasicTunnelService basicTunnelService;
 	private Part[] descriptionOnly;
 	private Part[] descNPid;
 	private HttpServletRequest requestOld;
@@ -50,47 +49,42 @@ public class TunnelServletTest {
 
 	@Before
 	public void setUp(){
-		this.nmCore = mock(NetworkManagerCore.class);
-		this.tunnel = mock(Tunnel.class);
-		
-		this.tunnelServlet = new TunnelServlet(this.tunnel);
+		//mock objects
+		this.basicTunnelService = mock(BasicTunnelService.class);
 		this.response = mock(HttpServletResponse.class);
 		this.outStream = mock(ServletOutputStream.class);
-		try {
-			when(tunnel.getNM()).thenReturn(this.nmCore);
-			when(response.getOutputStream()).thenReturn(outStream);
-		} catch (IOException e1) {
-			//NOP
-		}
-		
-		this.descriptionOnly = new Part[]{new Part("DESCRIPTION", "CalculatorForBeginners")};
-		this.descNPid = new Part[]{
-				new Part("DESCRIPTION", "CalculatorForBeginners"),
-				new Part("PID", "010")};
+		this.nmCore = mock(NetworkManagerCore.class);
+
+		//init objects
+		receiver = new VirtualAddress(receiverString);
+		nmAddress = new VirtualAddress(nmAddressString);		
+		this.tunnel = new Tunnel();
+		this.tunnel.nmCore = this.nmCore;
+		this.tunnel.basicTunnelService = this.basicTunnelService;
+		this.tunnelServlet = new TunnelServlet(this.tunnel);
 		this.nmAddress = new VirtualAddress(nmAddressString);
 		this.nmResponse = new NMResponse(NMResponse.STATUS_SUCCESS);
-		this.nmResponse.setMessage("Bla");
+		this.nmResponse.setMessage("HTTP/1.1 200 OK");
 
-		try {
-			when(this.nmCore.getService()).thenReturn(nmAddress);
+
+		//mock methods
+		try{
+			when(basicTunnelService.getReceiverVirtualAddressFromPath(any(HttpServletRequest.class))).thenReturn(receiver);
+			when(basicTunnelService.getSenderVirtualAddressFromPath(any(HttpServletRequest.class), any(VirtualAddress.class))).
+			thenReturn(nmAddress);
+			when(basicTunnelService.processRequest(any(HttpServletRequest.class), any(HttpServletResponse.class), any(boolean.class))).
+			thenReturn(new String());
+			when(basicTunnelService.composeResponse(any(byte[].class), any(HttpServletResponse.class))).thenReturn(new byte[]{});
+			when(response.getOutputStream()).thenReturn(outStream);
+			when(this.nmCore.getServiceByAttributes(any(Part[].class))).thenReturn(new Registration[]{new Registration(receiver, this.descriptionOnly)});
+			when(this.nmCore.getVirtualAddress()).thenReturn(nmAddress);
 			when(this.nmCore.sendData(
 					any(VirtualAddress.class),
 					any(VirtualAddress.class),
 					any(byte[].class),
 					any(boolean.class))).thenReturn(
 							nmResponse);
-		} catch (RemoteException e) {
-			//NOP
-		}
-		
-		try {
-			when(this.nmCore.getServiceByAttributes(any(Part[].class))).
-			thenReturn(new Registration[]{
-					new Registration(new VirtualAddress(this.receiverString), "CalculatorForBeginners")});
-			when(this.nmCore.getServiceByAttributes(any(Part[].class), any(int.class), any(boolean.class), any(boolean.class))).
-			thenReturn(new Registration[]{
-					new Registration(new VirtualAddress(this.receiverString), "CalculatorForBeginners")});
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			//NOP
 		}
 
@@ -100,98 +94,22 @@ public class TunnelServletTest {
 		when(this.requestShort.getMethod()).thenReturn("POST");
 		when(this.requestShort.getProtocol()).thenReturn("HTTP/1.1");
 		when(this.requestShort.getQueryString()).thenReturn(this.urlShort.substring(urlShort.indexOf("?") + 1));
-		this.requestLong = mock(HttpServletRequest.class);
-		when(this.requestLong.getHeaderNames()).thenReturn(new Hashtable<String, String>().elements());
-		when(this.requestLong.getPathInfo()).thenReturn(urlLong.substring(0, urlLong.indexOf("?")));
-		when(this.requestLong.getMethod()).thenReturn("POST");
-		when(this.requestLong.getProtocol()).thenReturn("HTTP/1.1");
-		when(this.requestLong.getQueryString()).thenReturn(this.urlLong.substring(urlLong.indexOf("?") + 1));
-		this.requestWsdl = mock(HttpServletRequest.class);
-		when(this.requestWsdl.getHeaderNames()).thenReturn(new Hashtable<String, String>().elements());
-		when(this.requestWsdl.getPathInfo()).thenReturn(urlWsdl.substring(0, urlWsdl.indexOf("?")));
-		when(this.requestWsdl.getMethod()).thenReturn("GET");
-		when(this.requestWsdl.getProtocol()).thenReturn("HTTP/1.1");
-		when(this.requestWsdl.getQueryString()).thenReturn(this.urlWsdl.substring(urlWsdl.indexOf("?") + 1));
-		this.requestOld = mock(HttpServletRequest.class);
-		when(this.requestOld.getHeaderNames()).thenReturn(new Hashtable<String, String>().elements());
-		when(this.requestOld.getPathInfo()).thenReturn(urlOld);
-		when(this.requestOld.getMethod()).thenReturn("POST");
-		when(this.requestOld.getProtocol()).thenReturn("HTTP/1.1");
-		when(this.requestOld.getQueryString()).thenReturn("");
 	}
 
 	@Test
-	public void testValidURLShort(){	
+	public void testRequest() {
 		try {
-			this.tunnelServlet.doPost(requestShort, response);
-		} catch (IOException e1) {
-			// NOP
+			tunnelServlet.doGet(requestShort, response);
+		} catch (IOException e) {
+			fail("Caught exception: " + e.getMessage());
 		}
-		try {
-			Mockito.verify(nmCore).getServiceByAttributes(this.descriptionOnly);
-			Mockito.verify(nmCore).sendData(
-					nmAddress,
-					new VirtualAddress(receiverString),
-					new String("POST / HTTP/1.1\r\n\r\n").getBytes(),
-					true);
-		} catch (RemoteException e) {
-			//NOP
-		}
-	}
 
-	@Test
-	public void testValidURLong(){	
 		try {
-			this.tunnelServlet.doPost(requestLong, response);
-		} catch (IOException e1) {
-			// NOP
-		}
-		try {
-			Mockito.verify(nmCore).getServiceByAttributes(this.descNPid, TunnelServlet.SERVICE_DISCOVERY_TIMEOUT, true, false);
-			Mockito.verify(nmCore).sendData(
-					new VirtualAddress("0.0.0.1"),
-					new VirtualAddress(receiverString),
-					new String("POST /some/addition HTTP/1.1\r\n\r\n").getBytes(),
-					true);
-		} catch (RemoteException e) {
-			//NOP
-		}
-	}
-
-
-	@Test
-	public void testValidUrlWsdl(){	
-		try {
-			this.tunnelServlet.doGet(requestWsdl, response);
-		} catch (IOException e1) {
-			// NOP
-		}
-		try {
-			Mockito.verify(nmCore).getServiceByAttributes(this.descriptionOnly);
-			Mockito.verify(nmCore).sendData(
-					nmAddress,
-					new VirtualAddress(receiverString),
-					new String("GET /?wsdl HTTP/1.1\r\n").getBytes(),
-					true);
-		} catch (RemoteException e) {
-			//NOP
-		}
-	}
-	
-	@Test
-	public void testValidUrlOld(){	
-		try {
-			this.tunnelServlet.doPost(requestOld, response);
-		} catch (IOException e1) {
-			// NOP
-		}
-		try {
-			Mockito.verify(nmCore).sendData(
-					nmAddress,
-					new VirtualAddress(receiverString),
-					new String("POST / HTTP/1.1\r\n\r\n").getBytes(),
-					true);
-		} catch (RemoteException e) {
+			Mockito.verify(basicTunnelService).getSenderVirtualAddressFromPath(requestShort, nmAddress);
+			Mockito.verify(basicTunnelService).getReceiverVirtualAddressFromPath(requestShort);
+			Mockito.verify(basicTunnelService).processRequest(requestShort, response, false);
+			Mockito.verify(basicTunnelService).composeResponse(nmResponse.getMessageBytes(), response);
+		} catch (Exception e) {
 			//NOP
 		}
 	}

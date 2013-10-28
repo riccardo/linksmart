@@ -3,4 +3,5 @@
    <implementation class="eu.linksmart.network.tunnel.Tunnel"/>
    <reference bind="bindNetworkManager" cardinality="1..1" interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore" name="NetworkManagerCore" policy="dynamic" unbind="unbindNetworkManager"/>
    <reference cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="static"/>
+   <reference bind="bindBasicTunnel" cardinality="1..1" interface="eu.linksmart.network.tunnel.BasicTunnelService" name="BasicTunnelService" policy="dynamic" unbind="unbindBasicTunnel"/>
 </scr:component>
