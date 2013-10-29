@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: BasicTunneling
-Bundle-SymbolicName: eu.linksmart.network.tunneling
+Bundle-SymbolicName: eu.linksmart.network.tunnel
 Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: eu.linksmart.network;version="2.0.0",

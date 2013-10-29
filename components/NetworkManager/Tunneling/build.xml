@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="SOAPTunneling" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="Tunneling" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
-	<property name="moduleName" value="eu.linksmart.network.tunneling" />
+	<property name="moduleName" value="eu.linksmart.network.tunnel" />
 	<property name="revision" value="2.0.0" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
