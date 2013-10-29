@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="Tunneling" immediate="true">
-   <implementation class="eu.linksmart.network.tunnel.Tunnel"/>
+   <implementation class="eu.linksmart.network.tunnel.standard.Tunnel"/>
    <reference bind="bindNetworkManager" cardinality="1..1" interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore" name="NetworkManagerCore" policy="dynamic" unbind="unbindNetworkManager"/>
    <reference cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="static"/>
    <reference bind="bindBasicTunnel" cardinality="1..1" interface="eu.linksmart.network.tunnel.BasicTunnelService" name="BasicTunnelService" policy="dynamic" unbind="unbindBasicTunnel"/>

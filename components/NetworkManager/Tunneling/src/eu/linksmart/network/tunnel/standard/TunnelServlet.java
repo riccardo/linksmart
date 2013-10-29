@@ -56,7 +56,8 @@ public class TunnelServlet extends HttpServlet{
 			return;
 		}
 		if(receiverVirtualAddress == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, BasicTunnelService.NO_SERVICE);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, BasicTunnelService.NO_SERVICE);
+			return;
 		}
 		//compose request and headers
 		String requestString = tunnel.getBasicTunnelService().processRequest(

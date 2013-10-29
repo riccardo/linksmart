@@ -57,7 +57,7 @@ public class GrandTunnelServlet extends HttpServlet{
 		VirtualAddress senderVirtualAddress = 
 				tunnel.getBasicTunnelService().
 				getSenderVirtualAddressFromPath(
-						request, tunnel.getNM().getVirtualAddress());
+						request, tunnel.getGrandHandlerVAD());
 		if(senderVirtualAddress == null) {
 			response.sendError(
 					HttpServletResponse.SC_BAD_REQUEST, BasicTunnelService.INVALID_VIRTUAL_ADDRESS_FORMAT);
@@ -73,7 +73,8 @@ public class GrandTunnelServlet extends HttpServlet{
 			return;
 		}
 		if(receiverVirtualAddress == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, BasicTunnelService.NO_SERVICE);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, BasicTunnelService.NO_SERVICE);
+			return;
 		}
 
 		//compose request and headers
