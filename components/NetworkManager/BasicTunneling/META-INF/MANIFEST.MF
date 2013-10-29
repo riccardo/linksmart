@@ -18,5 +18,4 @@ Import-Package: eu.linksmart.network;version="2.0.0",
  org.osgi.service.component;version="1.1.0"
 Service-Component: OSGI-INF/DS_BasicTunneling.xml
 Bundle-Vendor: Fraunhofer FIT
-Export-Package: eu.linksmart.network.tunnel,
- eu.linksmart.network.tunnel.impl
+Export-Package: eu.linksmart.network.tunnel

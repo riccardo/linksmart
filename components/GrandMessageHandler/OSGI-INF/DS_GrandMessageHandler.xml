@@ -9,4 +9,5 @@
    <reference cardinality="1..1" interface="eu.linksmart.network.routing.BackboneRouter" name="BackboneRouter" policy="static"/>
    <reference bind="bindNetworkManagerCore" cardinality="1..1" interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore" name="NetworkManagerCore" policy="dynamic" unbind="unbindNetworkManagerCore"/>
    <reference cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="static"/>
+   <reference bind="bindBasicTunnelService" cardinality="1..1" interface="eu.linksmart.network.tunnel.BasicTunnelService" name="BasicTunnelService" policy="dynamic" unbind="unbindBasicTunnelService"/>
 </scr:component>

@@ -6,9 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 
@@ -25,7 +23,6 @@ import eu.linksmart.network.Registration;
 import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.tunnel.BasicTunnelService;
-import eu.linksmart.network.tunnel.impl.BasicTunnelServiceImpl;
 import eu.linksmart.utils.Part;
 
 public class BasicTunnelServiceImplTest {
@@ -55,7 +52,7 @@ public class BasicTunnelServiceImplTest {
 		this.nmCore = mock(NetworkManagerCore.class);		
 		this.tunnel = new BasicTunnelServiceImpl();
 		this.tunnel.nmCore = this.nmCore;
-		
+
 		this.response = mock(HttpServletResponse.class);
 		this.outStream = mock(ServletOutputStream.class);
 		try {
@@ -63,14 +60,19 @@ public class BasicTunnelServiceImplTest {
 		} catch (IOException e1) {
 			//NOP
 		}
-		
+
 		this.descriptionOnly = new Part[]{new Part("DESCRIPTION", "CalculatorForBeginners")};
 		this.descNPid = new Part[]{
 				new Part("DESCRIPTION", "CalculatorForBeginners"),
 				new Part("PID", "010")};
 		this.nmAddress = new VirtualAddress(nmAddressString);
 		this.nmResponse = new NMResponse(NMResponse.STATUS_SUCCESS);
-		this.nmResponse.setMessage("Bla");
+		this.nmResponse.setMessage(
+				"HTTP/1.1 200 OK\r\n" +
+						"Content-Encoding: gzip\r\n" +
+						"Connection: Keep-Alive\r\n" +
+						"Transfer-Encoding: chunked\r\n" +
+				"Content-Type: text/html; charset=UTF-8\r\n\r\nBla");
 
 		try {
 			when(this.nmCore.getService()).thenReturn(nmAddress);
@@ -83,7 +85,7 @@ public class BasicTunnelServiceImplTest {
 		} catch (RemoteException e) {
 			//NOP
 		}
-		
+
 		try {
 			when(this.nmCore.getServiceByAttributes(any(Part[].class))).
 			thenReturn(new Registration[]{
@@ -134,7 +136,7 @@ public class BasicTunnelServiceImplTest {
 		}
 		assertEquals("POST / HTTP/1.1\r\n\r\n", requestString);
 	}
-	
+
 	/**
 	 * Check whether query provided in path is correctly parsed if query only contains description.
 	 */
@@ -153,7 +155,7 @@ public class BasicTunnelServiceImplTest {
 		}
 		assertEquals(new VirtualAddress(receiverString), receiver);
 	}
-	
+
 	/**
 	 * Check whether query provided in path is correctly parsed if query contains multiple items.
 	 */
@@ -172,7 +174,7 @@ public class BasicTunnelServiceImplTest {
 		}
 		assertEquals(new VirtualAddress(receiverString), receiver);
 	}
-	
+
 	/**
 	 * Checks whether urls with receiver address are properly parsed.
 	 */
@@ -218,7 +220,7 @@ public class BasicTunnelServiceImplTest {
 		}
 		assertEquals("GET /?wsdl HTTP/1.1\r\n", requestString);
 	}
-	
+
 	/**
 	 * Checks whether urls with receiver address are properly parsed.
 	 */
@@ -231,5 +233,19 @@ public class BasicTunnelServiceImplTest {
 			fail("Caught exception: " + e1.getMessage());
 		}
 		assertEquals("POST / HTTP/1.1\r\n\r\n", requestString);
+	}
+
+	@Test
+	/**
+	 * Checks whether the headers which are returned with the method are set in the response.
+	 */
+	public void testHeaderForwarding() {
+		this.tunnel.composeResponse(nmResponse.getMessageBytes(), response);
+
+		Mockito.verify(response).setHeader("Content-Encoding", "gzip");
+		Mockito.verify(response).setHeader("Connection", "Keep-Alive");
+		Mockito.verify(response).setHeader("Content-Encoding", "gzip");
+		Mockito.verify(response).setHeader("Content-Type", "text/html; charset=UTF-8");
+		Mockito.verify(response).setHeader("Transfer-Encoding", "chunked");
 	}
 }

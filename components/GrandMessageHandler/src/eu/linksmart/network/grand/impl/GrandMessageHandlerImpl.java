@@ -15,6 +15,7 @@ import eu.linksmart.network.grand.backbone.BackboneGrandImpl;
 import eu.linksmart.network.grand.tunnel.GrandTunnelServlet;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
+import eu.linksmart.network.tunnel.BasicTunnelService;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.backbone.data.DataEndpoint;
 import eu.linksmart.security.communication.SecurityProperty;
@@ -30,6 +31,7 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 	private BackboneRouter bbRouter = null;
 	private Registration registration = null;
 	private GrandTunnelServlet grandTunnelServlet = null;
+	private BasicTunnelService basicTunnelService;
 
 	public NetworkManagerCore getNM() {
 		return this.nmCore;
@@ -37,6 +39,10 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 	
 	public VirtualAddress getGrandHandlerVAD() {
 		return registration.getVirtualAddress();
+	}
+
+	public BasicTunnelService getBasicTunnelService() {
+		return basicTunnelService;
 	}
 
 	protected void activate(ComponentContext context) {
@@ -97,6 +103,14 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 		} catch (RemoteException e) {
 			//local invocation
 		}
+	}
+	
+	protected void bindBasicTunnelService(BasicTunnelService basicTunnelService) {
+		this.basicTunnelService = basicTunnelService;
+	}
+	
+	protected void unbindBasicTunnelService(BasicTunnelService basicTunnelService) {
+		this.basicTunnelService = null;
 	}
 
 	protected void bindNetworkManagerCore(NetworkManagerCore nmCore) {

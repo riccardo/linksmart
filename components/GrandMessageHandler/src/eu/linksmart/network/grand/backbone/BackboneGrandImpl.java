@@ -89,7 +89,7 @@ public class BackboneGrandImpl implements Backbone {
 		NMResponse resp = new NMResponse();
 
 		// Set error as default status
-		String soapMsg = "Error in SOAP tunneling receiveData";
+		String soapMsg = "Error in GrandTunneling receiveData";
 		resp.setStatus(NMResponse.STATUS_ERROR);
 		resp.setMessage(generateSoapResponse(soapMsg));
 
