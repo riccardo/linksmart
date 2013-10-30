@@ -36,6 +36,8 @@ public class GrandTunnelServletTest {
 	private String urlShort = "/0?description=\"CalculatorForBeginners\"";
 	private VirtualAddress nmAddress;
 	private String nmAddressString = "0.0.0.0";
+	private String grandMsgHandlerVadString = "0.0.0.1";
+	private VirtualAddress grandMsgHandlerVad;
 	private NMResponse nmResponse;
 	private ServletOutputStream outStream;
 	private BasicTunnelService basicTunnelService;
@@ -52,6 +54,7 @@ public class GrandTunnelServletTest {
 		this.grandMsgHandler = mock(GrandMessageHandlerImpl.class);
 
 		//init objects
+		grandMsgHandlerVad = new VirtualAddress(grandMsgHandlerVadString);
 		receiver = new VirtualAddress(receiverString);
 		nmAddress = new VirtualAddress(nmAddressString);		
 		this.tunnelServlet = new GrandTunnelServlet(this.grandMsgHandler);
@@ -61,6 +64,7 @@ public class GrandTunnelServletTest {
 
 		//mock methods
 		try{
+			when(grandMsgHandler.getGrandHandlerVAD()).thenReturn(grandMsgHandlerVad);
 			when(grandMsgHandler.getNM()).thenReturn(this.nmCore);
 			when(grandMsgHandler.getBasicTunnelService()).thenReturn(this.basicTunnelService);
 			when(basicTunnelService.getReceiverVirtualAddressFromPath(any(HttpServletRequest.class))).thenReturn(receiver);
@@ -102,7 +106,7 @@ public class GrandTunnelServletTest {
 		}
 
 		try {
-			Mockito.verify(basicTunnelService).getSenderVirtualAddressFromPath(requestShort, nmAddress);
+			Mockito.verify(basicTunnelService).getSenderVirtualAddressFromPath(requestShort, grandMsgHandlerVad);
 			Mockito.verify(basicTunnelService).getReceiverVirtualAddressFromPath(requestShort);
 			Mockito.verify(basicTunnelService).processRequest(requestShort, response, false);
 			Mockito.verify(response).sendError(any(int.class), any(String.class));
