@@ -15,7 +15,13 @@
 		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi"	rev="3.6.2" />
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi.services" rev="3.2.100" />
-		<dependency org="eu.linksmart" name="eu.linksmart.middlewareapi"	rev="2.0.0" />
+		
+		<dependency org="eu.linksmart" name="eu.linksmart.api.clients" rev="2.0.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.0.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.trustmanager" rev="2.0.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.0.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager" rev="2.0.0" />
+		
 	</dependencies>
 
 </ivy-module>
