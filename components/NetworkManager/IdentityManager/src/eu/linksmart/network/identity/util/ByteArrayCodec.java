@@ -1,4 +1,4 @@
-package eu.linksmart.utils;
+package eu.linksmart.network.identity.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,12 +11,13 @@ import java.io.ObjectOutputStream;
 /** Converts serializable objects to and from bytearrays
  * see http://stackoverflow.com/questions/2836646/java-serializable-object-to-byte-array
  * 
+ * It has to be local to the invoking class because 
+ * else it may not now the classes it is serializing.
+ * 
  * @author fit-ee
  * @version $Id$
  */
-
 public class ByteArrayCodec {
-
 	
 	/** Encodes a Serializable object to a byte array
 	 * Will throw an exception if the object is not Serializable
@@ -24,8 +25,7 @@ public class ByteArrayCodec {
 	 * @return a byte-array representation of the *serialized* object
 	 * @throws IOException
 	 */
-	public static final byte[] encodeObjectToBytes(Object o) throws IOException {
-		
+	public static final byte[] encodeObjectToBytes(Object o) throws IOException {	
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutput out = new ObjectOutputStream(bos);   
 		out.writeObject(o);

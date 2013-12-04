@@ -26,19 +26,19 @@ import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.BroadcastMessage;
-import eu.linksmart.network.VirtualAddress;
-import eu.linksmart.network.ServiceAttribute;
-import eu.linksmart.network.Registration;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.MessageDistributor;
 import eu.linksmart.network.MessageProcessor;
+import eu.linksmart.network.Registration;
+import eu.linksmart.network.ServiceAttribute;
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.identity.util.AttributeQueryParser;
 import eu.linksmart.network.identity.util.AttributeResolveFilter;
 import eu.linksmart.network.identity.util.AttributeResolveResponse;
 import eu.linksmart.network.identity.util.BloomFilterFactory;
+import eu.linksmart.network.identity.util.ByteArrayCodec;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
-import eu.linksmart.utils.ByteArrayCodec;
 import eu.linksmart.utils.Part;
 import eu.linksmart.utils.PartConverter;
 
@@ -793,7 +793,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		try {
 			if (!msg.getSenderVirtualAddress().equals(networkManagerCore.getService())) {
 				@SuppressWarnings("unchecked")
-				Set<Registration> serviceInfos = (Set<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+				ArrayList<Registration> serviceInfos = (ArrayList<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
 				if (serviceInfos != null) {
 					Iterator<Registration> i = serviceInfos.iterator();
 					while (i.hasNext()) {
@@ -1013,7 +1013,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					//#NM refactoring put list of local Services into message
 					Set<Registration> localServices = getLocalServices();
 					//only keep Service and description in sent data
-					Set<Registration> servicesToSend = new HashSet<Registration>();
+					ArrayList<Registration> servicesToSend = new ArrayList<Registration>();
 					for(Registration serviceInfo : localServices) {
 						if(serviceInfo.getDescription() != null) {
 							servicesToSend.add(
