@@ -789,11 +789,18 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		return msg;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Message processNMAdvertisement(Message msg) {
 		try {
 			if (!msg.getSenderVirtualAddress().equals(networkManagerCore.getService())) {
-				@SuppressWarnings("unchecked")
-				ArrayList<Registration> serviceInfos = (ArrayList<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+				Collection<Registration> serviceInfos = null;
+				try {
+					serviceInfos = (ArrayList<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+				} catch (ClassCastException e) {
+					LOG.trace("Could not parse advertisement. Probably received advertisement from older version of IdentityManager. Trying...");
+					serviceInfos = (HashSet<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+					LOG.trace("Succeeded using previous version.");
+				}
 				if (serviceInfos != null) {
 					Iterator<Registration> i = serviceInfos.iterator();
 					while (i.hasNext()) {
