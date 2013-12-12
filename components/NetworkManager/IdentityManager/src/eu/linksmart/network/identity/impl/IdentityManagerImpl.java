@@ -793,14 +793,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected Message processNMAdvertisement(Message msg) {
 		try {
 			if (!msg.getSenderVirtualAddress().equals(networkManagerCore.getService())) {
-				Collection<Registration> serviceInfos = null;
-				try {
-					serviceInfos = (ArrayList<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
-				} catch (ClassCastException e) {
-					LOG.trace("Could not parse advertisement. Probably received advertisement from older version of IdentityManager. Trying...");
-					serviceInfos = (HashSet<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
-					LOG.trace("Succeeded using previous version.");
-				}
+				Set<Registration> serviceInfos = (Set<Registration>) ByteArrayCodec.decodeByteArrayToObject(msg.getData());
+
 				if (serviceInfos != null) {
 					Iterator<Registration> i = serviceInfos.iterator();
 					while (i.hasNext()) {
@@ -1020,7 +1014,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 					//#NM refactoring put list of local Services into message
 					Set<Registration> localServices = getLocalServices();
 					//only keep Service and description in sent data
-					ArrayList<Registration> servicesToSend = new ArrayList<Registration>();
+					Set<Registration> servicesToSend = new HashSet<Registration>();
 					for(Registration serviceInfo : localServices) {
 						if(serviceInfo.getDescription() != null) {
 							servicesToSend.add(
