@@ -312,6 +312,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 						// response
 						// here the response message should include a message
 						// object
+						LOG.trace("Forwarding received message to " + msg.getReceiverVirtualAddress());
 						msg = sendMessageSynch(msg, msg.getSenderVirtualAddress(),
 								msg.getReceiverVirtualAddress()).getMessageObject();
 					}
@@ -423,6 +424,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				 * send message over sendMessage method of this and return
 				 * response of it
 				 */
+				LOG.trace("Forwarding received message to " + msg.getReceiverVirtualAddress());
 				return sendMessageAsynch(msg, msg.getSenderVirtualAddress(), msg.getReceiverVirtualAddress());
 			} else {
 				NMResponse response = new NMResponse();
@@ -502,6 +504,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	public NMResponse sendMessage(Message message, boolean synch) {
 		VirtualAddress senderVirtualAddress = message.getSenderVirtualAddress();
 		VirtualAddress receiverVirtualAddress = message.getReceiverVirtualAddress();
+		LOG.debug("Request to send message to " + receiverVirtualAddress + "from " + senderVirtualAddress);
 		if (synch)
 			return sendMessageSynch(message, senderVirtualAddress, receiverVirtualAddress);
 		else
@@ -738,6 +741,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		connectionManager.getLock();
 		Connection con = this.connectionManager.getConnection(receiverVirtualAddress, senderVirtualAddress);
 		if(con == null) {
+			LOG.debug("Creating connection for sender " + senderVirtualAddress + " and receiver " + receiverVirtualAddress);
 			try {
 				con = this.connectionManager.createConnection(receiverVirtualAddress, senderVirtualAddress, data);
 			} catch (Exception e) {

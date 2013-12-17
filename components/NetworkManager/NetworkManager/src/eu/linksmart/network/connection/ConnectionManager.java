@@ -273,6 +273,7 @@ public class ConnectionManager {
 		boolean isHandshakeMsg = isHandshakeMessage(data, senderVirtualAddress, receiverVirtualAddress);
 		String sessionId = null;
 		if(isHandshakeMsg) {
+			logger.trace("Received handshake message from: " + senderVirtualAddress);
 			//open message in standard way
 			Message message = 
 					MessageSerializerUtiliy.
@@ -313,6 +314,7 @@ public class ConnectionManager {
 		} else {
 			//we only start the handshake if we are the initiator of the communication
 			if(remoteEndpoint.equals(receiverVirtualAddress)) {
+				logger.debug("Starting handshake with remote endpint: " + receiverVirtualAddress);
 				do {
 					sessionId = UUID.randomUUID().toString();
 				} while(sessions.containsKey(sessionId));
@@ -324,6 +326,7 @@ public class ConnectionManager {
 					if(handshakeResults.length > 1) {
 						//the other end wished to change the session id as it already has a connection
 						sessionId = handshakeResults[1];
+						logger.trace("Remote endpoint changed session id to: " + sessionId);
 						//if we have a connection with this session id we use it also for this entities
 						if (sessions.containsKey(sessionId)) {
 							Connection dummy = new Connection(receiverVirtualAddress, senderVirtualAddress);
@@ -351,6 +354,7 @@ public class ConnectionManager {
 				//check whether the message already contains a valid session id
 				if (message.getKeySet().contains(Message.SESSION_ID_KEY)
 						&& sessions.containsKey(message.getProperty(Message.SESSION_ID_KEY))) {
+					logger.debug("Adding endpoint " + senderVirtualAddress + " to session " + message.getProperty(Message.SESSION_ID_KEY));
 					//use same connection as stored for this session id
 					Connection conn = sessions.get(message.getProperty(Message.SESSION_ID_KEY));
 					timeouts.put(conn, cal.getTime());
@@ -369,6 +373,7 @@ public class ConnectionManager {
 						//we check whether we can open message with standard settings
 						comSecMgrName = findMatchingCommunicationSecurityManager(
 								servicePolicies.get(remoteEndpoint), null, null);
+						logger.debug("Solved issue with " + senderVirtualAddress + " with NoSecurity as it is allowed");
 					} else {
 						//ignore message
 						comSecMgrName = null;
@@ -376,6 +381,9 @@ public class ConnectionManager {
 				}
 			}
 		}
+		
+		logger.debug("Selected communication method for remote party " + senderVirtualAddress + ":" + 
+				((comSecMgrName == null)?"declined":comSecMgrName));
 
 		if(comSecMgrName == null) {
 			//communication has been declined
