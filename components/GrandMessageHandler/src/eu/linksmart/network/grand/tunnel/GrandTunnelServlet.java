@@ -95,11 +95,11 @@ public class GrandTunnelServlet extends HttpServlet{
 				receiverVirtualAddress,
 				requestString.getBytes(),
 				true);
-		
+
 		if(r.getStatus() == NMResponse.STATUS_SUCCESS) {
 			int largestIndex = 0;
 			try {
-			largestIndex = Integer.parseInt(r.getMessage());
+				largestIndex = Integer.parseInt(r.getMessage());
 			} catch (NumberFormatException ne) {
 				closeSession(uuid);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ne.getMessage());
@@ -127,12 +127,13 @@ public class GrandTunnelServlet extends HttpServlet{
 			closeSession(uuid);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, r.getMessage());
 		}
-		
+
 	}
 
 	private boolean allMessagesAvailable(String uuid, int largestIndex) {
 		Vector<byte[]> mergedPackets = sessionBuffers.get(uuid);
-		if(mergedPackets.size() < largestIndex - 1 || mergedPackets.size() == 0) {
+		if(mergedPackets.size() != largestIndex + 1) {
+			logger.trace("Buffer smaller then expected largest index for uuid " + uuid);
 			return false;
 		}
 		for(int i=0; i <= largestIndex; i++) {
@@ -151,14 +152,16 @@ public class GrandTunnelServlet extends HttpServlet{
 		try {
 			//wait for delayed packets for max timeout
 			long startTime = Calendar.getInstance().getTimeInMillis();
-			boolean allMsgsAvailable = false;
+			boolean allMsgsAvailable = allMessagesAvailable(uuid, largestIndex);
 			while (Calendar.getInstance().getTimeInMillis() - startTime < GRAND_MESSAGE_RETRIEVE_TIMEOUT &&
-					!(allMsgsAvailable = allMessagesAvailable(uuid, largestIndex))) {
+					!allMsgsAvailable) {
 				try {
 					Object lock = workingThreads.get(uuid);
 					synchronized(lock) {
-						lock.wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT);
+						logger.trace("Waiting for delayed packets for uuid " + uuid);
+						lock.wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT / 2);
 					}
+					allMsgsAvailable = allMessagesAvailable(uuid, largestIndex);
 				} catch(InterruptedException e) {
 					//nothing to handle
 				}
@@ -194,7 +197,7 @@ public class GrandTunnelServlet extends HttpServlet{
 				synchronized(this) {
 					sessionBuffers.remove(uuid);
 				}
-				while(workingThreads.get(uuid).size() > 0) {
+				while(checkActivity(workingThreads.get(uuid))) {
 					try {
 						lock.wait(GRAND_MESSAGE_RETRIEVE_TIMEOUT);
 					} catch (InterruptedException e) {
@@ -207,6 +210,20 @@ public class GrandTunnelServlet extends HttpServlet{
 		} else {
 			throw new IllegalArgumentException(SESSION_CLOSED_EXCEPTION);
 		}
+	}
+
+	/**
+	 * Checks whether there are not null elements in the list.
+	 * @param linkedList
+	 * @return
+	 */
+	private boolean checkActivity(LinkedList<Integer> linkedList) {
+		for(Integer i : linkedList) {
+			if(i != null) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void receiveDataPacket(byte[] data) {
@@ -251,6 +268,7 @@ public class GrandTunnelServlet extends HttpServlet{
 				if(mergingData.size() <= index) mergingData.setSize(index + 1);
 				//set data
 				mergingData.set(index, Arrays.copyOfRange(data, bodyStartIndex, data.length));
+				logger.trace("Put packet nr " + index + " for uuid " + uuid);
 			}
 			workingThreads.get(uuid).remove((Object)boxedIndex);
 			//notify threads as they may wait for delayed packets
