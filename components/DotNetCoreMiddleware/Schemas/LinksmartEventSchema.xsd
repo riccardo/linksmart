@@ -1,0 +1,254 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="DeviceQuery" nillable="true" type="DeviceQuery" />
+  <xs:complexType name="DeviceQuery">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="DeviceId" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="DeviceIdLike" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Properties" type="ArrayOfIotProperty" />
+      <xs:element minOccurs="1" maxOccurs="1" name="OrderByAscending" type="xs:boolean" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Take" type="xs:int" />
+      <xs:element minOccurs="1" maxOccurs="1" name="After" type="xs:dateTime" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Before" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfIotProperty">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="IotProperty" nillable="true" type="IotProperty" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IotProperty">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Id" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Nspace" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="TypeReference" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="DataType" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Unit" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Observations" type="ArrayOfIotStateObservation" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfIotStateObservation">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="IotStateObservation" nillable="true" type="IotStateObservation" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IotStateObservation">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Timestamp" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservationTimestamp" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="IotProperty" nillable="true" type="IotProperty" />
+  <xs:element name="ObservationQuery" nillable="true" type="ObservationQuery" />
+  <xs:complexType name="ObservationQuery">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="SubContextLevelToBeIncluded" type="xs:int" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Starttime" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Endtime" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" name="IsStarttimeIncusive" type="xs:boolean" />
+      <xs:element minOccurs="1" maxOccurs="1" name="IsEndtimeIncusive" type="xs:boolean" />
+      <xs:element minOccurs="1" maxOccurs="1" name="WeekDay" type="xs:int" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Month" type="xs:int" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Year" type="xs:int" />
+      <xs:element minOccurs="0" maxOccurs="1" name="StartTimeOfDay" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="EndTimeOfDay" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservablePropertyId" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservablePropertyType" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="SourceId" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ContextId" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" name="ResultsCount" type="xs:int" />
+      <xs:element minOccurs="1" maxOccurs="1" name="ShouldReturnOnlyLatestValues" type="xs:boolean" />
+      <xs:element minOccurs="1" maxOccurs="1" name="ShouldExcludeEarlierVersions" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Event" nillable="true" type="Event" />
+  <xs:complexType name="Event">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="EventMeta" type="EventMeta" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Source" type="SourceType" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Content" type="ContentType" />
+      <xs:element minOccurs="0" maxOccurs="1" name="schemaVersion" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="systemsID" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" name="eventStatus" type="EventStatusCV" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EventMeta">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="EventID" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="EventType" type="ShortTokenTypeModelRef" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Timestamp" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Topic" type="ShortTokenTypeModelRef" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Comment" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ShortTokenTypeModelRef" mixed="true">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="modelRef" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SourceType">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Project" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Location" type="ShortTokenTypeModelRef" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObjectID" type="ShortTokenTypeModelRef" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ProcessID" type="ShortTokenTypeModelRef" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Properties" type="Properties" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ID" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Properties">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Any" type="ArrayOfXmlElement" />
+      <xs:element minOccurs="0" maxOccurs="1" name="modelRef" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfXmlElement">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="XmlElement" nillable="true">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:any />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ContentType">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="IotEntity" type="ArrayOfIotEntity" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfIotEntity">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="IotEntity" nillable="true" type="IotEntity" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IotEntity">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Pid" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Type" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Properties" type="ArrayOfIotProperty" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="EventStatusCV">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Production" />
+      <xs:enumeration value="Test" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="EventMeta" nillable="true" type="EventMeta" />
+  <xs:element name="ShortTokenTypeModelRef" nillable="true" type="ShortTokenTypeModelRef" />
+  <xs:element name="SourceType" nillable="true" type="SourceType" />
+  <xs:element name="Properties" nillable="true" type="Properties" />
+  <xs:element name="Observation" nillable="true" type="Observation" />
+  <xs:complexType name="Observation">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="ID" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservablePropertyType" type="ShortTokenTypeModelRef" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservableProperty" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ComplexValue" type="ComplexValue" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Timestamp" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservationTimestamp" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Properties" type="Properties" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ComplexValue">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Any" type="ArrayOfXmlElement" />
+      <xs:element minOccurs="0" maxOccurs="1" name="modelRef" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ComplexValue" nillable="true" type="ComplexValue" />
+  <xs:element name="EventStatusCV" type="EventStatusCV" />
+  <xs:element name="ContentType" nillable="true" type="ContentType" />
+  <xs:element name="EventQuery" nillable="true" type="EventQuery" />
+  <xs:complexType name="EventQuery">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="DeviceId" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="State" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" name="OrderByAscending" type="xs:boolean" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Take" type="xs:int" />
+      <xs:element minOccurs="1" maxOccurs="1" name="After" type="xs:dateTime" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Before" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="IotEventItem" nillable="true" type="IotEventItem" />
+  <xs:complexType name="IotEventItem">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="State" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Topic" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Content" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="DeviceId" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Timestamp" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ObservationDto1" nillable="true" type="ObservationDto1" />
+  <xs:complexType name="ObservationDto1">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="ContextPID" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservablePropertyPID" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="SourcePID" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ComplexValue" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Unit" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="DataType" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" name="Timestamp" type="xs:dateTime" />
+      <xs:element minOccurs="1" maxOccurs="1" name="ObservationTimestamp" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="IotEntity" nillable="true" type="IotEntity" />
+  <xs:element name="Context" nillable="true" type="Context" />
+  <xs:complexType name="Context">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Id" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Type" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Attributes" type="ArrayOfContextAttribute" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Tags" type="ArrayOfContextTag" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfContextAttribute">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ContextAttribute" nillable="true" type="ContextAttribute" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ContextAttribute">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Key" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfContextTag">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ContextTag" nillable="true" type="ContextTag" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ContextTag">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="Tag" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ModelRef" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ContextAttribute" nillable="true" type="ContextAttribute" />
+  <xs:element name="ContextTag" nillable="true" type="ContextTag" />
+  <xs:element name="IotStateObservation" nillable="true" type="IotStateObservation" />
+  <xs:element name="ContextQuery" nillable="true" type="ContextQuery" />
+  <xs:complexType name="ContextQuery">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservablePropertyId" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ObservablePropertyType" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ContextType" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="SourceId" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ContextId" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ParentContextId" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="1" name="SubContextLevelToBeIncluded" type="xs:int" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ChildContext" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ContextLike" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
