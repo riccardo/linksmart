@@ -3,8 +3,8 @@
 <project name="SecurityManagerAPI" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
-	<property name="moduleName" value="eu.linksmart.api.securitymanager" />
-	<property name="revision" value="2.0.0" />
+	<property name="moduleName" value="eu.linksmart.api.security.communication" />
+	<property name="revision" value="2.1.0" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />

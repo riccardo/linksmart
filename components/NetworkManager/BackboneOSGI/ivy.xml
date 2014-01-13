@@ -3,17 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
-	<info organisation="eu.linksmart.network.backbone" module="eu.linksmart.network.backbone.jxta" />
+	<info organisation="eu.linksmart" module="eu.linksmart.network.backbone.osgi" />
 
 	<publications>
-		<artifact name="eu.linksmart.network.backbone.jxta" type="jar" />
+		<artifact name="eu.linksmart.network.backbone.osgi" type="jar" />
 	</publications>
 
 	<dependencies>
-		<dependency org="org.mockito" name="mockito-all" rev="1.9.0-rc1" />
-		<dependency org="org.junit" name="com.springsource.org.junit" rev="4.8.1" />
-		<dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.4.0" />
-		<dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15" />
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi"	rev="3.6.2" />
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi.services" rev="3.2.100" />
 		
@@ -21,8 +17,6 @@
 		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone.router" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.securitymanager" rev="2.1.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.1.0" />
-		
 	</dependencies>
 
 </ivy-module>

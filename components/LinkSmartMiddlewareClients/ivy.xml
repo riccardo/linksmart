@@ -18,11 +18,11 @@
 		<dependency org="javax.xml.rpc" name="com.springsource.javax.xml.rpc" rev="1.1.0" />
 		<dependency org="org.apache.axis" name="com.springsource.org.apache.axis" rev="1.4.0" />
 		
-		<dependency org="eu.linksmart" name="eu.linksmart.api.clients" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.trustmanager" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.0.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.clients" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.trustmanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.1.0" />
 	</dependencies>
 
 </ivy-module>

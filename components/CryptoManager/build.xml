@@ -4,7 +4,7 @@ Local build file for the Linksmart Crypto Manager
 <project name="CryptoManager" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="moduleName" value="eu.linksmart.security.cryptomanager" />
-	<property name="revision" value="2.0.0" />
+	<property name="revision" value="2.1.0" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="lib.dir" value="${basedir}/lib" />

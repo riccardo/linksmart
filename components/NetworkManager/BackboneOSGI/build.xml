@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="TrustManagerAPI" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="BackboneOSGI" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
-	<property name="moduleName" value="eu.linksmart.api.trustmanager" />
+	<property name="moduleName" value="eu.linksmart.network.backbone.osgi" />
 	<property name="revision" value="2.1.0" />
 	<property name="src.dir" value="${basedir}/src" />
-	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
 	<property name="javadoc.dir" value="${basedir}/doc" />
@@ -22,9 +21,21 @@
 		<pathelement path="${build.dir}" />
 	</path>
 
+	<!-- Properties used for JUnit testing -->
+	<property name="test.report.dir" location="test/testreport" />
+	<property name="test.dir" value="${basedir}/test" />
+	<property name="test.build.dir" value="${basedir}/test/bin" />
+
+	<!-- Define the classpath for testing-->
+	<path id="classpath.test">
+	    <pathelement location="${test.dir}" />
+	    <pathelement location="${test.build.dir}" />
+	    <path refid="classpath" />
+	</path>
+	
 	<!-- targets -->
 
-	<!-- default target fails to encourage using the distribution build file -->
+	<!-- default target fails -->
 	<target name="fail">
 		<fail message="please use the root ant build file" />
 	</target>
@@ -32,7 +43,7 @@
 	<!-- set up local build environment -->
 	<target name="setup-local">
 		<echo message="Setting up local build environment" />
-		<property name="antlib.dir" value="${basedir}/../antlibs" />
+		
 		<path id="antlib.path">
 			<fileset dir="${antlib.dir}" includes="*.jar" />
 		</path>
@@ -49,9 +60,9 @@
 	<target name="resolve">
 		<echo message="Setting up build environment" />
 		<ivy:resolve transitive="true" />
-		<ivy:retrieve transitive="true" type="jar" pattern="${targetPlatform.dir}//[artifact]-[revision].[ext]" />
-		<ivy:retrieve transitive="true" type="jars" pattern="${targetPlatform.dir}//[artifact]-[revision].[ext]" />
-		<ivy:retrieve transitive="true" type="bundle" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="jar" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="jars" pattern="${targetPlatform.dir}/[artifact]-[revision].[ext]" />
+		<ivy:retrieve transitive="true" type="bundle" pattern="${targetPlatform}/[artifact]-[revision].[ext]" />
 	</target>
 
 	<!-- build -->
@@ -83,19 +94,36 @@
 	</target>
 
 	<!-- make -->
-	<target name="make" depends="jar,publish">
+	<target name="make" depends="jar,publish,junit">
 		<echo message="Compiled from: ${basedir}" />
 		<echo message="Compiled to: ${build.dir}" />
 		<echo message="Published as: ${rootDistributionDir}/${moduleName}-${revision}.jar" />
 	</target>
+	
+	<!-- Compiles the java code of the tests-->
+	<target name="buildTest" depends="resolve">
+	    <echo message="Compiling Tests"/>
+	    <delete dir="${test.build.dir}"/>
+	    <mkdir dir="${test.build.dir}"/>
+	    <javac srcdir="${test.dir}" destdir="${test.build.dir}">
+	        <classpath refid="classpath" />
+	    </javac>
+	</target>
 
-	<!-- javadoc -->
-	<target name="javadoc">
-		<javadoc access="public" destdir="${javadoc.dir}" author="true" version="true" use="true" windowtitle="TrustManager API">
-			<fileset dir="${src.dir}" defaultexcludes="yes">
-				<include name="**/*.java" />
-			</fileset>
-		</javadoc>
+	<!-- Executes the Unit-Tests -->
+	<target name="junit" depends="buildTest">
+	    <echo message="Testing"/>
+	    <delete dir="${test.report.dir}"/>
+	    <mkdir dir="${test.report.dir}"/>
+	    <junit printsummary="on" haltonfailure="yes">
+	        <classpath refid="classpath.test" />
+	        <formatter type="xml" />
+	        <batchtest todir="${test.report.dir}">
+	            <fileset dir="${test.dir}">
+	            <include name="**/*Test*.java" />
+	            </fileset>
+	    </batchtest>
+	    </junit>
 	</target>
 
 	<!-- clean -->

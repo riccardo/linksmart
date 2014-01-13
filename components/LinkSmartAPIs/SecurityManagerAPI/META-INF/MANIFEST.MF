@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Security Manager API
-Bundle-SymbolicName: eu.linksmart.api.securitymanager
-Bundle-Version: 2.0.0
+Bundle-SymbolicName: eu.linksmart.api.security.communication
+Bundle-Version: 2.1.0
 Bundle-Vendor: FIT
-Import-Package: eu.linksmart.network;version="2.0.0",
+Import-Package: eu.linksmart.network;version="2.1.0",
  org.osgi.framework,
  org.osgi.service.cm
 Bundle-ClassPath: .
-Export-Package: eu.linksmart.security.communication;version="2.0.0"
+Export-Package: eu.linksmart.security.communication;version="2.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -41,15 +41,15 @@
 		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.ds" rev="1.2.1.R36x_v20100803" />
 		<dependency org="org.eclipse.equinox" name="org.eclipse.equinox.util" rev="1.0.200.v20100503" />
 		
-		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone.router" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.identitymanager" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager.core" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.securitymanager" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.cryptomanager" rev="2.0.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.trustmanager" rev="2.0.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone.router" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.identitymanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager.core" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.securitymanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.cryptomanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.trustmanager" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.0.0" />
 	</dependencies>
 

@@ -2,17 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: NetworkManager
 Bundle-SymbolicName: eu.linksmart.network.networkmanager
-Bundle-Version: 2.0.0
-Import-Package: eu.linksmart.network;version="2.0.0",
- eu.linksmart.network.backbone;version="2.0.0",
- eu.linksmart.network.identity;version="2.0.0",
- eu.linksmart.network.networkmanager;version="2.0.0",
- eu.linksmart.network.networkmanager.core;version="2.0.0",
- eu.linksmart.network.routing;version="2.0.0",
- eu.linksmart.security.communication;version="2.0.0",
- eu.linksmart.security.cryptomanager;version="2.0.0",
- eu.linksmart.security.trustmanager;version="1.1.0",
- eu.linksmart.utils;version="2.0.0",
+Bundle-Version: 2.1.0
+Import-Package: eu.linksmart.network;version="2.1.0",
+ eu.linksmart.network.backbone;version="2.1.0",
+ eu.linksmart.network.identity;version="2.1.0",
+ eu.linksmart.network.networkmanager;version="2.1.0",
+ eu.linksmart.network.networkmanager.core;version="2.1.0",
+ eu.linksmart.network.routing;version="2.1.0",
+ eu.linksmart.security.communication;version="2.1.0",
+ eu.linksmart.security.cryptomanager;version="2.1.0",
+ eu.linksmart.security.trustmanager;version="2.1.0",
+ eu.linksmart.utils;version="2.1.0",
  javax.servlet;version="2.4.0",
  javax.servlet.http;version="2.4.0",
  javax.servlet.resources;version="2.4.0",

@@ -3,10 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
-	<info organisation="eu.linksmart" module="eu.linksmart.api.securitymanager" />
+	<info organisation="eu.linksmart" module="eu.linksmart.api.security.communication" />
 
 	<publications>
-		<artifact name="eu.linksmart.api.securitymanager" type="jar" />
+		<artifact name="eu.linksmart.api.security.communication" type="jar" />
 	</publications>
 
 	<dependencies>

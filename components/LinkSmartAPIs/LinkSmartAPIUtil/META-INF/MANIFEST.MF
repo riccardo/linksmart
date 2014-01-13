@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: LinkSmart Utils API
 Bundle-SymbolicName: eu.linksmart.api.utils
-Bundle-Version: 2.0.0
+Bundle-Version: 2.1.0
 Bundle-Vendor: FIT
 Import-Package: org.apache.log4j,
  org.osgi.framework,
  org.osgi.service.cm
 Bundle-ClassPath: .
-Export-Package: eu.linksmart.utils;version="2.0.0"
+Export-Package: eu.linksmart.utils;version="2.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

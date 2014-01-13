@@ -4,7 +4,7 @@
 
 	<!-- properties -->
 	<property name="moduleName" value="eu.linksmart.network.identitymanager" />
-	<property name="revision" value="2.0.0" />
+	<property name="revision" value="2.1.0" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
