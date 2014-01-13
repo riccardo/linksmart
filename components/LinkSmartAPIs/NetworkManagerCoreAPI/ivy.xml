@@ -15,7 +15,7 @@
 		
 		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager" rev="2.1.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.securitymanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.security.communication" rev="2.1.0" />
 	</dependencies>
 
 </ivy-module>

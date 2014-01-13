@@ -14,7 +14,7 @@
 		<dependency org="org.eclipse.osgi" name="org.eclipse.osgi" rev="3.6.2" />
 		
 		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.1.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.securitymanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.security.communication" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone" rev="2.1.0" />
 	</dependencies>
 
