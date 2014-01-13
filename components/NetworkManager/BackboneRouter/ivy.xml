@@ -19,7 +19,7 @@
 		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.backbone.router" rev="2.1.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.securitymanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.security.communication" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager.core" rev="2.1.0" />
