@@ -246,15 +246,16 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 					conn = getConnection(myVirtualAddress, senderVirtualAddress, data);
 					//no common connection parameters could be established with the other end
 					if(conn == null) {
+						NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
 						if(this.connectionManager.isHandshakeMessage(
 								data, senderVirtualAddress, receiverVirtualAddress)) {
-							return this.connectionManager.getDeclineHandshakeMessage(
+							response = this.connectionManager.getDeclineHandshakeMessage(
 									senderVirtualAddress, getService());
 						} else {
-							NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
-							response.setMessage(COMMUNICATION_PARAMETERS_ERROR);
-							return response;
+							response = createErrorMessage(receiverVirtualAddress, senderVirtualAddress,
+									COMMUNICATION_PARAMETERS_ERROR, ErrorMessage.ERROR, null); 
 						}
+						return response;
 					}
 				}
 			} catch (Exception e) {
@@ -264,8 +265,11 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 								e);
 				NMResponse response = new NMResponse();
 				response.setStatus(NMResponse.STATUS_ERROR);
-				response.setMessage("Error getting connection for services: "
-						+ senderVirtualAddress.toString() + " " + myVirtualAddress.toString());
+				String errorMsg = "Error getting connection for services: "
+						+ senderVirtualAddress.toString() + " " + myVirtualAddress.toString();
+				response = createErrorMessage( 
+						receiverVirtualAddress,
+						senderVirtualAddress, errorMsg, ErrorMessage.RECEPTION_ERROR, null);
 				return response;
 			}
 
@@ -275,7 +279,15 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			if(msg instanceof ErrorMessage) {
 				NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
 				if(msg.getData() != null) {
-					response.setMessage(new String(msg.getData()));
+					response.setBytesPrimary(true);
+					try {
+						response.setMessageBytes(conn.processMessage(msg));
+					} catch (Exception e) {
+						response = createErrorMessage(
+								receiverVirtualAddress, 
+								senderVirtualAddress,
+								new String(msg.getData()), msg.getTopic(), conn);
+					}
 				}
 				return response;
 			}
@@ -301,9 +313,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				 */
 				if (msg.getReceiverVirtualAddress() == null) {
 					LOG.warn("Received a message which has not been processed");
-					NMResponse response = new NMResponse();
-					response.setStatus(NMResponse.STATUS_ERROR);
-					response.setMessage("Received a message which has not been processed");
+					NMResponse response = createErrorMessage(
+							receiverVirtualAddress, senderVirtualAddress,
+							"Received a message which has not been processed",
+							ErrorMessage.RECEPTION_ERROR, conn);
 					return response;
 				} else {
 					// if this is not the response first forward it
@@ -324,11 +337,16 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 							nmresp.setBytesPrimary(true);
 							nmresp.setMessageBytes(conn.processMessage(msg));
 						} catch (Exception e) {
-							nmresp.setStatus(NMResponse.STATUS_ERROR);
+							nmresp = createErrorMessage(
+									receiverVirtualAddress, senderVirtualAddress,
+									"Error receiving message: " + e.getMessage(),
+									ErrorMessage.ERROR, conn);
 						}
 					} else {
-						nmresp.setStatus(NMResponse.STATUS_ERROR);
-						nmresp.setMessage("Error in processing request");
+						nmresp = createErrorMessage(
+								receiverVirtualAddress, senderVirtualAddress,
+								"Error processing message",
+								ErrorMessage.ERROR, conn);
 					}
 					return nmresp;
 				}
@@ -752,5 +770,38 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			}
 		}
 		return con;
+	}
+
+	/**
+	 * 
+	 * @param senderVirtualAddress
+	 * @param receiverVirtualAddress
+	 * @param errorMessage
+	 * @param errorType
+	 * @param conn
+	 * @return
+	 */
+	private NMResponse createErrorMessage (
+			VirtualAddress senderVirtualAddress,
+			VirtualAddress receiverVirtualAddress,
+			String errorMessage, String errorType, Connection conn) {
+		ErrorMessage error = new ErrorMessage(
+				errorType, 
+				senderVirtualAddress,
+				receiverVirtualAddress,
+				errorMessage.getBytes());
+		NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
+		response.setBytesPrimary(true);
+		if(conn == null) {
+			response.setMessageBytes(error.getData());
+		} else {
+			try {
+				response.setMessageBytes(conn.processMessage(error));
+			} catch (Exception e) {
+				response.setMessageBytes(error.getData());
+			}
+		}
+
+		return response;
 	}
 }
