@@ -17,6 +17,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.linksmart.network.ErrorMessage;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.Registration;
@@ -186,11 +187,17 @@ public class NetworkManagerCoreImplTest {
 
 		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
 		Connection connection = mock(Connection.class);
+		ErrorMessage errorMsg = new ErrorMessage(
+				ErrorMessage.RECEPTION_ERROR,
+				nmCoreImpl.myVirtualAddress, senderVirtualAddress,
+				NetworkManagerCoreImpl.UNPROCESSED_MSG.getBytes());
 		try {
 			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress))).
 			thenReturn(connection);
 			when(connection.processData(eq(senderVirtualAddress), any(VirtualAddress.class), any(byte[].class))).
 			thenReturn(new Message(topic, senderVirtualAddress, null, data));
+			when(connection.processMessage(eq(errorMsg))).
+			thenReturn("testdata".getBytes());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception occured " +e);
@@ -210,7 +217,8 @@ public class NetworkManagerCoreImplTest {
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
 				NMResponse.STATUS_ERROR, response.getStatus());
-		assertEquals("Received a message which has not been processed", response.getMessage());
+		//the mock returns testdata as answer when invoked
+		assertEquals("testdata", response.getMessage());
 	}
 
 	/**

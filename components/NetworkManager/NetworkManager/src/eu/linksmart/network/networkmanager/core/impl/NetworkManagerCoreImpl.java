@@ -50,6 +50,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	private static final String STARTING_MESSAGE = "Starting"
 			+ NETWORK_MGR_CORE;
 	private static final String COMMUNICATION_PARAMETERS_ERROR = "Could not establish common communication parameters with remote endpoint";
+	protected static final String UNPROCESSED_MSG = "Received a message which has not been processed";
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
 	private static String NETWORK_MGR_ENDPOINT = "http://localhost:9090/cxf/services/NetworkManager";
@@ -312,10 +313,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 				 * has not been processed drop it
 				 */
 				if (msg.getReceiverVirtualAddress() == null) {
-					LOG.warn("Received a message which has not been processed");
+					LOG.warn(UNPROCESSED_MSG);
 					NMResponse response = createErrorMessage(
-							receiverVirtualAddress, senderVirtualAddress,
-							"Received a message which has not been processed",
+							getVirtualAddress(), senderVirtualAddress,
+							UNPROCESSED_MSG,
 							ErrorMessage.RECEPTION_ERROR, conn);
 					return response;
 				} else {
