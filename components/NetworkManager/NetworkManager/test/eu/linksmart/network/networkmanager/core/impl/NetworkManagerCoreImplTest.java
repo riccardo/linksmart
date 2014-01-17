@@ -26,6 +26,7 @@ import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.connection.BroadcastConnection;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
+import eu.linksmart.network.connection.MessageSerializerUtiliy;
 import eu.linksmart.network.connection.NOPConnection;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.routing.BackboneRouter;
@@ -321,6 +322,10 @@ public class NetworkManagerCoreImplTest {
 
 		nmCoreImpl.connectionManager = mock(ConnectionManager.class);
 		Connection connection = mock(Connection.class);
+		ErrorMessage errorMsg = new ErrorMessage(
+				ErrorMessage.RECEPTION_ERROR,
+				nmCoreImpl.myVirtualAddress, senderVirtualAddress,
+				NetworkManagerCoreImpl.UNPROCESSED_MSG.getBytes());
 		try {
 			when(nmCoreImpl.connectionManager.getBroadcastConnection(eq(senderVirtualAddress))).
 			thenReturn(connection);
@@ -345,12 +350,7 @@ public class NetworkManagerCoreImplTest {
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
 				NMResponse.STATUS_ERROR, response.getStatus());
-		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" +
-				"<!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">\r\n" +
-				"<properties>\r\n" +
-				"<entry key=\"applicationData\">UmVjZWl2ZWQgYSBtZXNzYWdlIHdoaWNoIGhhcyBub3QgYmVlbiBwcm9jZXNzZWQ=</entry>\r\n" +
-				"<entry key=\"topic\">ReceptionError</entry>\r\n" +
-				"</properties>\r\n", response.getMessage());
+		assertEquals(new String(MessageSerializerUtiliy.serializeMessage(errorMsg, true, false)), response.getMessage());
 	}
 
 	/**
