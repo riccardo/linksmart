@@ -21,6 +21,7 @@ import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.connection.Connection;
 import eu.linksmart.network.connection.ConnectionManager;
+import eu.linksmart.network.connection.MessageSerializerUtiliy;
 import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
@@ -794,12 +795,12 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		NMResponse response = new NMResponse(NMResponse.STATUS_ERROR);
 		response.setBytesPrimary(true);
 		if(conn == null) {
-			response.setMessageBytes(error.getData());
+			response.setMessageBytes(MessageSerializerUtiliy.serializeMessage(error, false, true));
 		} else {
 			try {
 				response.setMessageBytes(conn.processMessage(error));
 			} catch (Exception e) {
-				response.setMessageBytes(error.getData());
+				response.setMessageBytes(MessageSerializerUtiliy.serializeMessage(error, false, true));
 			}
 		}
 

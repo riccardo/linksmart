@@ -345,7 +345,12 @@ public class NetworkManagerCoreImplTest {
 		// Check if the response is as expected
 		assertEquals("The request was not successful.",  
 				NMResponse.STATUS_ERROR, response.getStatus());
-		assertEquals("Received a message which has not been processed", response.getMessage());
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" +
+				"<!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">\r\n" +
+				"<properties>\r\n" +
+				"<entry key=\"applicationData\">UmVjZWl2ZWQgYSBtZXNzYWdlIHdoaWNoIGhhcyBub3QgYmVlbiBwcm9jZXNzZWQ=</entry>\r\n" +
+				"<entry key=\"topic\">ReceptionError</entry>\r\n" +
+				"</properties>\r\n", response.getMessage());
 	}
 
 	/**

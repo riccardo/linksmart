@@ -822,19 +822,22 @@ public class ConnectionManager {
 				tempCon = c;
 			}
 		}
+		ErrorMessage errorMsg = 
+			new ErrorMessage(
+					ErrorMessage.TOPIC_CONNECTION_HANDSHAKE,
+					senderVirtualAddress, receiverVirtualAddress, 
+					declineMessage.getBytes());
 		if(tempCon != null) {
-			ErrorMessage errorMsg = 
-					new ErrorMessage(
-							ErrorMessage.TOPIC_CONNECTION_HANDSHAKE,
-							senderVirtualAddress, receiverVirtualAddress, 
-							declineMessage.getBytes());
 			try {
-				resp.setMessage(new String(tempCon.processMessage(errorMsg)));
+				resp.setBytesPrimary(true);
+				resp.setMessageBytes(tempCon.processMessage(errorMsg));
 			} catch (Exception e) {
-				resp.setMessage(declineMessage);
+				resp.setBytesPrimary(true);
+				resp.setMessageBytes(MessageSerializerUtiliy.serializeMessage(errorMsg, true, true));
 			}
 		} else {
-			resp.setMessage(declineMessage);
+			resp.setBytesPrimary(true);
+			resp.setMessageBytes(MessageSerializerUtiliy.serializeMessage(errorMsg, true, true));
 		}
 		return resp;
 	}
