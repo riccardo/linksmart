@@ -50,7 +50,7 @@
 		<dependency org="eu.linksmart" name="eu.linksmart.api.security.communication" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.cryptomanager" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.trustmanager" rev="2.1.0" />
-		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.0.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.1.0" />
 	</dependencies>
 
 </ivy-module>
