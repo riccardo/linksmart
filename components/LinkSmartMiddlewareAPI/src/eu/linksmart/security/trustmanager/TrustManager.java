@@ -39,7 +39,7 @@ import java.rmi.RemoteException;
  * This interface describes a web service for checking tokens with the Trust
  * Manager, to be used as a web service.
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * 
  */

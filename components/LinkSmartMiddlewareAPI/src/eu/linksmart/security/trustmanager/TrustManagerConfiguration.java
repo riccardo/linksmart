@@ -36,7 +36,7 @@ package eu.linksmart.security.trustmanager;
 /**
  * This interface describes the Trust Manager configuration interface.
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * 
  */
