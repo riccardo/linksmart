@@ -74,7 +74,7 @@ import eu.linksmart.security.communication.CryptoException;
 
 /**
  * 
- * @author Junaid Khan, Julian Sch�tte
+ * @author Junaid Khan, Julian Schuette
  * 
  */
 public class InsideHydraSecLib implements InsideHydra {

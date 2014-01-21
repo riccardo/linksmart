@@ -48,7 +48,7 @@ import eu.linksmart.security.trustmanager.util.Util;
  * Different Trust Models can be registered and removed here. This class is
  * implemented as a Singleton in order to ensure only one of these exists.
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  */
 public final class TrustModelRegistry {

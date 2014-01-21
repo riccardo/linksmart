@@ -97,7 +97,7 @@ import sun.security.rsa.RSAKeyPairGenerator;
 /**
  * Class for managing the keystore and creating cryptographic keys. <p>
  * 
- * @author Julian Sch�tte
+ * @author Julian Schuette
  * 
  */
 public class KeyManagerImpl implements KeyManager {
