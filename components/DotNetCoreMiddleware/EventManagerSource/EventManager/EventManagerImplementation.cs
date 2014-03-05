@@ -95,6 +95,8 @@ namespace EventManager
     [ServiceBehavior(Name = "EventManagerImplementation", Namespace = "http://eventmanager.linksmart.eu", IncludeExceptionDetailInFaults=true)]
     public partial class EventManagerImplementation : EventManagerPort, IEventManager20
     {
+        public static int SubscriberTimeout = Properties.Settings.Default.SubscriberTimeout; // 5000
+
         private readonly string XMLEVENT = "###XMLEVENT###";
         EventStorage.EventStorage ess = new EventStorage.EventStorage();
         /// <summary>
@@ -308,8 +310,10 @@ namespace EventManager
         {
             // Create a local event to use internally and store this in the eventstore
             Components.LinkSmartEvent publishedEvent = new Components.LinkSmartEvent(request.topic, request.in1);
-            var store = new EventStorage.EventStorage();
-            store.storeEvent(publishedEvent);
+            
+            // Disabled due to performance and threading issues in SQLite 20140305 MAAX
+            //var store = new EventStorage.EventStorage();
+            //store.storeEvent(publishedEvent);
 
             PublishEvent(publishedEvent);
 

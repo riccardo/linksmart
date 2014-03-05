@@ -74,11 +74,17 @@ namespace WindowsEventManager
                 buttonStop.Enabled = true;
                 var writer = new TextBoxStreamWriter(textBoxEmOutput);
                 // Redirect the out Console stream
+                consoleOutcheckBox.Checked = true;
                 Console.SetOut(writer);
                 EventManagerImplementation.AddressChanged += new EventHandler<EventManagerImplementation.EmAddressEventArgs>(EventManagerImplementation_AddressChanged);
                 EventManagerImplementation.HidChanged += new EventHandler<EventManagerImplementation.EmHidEventArgs>(EventManagerImplementation_HidChanged);
                 EventManagerImplementation.Start();
                 textBoxDescription.Text = EventManagerImplementation.Description;
+                var stdOut = new StreamWriter(Console.OpenStandardOutput());
+                stdOut.AutoFlush = true;
+                Console.SetOut(stdOut);
+                consoleOutcheckBox.Checked = false;
+          
             }
         }
 
@@ -152,6 +158,23 @@ namespace WindowsEventManager
             string result = regex.Replace(this.textBoxEmOutput.Text, "");
             this.textBoxEmOutput.Text = result;
             
+        }
+
+        private void consoleOutcheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (consoleOutcheckBox.Checked)
+            {
+                var writer = new TextBoxStreamWriter(textBoxEmOutput);
+                Console.SetOut(writer);
+                Console.Out.WriteLine("Directing log to output window. Disable this during normal operation.");
+            }
+            else
+            {
+                Console.Out.WriteLine("Disabling output.");
+                var stdOut = new StreamWriter(Console.OpenStandardOutput());
+                stdOut.AutoFlush = true;
+                Console.SetOut(stdOut);
+            }
         }
 
       

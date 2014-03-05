@@ -45,6 +45,7 @@
             this.buttonClearSubscriptions = new System.Windows.Forms.Button();
             this.buttonCleanEvents = new System.Windows.Forms.Button();
             this.textBoxRegEx = new System.Windows.Forms.TextBox();
+            this.consoleOutcheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -203,11 +204,24 @@
             this.textBoxRegEx.TabIndex = 17;
             this.textBoxRegEx.Text = "###.*###[\\r|\\n]";
             // 
+            // consoleOutcheckBox
+            // 
+            this.consoleOutcheckBox.AutoSize = true;
+            this.consoleOutcheckBox.Location = new System.Drawing.Point(205, 374);
+            this.consoleOutcheckBox.Name = "consoleOutcheckBox";
+            this.consoleOutcheckBox.Size = new System.Drawing.Size(135, 17);
+            this.consoleOutcheckBox.TabIndex = 18;
+            this.consoleOutcheckBox.Tag = "Keep this disabled during operation";
+            this.consoleOutcheckBox.Text = "Enable Console Output";
+            this.consoleOutcheckBox.UseVisualStyleBackColor = true;
+            this.consoleOutcheckBox.CheckedChanged += new System.EventHandler(this.consoleOutcheckBox_CheckedChanged);
+            // 
             // EventManagerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(775, 434);
+            this.Controls.Add(this.consoleOutcheckBox);
             this.Controls.Add(this.textBoxRegEx);
             this.Controls.Add(this.buttonCleanEvents);
             this.Controls.Add(this.buttonClearSubscriptions);
@@ -253,6 +267,7 @@
         private System.Windows.Forms.Button buttonClearSubscriptions;
         private System.Windows.Forms.Button buttonCleanEvents;
         private System.Windows.Forms.TextBox textBoxRegEx;
+        private System.Windows.Forms.CheckBox consoleOutcheckBox;
     }
 }
 

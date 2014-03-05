@@ -152,9 +152,11 @@ namespace EventManager
                 //double emVersion = 2;
                 if (emVersion < 2.0)
                 {
-                    eventSubscriberService.Url = GetEventSubscriberServiceUrl(subscription);
-                    try
+                      try
                     {
+                        eventSubscriberService.Url = GetEventSubscriberServiceUrl(subscription);
+                        eventSubscriberService.Timeout = EventManagerImplementation.SubscriberTimeout; 
+                 
                         SubscriberInterface.Part[] parts = CopyPartArray(request.Parts.ToArray());
                         eventSubscriberService.notify(request.Topic, parts, out notifyResult, out notifyResultSpecified);
                         //subscription.Parts = request.Parts.ToArray();
@@ -167,7 +169,7 @@ namespace EventManager
                     catch (Exception e)
                     {
                         //Console.WriteLine(e.Message + e.StackTrace);
-                        Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber is overloaded, or the subscriber service does not fulfill the notify contract! ");
+                        Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! ");
                         subscription.NotifyFailed();
                         retryQueue.queue(subscription, request); 
                         Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
@@ -175,9 +177,11 @@ namespace EventManager
                 }
                 else if (emVersion >= 2.0) {
                     bool? notifyResultNullable = false;
-                    eventSubscriberService20.Url = GetEventSubscriberServiceUrl(subscription);
-                    try
+                     try
                     {
+                        eventSubscriberService20.Url = GetEventSubscriberServiceUrl(subscription);
+                        eventSubscriberService20.Timeout = EventManagerImplementation.SubscriberTimeout;
+                
                         SubscriberInterface20.Part[] parts = CopyPart20Array(request.Parts.ToArray());
                         eventSubscriberService20.notify(request.Topic, parts, out notifyResultNullable, out notifyResultSpecified);
                         //subscription.Parts = request.Parts.ToArray();
@@ -189,7 +193,7 @@ namespace EventManager
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber is overloaded, or the subscriber service does not fulfill the notify contract! ");
+                        Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! ");
                         subscription.NotifyFailed();
                         retryQueue.queue(subscription, request); 
                         Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
@@ -201,27 +205,27 @@ namespace EventManager
 
         public void eventNotification(Components.Subscription subscription, string xmlEventString, EventFormat eventFormat)
         {
-            bool? notifyResult = false;
+            bool notifyResult = false;
             bool notifyResultSpecified = false;
 
             lock (this)
             {
-                //eventSubscriberService.Url = GetEventSubscriberServiceUrl(subscription);
-                eventSubscriberService20.Url = GetEventSubscriberServiceUrl(subscription);
                 try
                 {
-                    eventSubscriberService20.notifyXmlEvent(xmlEventString, out notifyResult, out notifyResultSpecified);
+                    eventSubscriberService.Url = GetEventSubscriberServiceUrl(subscription);
+                    eventSubscriberService.Timeout = EventManagerImplementation.SubscriberTimeout; ;
+             
+                    eventSubscriberService.notifyXmlEvent(xmlEventString, out notifyResult, out notifyResultSpecified);
                     //subscription.Parts = request.in1;
                     //es.storeEvent(subscription);
                     Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                     //eventSubscriberService.notifyXmlEventAsync(xmlEventString);
                     subscription.NotifyWasSuccessful();
                 }
-                catch { 
-                    //retryQueue.queue(subscription, request); 
+                catch {
+                    Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! ");
                     subscription.NotifyFailed();
-                    Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description)))); 
-                }
+                    }
             }
         }
 
@@ -244,6 +248,11 @@ namespace EventManager
 
                 eventSubscriberServiceUrl = EventManagerImplementation.GetNetworkManagerLocalEndpointForDescription(subscription.Description);
                 System.Net.ServicePointManager.Expect100Continue = false;
+                if (string.IsNullOrEmpty(eventSubscriberServiceUrl))
+                {
+                    throw new Exception("Description not found in Network Manager: " + subscription.Description);
+                }
+                
             }
             else { Console.WriteLine("Faulty address"); }
             return eventSubscriberServiceUrl;

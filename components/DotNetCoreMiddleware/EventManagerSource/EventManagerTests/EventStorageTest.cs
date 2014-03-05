@@ -25,7 +25,7 @@ namespace EventManagerTests
 
 
         [Test]
-        public void StoreAndRetireve()
+        public void StoreAndRetrieve()
         {
             string topic = "test";
             Part[] parts = new Part[] {new Part() {key="1",value="a"}, new Part() {key="2",value="b"} };
@@ -110,9 +110,28 @@ namespace EventManagerTests
             };
 
             EventStorage.SubscriptionStore.Store.AddFailedNotification(s, e1);
+        }
 
+        [Test]
+        public void TryThread()
+        {
+            
+            
+            Thread t1 = new Thread(new ThreadStart(CallEsStore));
+            t1.Start();
+            Thread t2 = new Thread(new ThreadStart(CallEsStore));
+            t2.Start();
+            Thread.Sleep(5000);
+           
+        }
 
-
+        public void CallEsStore()
+        {
+            string topic = "test";
+            Part[] parts = new Part[] { new Part() { key = "1", value = "a" }, new Part() { key = "2", value = "b" } };
+            LinkSmartEvent e = new LinkSmartEvent(topic, parts);
+            EventStorage.EventStorage store = new EventStorage.EventStorage();
+            e = store.storeEvent(e);
         }
        
     }
