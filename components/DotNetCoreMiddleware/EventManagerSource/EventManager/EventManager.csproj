@@ -57,6 +57,10 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=4.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -86,9 +90,13 @@
     <Compile Include="EventManagerPortService.cs" />
     <Compile Include="EventManagerPort.2.cs" />
     <Compile Include="JSONServer.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Notification.cs" />
     <Compile Include="Operations.cs" />
     <Compile Include="Program.cs" />
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ProgramHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -240,6 +248,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="log4net.dll" />
     <Content Include="Newtonsoft.Json.dll" />
     <Content Include="Newtonsoft.Json.xml" />
   </ItemGroup>

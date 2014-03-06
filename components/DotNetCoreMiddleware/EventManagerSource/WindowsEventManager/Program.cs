@@ -3,8 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
+using EventManager;
+using System.Threading;
+
 namespace WindowsEventManager
 {
+
+
+
+
+
     static class Program
     {
         /// <summary>
@@ -13,11 +21,31 @@ namespace WindowsEventManager
         [STAThread]
         static void Main()
         {
-            //We have to have it in the main function because the DLL gets loaded before we can add the HandleUnresolvedAssemblies in SubscriptionStore
-            AssemblyResolver.HandleUnresovledAssemblies();
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new EventManagerForm());
+            try
+            {
+                //We have to have it in the main function because the DLL gets loaded before we can add the HandleUnresolvedAssemblies in SubscriptionStore
+                AssemblyResolver.HandleUnresovledAssemblies();
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.ThreadException += new ThreadExceptionEventHandler(ExceptionHandlingMethod);
+                AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandlingMethod);
+
+                Application.Run(new EventManagerForm());
+            }
+            catch (Exception fatal)
+            {
+                Log.Fatal("Uncaught Exception in Event Manager Main", fatal);
+            }
+        }
+
+        private static void ExceptionHandlingMethod(object sender, EventArgs t)
+        {
+            if (t.GetType().Equals(typeof(ThreadExceptionEventArgs))) {
+                Log.Fatal("Unhandled Exception in Event Manager ", ((ThreadExceptionEventArgs)t).Exception);
+            } else {
+                Log.Fatal("Unhandled Exception in Event Manager  " + ((UnhandledExceptionEventArgs)t).ExceptionObject.ToString());
+            }
+            
         }
     }
 
@@ -45,7 +73,7 @@ namespace WindowsEventManager
                 }
 
                 path = Path.Combine(path, "System.Data.SQLite.dll");
-                System.Console.WriteLine("Path:" + path);
+                Log.Debug("Path:" + path);
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.LoadFrom(path);
                 return assembly;
             }

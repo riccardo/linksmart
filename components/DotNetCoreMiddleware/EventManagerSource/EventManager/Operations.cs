@@ -105,14 +105,14 @@ namespace EventManager
             EventManagerImplementation.subscriptionList.Add(subscription);
             if (!string.IsNullOrEmpty(subscription.HID))
             {
-                Console.WriteLine("Subscribe:\nTopic: {0}\nHid: {1}\nPriority: {2}", subscription.Topic, subscription.HID, subscription.Priority);
+                Log.Debug(string.Format("Subscribe:\nTopic: {0}\nHid: {1}\nPriority: {2}", subscription.Topic, subscription.HID, subscription.Priority));
             }
             else if (!string.IsNullOrEmpty(subscription.Endpoint)) 
             {
-                Console.WriteLine("Subscribe:\nTopic: {0}\nEndpoint: {1}\nPriority: {2}", subscription.Topic, subscription.Endpoint, subscription.Priority);
+                Log.Debug(string.Format("Subscribe:\nTopic: {0}\nEndpoint: {1}\nPriority: {2}", subscription.Topic, subscription.Endpoint, subscription.Priority));
             }
             else if (!string.IsNullOrEmpty(subscription.Description)) {
-                Console.WriteLine("Subscribe:\nTopic: {0}\nDescription: {1}\nPriority: {2}", subscription.Topic, subscription.Description, subscription.Priority);
+               Log.Debug(string.Format("Subscribe:\nTopic: {0}\nDescription: {1}\nPriority: {2}", subscription.Topic, subscription.Description, subscription.Priority));
             }
             
         }
@@ -162,17 +162,17 @@ namespace EventManager
                         //subscription.Parts = request.Parts.ToArray();
                         //es.storeEvent(subscription);
                         // to many logging. maybe change this to Log4Net in the future.
-                        //Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                        //Log.Debug(("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                         //eventSubscriberService.notifyAsync(request.topic, parts);
                         subscription.NotifyWasSuccessful();
                     }
                     catch (Exception e)
                     {
-                        //Console.WriteLine(e.Message + e.StackTrace);
-                        Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! ");
+                        //Log.Debug((e.Message + e.StackTrace);
+                       Log.Error(string.Format("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! "));
                         subscription.NotifyFailed();
                         retryQueue.queue(subscription, request); 
-                        Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                      Log.Debug(string.Format("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description)))));
                     }
                 }
                 else if (emVersion >= 2.0) {
@@ -187,16 +187,16 @@ namespace EventManager
                         //subscription.Parts = request.Parts.ToArray();
                         // to many logging. maybe change this to Log4Net in the future.
                         //es.storeEvent(subscription);
-                        //Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                        //Log.Debug(("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
                         //eventSubscriberService.notifyAsync(request.topic, parts);
                         subscription.NotifyWasSuccessful();
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! ");
+                        Log.Debug(string.Format("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! "));
                         subscription.NotifyFailed();
                         retryQueue.queue(subscription, request); 
-                        Console.WriteLine("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                       Log.Debug(string.Format("###Event queued: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description)))));
                     }
                 }
                
@@ -218,12 +218,12 @@ namespace EventManager
                     eventSubscriberService.notifyXmlEvent(xmlEventString, out notifyResult, out notifyResultSpecified);
                     //subscription.Parts = request.in1;
                     //es.storeEvent(subscription);
-                    Console.WriteLine("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))));
+                  Log.Debug(string.Format("###Event published to: {0}###", (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description)))));
                     //eventSubscriberService.notifyXmlEventAsync(xmlEventString);
                     subscription.NotifyWasSuccessful();
                 }
                 catch {
-                    Console.WriteLine("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! ");
+                    Log.Error("Error: Cannot call SubscriberService. Either the subscriber (" + (subscription.Endpoint ?? (subscription.HID ?? (subscription.Description))) + ") is overloaded, or the subscriber service does not fulfill the notify contract! ");
                     subscription.NotifyFailed();
                     }
             }
@@ -254,7 +254,7 @@ namespace EventManager
                 }
                 
             }
-            else { Console.WriteLine("Faulty address"); }
+            else { Log.Debug("Faulty address"); }
             return eventSubscriberServiceUrl;
         }
 

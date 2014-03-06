@@ -203,7 +203,7 @@ namespace EventManager
             }
             catch (Exception e)
             {
-                Console.WriteLine("Subscription description->hid lookup at Network Manager failed: {0}", e.Message);
+               Log.Error(string.Format("Subscription description->hid lookup at Network Manager failed: {0}", e.Message));
             }
             return resultAddress;
         }
@@ -239,7 +239,7 @@ namespace EventManager
             }
             catch (Exception e)
             {
-                Console.WriteLine("Subscription description->hid lookup at Network Manager failed: {0}", e.Message);
+                Log.Error(string.Format("Subscription description->hid lookup at Network Manager failed: {0}", e.Message));
             }
             return resultAddress;
         }
@@ -270,7 +270,7 @@ namespace EventManager
 
         public static void DeregisterOtherDescriptionsAtNetworkManager()
         {
-            Console.WriteLine("Removing other registered HIDs for {0} at Network Manager",EventManagerImplementation.Description);
+            Log.Debug(string.Format("Removing other registered HIDs for {0} at Network Manager", EventManagerImplementation.Description));
             if (Properties.Settings.Default.NetworkManagerVersion.Equals("2.0"))
             {
                 NetworkManager20ServiceReference.NetworkManager nm = new NetworkManager20ServiceReference.NetworkManager();
@@ -283,12 +283,12 @@ namespace EventManager
                         {
                             
                             nm.removeService(reg.virtualAddress);
-                            Console.WriteLine("VirtualAddress removed: {0}", reg.virtualAddressAsString);
+                            Log.Debug(string.Format("VirtualAddress removed: {0}", reg.virtualAddressAsString));
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Deregister VirtualAddress at Network Manager failed: {0}", e.Message);
+                        Log.Debug(string.Format("Deregister VirtualAddress at Network Manager failed: {0}", e.Message));
                     }
                 }
             }
@@ -303,11 +303,11 @@ namespace EventManager
                         {
                             NetworkManager.NetworkManagerApplicationService nma = new NetworkManager.NetworkManagerApplicationService();
                             nma.removeHID(hid);
-                            Console.WriteLine("HID removed: {0}", hid);
+                            Log.Debug(string.Format("HID removed: {0}", hid));
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Deregister HID at Network Manager failed: {0}", e.Message);
+                            Log.Debug(string.Format("Deregister HID at Network Manager failed: {0}", e.Message));
                         }
                     }
                 }
@@ -324,7 +324,7 @@ namespace EventManager
             //        NetworkManager.NetworkManagerApplicationService nma = new NetworkManager.NetworkManagerApplicationService();
             //        nma.removeHID(EventManagerImplementation.Hid);
             //        IsRegisteredAtNetworkManager = false;
-            //        Console.WriteLine("EM HID removed: {0}", EventManagerImplementation.Hid);
+            //        Log.Debug("EM HID removed: {0}", EventManagerImplementation.Hid);
             //    }
             //}
             //catch (Exception e)
@@ -348,12 +348,12 @@ namespace EventManager
  
                                 nm.removeService(EventManagerImplementation.Registration.virtualAddress);
                                 IsRegisteredAtNetworkManager = false;
-                                Console.WriteLine("VirtualAddress removed: {0}", EventManagerImplementation.Registration.virtualAddressAsString);
+                                Log.Debug(string.Format("VirtualAddress removed: {0}", EventManagerImplementation.Registration.virtualAddressAsString));
                             
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Deregister VirtualAddress at Network Manager failed: {0}", e.Message);
+                            Log.Error(string.Format("Deregister VirtualAddress at Network Manager failed: {0}", e.Message));
                         }
                     }
                     else
@@ -361,13 +361,13 @@ namespace EventManager
                         NetworkManager.NetworkManagerApplicationService nma = new NetworkManager.NetworkManagerApplicationService();
                         nma.removeHID(hid);
                         IsRegisteredAtNetworkManager = false;
-                        Console.WriteLine("EM HID removed: {0}", EventManagerImplementation.Hid);
+                       Log.Debug(string.Format("EM HID removed: {0}", EventManagerImplementation.Hid));
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Deregister HID at Network Manager failed: {0}", e.Message);
+               Log.Error(string.Format("Deregister HID at Network Manager failed: {0}", e.Message));
             }
         }
 
@@ -398,14 +398,14 @@ namespace EventManager
                     
                     EventManagerImplementation.Registration = nm.registerService(b, Address, "eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl");
                     EventManagerImplementation.IsRegisteredAtNetworkManager = true;
-                    Console.WriteLine("Registered at NM2.0: {0}", EventManagerImplementation.Registration.virtualAddressAsString);
+                    Log.Debug(string.Format("Registered at NM2.0: {0}", EventManagerImplementation.Registration.virtualAddressAsString));
                 }
                 else
                 {
                     NetworkManager.NetworkManagerApplicationService nma = new NetworkManager.NetworkManagerApplicationService();
                     EventManagerImplementation.Hid = nma.createHIDwDesc(Description, Address);
                     IsRegisteredAtNetworkManager = true;
-                    Console.WriteLine("EM HID assigned: {0}", EventManagerImplementation.Hid);
+                    Log.Debug(string.Format("EM HID assigned: {0}", EventManagerImplementation.Hid));
                     //Send Event #LINKSMARTADMIN#/EVENTMANAGER/EVENTMANAGERDESCRIPTION
                     //event = "HID"
                     //value = EventManagerImplementation.Hid
@@ -413,7 +413,7 @@ namespace EventManager
             }
             catch (Exception e)
             {
-                Console.WriteLine("Register at Network Manager failed: {0}", e.Message);
+              Log.Error(string.Format("Register at Network Manager failed: {0}", e.Message));
             }
         }
 
@@ -425,7 +425,7 @@ namespace EventManager
                 m_timer = new Timer(new TimerCallback(CheckNetworkmanager));
             }
             m_timer.Change(30000, 30000);
-            Console.WriteLine("Network Manager monitoring process started.");
+            Log.Debug("Network Manager monitoring process started.");
 
         }
 
@@ -454,8 +454,8 @@ namespace EventManager
                                 // The NM is up, but EM is no longer registered with the current HID.
                                 IsRegisteredAtNetworkManager = false;
                                 // Network Manager has been restarted
-                                Console.WriteLine("Network Manager has been restarted.");
-                                Console.WriteLine("Trying to register at Network Manager.");
+                                Log.Debug("Network Manager has been restarted.");
+                                Log.Debug("Trying to register at Network Manager.");
                                 RegisterAtNetworkManager();
                             
                             }
@@ -472,8 +472,8 @@ namespace EventManager
                                 // The NM is up, but EM is no longer registered with the current HID.
                                 IsRegisteredAtNetworkManager = false;
                                 // Network Manager has been restarted
-                                Console.WriteLine("Network Manager has been restarted.");
-                                Console.WriteLine("Trying to register at Network Manager.");
+                               Log.Debug("Network Manager has been restarted.");
+                               Log.Debug("Trying to register at Network Manager.");
                                 RegisterAtNetworkManager();
                             }
                         }
@@ -482,14 +482,14 @@ namespace EventManager
                     {
                         IsRegisteredAtNetworkManager = false;
                         // Timeout or other exception
-                        Console.WriteLine("Network Manager not avaliable: {0}", e.Message);
+                       Log.Error(string.Format("Network Manager not avaliable: {0}", e.Message));
                     }
                 }
 
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception in Network Manager monitoring: " + e.Message);
+                Log.Error("Exception in Network Manager monitoring: " + e.Message);
             }
         }
 

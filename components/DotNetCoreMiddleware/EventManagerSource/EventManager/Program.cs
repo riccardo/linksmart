@@ -96,19 +96,28 @@ namespace EventManager
        
         static void Main(string[] args)
         {
-            //ProgramHelper programHelper = new ProgramHelper();
-            //programHelper.Start();
-            //We have to have it in the main function because the DLL gets loaded before we can add the HandleUnresolvedAssemblies in SubscriptionStore
-            AssemblyResolver.HandleUnresovledAssemblies();
-            EventManagerImplementation.Start();
-            
-            Console.ReadLine();
-            EventManagerImplementation.Stop();
-            
+            try
+            {
+                //ProgramHelper programHelper = new ProgramHelper();
+                //programHelper.Start();
+                //We have to have it in the main function because the DLL gets loaded before we can add the HandleUnresolvedAssemblies in SubscriptionStore
+                AssemblyResolver.HandleUnresovledAssemblies();
+                AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandlingMethod);
+                EventManagerImplementation.Start();
+                Console.ReadLine();
+                EventManagerImplementation.Stop();
+            }
+            catch (Exception fatal)
+            {
+                Log.Fatal("Uncaught Exception in Event Manager Main", fatal);
+            }
            
         }
 
-
+        private static void ExceptionHandlingMethod(object sender, EventArgs t)
+        {
+                Log.Fatal("Unhandled Exception in Event Manager " + ((UnhandledExceptionEventArgs)t).ExceptionObject.ToString());
+        }
 
 
 
@@ -137,7 +146,7 @@ namespace EventManager
                  }
 
                  path = Path.Combine(path, "System.Data.SQLite.dll");
-                 System.Console.WriteLine("Path:" + path);
+                 Log.Debug("Path:" + path);
                  System.Reflection.Assembly assembly = System.Reflection.Assembly.LoadFrom(path);
                  return assembly;
              }

@@ -152,7 +152,7 @@ namespace EventManager
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Retry Database failed. "+e.Message+e.StackTrace);
+                    Log.Error(string.Format("Retry Database failed. "+e.Message+e.StackTrace));
                 }
             }
         }

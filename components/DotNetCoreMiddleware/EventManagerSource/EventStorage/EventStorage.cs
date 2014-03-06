@@ -108,14 +108,14 @@ namespace EventStorage
 
         public LinkSmartEvent storeEvent(LinkSmartEvent theEvent)
         {
-            try
-            {
+            //try
+            //{
                 theEvent.InternalId = storeEvent(theEvent.Topic, theEvent.Parts.ToArray());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Event storage failed: "+e.Message + e.StackTrace);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //   Log.Error("Event storage failed: "+e.Message + e.StackTrace);
+            //}
             return theEvent;
         }
 

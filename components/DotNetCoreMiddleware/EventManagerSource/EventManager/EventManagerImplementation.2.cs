@@ -81,19 +81,19 @@ namespace EventManager
                     serviceHost.AddServiceEndpoint(typeof(IEventManager20), myBinding, "/20");
                     serviceHost.Open();
 
-                    Console.WriteLine("Event manager listening at: {0}", address);
+                    Log.Debug(string.Format("Event manager listening at: {0}", address));
                     if (serviceHost.State == CommunicationState.Opened && Properties.Settings.Default.UseNetworkManager)
                     {
                         EventManagerImplementation.RegisterAtNetworkManager(address);
                     }
                 }
-                catch (Exception e) { Console.WriteLine(e.Message); }
+                catch (Exception e) { Log.Error(e.Message); }
 
                 //EventManagerImplementation m_eventmanager = new EventManager.EventManagerImplementation();
                 jss.start();
                 Address = address;
                 IsRunning = true;
-                Console.WriteLine("Event manager has started.");
+                Log.Debug("Event manager has started.");
             }
         }
 
@@ -110,7 +110,7 @@ namespace EventManager
                     ))
                 {
                 EventManagerImplementation.subscriptionList.Add(subscription);
-                    Console.WriteLine("Subscription added from persistent storage: [{0}], {1} {2} {3}",subscription.Topic,subscription.Endpoint,subscription.HID,subscription.Description);
+                     Log.Debug(string.Format("Subscription added from persistent storage: [{0}], {1} {2} {3}",subscription.Topic,subscription.Endpoint,subscription.HID,subscription.Description));
                 }
             }
         }
@@ -132,7 +132,7 @@ namespace EventManager
 
             EventManagerImplementation.subscriptionList.Clear();
             IsRunning = false;
-            Console.WriteLine("Event manager has stopped.");
+           Log.Debug("Event manager has stopped.");
             }
         }
 
@@ -153,7 +153,7 @@ namespace EventManager
                 Components.Subscription subscription = new Components.Subscription(topic, null, null, description, 0, null, 0, null);
                 SubscriptionStore.Store.RemoveSubscription(subscription);
                 //SubscriptionStore.Store.RemoveSubscriptionWithTopicAndDescription(topic, description);
-                Console.WriteLine("Unsubscribe:\nTopic: {0}\nDescription: {1}", topic, description);
+                 Log.Debug(string.Format("Unsubscribe:\nTopic: {0}\nDescription: {1}", topic, description));
                 return true;
             }
             catch { return false; }
@@ -164,7 +164,7 @@ namespace EventManager
             try
             {
                 if (EventManagerImplementation.subscriptionList.Exists(f => (f.Description != null && f.Description.Equals(description) == true && f.Topic.Equals(topic) == true)))
-                { Console.WriteLine("Subscription already exists"); }
+                { Log.Debug("Subscription already exists"); }
                 else
                 {
                     Components.Subscription subscription = new Components.Subscription(topic, null, null, description, priority, null, 0, null);
@@ -185,7 +185,7 @@ namespace EventManager
                 EventManagerImplementation.subscriptionList.RemoveAll(f => (f.Description.Equals(description)));
                 Components.Subscription subscription = new Components.Subscription(null, null, null, description, 0, null, 0, null);
                 SubscriptionStore.Store.RemoveSubscriptions(subscription);
-                Console.WriteLine("Subscription cleared:\nDescription: {0}", description);
+                Log.Debug(string.Format("Subscription cleared:\nDescription: {0}", description));
                 return true;
             }
             catch { return false; }

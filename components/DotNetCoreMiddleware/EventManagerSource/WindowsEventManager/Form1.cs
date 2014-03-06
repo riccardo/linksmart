@@ -54,7 +54,7 @@ namespace WindowsEventManager
                 }
             }
             catch(Exception ex)
-            { Console.WriteLine("Error with autostart config setting."+ex.Message); }
+            { Log.Debug("Error with autostart config setting."+ex.Message); }
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -164,6 +164,7 @@ namespace WindowsEventManager
         {
             if (consoleOutcheckBox.Checked)
             {
+                Log.IsConsoleOutEnabled = true;
                 var writer = new TextBoxStreamWriter(textBoxEmOutput);
                 Console.SetOut(writer);
                 Console.Out.WriteLine("Directing log to output window. Disable this during normal operation.");
@@ -171,6 +172,7 @@ namespace WindowsEventManager
             else
             {
                 Console.Out.WriteLine("Disabling output.");
+                Log.IsConsoleOutEnabled = false;
                 var stdOut = new StreamWriter(Console.OpenStandardOutput());
                 stdOut.AutoFlush = true;
                 Console.SetOut(stdOut);

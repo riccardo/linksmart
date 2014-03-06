@@ -126,7 +126,7 @@ namespace EventManager
                     var theEvent = subscription.FailedEvents.ElementAt(0);
                     if (null != theEvent)
                     {
-                        Console.WriteLine("Retry: {0}\nEvent topic: {1}\nEventID: {2}\nTimestamp: {3}\nLastSuccessfulCall: {4}", subscription.Topic, theEvent.Topic, theEvent.InternalId.ToString(), subscription.DateTime, subscription.LastSuccessfulNotifyCall);
+                         Log.Debug(string.Format("Retry: {0}\nEvent topic: {1}\nEventID: {2}\nTimestamp: {3}\nLastSuccessfulCall: {4}", subscription.Topic, theEvent.Topic, theEvent.InternalId.ToString(), subscription.DateTime, subscription.LastSuccessfulNotifyCall));
                         subscription.FailedEvents.RemoveAt(0);
                         notification = new Notification(subscription, theEvent);
                         Thread retryThread = new Thread(new ThreadStart(notification.notify));

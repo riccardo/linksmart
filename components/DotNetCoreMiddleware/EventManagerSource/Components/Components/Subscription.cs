@@ -453,8 +453,7 @@ namespace Components
                 }
             } else {
                 this.FailedEvents = new List<LinkSmartEvent>();
-                Console.WriteLine("Subscription [{0}   |   {1}   |   {2}   |   {3}] has more than 100 failed events, resetting resend list.", this.Topic, this.Description, this.Endpoint, this.HID);
-            }
+             }
         }
 
         [System.Xml.Serialization.XmlIgnore]

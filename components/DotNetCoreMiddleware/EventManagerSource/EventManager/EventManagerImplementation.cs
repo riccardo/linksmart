@@ -122,7 +122,7 @@ namespace EventManager
             try
             {
                 if (EventManagerImplementation.subscriptionList.Exists(f => (f.Endpoint != null && f.Endpoint.Equals(endpoint) == true && f.Topic.Equals(topic) == true)))
-                { Console.WriteLine("Subscription already exists"); }
+                { Log.Debug("Subscription already exists"); }
                 else
                 {
                     Components.Subscription subscription = new Components.Subscription(topic, null, endpoint,null, priority, null, 0, null);
@@ -141,7 +141,7 @@ namespace EventManager
             try
             {
                 if (EventManagerImplementation.subscriptionList.Exists(f => f.IsSameAs(subscription)))
-                { Console.WriteLine("Subscription already exists"); }
+                { Log.Debug("Subscription already exists"); }
                 else
                 {
                     Subscribe subscribeClass = new Subscribe(subscription);
@@ -151,7 +151,7 @@ namespace EventManager
                 }
                 
             }
-            catch (Exception e) { Console.WriteLine("AddSubscription: " + e.Message + e.StackTrace); }
+            catch (Exception e) {  Log.Error("AddSubscription: " + e.Message + e.StackTrace); }
         }
 
         public void RemoveSubscription(Components.Subscription subscription)
@@ -162,7 +162,7 @@ namespace EventManager
                 EventManagerImplementation.subscriptionList.Remove(sub);
 
             }
-            catch (Exception e) { Console.WriteLine("RemoveSubscription: " + e.Message + e.StackTrace); }
+            catch (Exception e) {  Log.Error("RemoveSubscription: " + e.Message + e.StackTrace); }
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace EventManager
                 EventManagerImplementation.subscriptionList.RemoveAll(f => (f.Endpoint.Equals(endpoint) && f.Topic.Equals(topic)));
                 Components.Subscription subscription = new Components.Subscription(topic, null, endpoint, null, 0, null, 0, null);
                 SubscriptionStore.Store.RemoveSubscription(subscription);
-                Console.WriteLine("Unsubscribe:\nTopic: {0}\nEndpoint: {1}", topic, endpoint);
+                Log.Debug(string.Format("Unsubscribe:\nTopic: {0}\nEndpoint: {1}", topic, endpoint));
                 return true;
             }
             catch { return false; }
@@ -209,7 +209,7 @@ namespace EventManager
             try
             {
                 if (EventManagerImplementation.subscriptionList.Exists(f => (f.HID != null && f.HID.Equals(hid) == true && f.Topic.Equals(topic) == true)))
-                { Console.WriteLine("Subscription already exists"); }
+                { Log.Debug("Subscription already exists"); }
                 else
                 {
                     Components.Subscription subscription = new Components.Subscription(topic, hid, null,null, priority, null, 0, null);
@@ -234,7 +234,7 @@ namespace EventManager
                 //SubscriptionStore.Store.RemoveSubscriptionWithTopicAndHid(topic, hid);
                 Components.Subscription subscription = new Components.Subscription(topic, hid, null, null, 0, null, 0, null);
                 SubscriptionStore.Store.RemoveSubscription(subscription);
-                Console.WriteLine("Unsubscribe:\nTopic: {0}\nHID: {1}", topic, hid);
+                Log.Debug(string.Format("Unsubscribe:\nTopic: {0}\nHID: {1}", topic, hid));
                 return true;
             }
             catch { return false; }
@@ -257,7 +257,7 @@ namespace EventManager
                 Components.Subscription subscription = new Components.Subscription(null, null, endpoint, null, 0, null, 0, null);
                 SubscriptionStore.Store.RemoveSubscriptions(subscription);
                 
-                Console.WriteLine("Subscription cleared:\nEndpoint: {0}", endpoint);
+               Log.Debug(string.Format("Subscription cleared:\nEndpoint: {0}", endpoint));
                 return true;
             }
             catch { return false; }
@@ -275,7 +275,7 @@ namespace EventManager
                 Components.Subscription subscription = new Components.Subscription(null, hid, null, null, 0, null, 0, null);
                 SubscriptionStore.Store.RemoveSubscriptions(subscription);
                 
-                Console.WriteLine("Subscription cleared:\nHID: {0}", hid);
+                Log.Debug(string.Format("Subscription cleared:\nHID: {0}", hid));
                 return true;
             }
             catch { return false; }

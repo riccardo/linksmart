@@ -37,7 +37,7 @@ namespace EventManager
 
 
 
-                    Console.WriteLine("CTRL+C received!");
+                 Log.Debug("CTRL+C received!");
 
                     ShutDown();
 
@@ -49,7 +49,7 @@ namespace EventManager
 
 
 
-                    Console.WriteLine("CTRL+BREAK received!");
+                    Log.Debug("CTRL+BREAK received!");
 
                     ShutDown();
 
@@ -59,7 +59,7 @@ namespace EventManager
 
                 case CtrlTypes.CTRL_CLOSE_EVENT:
 
-                    Console.WriteLine("Program being closed!");
+                    Log.Debug("Program being closed!");
 
                     ShutDown();
 
@@ -71,7 +71,7 @@ namespace EventManager
 
 
 
-                    Console.WriteLine("User is logging off!");
+                    Log.Debug("User is logging off!");
 
                     ShutDown();
 
@@ -90,7 +90,7 @@ namespace EventManager
             if (Properties.Settings.UseNetworkManager)
             {
                 EventManagerImplementation.DeregisterAtNetworkManager();
-                Console.WriteLine("Exit cleanup.");
+               Log.Debug("Exit cleanup.");
                 Console.ReadLine();
             }
         }
