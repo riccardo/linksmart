@@ -98,6 +98,7 @@ namespace EventManager
         {
             try
             {
+               
                 //ProgramHelper programHelper = new ProgramHelper();
                 //programHelper.Start();
                 //We have to have it in the main function because the DLL gets loaded before we can add the HandleUnresolvedAssemblies in SubscriptionStore

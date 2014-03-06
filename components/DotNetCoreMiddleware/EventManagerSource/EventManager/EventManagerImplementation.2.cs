@@ -28,6 +28,11 @@ namespace EventManager
         private static  ServiceHost serviceHost;
         public static void Start()
         {
+            try
+            {
+                Log.IsConsoleOutEnabled = Properties.Settings.Default.WriteToConsoleOut;
+            }
+            catch (Exception e){ Log.Error(e.Message+ e.StackTrace); }
             if (!IsRunning)
             {
                 InitiateStoredSubscriptions();

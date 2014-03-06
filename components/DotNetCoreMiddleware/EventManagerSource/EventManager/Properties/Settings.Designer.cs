@@ -143,5 +143,14 @@ namespace EventManager.Properties {
                 return ((int)(this["SubscriberTimeout"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool WriteToConsoleOut {
+            get {
+                return ((bool)(this["WriteToConsoleOut"]));
+            }
+        }
     }
 }
