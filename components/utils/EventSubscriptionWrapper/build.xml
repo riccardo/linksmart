@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<project name="EventPublicationWrapper" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="EventSubscriptionWrapper" default="fail" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- properties -->
 
-	<property name="moduleName" value="eu.linksmart.event.publication" />
+	<property name="moduleName" value="eu.linksmart.event.subscription" />
 	<property name="revision" value="2.0.0" />
 
 	<property name="src.dir" value="${basedir}/src" />

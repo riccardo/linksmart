@@ -3,10 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
-	<info organisation="eu.linksmart.event" module="eu.linksmart.event.publication" />
+	<info organisation="eu.linksmart.event" module="eu.linksmart.event.subscription" />
 
 	<publications>
-		<artifact name="eu.linksmart.event.publication" type="jar" />
+		<artifact name="eu.linksmart.event.subscription" type="jar" />
 	</publications>
 
 	<dependencies>

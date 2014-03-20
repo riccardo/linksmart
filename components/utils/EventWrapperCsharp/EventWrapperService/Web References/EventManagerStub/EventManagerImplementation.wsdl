@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://eventmanager.linksmart.eu" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="EventManagerImplementation" targetNamespace="http://eventmanager.linksmart.eu" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xs:schema elementFormDefault="qualified" targetNamespace="http://eventmanager.linksmart.eu" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import />
+      <xs:element name="publishXmlEvent">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="eventXmlString" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="publishXmlEventResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="publishReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="unsubscribeWithDescription">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="unsubscribeWithDescriptionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="unsubscribeWithDescriptionReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="subscribeWithDescription">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string" />
+            <xs:element minOccurs="1" maxOccurs="1" name="priority" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="subscribeWithDescriptionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="subscribeWithDescriptionReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="clearSubscriptionsWithDescription">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="clearSubscriptionsWithDescriptionResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="clearSubscriptionsWithDescriptionReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="subscribe">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="endpoint" type="xs:string" />
+            <xs:element minOccurs="1" maxOccurs="1" name="priority" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="subscribeResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="subscribeReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="unsubscribe">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="endpoint" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="unsubscribeResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="unsubscribeReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="subscribeWithHID">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="hid" type="xs:string" />
+            <xs:element minOccurs="1" maxOccurs="1" name="priority" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="subscribeWithHIDResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="subscribeWithHIDReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="unsubscribeWithHID">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="topic" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="hid" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="unsubscribeWithHIDResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="unsubscribeWithHIDReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="getSubscriptions">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="getSubscriptionsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" ref="getSubscriptionsReturn" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="Subscription">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="Topic" nillable="true" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="HID" nillable="true" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="Endpoint" nillable="true" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="Description" nillable="true" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="Priority" type="xs:int" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Parts" nillable="true" type="tns:Part" />
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="NumberOfRetries" type="xs:int" />
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="DateTime" nillable="true" type="xs:dateTime" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="Part">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="key" nillable="true" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" form="unqualified" name="value" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="clearSubscriptions">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="endpoint" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="clearSubscriptionsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="clearSubscriptionsReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="clearSubscriptionsWithHID">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="hid" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="clearSubscriptionsWithHIDResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="clearSubscriptionsWithHIDReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setPriority">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="in0" type="xs:string" />
+            <xs:element minOccurs="1" maxOccurs="1" name="in1" type="xs:int" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="setPriorityResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="setPriorityReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="triggerRetryQueue">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="triggerRetryQueueResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="triggerRetryQueueReturn" type="xs:boolean" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="publish">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" ref="topic" />
+            <xs:element minOccurs="0" maxOccurs="1" ref="in1" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="publishResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" ref="publishReturn" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+    <xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://eventmanager.linksmart.eu" />
+      <xs:element name="getSubscriptionsReturn" type="ArrayOfSubscription" />
+      <xs:complexType name="ArrayOfSubscription">
+        <xs:sequence>
+          <xs:element xmlns:q1="http://eventmanager.linksmart.eu" minOccurs="0" maxOccurs="unbounded" form="unqualified" name="item" type="q1:Subscription" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="topic" type="xs:string" />
+      <xs:element name="in1" type="ArrayOfPart" />
+      <xs:complexType name="ArrayOfPart">
+        <xs:sequence>
+          <xs:element xmlns:q2="http://eventmanager.linksmart.eu" minOccurs="0" maxOccurs="unbounded" form="unqualified" name="item" type="q2:Part" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="publishReturn" type="xs:boolean" />
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="EventManagerPort_publishXmlEvent_InputMessage">
+    <wsdl:part name="parameters" element="tns:publishXmlEvent" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_publishXmlEvent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:publishXmlEventResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribeWithDescription_InputMessage">
+    <wsdl:part name="parameters" element="tns:unsubscribeWithDescription" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribeWithDescription_OutputMessage">
+    <wsdl:part name="parameters" element="tns:unsubscribeWithDescriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribeWithDescription_InputMessage">
+    <wsdl:part name="parameters" element="tns:subscribeWithDescription" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribeWithDescription_OutputMessage">
+    <wsdl:part name="parameters" element="tns:subscribeWithDescriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptionsWithDescription_InputMessage">
+    <wsdl:part name="parameters" element="tns:clearSubscriptionsWithDescription" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptionsWithDescription_OutputMessage">
+    <wsdl:part name="parameters" element="tns:clearSubscriptionsWithDescriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribe_InputMessage">
+    <wsdl:part name="parameters" element="tns:subscribe" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribe_OutputMessage">
+    <wsdl:part name="parameters" element="tns:subscribeResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribe_InputMessage">
+    <wsdl:part name="parameters" element="tns:unsubscribe" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribe_OutputMessage">
+    <wsdl:part name="parameters" element="tns:unsubscribeResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribeWithHID_InputMessage">
+    <wsdl:part name="parameters" element="tns:subscribeWithHID" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_subscribeWithHID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:subscribeWithHIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribeWithHID_InputMessage">
+    <wsdl:part name="parameters" element="tns:unsubscribeWithHID" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_unsubscribeWithHID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:unsubscribeWithHIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="getSubscriptionsRequest">
+    <wsdl:part name="parameters" element="tns:getSubscriptions" />
+  </wsdl:message>
+  <wsdl:message name="getSubscriptionsResponse">
+    <wsdl:part name="parameters" element="tns:getSubscriptionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptions_InputMessage">
+    <wsdl:part name="parameters" element="tns:clearSubscriptions" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptions_OutputMessage">
+    <wsdl:part name="parameters" element="tns:clearSubscriptionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptionsWithHID_InputMessage">
+    <wsdl:part name="parameters" element="tns:clearSubscriptionsWithHID" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_clearSubscriptionsWithHID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:clearSubscriptionsWithHIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_setPriority_InputMessage">
+    <wsdl:part name="parameters" element="tns:setPriority" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_setPriority_OutputMessage">
+    <wsdl:part name="parameters" element="tns:setPriorityResponse" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_triggerRetryQueue_InputMessage">
+    <wsdl:part name="parameters" element="tns:triggerRetryQueue" />
+  </wsdl:message>
+  <wsdl:message name="EventManagerPort_triggerRetryQueue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:triggerRetryQueueResponse" />
+  </wsdl:message>
+  <wsdl:message name="publishRequest">
+    <wsdl:part name="parameters" element="tns:publish" />
+  </wsdl:message>
+  <wsdl:message name="publishResponse">
+    <wsdl:part name="parameters" element="tns:publishResponse" />
+  </wsdl:message>
+  <wsdl:portType name="EventManagerPort">
+    <wsdl:operation name="publishXmlEvent">
+      <wsdl:input wsaw:Action="publishXmlEvent" message="tns:EventManagerPort_publishXmlEvent_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_publishXmlEvent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribeWithDescription">
+      <wsdl:input wsaw:Action="unsubscribeWithDescription" message="tns:EventManagerPort_unsubscribeWithDescription_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_unsubscribeWithDescription_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="subscribeWithDescription">
+      <wsdl:input wsaw:Action="subscribeWithDescription" message="tns:EventManagerPort_subscribeWithDescription_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_subscribeWithDescription_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptionsWithDescription">
+      <wsdl:input wsaw:Action="clearSubscriptionsWithDescription" message="tns:EventManagerPort_clearSubscriptionsWithDescription_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_clearSubscriptionsWithDescription_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="subscribe">
+      <wsdl:input wsaw:Action="subscribe" message="tns:EventManagerPort_subscribe_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_subscribe_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribe">
+      <wsdl:input wsaw:Action="unsubscribe" message="tns:EventManagerPort_unsubscribe_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_unsubscribe_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="subscribeWithHID">
+      <wsdl:input wsaw:Action="subscribeWithHID" message="tns:EventManagerPort_subscribeWithHID_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_subscribeWithHID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribeWithHID">
+      <wsdl:input wsaw:Action="unsubscribeWithHID" message="tns:EventManagerPort_unsubscribeWithHID_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_unsubscribeWithHID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="getSubscriptions">
+      <wsdl:input wsaw:Action="getSubscriptions" name="getSubscriptionsRequest" message="tns:getSubscriptionsRequest" />
+      <wsdl:output wsaw:Action="" name="getSubscriptionsResponse" message="tns:getSubscriptionsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptions">
+      <wsdl:input wsaw:Action="clearSubscriptions" message="tns:EventManagerPort_clearSubscriptions_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_clearSubscriptions_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptionsWithHID">
+      <wsdl:input wsaw:Action="clearSubscriptionsWithHID" message="tns:EventManagerPort_clearSubscriptionsWithHID_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_clearSubscriptionsWithHID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="setPriority">
+      <wsdl:input wsaw:Action="setPriority" message="tns:EventManagerPort_setPriority_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_setPriority_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="triggerRetryQueue">
+      <wsdl:input wsaw:Action="triggerRetryQueue" message="tns:EventManagerPort_triggerRetryQueue_InputMessage" />
+      <wsdl:output wsaw:Action="" message="tns:EventManagerPort_triggerRetryQueue_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="publish">
+      <wsdl:input wsaw:Action="publish" name="publishRequest" message="tns:publishRequest" />
+      <wsdl:output wsaw:Action="" name="publishResponse" message="tns:publishResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_EventManagerPort" type="tns:EventManagerPort">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="publishXmlEvent">
+      <soap:operation soapAction="publishXmlEvent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribeWithDescription">
+      <soap:operation soapAction="unsubscribeWithDescription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="subscribeWithDescription">
+      <soap:operation soapAction="subscribeWithDescription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptionsWithDescription">
+      <soap:operation soapAction="clearSubscriptionsWithDescription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="subscribe">
+      <soap:operation soapAction="subscribe" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribe">
+      <soap:operation soapAction="unsubscribe" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="subscribeWithHID">
+      <soap:operation soapAction="subscribeWithHID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="unsubscribeWithHID">
+      <soap:operation soapAction="unsubscribeWithHID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSubscriptions">
+      <soap:operation soapAction="getSubscriptions" style="document" />
+      <wsdl:input name="getSubscriptionsRequest">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="getSubscriptionsResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptions">
+      <soap:operation soapAction="clearSubscriptions" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clearSubscriptionsWithHID">
+      <soap:operation soapAction="clearSubscriptionsWithHID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setPriority">
+      <soap:operation soapAction="setPriority" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="triggerRetryQueue">
+      <soap:operation soapAction="triggerRetryQueue" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="publish">
+      <soap:operation soapAction="publish" style="document" />
+      <wsdl:input name="publishRequest">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="publishResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EventManagerImplementation">
+    <wsdl:port name="BasicHttpBinding_EventManagerPort" binding="tns:BasicHttpBinding_EventManagerPort">
+      <soap:address location="http://129.26.162.159:8124/Service" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
