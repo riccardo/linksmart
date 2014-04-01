@@ -66,6 +66,7 @@
 		<ant dir="LinkSmartAPIs/TrustManagerAPI" target="make"/>
 		<ant dir="LinkSmartAPIs/CryptoManagerAPI" target="make"/>
 		<ant dir="LinkSmartAPIs/BackboneRouterAPI" target="make"/>
+		<ant dir="LinkSmartAPIs/EventManagerAPI" target="make"/>
 		
         <ant dir="LinkSmartManagerConfigurator" target="make" />
 		<ant dir="LinkSmartMiddlewareClients" target="make" />
