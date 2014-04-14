@@ -24,7 +24,8 @@ public class MessageSerializerUtiliy {
 	 * Logger from log4j
 	 */
 	static Logger logger = Logger.getLogger(MessageSerializerUtiliy.class.getName());
-	
+	static final String MISSING_FIELD = "Received message does not contain topic or payload";
+
 	/**
 	 * Creates a stream from the provided message
 	 * @param msg to be serialized
@@ -62,7 +63,7 @@ public class MessageSerializerUtiliy {
 		}
 		return serializedCommand;
 	}
-	
+
 	/**
 	 * Creates message from received byte stream.
 	 * @param serializedMsg Stream to read from
@@ -82,7 +83,7 @@ public class MessageSerializerUtiliy {
 		} catch (InvalidPropertiesFormatException e) {
 			if(showException)logger.warn(
 					"Unable to load properties from XML data. Data is not valid XML: "
-					+ new String(serializedMsg));
+							+ new String(serializedMsg));
 			return new ErrorMessage(ErrorMessage.RECEPTION_ERROR,
 					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());
 		} catch (IOException e) {
@@ -92,19 +93,28 @@ public class MessageSerializerUtiliy {
 					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());
 		}
 
-		// create real message
-		Message message = new Message((String) properties.remove(Connection.TOPIC),
-				senderVirtualAddress, receiverVirtualAddress, (Base64.decode((String) properties
-						.remove(Connection.APPLICATION_DATA))));
-		if(includeProps) {
-			// go through the properties and add them to the message
-			Iterator<Object> i = properties.keySet().iterator();
-			while (i.hasNext()) {
-				String key = (String) i.next();
-				message.setProperty(key, properties.getProperty(key));
+		if(properties.contains(Connection.TOPIC) && properties.contains(Connection.APPLICATION_DATA)) {
+			// create real message
+			Message message = new Message((String) properties.remove(Connection.TOPIC),
+					senderVirtualAddress, receiverVirtualAddress, (Base64.decode((String) properties
+							.remove(Connection.APPLICATION_DATA))));
+			if(includeProps) {
+				// go through the properties and add them to the message
+				Iterator<Object> i = properties.keySet().iterator();
+				while (i.hasNext()) {
+					String key = (String) i.next();
+					message.setProperty(key, properties.getProperty(key));
+				}
 			}
+			return message;
+		} else {
+			if (showException)
+			{
+				logger.debug(MISSING_FIELD + " sender:" + senderVirtualAddress + " receiver:" + receiverVirtualAddress);
+				logger.trace("Contains topic:" + properties.contains(Connection.TOPIC) + " payload:" + properties.containsKey(Connection.APPLICATION_DATA));
+			}
+			return new ErrorMessage(ErrorMessage.ERROR, senderVirtualAddress, receiverVirtualAddress, MISSING_FIELD.getBytes());
 		}
-		return message;
 	}
 
 }
