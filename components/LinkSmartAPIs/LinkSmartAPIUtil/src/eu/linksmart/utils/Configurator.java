@@ -238,6 +238,65 @@ public abstract class Configurator implements ManagedService{
 	 */
 	public abstract void applyConfigurations(Hashtable updates);
 
+	public synchronized final void setConfiguration(Properties props) {
+		Configuration config;
+
+		if (cm == null) {
+			if (configuration == null) {
+				configuration = loadDefaults();
+			}
+
+			for(Object key : props.keySet()) {
+				configuration.put(key, props.get(key));
+				unsavedConfigs.put(key, props.get(key));
+				logger.error("setConfiguration: Could not save configuration "
+						+ "properties into CM. CM not available");
+				return;
+			}
+		}
+
+		if (props != null) {
+			for(Object key : props.keySet()) {
+				configuration.put(key, props.get(key));
+				unsavedConfigs.put(key, props.get(key));
+			}
+		}
+
+		try {
+			config = cm.getConfiguration(pid);
+			Dictionary storedConfig = null;
+			if (config != null) {
+				config.getProperties();
+			}
+
+			if (storedConfig == null) {
+				/*
+				 * Only when there is still no configuration, take the current 
+				 * one (will have already the unsaved properties)
+				 */
+				storedConfig = configuration;
+			}
+			else {
+				Enumeration unsaved = unsavedConfigs.keys();
+				while (unsaved.hasMoreElements()) {
+					String k = (String) unsaved.nextElement();
+					storedConfig.put(k, unsavedConfigs.get(k));
+				}
+			}
+
+			if (config != null) {
+				config.update(storedConfig);
+			}
+
+			unsavedConfigs.clear();
+			logger.info("setConfiguration: Saved configuration into CM");
+		} catch (IOException e) {
+			logger.error("setConfiguration: Could not save configuration "
+					+ "properties into CM");
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Sets a new configuration pair (key, value) in the configuration
 	 * 
@@ -277,7 +336,7 @@ public abstract class Configurator implements ManagedService{
 				 */
 				storedConfig = configuration;
 			}
-			else {				
+			else {
 				Enumeration unsaved = unsavedConfigs.keys();
 				while (unsaved.hasMoreElements()) {
 					String k = (String) unsaved.nextElement();
