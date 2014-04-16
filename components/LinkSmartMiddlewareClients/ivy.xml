@@ -22,6 +22,7 @@
 		<dependency org="eu.linksmart" name="eu.linksmart.api.network" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.networkmanager" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.trustmanager" rev="2.1.0" />
+		<dependency org="eu.linksmart" name="eu.linksmart.api.eventmanager" rev="2.1.0" />
 		<dependency org="eu.linksmart" name="eu.linksmart.api.utils" rev="2.1.0" />
 	</dependencies>
 

@@ -91,7 +91,7 @@
 
 	<!-- javadoc -->
 	<target name="javadoc">
-		<javadoc access="public" destdir="${javadoc.dir}" author="true" version="true" use="true" windowtitle="NetworkManager API">
+		<javadoc access="public" destdir="${javadoc.dir}" author="true" version="true" use="true" windowtitle="EventManager API">
 			<fileset dir="${src.dir}" defaultexcludes="yes">
 				<include name="**/*.java" />
 			</fileset>
