@@ -38,6 +38,7 @@ import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
@@ -185,10 +186,20 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 			String trustModelValue = (String) updates.get(TrustManagerConfigurator.TM_TRUST_MODEL);
 			setCurrentTrustModel(trustModelValue);
 		}
+		// check if this code should be call always 
 		if (updates.containsKey(TrustManagerConfigurator.PID)) {
-			removeTrustManagerService();
-			createServiceForTrustManager(true);
-			createdService = true;
+			String currentPid = null;
+			for (Part attr : this.trustManagerVirtualAddress.getAttributes()) {
+				if (attr.getKey().equals(ServiceAttribute.PID.name())) {
+					currentPid = attr.getValue();
+				}
+			}
+			String pidaux =(String)updates.get( TrustManagerConfigurator.PID) ;
+			if(updates.get( TrustManagerConfigurator.PID) != currentPid ){
+				removeTrustManagerService();
+				createServiceForTrustManager(true);
+				createdService = true;
+			}
 		}
 		if (updates.containsKey(TrustManagerConfigurator.USE_NETWORK_MANAGER) || updates.containsKey(TrustManagerConfigurator.NETWORK_MANAGER_ADDRESS)) {
 			boolean useNetworkManager = Boolean.parseBoolean((String) updates.get(TrustManagerConfigurator.USE_NETWORK_MANAGER));
@@ -357,26 +368,75 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 
 	private Registration createCertificate() throws IOException{
 		String pid = configurator.get(TrustManagerConfigurator.PID);
+		String[] pidAux;
 		//if no PID set use local IP as identifier
 		if ((pid == null)||(pid.equals(""))) {
+			
 			pid = "TrustManager:" + InetAddress.getLocalHost().getHostName();
+			
+		} else 	if (pid.contains(":")) { // check if the name of the TrustManager is empty after the ':'
+			if ((pidAux=pid.split(":")).length<2) {
+				
+				pid = pidAux[0] + ":" + InetAddress.getLocalHost().getHostName();
+			}
 		}
+		
+		
 		
 		Part[] tmAttr = new Part[]{
 			new Part(ServiceAttribute.PID.name(), pid),
 			new Part(ServiceAttribute.DESCRIPTION.name(), "TrustManager"),
 			new Part(ServiceAttribute.SID.name(), pid)
 		};
+		// variables for the attepts to get a PID
+		int attempts = 3;
+		boolean havePID=false;
+		String pidaux = pid;
+		Registration serviceInfo =null;
 		
-		Registration serviceInfo = nm.registerService(tmAttr,
-				"http://localhost:9090" + TRUST_MANAGER_PATH, BACKBONE_SOAP);
+		// Try to get a PID
+		while (!havePID&&attempts>1){
+
+			LOG.debug("TrustManager attempts to obtain PID: " + pidaux);
+			try{
+				serviceInfo = nm.registerService(tmAttr,
+						"http://localhost:9090" + TRUST_MANAGER_PATH, BACKBONE_SOAP);
+				havePID= true;
+			}catch(IllegalArgumentException ex){
+				attempts--;
+				
+				// generate selected PID + a random UUID
+				 pidaux+= pid + java.util.UUID.randomUUID();
+				tmAttr = new Part[]{
+						new Part(ServiceAttribute.PID.name(), pidaux),
+						new Part(ServiceAttribute.DESCRIPTION.name(), "TrustManager"),
+						new Part(ServiceAttribute.SID.name(), pidaux)
+					};
+			}
+		}
+		
+		// If it didn't obtain a selected PID after the attempts 
+		if (!havePID|| serviceInfo== null){
+			throw new IllegalArgumentException(
+					"PID already in use, and the attemps to generate a new one fail. Please choose a different one.");
+		}
+		
+		LOG.debug("TrustManager gets PID: " + pidaux);
+		
+		// updating configuration
 		Part[] attributes = serviceInfo.getAttributes();
+		Properties confUpdates = new Properties();
 		for (Part attr : attributes) {
 			if(attr.getKey().contentEquals(ServiceAttribute.CERT_REF.name())){
-				configurator.setConfiguration(
+				confUpdates.put(
 						TrustManagerConfigurator.CERTIFICATE_REF, attr.getValue());
 			}
-		}		
+			if (attr.getKey().contentEquals(ServiceAttribute.PID.name())){
+				confUpdates.put(TrustManagerConfigurator.PID,pidaux);
+			}
+		}
+		configurator.setConfiguration(confUpdates);
+		
 		return serviceInfo;
 	}
 
