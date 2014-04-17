@@ -9,7 +9,7 @@
 	<property name="build.dir" value="${rootBuildDir}/${moduleName}/bin" />
 	<property name="dist.dir" value="${rootDistributionDir}" />
 	<property name="javadoc.dir" value="${basedir}/doc" />
-	<property name="targetPlatform.dir" value="${basedir}/../../target_platform" />
+	<property name="targetPlatform.dir" value="${basedir}/../target_platform" />
 	<property name="antlib.dir" value="${basedir}/../../../antlibs" />
 
 	<!-- Properties used for JUnit testing -->
