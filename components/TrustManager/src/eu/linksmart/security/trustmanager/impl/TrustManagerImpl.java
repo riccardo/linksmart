@@ -38,6 +38,7 @@ import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
