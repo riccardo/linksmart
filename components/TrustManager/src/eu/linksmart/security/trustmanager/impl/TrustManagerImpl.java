@@ -357,9 +357,15 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 
 	private Registration createCertificate() throws IOException{
 		String pid = configurator.get(TrustManagerConfigurator.PID);
+		String[] pidAux;
 		//if no PID set use local IP as identifier
 		if ((pid == null)||(pid.equals(""))) {
 			pid = "TrustManager:" + InetAddress.getLocalHost().getHostName();
+		}else if (pid.contains(":")) { // check if the name of the TrustManager is empty after the ':'
+			if ((pidAux=pid.split(":")).length<2) {
+				
+				pid = pidAux[0] + ":" + InetAddress.getLocalHost().getHostName();
+			}
 		}
 		
 		Part[] tmAttr = new Part[]{
@@ -368,15 +374,54 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 			new Part(ServiceAttribute.SID.name(), pid)
 		};
 		
-		Registration serviceInfo = nm.registerService(tmAttr,
-				"http://localhost:9090" + TRUST_MANAGER_PATH, BACKBONE_SOAP);
+		// variables for the attempts to get a PID
+		int attempts = 3;
+		boolean havePID=false;
+		String pidaux = pid;
+		Registration serviceInfo =null;
+		
+		// Try to get a PID
+		while (!havePID&&attempts>1){
+
+			LOG.debug("TrustManager attempts to obtain PID: " + pidaux);
+			try{
+				serviceInfo = nm.registerService(tmAttr,
+						"http://localhost:9090" + TRUST_MANAGER_PATH, BACKBONE_SOAP);
+				havePID= true;
+			}catch(IllegalArgumentException ex){
+				attempts--;
+				
+				// generate selected PID + a random UUID
+				 pidaux+= pid + java.util.UUID.randomUUID();
+				tmAttr = new Part[]{
+						new Part(ServiceAttribute.PID.name(), pidaux),
+						new Part(ServiceAttribute.DESCRIPTION.name(), "TrustManager"),
+						new Part(ServiceAttribute.SID.name(), pidaux)
+					};
+			}
+		}
+		// If it didn't obtain a selected PID after the attempts 
+		if (!havePID|| serviceInfo== null){
+			throw new IllegalArgumentException(
+					"PID already in use, and the attemps to generate a new one fail. Please choose a different one.");
+		}
+		
+		LOG.debug("TrustManager gets PID: " + pidaux);
+		
+		// updating configuration
 		Part[] attributes = serviceInfo.getAttributes();
+		Properties confUpdates = new Properties();
 		for (Part attr : attributes) {
 			if(attr.getKey().contentEquals(ServiceAttribute.CERT_REF.name())){
-				configurator.setConfiguration(
+				confUpdates.put(
 						TrustManagerConfigurator.CERTIFICATE_REF, attr.getValue());
 			}
-		}		
+			if (attr.getKey().contentEquals(ServiceAttribute.PID.name())){
+				confUpdates.put(TrustManagerConfigurator.PID,pidaux);
+			}
+		}
+		configurator.setConfiguration(confUpdates);
+		
 		return serviceInfo;
 	}
 
