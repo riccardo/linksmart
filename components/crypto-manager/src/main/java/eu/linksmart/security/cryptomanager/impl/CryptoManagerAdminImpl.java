@@ -36,6 +36,9 @@ package eu.linksmart.security.cryptomanager.impl;
 import java.util.Arrays;
 import java.util.Vector;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -44,6 +47,8 @@ import eu.linksmart.security.cryptomanager.CryptoManagerAdmin;
 import eu.linksmart.security.cryptomanager.cryptoprocessor.impl.CryptoFactory;
 import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
 
+@Component(name="CryptoManagerAdmin", immediate=true)
+@Service
 public class CryptoManagerAdminImpl implements CryptoManagerAdmin {
 
 	private static Logger logger = Logger
@@ -62,6 +67,7 @@ public class CryptoManagerAdminImpl implements CryptoManagerAdmin {
 	 * Start the Cryptomanager-Admin as OSGi bundle
 	 * 
 	 */
+    @Activate
 	protected void activate(ComponentContext context) {
 		this.context = context.getBundleContext();
 

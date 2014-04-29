@@ -53,9 +53,11 @@ import java.util.Vector;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 
+import org.apache.felix.scr.annotations.*;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.security.cryptomanager.CryptoManager;
@@ -71,6 +73,9 @@ import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
  * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * 
  */
+@Component(name="CryptoManager", immediate=true)
+@Service
+@Property(name="service.remote.registration", value="true")
 public class CryptoManagerImpl implements CryptoManager{
 
 	private static Logger logger = Logger.getLogger(CryptoManagerImpl.class);
@@ -87,6 +92,22 @@ public class CryptoManagerImpl implements CryptoManager{
 	private CryptoManagerConfigurator configurator;
 	private boolean activated = false;
 
+    @Reference(name="ConfigurationAdmin",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindConfigAdmin",
+            unbind="unbindConfigAdmin",
+            policy=ReferencePolicy.STATIC)
+    protected ConfigurationAdmin configAdmin = null;
+
+    protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	logger.debug("CryptoManager::binding ConfigurationAdmin");
+        this.configAdmin = configAdmin;
+    }
+
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	logger.debug("CryptoManager::un-binding ConfigurationAdmin");
+        this.configAdmin = null;
+    }
 
 	/**
 	 * Constructor.
@@ -100,7 +121,9 @@ public class CryptoManagerImpl implements CryptoManager{
 	 * web service.
 	 * 
 	 */
+    @Activate
 	protected void activate(ComponentContext context) {
+    	logger.info("[activating CryptoManager]");
 		CryptoManagerImpl.context = context.getBundleContext();
 		// Extract all configuration files from the bundle's jar file to the
 		// filesystem
@@ -139,7 +162,8 @@ public class CryptoManagerImpl implements CryptoManager{
 
 		keyManager = CryptoFactory.getKeyManagerInstance();
 		cryptoProcessor = CryptoFactory.getProcessorInstance("XMLEnc");
-		configurator = new CryptoManagerConfigurator(this, context.getBundleContext());
+		//configurator = new CryptoManagerConfigurator(this, context.getBundleContext());
+        configurator = new CryptoManagerConfigurator(this, context.getBundleContext(),configAdmin);
 		configurator.registerConfiguration();
 		activated = true;
 
@@ -149,7 +173,9 @@ public class CryptoManagerImpl implements CryptoManager{
 	/**
 	 * Clean up work when bundle is stopped
 	 */
+    @Deactivate
 	protected void deactivate(ComponentContext context) {
+    	logger.info("[de-activating CryptoManager]");
 		activated = false;
 		keyManager.close();
 	}

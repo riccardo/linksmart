@@ -87,7 +87,6 @@ import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
-import sun.security.rsa.RSAKeyPairGenerator;
 import eu.linksmart.security.cryptomanager.impl.Configuration;
 import eu.linksmart.security.cryptomanager.impl.CryptoManagerImpl;
 import eu.linksmart.security.cryptomanager.impl.CustomCertificateAttributes;
@@ -833,8 +832,11 @@ public class KeyManagerImpl implements KeyManager {
 	IOException {
 		// Create new DSA key pair, store it into keystore and create a
 		// reference to it in the database
-		RSAKeyPairGenerator rsakpg = new RSAKeyPairGenerator();
-		KeyPair dsakp = rsakpg.generateKeyPair();
+		//RSAKeyPairGenerator rsakpg = new RSAKeyPairGenerator();
+        // TODO swiching from properitary sun implementation to java standard of creating RSA keys
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(2048);
+		KeyPair dsakp = kpg.generateKeyPair();
 		java.security.cert.Certificate[] certificates =
 		{ new KeyManagerImpl().certGenerator(dsakp, null) };
 		ks.setKeyEntry(PRIVATE_SIGNING_KEY_ALIAS, dsakp.getPrivate()

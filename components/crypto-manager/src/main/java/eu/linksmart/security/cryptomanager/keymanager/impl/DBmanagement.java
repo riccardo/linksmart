@@ -46,6 +46,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import org.apache.derby.jdbc.EmbeddedDriver;
 
 import org.apache.log4j.Logger;
 

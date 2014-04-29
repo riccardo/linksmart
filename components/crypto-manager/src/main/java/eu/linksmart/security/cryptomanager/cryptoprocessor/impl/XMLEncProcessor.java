@@ -66,13 +66,14 @@ import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
+import org.jdom.xpath.XPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXParseException;
 
-import com.sun.org.apache.xpath.internal.XPathAPI;
+//import com.sun.org.apache.xpath.internal.XPathAPI;
 
 import eu.linksmart.security.cryptomanager.cryptoprocessor.CryptoMessageFormatProcessor;
 import eu.linksmart.security.cryptomanager.keymanager.impl.DBmanagement;
@@ -745,9 +746,9 @@ public class XMLEncProcessor implements CryptoMessageFormatProcessor {
 			X509Certificate cert = key.getX509Certificate();
 			result = sig.checkSignatureValue(cert);
 			if (result) {
-				Text textElement =
-					(Text) XPathAPI.selectSingleNode(doc,
-							"/linksmart:SignedMessage/text()");
+                Text textElement = (Text) XPath.selectSingleNode(doc, "/linksmart:SignedMessage/text()");
+                // deprecated internal com.sun.org.apache.xpath.internal.XPathAPI replaced
+    			//(Text) XPathAPI.selectSingleNode(doc,"/linksmart:SignedMessage/text()");
 				textResult =
 					new String(Base64.decode(textElement.getTextContent()));
 				logger.debug("Textresult is " + textResult);

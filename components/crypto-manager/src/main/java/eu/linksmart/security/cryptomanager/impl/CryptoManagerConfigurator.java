@@ -21,6 +21,7 @@ import org.osgi.framework.BundleContext;
 
 import eu.linksmart.security.cryptomanager.SecurityLevel;
 import eu.linksmart.utils.Configurator;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 public class CryptoManagerConfigurator extends Configurator {
 
@@ -49,7 +50,6 @@ public class CryptoManagerConfigurator extends Configurator {
 	/**
 	 * Constructor. Creates a new "NetworkManagerConfigurator" object
 	 * 
-	 * @param trustManager the network manager implementation
 	 * @param context the bundle's execution context
 	 */
 	public CryptoManagerConfigurator(CryptoManagerImpl cm, 
@@ -59,6 +59,14 @@ public class CryptoManagerConfigurator extends Configurator {
 			CM_PID, CONFIGURATION_FILE);
 		this.cryptoManager = cm;
 	}
+    public CryptoManagerConfigurator(CryptoManagerImpl cm,
+                                     BundleContext context,ConfigurationAdmin configurationAdmin) {
+
+        super(context, Logger.getLogger(CryptoManagerConfigurator.class.getName()),
+                CM_PID, CONFIGURATION_FILE,configurationAdmin);
+        super.init();
+        this.cryptoManager = cm;
+    }
 	
 	@Override
 	public void applyConfigurations(Hashtable updates) {
