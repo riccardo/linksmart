@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.linksmart</groupId>
+		<artifactId>linksmart-parent</artifactId>
+		<version>2.2.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>linksmart-deployment-features</artifactId>
+	
+	<name>LinkSmart OSGi Deployment Features</name>
+    
+    <packaging>pom</packaging>
+     
+    <modules>
+    	<module>linksmart-features</module>
+    </modules>
+    
+    <properties>
+    	<commons-codec.version>1.3_2</commons-codec.version>
+        <commons-httpclient.version>3.1_7</commons-httpclient.version>
+    </properties> 
+
+    <scm>
+        <connection>scm:svn:https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/deployment-features</connection>
+        <developerConnection>scm:svn:https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/deployment-features</developerConnection>
+        <url>https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/deployment-features</url>
+    </scm>
+
+	<build>
+		<pluginManagement>
+            <plugins>
+            	<!-- plugin for Karaf feature -->
+            	<plugin>
+                	<groupId>org.codehaus.mojo</groupId>
+                	<artifactId>build-helper-maven-plugin</artifactId>
+                	<version>1.8</version>
+            	</plugin>
+            </plugins>
+        </pluginManagement>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>filter</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+			<plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>target/features.xml</file>
+                                    <type>xml</type>
+                                    <classifier>features</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+		</plugins>
+	</build>
+
+</project>

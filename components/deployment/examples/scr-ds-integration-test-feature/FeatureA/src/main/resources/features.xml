@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<features>
+    <feature name="${artifactId}" version="${version}">
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/1.6.2</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/1.0.4</bundle>
+        <bundle>mvn:eu.linksmart/BundleA/${parent.version}</bundle>
+    </feature>
+</features>

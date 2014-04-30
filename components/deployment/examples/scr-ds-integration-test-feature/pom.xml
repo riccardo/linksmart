@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>scr-ds-integration-test-feature</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+    <groupId>eu.linksmart</groupId>
+
+	<packaging>pom</packaging>
+
+    <modules>
+        <module>FeatureA</module>
+        <module>BundleA</module>
+    </modules>
+
+
+	<dependencies>
+		<!-- PaxExam dependencies -->
+		<dependency>
+			<groupId>org.ops4j.pax.exam</groupId>
+			<artifactId>pax-exam-junit4</artifactId>
+            <version>3.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.ops4j.pax.exam</groupId>
+			<artifactId>pax-exam-link-mvn</artifactId>
+            <version>3.2.0</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- 
+			PaxExam decides on a specific OSGi Container for testing based on the maven dependecies,
+			we are using Apache Karaf for in-container OSGi testing
+		 -->
+		<dependency>
+			<groupId>org.ops4j.pax.exam</groupId>
+			<artifactId>pax-exam-container-karaf</artifactId>
+            <version>3.2.0</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

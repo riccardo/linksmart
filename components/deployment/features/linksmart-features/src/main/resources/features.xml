@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<features name="${project.artifactId}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+    <feature name="linksmart-boot-feature" version="${project.version}">
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle> 
+        
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${project.version}</bundle>
+    </feature>
+    
+    <feature name="osgi-http-service" version="${project.version}">
+    	<feature version="${karaf.version}">http</feature>
+<!--     	<bundle>mvn:org.apache.felix/org.apache.felix.http.jetty/${felix.http.version}</bundle>	 -->
+    </feature>
+    
+    <feature name="network-manager-core" version="${project.version}">  
+    	<feature version="${project.version}">linksmart-boot-feature</feature> 
+    	<feature version="${project.version}">osgi-http-service</feature>  
+    		
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.cryptomanager/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/crypto-manager-dummy/${project.version}</bundle>
+        
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/communication-security-manager-sym-dummy/${project.version}</bundle>
+        
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.identitymanager/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/identity-manager-dummy/${project.version}</bundle>
+        
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/trust-manager-dummy/${project.version}</bundle>
+        
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/backbone-router-dummy/${project.version}</bundle>
+        
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/network-manager-dummy/${project.version}</bundle>
+    </feature>
+    
+    <feature name="basic-tunnel" version="${project.version}">
+    	<feature version="${project.version}">network-manager-core</feature>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.network.tunnel/${project.version}</bundle>
+    </feature>
+    
+    <feature name="standard-tunnel" version="${project.version}">
+    	<feature version="${project.version}">basic-tunnel</feature>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.network.tunnel.standard/${project.version}</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-codec/${commons-codec.version}</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/${commons-httpclient.version}</bundle>
+    </feature>
+    
+    <feature name="soap-tunnel" version="${project.version}">
+    	<feature version="${project.version}">network-manager-core</feature>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.network.soaptunneling/${project.version}</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-codec/${commons-codec.version}</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/${commons-httpclient.version}</bundle>
+    </feature>
+
+    <!-- ****************************** -->
+    <!--  BACKBONE INTEGRATION FEATURE -->
+
+    <feature name="cryptomanager-it" version="${project.version}">
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.cryptomanager/${project.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-jxpath/1.3_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-beanutils/1.8.3_2</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/1.1_4</bundle>
+        <bundle>mvn:org.bouncycastle/bcprov-jdk16/1.46</bundle>
+        <bundle>mvn:javax.transaction/com.springsource.javax.transaction/1.1.0</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.derby/10.10.1.1_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/1.2_5</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/2.4_6</bundle>
+        <bundle>mvn:org.apache.commons/commons-jexl/2.1.1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-digester/1.8_4</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-collections/3.2.1_3</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-codec/1.3_5</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-configuration/1.9_1</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.security.cryptomanager/${project.version}</bundle>
+    </feature>
+
+    <!-- ****************************** -->
+    <!--  BACKBONE INTEGRATION FEATURES -->
+
+    <feature name="backbone-osgi-it" version="${project.version}">
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.router/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.impl.osgi/${parent.version}</bundle>
+    </feature>
+
+    <feature name="backbone-soap-it" version="${project.version}">
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.router/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.soap/${parent.version}</bundle>
+    </feature>
+
+    <feature name="backbone-jxta-it" version="${project.version}">
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/4.2.22</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcpg-jdk16/${servicemix.bcpg-jdk16}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.router/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.jxta/${parent.version}</bundle>
+    </feature>
+
+    <feature name="backbone-router-it" version="${project.version}">
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <!--<bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/4.2.22</bundle>-->
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcpg-jdk16/${servicemix.bcpg-jdk16}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/network-manager-dummy/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.impl.osgi/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.router/${parent.version}</bundle>
+    </feature>
+
+    <!-- ****************************** -->
+    
+</features>

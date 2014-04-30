@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.linksmart</groupId>
+		<artifactId>linksmart-osgi-component</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>scr-declerative-service</artifactId>
+
+	<packaging>bundle</packaging>
+
+	<name>Felix SCR annotated OSGi Declerative Service</name>
+	<description>Example for creating OSGi Declerative services with apache Felix maven-scr-plugin</description>
+
+	<dependencies>
+		<!-- 
+		dependency 'org.apache.felix:org.osgi.core' (used by maven-bundle-plugin) & 'felix.scr.annotations' 
+		is inherited from linksmart-osgi-component pom, felix.scr.annotations dependency is needed by maven-scr-plugin
+		-->
+	</dependencies>
+
+	<build>
+		<!-- maven-bundle-plugin & maven-scr-plugin are inherited from linksmart-osgi-component pom -->
+	</build>
+
+</project>
