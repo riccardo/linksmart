@@ -41,36 +41,29 @@ package eu.linksmart.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
-/**
- *
- */
-public abstract class Configurator implements ManagedService{
+public abstract class Configurator implements ManagedService {
 
-	public Dictionary configuration;
-	public ConfigurationAdmin cm;
-	private boolean initiated = false;
-	public Logger logger;
+	public Dictionary configuration = null;
+	private ConfigurationAdmin cm = null;
 	private ServiceRegistration managedServiceReg;
-	public BundleContext context;
 	public Hashtable unsavedConfigs = new Hashtable();
 
+	public BundleContext context;
+	public Logger logger;
 	/** Configuration PID */
 	public String pid;
-
 	/** Default Configuration Location */
 	public String configurationFilePath;
 
@@ -83,33 +76,41 @@ public abstract class Configurator implements ManagedService{
 	 */
 	public Configurator(BundleContext context, Logger logger, 
 			String pid, String configurationFilePath) {
-
 		this.context = context;
 		this.pid = pid;
 		this.configurationFilePath = configurationFilePath;
 		this.logger = logger;
 
-		ServiceReference ref = context.getServiceReference(
-				ConfigurationAdmin.class.getName());
-		if (ref != null) {
-			this.cm = (ConfigurationAdmin) context.getService(ref);
-		}
+//		ServiceReference ref = context.getServiceReference(
+//				ConfigurationAdmin.class.getName());
+//		if (ref != null) {
+//			this.cm = (ConfigurationAdmin) context.getService(ref);
+//		}
 
-		init();
-		initiated = true;
+//		init();
+//		initiated = true;
 	}
-
+	
+	public Configurator(BundleContext context, Logger logger, 
+			String pid, String configurationFilePath, ConfigurationAdmin cm) {
+		this.context = context;
+		this.pid = pid;
+		this.configurationFilePath = configurationFilePath;
+		this.logger = logger;
+		this.cm = cm;
+	}
+	
 	/**
 	 * Sets the Configuration Admin, thats is a service for administer 
 	 * configuration data
 	 * 
 	 * @param cm the configuration admin
 	 */
-	public final void bindConfigurationAdmin(ConfigurationAdmin cm) {
+	public final void setConfigurationAdmin(ConfigurationAdmin cm) {
 		this.cm = cm;
-		if (initiated) {
-			setConfiguration(null, null);
-		}
+//		if (initiated) {
+//			setConfiguration(null, null);
+//		}
 	}
 
 	/**
@@ -117,7 +118,7 @@ public abstract class Configurator implements ManagedService{
 	 * 
 	 * @param admin not used
 	 */
-	public final void unbindConfigurationAdmin(ConfigurationAdmin admin) {
+	public final void unsetConfigurationAdmin(ConfigurationAdmin admin) {
 		if (managedServiceReg!=null) {
 			managedServiceReg.unregister();
 		}
@@ -129,8 +130,6 @@ public abstract class Configurator implements ManagedService{
 	 */
 	public void init() {
 		try {
-			configuration = null;
-
 			if (cm != null) {
 				// We check if there is already a persistent configuration
 				// in the framework.
@@ -140,8 +139,7 @@ public abstract class Configurator implements ManagedService{
 				// If there is no configuration, we will use the properties 
 				// file in the jar
 				if (configuration == null) {
-					logger.info("No persistent configuration for PID " + pid
-							+ " available");
+					logger.info("No persistent configuration for PID " + pid + " available");
 					configuration = loadDefaults();
 					config.update(configuration);
 				}
@@ -149,8 +147,7 @@ public abstract class Configurator implements ManagedService{
 			else {
 				// If the configuration admin is not yet available, just use the 
 				// default configuration from the Jar
-				logger.warn("Configuration=" + pid
-						+ " - ConfigurationAdmin not found... loading defaults...");
+				logger.warn("Configuration=" + pid + " - ConfigurationAdmin not found... loading defaults...");
 				configuration = loadDefaults();
 			}
 		} catch (IOException e) {
@@ -166,8 +163,8 @@ public abstract class Configurator implements ManagedService{
 		if (cm != null) {
 			Dictionary d  = new Hashtable();
 			d.put(Constants.SERVICE_PID, pid);
-			managedServiceReg = context.registerService(
-					ManagedService.class.getName(), this, d);
+			managedServiceReg = context.registerService(ManagedService.class.getName(), this, d);
+			logger.info("registering configuration for PID [" + pid + "]");
 		}
 	}
 
@@ -176,7 +173,7 @@ public abstract class Configurator implements ManagedService{
 	 */
 	public void stop() {
 		managedServiceReg.unregister();
-		initiated = false;
+//		initiated = false;
 		configuration = null;
 		unsavedConfigs = null;
 	}
@@ -265,11 +262,11 @@ public abstract class Configurator implements ManagedService{
 
 		try {
 			config = cm.getConfiguration(pid);
-			Dictionary storedConfig = null;
 			if (config != null) {
 				config.getProperties();
 			}
 
+			Dictionary storedConfig = null;
 			if (storedConfig == null) {
 				/*
 				 * Only when there is still no configuration, take the current 
@@ -277,13 +274,13 @@ public abstract class Configurator implements ManagedService{
 				 */
 				storedConfig = configuration;
 			}
-			else {				
-				Enumeration unsaved = unsavedConfigs.keys();
-				while (unsaved.hasMoreElements()) {
-					String k = (String) unsaved.nextElement();
-					storedConfig.put(k, value);
-				}
-			}
+//			else {				
+//				Enumeration unsaved = unsavedConfigs.keys();
+//				while (unsaved.hasMoreElements()) {
+//					String k = (String) unsaved.nextElement();
+//					storedConfig.put(k, value);
+//				}
+//			}
 
 			if (config != null) {
 				config.update(storedConfig);
@@ -319,7 +316,7 @@ public abstract class Configurator implements ManagedService{
 	public Dictionary loadDefaults() {
 		Properties properties = new Properties();
 		InputStream f = null;
-		logger.info("Loading default configuration from " + configurationFilePath);
+		logger.info("Loading default configuration for PID [" + pid + "] from " + configurationFilePath);
 		f = this.getClass().getResourceAsStream(configurationFilePath);
 
 		try {
