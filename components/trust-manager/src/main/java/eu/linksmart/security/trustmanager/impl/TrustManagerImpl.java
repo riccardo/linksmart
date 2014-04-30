@@ -39,6 +39,15 @@ import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Properties;
+import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -65,12 +74,15 @@ import eu.linksmart.utils.Part;
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * @author Mark Vinkovits (mark.vinkovits@fit.fraunhofer.de)
  */
-
+@Component(name="TrustManager")
+@Service({TrustManager.class})
+@Properties({
+    @Property(name="service.exported.interfaces", value="*"),
+    @Property(name="service.exported.configs", value="org.apache.cxf.ws"),
+    @Property(name="org.apache.cxf.ws.address", value="http://0.0.0.0:9090/cxf/services/TrustManager")
+})
 public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration {
 
-	/**
-	 * Logger.
-	 */
 	private final static Logger LOG = Logger.getLogger(TrustManagerImpl.class.getName());
 	
 	public static final String TRUST_MANAGER_PATH = "/cxf/services/TrustManager";
@@ -85,10 +97,100 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 	private ServiceRegistration trustModelConfigService = null;
 	private Registration trustManagerVirtualAddress = null;
 	private boolean nmOsgi = false;
-	private NetworkManager nm = null;
-	private RemoteWSClientProvider clientProvider;
 	private boolean createdService;
 	private String nmAddress = null;
+	
+	@Reference(name="ConfigurationAdmin",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindConfigAdmin", 
+			unbind="unbindConfigAdmin",
+			policy=ReferencePolicy.STATIC)
+	protected ConfigurationAdmin configAdmin = null;
+	
+	@Reference(name="NetworkManager",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindNetworkManager", 
+			unbind="unbindNetworkManager",
+			policy=ReferencePolicy.DYNAMIC)
+	private NetworkManager nm = null;
+	
+	@Reference(name="RemoteWSClientProvider",
+			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+			bind="bindWSProvider", 
+			unbind="unbindWSProvider",
+			policy=ReferencePolicy.DYNAMIC)
+	private RemoteWSClientProvider clientProvider;
+	
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+		LOG.debug("TrustManager::binding ConfigurationAdmin");
+		this.configAdmin = configAdmin;
+    }
+    
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	LOG.debug("TrustManager::un-binding ConfigurationAdmin");
+    	this.configAdmin = null;
+    }
+	
+	protected void bindWSProvider(RemoteWSClientProvider clientProvider) {
+		LOG.debug("TrustManager::binding ws-client");
+		this.clientProvider = clientProvider;
+	}
+
+	protected void unbindWSProvider(RemoteWSClientProvider clientProvider) {
+		LOG.debug("TrustManager::un-binding ws-client");
+		removeTrustManagerService();
+		this.clientProvider = null;
+		if(!nmOsgi){
+			removeTrustManagerService();
+			createdService = false;
+			this.nm= null;
+		}
+	}
+
+	protected void bindNetworkManager(NetworkManager netManager) {
+		LOG.debug("TrustManager::binding network-manager");
+		this.nm = netManager;
+		nmOsgi = true;
+	}
+
+	protected void unbindNetworkManager(NetworkManager nm) {
+		LOG.debug("TrustManager::un-binding network-manager");
+		if (activated) {
+			removeTrustManagerService();
+			createdService = false;
+		}
+		this.nm = null;
+		nmOsgi = false;
+
+	}
+
+	@Activate
+	protected void activate(ComponentContext ccontext) {
+		LOG.info("[activating TrustManager]");
+		this.context = ccontext.getBundleContext();
+		//create configuration files
+		Hashtable<String, String> HashFilesExtract = new Hashtable<String, String>();
+		LOG.debug("Deploying TrustManager config files");
+		HashFilesExtract.put(Util.FILE_CONFIG, "configuration/config.xml");
+
+		Util.createDirectory(Util.CONFIGFOLDERPATH);
+		Util.extractFilesJar(HashFilesExtract);	
+
+		//set up configurator for trust manager
+		configurator = new TrustManagerConfigurator(this, context, configAdmin);
+		configurator.registerConfiguration();
+
+		createServiceForTrustManager(false);
+
+		this.activated = true;
+		LOG.info("TrustManager activated");		
+	}
+
+	@Deactivate
+	protected void deactivate(ComponentContext ccontext) {
+		LOG.info("de-activating TrustManagerDummy");
+		this.activated=false;
+	}
 
 	@Override
 	public boolean setCurrentTrustModel(String identifier) {
@@ -204,83 +306,6 @@ public class TrustManagerImpl implements TrustManager, TrustManagerConfiguration
 		}
 		// else is handled by OSGI ConfigAdmin
 
-	}
-
-	protected void configurationUnbind(ConfigurationAdmin ca){
-		configurator.unbindConfigurationAdmin(ca);
-	}
-
-	protected void configurationBind(ConfigurationAdmin ca){
-
-		if (configurator != null) {
-			configurator.bindConfigurationAdmin(ca);
-			if (activated == true) {
-				configurator.registerConfiguration();
-			}
-		}
-	}
-
-	protected void bindWSProvider(RemoteWSClientProvider clientProvider) {
-		LOG.debug("RemoteWSClientProvider bound in TrustManager");
-		this.clientProvider = clientProvider;
-		if (activated) {
-			createServiceForTrustManager(false);
-		}
-	}
-
-	protected void unbindWSProvider(RemoteWSClientProvider clientProvider) {
-		removeTrustManagerService();
-		this.clientProvider = null;
-		if(!nmOsgi){
-			removeTrustManagerService();
-			createdService = false;
-			this.nm= null;
-		}
-		LOG.debug("RemoteWSClientProvider unbound from TrustManager");
-	}
-
-	protected void bindNetworkManager (NetworkManager netManager) {
-		this.nm = netManager;
-		nmOsgi = true;
-		if (activated) {
-			createServiceForTrustManager(false);
-		}
-	}
-
-	protected void unbindNetworkManager (NetworkManager nm) {
-		if (activated) {
-			removeTrustManagerService();
-			createdService = false;
-		}
-		this.nm = null;
-		nmOsgi = false;
-
-	}
-
-	protected void activate(ComponentContext ccontext){
-		this.context = ccontext.getBundleContext();
-
-		//create configuration files
-		Hashtable<String, String> HashFilesExtract = new Hashtable<String, String>();
-		LOG.debug("Deploying TrustManager config files");
-		HashFilesExtract.put(Util.FILE_CONFIG, "configuration/config.xml");
-
-		Util.createDirectory(Util.CONFIGFOLDERPATH);
-		Util.extractFilesJar(HashFilesExtract);	
-
-		//set up configurator for trust manager
-		configurator = new TrustManagerConfigurator(this, context);
-		configurator.registerConfiguration();
-
-		createServiceForTrustManager(false);
-
-		this.activated = true;
-		LOG.debug("TrustManager activated");		
-	}
-
-	protected void deactivate(ComponentContext ccontext){
-		this.activated=false;
-		LOG.debug("TrustManager deactivated");
 	}
 
 	private void createServiceForTrustManager(boolean renewCert) {

@@ -41,9 +41,9 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import eu.linksmart.utils.Configurator;
-
 
 public class TrustManagerConfigurator extends Configurator {
 
@@ -61,8 +61,6 @@ public class TrustManagerConfigurator extends Configurator {
 	
 	private TrustManagerImpl trustManager;
 
-	
-	
 	/**
 	 * Constructor. Creates a new "NetworkManagerConfigurator" object
 	 * 
@@ -74,6 +72,24 @@ public class TrustManagerConfigurator extends Configurator {
 		
 		super(context, Logger.getLogger(TrustManagerConfigurator.class.getName()),
 			TM_PID, CONFIGURATION_FILE);
+		this.trustManager = trustManager;
+		trustManager.setCurrentTrustModel(this.get(TM_TRUST_MODEL));
+	}
+	
+	/**
+	 * Constructor. Creates a new "NetworkManagerConfigurator" object
+	 * 
+	 * @param trustManager the network manager implementation
+	 * @param context the bundle's execution context
+	 * @param configuration admin
+	 */
+	public TrustManagerConfigurator(TrustManagerImpl trustManager, 
+			BundleContext context, ConfigurationAdmin configAdmin) {
+		
+		super(context, Logger.getLogger(TrustManagerConfigurator.class.getName()),
+			TM_PID, CONFIGURATION_FILE, configAdmin);
+		//super.setConfigurationAdmin(configAdmin); // if not passed in through super constructor
+		super.init();
 		this.trustManager = trustManager;
 		trustManager.setCurrentTrustModel(this.get(TM_TRUST_MODEL));
 	}
