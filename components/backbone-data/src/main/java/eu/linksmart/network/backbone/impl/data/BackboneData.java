@@ -5,6 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
@@ -16,8 +23,15 @@ import eu.linksmart.network.backbone.data.DataEndpoint;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.SecurityProperty;
 
+@Component(name="BackboneData", immediate=true)
+@Service
 public class BackboneData implements Backbone {
 
+	@Reference(name="BackboneRouter",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindBackboneRouter",
+            unbind="unbindBackboneRouter",
+            policy= ReferencePolicy.STATIC)
 	private BackboneRouter bRouter;
 
 	private Logger LOG = Logger.getLogger(BackboneData.class.getName());
@@ -25,17 +39,33 @@ public class BackboneData implements Backbone {
 	private static final String ENDPOINT_UNREACHABLE = "Unknown endpoint";
 
 	private ComponentContext context;
+	
+	// Maps the LS virtual address to OSGi "component.name" property
+	//private Map<VirtualAddress, String> addressEndpointMap = new ConcurrentHashMap<VirtualAddress, String>();
+	private Map<VirtualAddress, String> addressEndpointMap = null;
 
 	protected void bindBackboneRouter(BackboneRouter router) {
+		LOG.debug("BackboneData::binding backbone-router");
 		bRouter = router;
 	}
 
 	protected void unbindBackboneRouter(BackboneRouter router) {
+		LOG.debug("BackboneData::un-binding backbone-router");
 		bRouter = null;
 	}
+	
+	@Activate
+	protected void activate(ComponentContext context) {
+		LOG.info("[activating BackboneData]");
+		this.context = context;
+		this.addressEndpointMap = new ConcurrentHashMap<VirtualAddress, String>();
+		LOG.info("BackboneData started");
+	}
 
-	// Maps the LS virtual address to OSGi "component.name" property
-	private Map<VirtualAddress, String> addressEndpointMap = new ConcurrentHashMap<VirtualAddress, String>();
+	@Deactivate
+	protected void deactivate(ComponentContext context) {
+		LOG.info("deactivating BackboneData");
+	}
 
 	@Override
 	public NMResponse sendDataSynch(VirtualAddress senderVirtualAddress,
@@ -221,15 +251,4 @@ public class BackboneData implements Backbone {
 		this.addressEndpointMap.put(remoteVirtualAddress,
 				this.addressEndpointMap.get(senderVirtualAddress));
 	}
-
-	protected void activate(ComponentContext context) {
-		this.context = context;
-		this.addressEndpointMap = new ConcurrentHashMap<VirtualAddress, String>();
-		LOG.info("BackboneData started");
-	}
-
-	protected void deactivate(ComponentContext context) {
-		LOG.info("BackboneData stopped");
-	}
-
 }
