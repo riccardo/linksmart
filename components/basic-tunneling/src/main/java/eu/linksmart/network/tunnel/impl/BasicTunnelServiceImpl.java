@@ -12,6 +12,13 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
@@ -23,30 +30,43 @@ import eu.linksmart.network.tunnel.BasicTunnelService;
 import eu.linksmart.utils.Part;
 import eu.linksmart.network.tunnel.MultipleMatchException;
 
-public class BasicTunnelServiceImpl implements BasicTunnelService{
+@Component(name="BasicTunneling", immediate=true)
+@Service
+public class BasicTunnelServiceImpl implements BasicTunnelService {
 
 	private BasicTunnelServiceImpl tunnel;
 
 	private static Logger LOG = Logger.getLogger(BasicTunnelServiceImpl.class.getName());
+	
+	@Reference(name="NetworkManagerCore",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindNetworkManagerCore", 
+			unbind="unbindNetworkManagerCore",
+			policy=ReferencePolicy.DYNAMIC)
 	protected NetworkManagerCore nmCore;
 
-	protected NetworkManagerCore getNM() {
-		return this.nmCore;
-	}
-
-	protected void activate(ComponentContext context) {
-		LOG.debug("BasicTunnelServiceImpl activated");
-	}
-
-	protected void deactivate(ComponentContext context) {
-	}
-
-	protected void bindNetworkManager(NetworkManagerCore nmCore) {
+	protected void bindNetworkManagerCore(NetworkManagerCore nmCore) {
+		LOG.debug("BasicTunnelService::binding network-manager-core");
 		this.nmCore = nmCore;
 	}
 
-	protected void unbindNetworkManager(NetworkManagerCore nmCore) {
+	protected void unbindNetworkManagerCore(NetworkManagerCore nmCore) {
+		LOG.debug("BasicTunnelService::binding network-manager-core");
 		this.nmCore = null;
+	}
+	
+	@Activate
+	protected void activate(ComponentContext context) {
+		LOG.info("[activating BasicTunnelService]");
+	}
+
+	@Deactivate
+	protected void deactivate(ComponentContext context) {
+		LOG.info("de-activating BasicTunnelService");
+	}
+
+	protected NetworkManagerCore getNM() {
+		return this.nmCore;
 	}
 
 	@Override
@@ -54,20 +74,24 @@ public class BasicTunnelServiceImpl implements BasicTunnelService{
 			HttpServletRequest request,
 			VirtualAddress defaultSender) {
 		String path = request.getPathInfo();
+		//TODO checking if whole path is in correct format
+		//TODO check if virtual address format is correct
 		//get sender address and check if path contained default switch
 		VirtualAddress senderVirtualAddress = null;
 		if (path.startsWith("/0/") || path.equals("/0")) {
 			return defaultSender;
 		} else {
+			//TODO first remove the receiver virtual address part from path
 			Pattern pat = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
 			Matcher matcher = pat.matcher(path);
 			if(matcher.find()) {
 				senderVirtualAddress = new VirtualAddress(matcher.group());
 				//remove sender virtual address part from path
+				//TODO does it required to do so?
 				path = path.substring(matcher.group().length() + 1);
 				return senderVirtualAddress;
 			} else {
-				LOG.info(BasicTunnelService.INVALID_VIRTUAL_ADDRESS_FORMAT + " of sender:" + request.getPathInfo());
+				LOG.error(BasicTunnelService.INVALID_VIRTUAL_ADDRESS_FORMAT + " of sender:" + request.getPathInfo());
 				return null;
 			}
 		}
