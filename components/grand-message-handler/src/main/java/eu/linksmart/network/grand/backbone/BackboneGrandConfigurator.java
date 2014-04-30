@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 
 import eu.linksmart.utils.Configurator;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 public class BackboneGrandConfigurator extends Configurator {
 
@@ -40,6 +41,23 @@ public class BackboneGrandConfigurator extends Configurator {
 		super(context, logger, BBSOAP_PID, CONFIGURATION_FILE);
 		this.bbGrandImpl = bbSOAPImpl;
 	}
+	
+	/**
+	 * Initializes the JXTA backbone configurator.
+	 * 
+	 * @param bbJXTAImpl
+	 *            instantiation of JXTA backbone
+	 * @param context
+	 *            A bundle context
+	 * @param configurationAdmin
+	 *            configuration Admin
+	 */
+    public BackboneGrandConfigurator(BackboneGrandImpl bbSOAPImpl,
+                                     BundleContext context,ConfigurationAdmin configurationAdmin) {
+        super(context, logger, BBSOAP_PID, CONFIGURATION_FILE,configurationAdmin);
+        super.init();
+        this.bbGrandImpl = bbSOAPImpl;
+    }
 
 	/**
 	 * Apply the configuration changes

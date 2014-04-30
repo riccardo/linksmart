@@ -3,7 +3,11 @@ package eu.linksmart.network.grand.impl;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import eu.linksmart.network.backbone.data.DataEndpoint;
+import eu.linksmart.network.grand.backbone.BackboneGrandImpl;
+import org.apache.felix.scr.annotations.*;
 import org.apache.log4j.Logger;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 
@@ -11,29 +15,112 @@ import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.VirtualAddress;
-import eu.linksmart.network.grand.backbone.BackboneGrandImpl;
 import eu.linksmart.network.grand.tunnel.GrandTunnelServlet;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.network.tunnel.BasicTunnelService;
 import eu.linksmart.network.backbone.Backbone;
-import eu.linksmart.network.backbone.data.DataEndpoint;
 import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.utils.Part;
 
+@Component(name="GrandMessageHandler",immediate=true)
+@Service
 public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 
 	private static Logger LOG = Logger.getLogger(GrandMessageHandlerImpl.class.getName());
-	private static final String OSGI_COMPONENT_NAME = "GrandMessageHandler"; 
+	private static final String OSGI_COMPONENT_NAME = "GrandMessageHandler";
 
-	private NetworkManagerCore nmCore;
 	private Backbone backboneGrand = null;
-	private BackboneRouter bbRouter = null;
+	
 	private Registration registration = null;
 	private GrandTunnelServlet grandTunnelServlet = null;
+	
+    @Reference(name="ConfigurationAdmin",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindConfigurationAdmin",
+            unbind="unbindConfigurationAdmin",
+            policy=ReferencePolicy.STATIC)
+    protected ConfigurationAdmin configAdmin = null;
+    
+    @Reference(name="NetworkManagerCore",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindNetworkManagerCore",
+            unbind="unbindNetworkManagerCore",
+            policy=ReferencePolicy.DYNAMIC)
+	private NetworkManagerCore nmCore;
+    
+    @Reference(name="BackboneRouter",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindBackboneRouter",
+            unbind="unbindBackboneRouter",
+            policy= ReferencePolicy.STATIC)
+	private BackboneRouter bbRouter = null;
+    
+    @Reference(name="BasicTunnelService",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindBasicTunnelService",
+            unbind="unbindBasicTunnelService",
+            policy=ReferencePolicy.DYNAMIC)
 	private BasicTunnelService basicTunnelService;
+    
+    @Reference(name="HttpService",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindHttpService",
+            unbind="unbindHttpService",
+            policy=ReferencePolicy.STATIC)
+    private HttpService httpService;
 
-	public NetworkManagerCore getNM() {
+    protected void bindConfigurationAdmin(ConfigurationAdmin configAdmin) {
+    	LOG.debug("GrandMessageHandler::binding ConfigurationAdmin");
+        this.configAdmin = configAdmin;
+    }
+
+    protected void unbindConfigurationAdmin(ConfigurationAdmin configAdmin) {
+    	LOG.debug("GrandMessageHandler::un-binding ConfigurationAdmin");
+        this.configAdmin = null;
+    }
+
+    protected void bindBackboneRouter(BackboneRouter bbRouter) {
+    	LOG.debug("GrandMessageHandler::binding backbone-router");
+        this.bbRouter = bbRouter;
+    }
+
+    protected void unbindBackboneRouter(BackboneRouter bbRouter) {
+    	LOG.debug("GrandMessageHandler::un-binding backbone-router");
+        this.bbRouter = null;
+    }
+
+    protected void bindHttpService(HttpService httpService) {
+    	LOG.debug("GrandMessageHandler::binding http-service");
+        this.httpService = httpService;
+    }
+
+    protected void unbindHttpService(HttpService httpService) {
+    	LOG.debug("GrandMessageHandler::un-binding http-service");
+        this.httpService = null;
+    }
+    
+    protected void bindBasicTunnelService(BasicTunnelService basicTunnelService) {
+    	LOG.debug("GrandMessageHandler::binding basic-tunneling");
+		this.basicTunnelService = basicTunnelService;
+	}
+	
+	protected void unbindBasicTunnelService(BasicTunnelService basicTunnelService) {
+		LOG.debug("GrandMessageHandler::un-binding basic-tunneling");
+		this.basicTunnelService = null;
+	}
+
+	protected void bindNetworkManagerCore(NetworkManagerCore nmCore) {
+		LOG.debug("GrandMessageHandler::binding network-manager-core");
+		this.nmCore = nmCore;
+	}
+
+	protected void unbindNetworkManagerCore(NetworkManagerCore nmCore) {
+		LOG.debug("GrandMessageHandler::un-binding network-manager-core");
+		this.nmCore = null;
+	}
+
+    public NetworkManagerCore getNM() {
 		return this.nmCore;
 	}
 	
@@ -45,21 +132,22 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 		return basicTunnelService;
 	}
 
+	@Activate
 	protected void activate(ComponentContext context) {
+		LOG.info("[activating GrandMessageHandler]");
 		//start tunneling
-		HttpService http = (HttpService) context.locateService("HttpService");
 		grandTunnelServlet = new GrandTunnelServlet(this);
 		try {
-			http.registerServlet("/GrandTunneling", grandTunnelServlet,
-					null, null);
+			httpService.registerServlet("/GrandTunneling", grandTunnelServlet, null, null);
+			LOG.info("[registering /GrandTunneling servlet]");
 		} catch (Exception e) {
 			LOG.error("Error registering servlet", e);
 		}
 		//start backbone
-		bbRouter = (BackboneRouter) context
-				.locateService(BackboneRouter.class.getSimpleName());
-		backboneGrand = new BackboneGrandImpl(context, bbRouter);
-
+		//bbRouter = (BackboneRouter) context
+		//		.locateService(BackboneRouter.class.getSimpleName());
+		backboneGrand = new BackboneGrandImpl(context, bbRouter,configAdmin);
+		
 		//register with network manager
 		try {
 			String[] backbones = nmCore.getAvailableBackbones();
@@ -86,15 +174,15 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 		if(registration == null) {
 			LOG.error("Failed to register service " + OSGI_COMPONENT_NAME);
 		} else {
-			LOG.info("Started component " + OSGI_COMPONENT_NAME);
+			LOG.info("Started: " + OSGI_COMPONENT_NAME);
 		}
 	}
 
+	@Deactivate
 	protected void deactivate(ComponentContext context) {
-		HttpService http = (HttpService) context.locateService("HttpService");
-
+		LOG.info("[de-activating GrandMessageHandler]");
 		try {
-			http.unregister("/GrandTunneling");
+			httpService.unregister("/GrandTunneling");
 		} catch (Exception e) {
 			LOG.error("Error unregistering servlet", e);
 		}	
@@ -105,22 +193,6 @@ public class GrandMessageHandlerImpl implements DataEndpoint, Backbone {
 		}
 	}
 	
-	protected void bindBasicTunnelService(BasicTunnelService basicTunnelService) {
-		this.basicTunnelService = basicTunnelService;
-	}
-	
-	protected void unbindBasicTunnelService(BasicTunnelService basicTunnelService) {
-		this.basicTunnelService = null;
-	}
-
-	protected void bindNetworkManagerCore(NetworkManagerCore nmCore) {
-		this.nmCore = nmCore;
-	}
-
-	protected void unbindNetworkManagerCore(NetworkManagerCore nmCore) {
-		this.nmCore = null;
-	}
-
 	/*
 	 * Method to receive data packets.
 	 */

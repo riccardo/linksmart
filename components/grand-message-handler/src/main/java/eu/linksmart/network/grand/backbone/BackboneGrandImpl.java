@@ -8,16 +8,15 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.VirtualAddress;
@@ -49,13 +48,15 @@ public class BackboneGrandImpl implements Backbone {
 
 	private BackboneGrandConfigurator configurator;
 	private BackboneRouter bbRouter;
+    private ConfigurationAdmin configurationAdmin;
 	
-	public BackboneGrandImpl(ComponentContext context, BackboneRouter bbRouter) {
+	public BackboneGrandImpl(ComponentContext context, BackboneRouter bbRouter,ConfigurationAdmin configurationAdmin) {
+        this.configurationAdmin = configurationAdmin;
 		virtualAddressUrlMap = new HashMap<VirtualAddress, URL>();
 
 		try {
 			this.configurator = new BackboneGrandConfigurator(this, context
-					.getBundleContext());
+					.getBundleContext(),this.configurationAdmin);
 			configurator.registerConfiguration();
 		} catch (NullPointerException e) {
 			LOG.fatal("Configurator could not be initialized " + e.toString());
