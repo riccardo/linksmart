@@ -7,9 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.servlet.ServletException;
+
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
+import org.osgi.service.http.NamespaceException;
 
 import eu.linksmart.network.ErrorMessage;
 import eu.linksmart.network.Message;
@@ -32,23 +43,19 @@ import eu.linksmart.utils.Part;
 /*
  * Core implementation of NetworkManagerCore Interface
  */
+@Component(name="NetworkManagerCore", immediate=true)
+@Service({NetworkManagerCore.class})
 public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistributor {
-	/** The used identity manager **/
-	protected IdentityManager identityManager;
-	/** The used backbone router **/
-	protected BackboneRouter backboneRouter;
-	/** The used connection manager **/
+	
 	protected ConnectionManager connectionManager = new ConnectionManager(this);
 	/** The VirtualAddress of this NetworkManager and IdentityManager **/
 	protected VirtualAddress myVirtualAddress;
 	protected String myDescription;
 
 	/* Constants */
-	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class
-			.getSimpleName();
-	private static final String STARTED_MESSAGE = "Started" + NETWORK_MGR_CORE;
-	private static final String STARTING_MESSAGE = "Starting"
-			+ NETWORK_MGR_CORE;
+	private static String NETWORK_MGR_CORE = NetworkManagerCoreImpl.class.getSimpleName();
+	private static final String STARTED_MESSAGE = "Started " + NETWORK_MGR_CORE;
+	private static final String STARTING_MESSAGE = "Starting " + NETWORK_MGR_CORE;
 	private static final String COMMUNICATION_PARAMETERS_ERROR = "Could not establish common communication parameters with remote endpoint";
 	public static String SUCCESSFUL_PROCESSING = "OK";
 	public static String ERROR_PROCESSING = "ERROR";
@@ -62,53 +69,119 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	/* fields */
 	private NetworkManagerCoreConfigurator configurator;
 	private Map<String, ArrayList<MessageProcessor>> msgObservers = new HashMap<String, ArrayList<MessageProcessor>>();
+	
+	@Reference(name="ConfigurationAdmin",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindConfigAdmin", 
+			unbind="unbindConfigAdmin",
+			policy=ReferencePolicy.STATIC)
+	protected ConfigurationAdmin configAdmin = null;
+	
+	@Reference(name="HttpService",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindHttpService", 
+			unbind="unbindHttpService", 
+			policy=ReferencePolicy.STATIC)
+	protected HttpService http = null;
+	
+	@Reference(name="IdentityManager",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindIdentityManager", 
+			unbind="unbindIdentityManager",
+			policy=ReferencePolicy.DYNAMIC)
+	protected IdentityManager identityManager = null;
+	
+	@Reference(name="CommunicationSecurityManager",
+			cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
+			bind="bindCommunicationSecurityManager", 
+			unbind="unbindCommunicationSecurityManager", 
+			policy=ReferencePolicy.DYNAMIC)
+	protected CommunicationSecurityManager communicationSecurityManager = null;
+	
+	@Reference(name="BackboneRouter",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindBackboneRouter", 
+			unbind="unbindBackboneRouter",
+			policy=ReferencePolicy.DYNAMIC)
+	protected BackboneRouter backboneRouter = null;
+	
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+		LOG.debug("NetworkManagerCore::binding ConfigurationAdmin");
+		this.configAdmin = configAdmin;
+    }
+    
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	LOG.debug("NetworkManagerCore::un-binding ConfigurationAdmin");
+    	this.configAdmin = null;
+    }
+    
+    protected void bindHttpService(HttpService http) {
+    	LOG.debug("NetworkManagerCore::binding http-service");
+    	this.http = http;
+    }
+    
+    protected void unbindHttpService(HttpService http) {
+    	LOG.debug("NetworkManagerCore::un-binding http-service");
+    	this.http = null;
+    	//TODO unregister the existing running servlets
+    }
 
-	/**
-	 * Component activation method.
-	 * @param context
-	 */
-	protected void activate(ComponentContext context) {
-
-		LOG.info(STARTING_MESSAGE);
-
-		init(context);
-
-		LOG.info(STARTED_MESSAGE);
-
+	protected void bindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr) {
+		LOG.debug("NetworkManagerCore::binding communicarion-sec-manager");
+		this.communicationSecurityManager = commSecMgr;
+		this.connectionManager.setCommunicationSecurityManager(communicationSecurityManager);
 	}
 
-	protected void deactivate(ComponentContext context) {
-		LOG.info(NETWORK_MGR_CORE + "stopped");
-	}
-
-	protected void bindCommunicationSecurityManager(
-			CommunicationSecurityManager commSecMgr) {
-		this.connectionManager.setCommunicationSecurityManager(commSecMgr);
-	}
-
-	protected void unbindCommunicationSecurityManager(
-			CommunicationSecurityManager commSecMgr) {
-		this.connectionManager.removeCommunicationSecurityManager(commSecMgr);
+	protected void unbindCommunicationSecurityManager(CommunicationSecurityManager commSecMgr) {
+		LOG.debug("NetworkManagerCore::un-binding communicarion-sec-manager");
+		this.connectionManager.removeCommunicationSecurityManager(communicationSecurityManager);
+		this.communicationSecurityManager = null;
 	}
 
 	protected void bindIdentityManager(IdentityManager identityManager) {
+		LOG.debug("NetworkManagerCore::binding identity-manager");
 		this.identityManager = identityManager;
 		this.connectionManager.setIdentityManager(identityManager);
 	}
 
 	protected void unbindIdentityManager(IdentityManager identityMgr) {
+		LOG.debug("NetworkManagerCore::un-binding identity-manager");
 		this.identityManager = null;
 		this.connectionManager.setIdentityManager(null);
 	}
 
 	protected void bindBackboneRouter(BackboneRouter backboneRouter) {
+		LOG.debug("NetworkManagerCore::binding backbone-router");
 		this.backboneRouter = backboneRouter;
 	}
 
 	protected void unbindBackboneRouter(BackboneRouter backboneRouter) {
+		LOG.debug("NetworkManagerCore::un-binding backbone-router");
 		this.backboneRouter = null;
 	}
 
+	/**
+	 * Component activation method.
+	 * @param context
+	 */
+	@Activate
+	protected void activate(ComponentContext context) {
+		LOG.info("activating " + STARTING_MESSAGE);
+		init(context);
+		LOG.info(STARTED_MESSAGE);
+	}
+	
+	/**
+	 * Deactivate method
+	 * 
+	 * @param context the bundle's execution context
+	 */
+	@Deactivate
+	protected void deactivate(ComponentContext context) {
+		LOG.info(NETWORK_MGR_CORE + "stopped");
+		//TODO cleanup the environment
+	}
+	
 	/**
 	 * Initializes the component, i.e. creates own VirtualAddress, and registers the NM
 	 * status servlets.
@@ -116,13 +189,10 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 	 * @param context
 	 */
 	private void init(ComponentContext context) {
-		this.configurator = new NetworkManagerCoreConfigurator(this,
-				context.getBundleContext());
+		this.configurator = new NetworkManagerCoreConfigurator(this, context.getBundleContext(), this.configAdmin);
 		this.configurator.registerConfiguration();
-		this.myDescription = this.configurator
-				.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
-		Part[] attributes = { new Part(ServiceAttribute.DESCRIPTION.name(),
-				this.myDescription) };
+		this.myDescription = this.configurator.get(NetworkManagerCoreConfigurator.NM_DESCRIPTION);
+		Part[] attributes = { new Part(ServiceAttribute.DESCRIPTION.name(),	this.myDescription) };
 
 		// Create a local VirtualAddress with SOAP Backbone for NetworkManager
 		// TODO Make the Backbone a constant or enum somewhere. find another way
@@ -132,6 +202,7 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 			this.myVirtualAddress = registerService(attributes, NETWORK_MGR_ENDPOINT,
 					"eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl")
 					.getVirtualAddress();
+			LOG.info("network-manager-core VirtualAddress: " + this.myVirtualAddress.toString());
 		} catch (RemoteException e) {
 			LOG.error(
 					"PANIC - RemoteException thrown on local access of own method",
@@ -143,13 +214,15 @@ public class NetworkManagerCoreImpl implements NetworkManagerCore, MessageDistri
 		// Init Servlets
 		// TODO implement servlet registration with HttpService in Declarative
 		// Services style
-		HttpService http = (HttpService) context.locateService("HttpService");
+		//HttpService http = (HttpService) context.locateService("HttpService");
 		try {
-
-			http.registerServlet("/GetNetworkManagerStatus",
-					new GetNetworkManagerStatus(this, identityManager,
-							backboneRouter), null, null);
+			http.registerServlet("/GetNetworkManagerStatus", new GetNetworkManagerStatus(this, identityManager, backboneRouter), null, null);
+			LOG.info("registring /GetNetworkManagerStatus into servlet container");
 			http.registerResources("/files", "/resources", null);
+		} catch (ServletException e) {
+			LOG.error("Error registering servlets", e);
+		} catch (NamespaceException e) {
+			LOG.error("Error registering servlet namespace", e);
 		} catch (Exception e) {
 			LOG.error("Error registering servlets", e);
 		}

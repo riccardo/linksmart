@@ -36,16 +36,15 @@ package eu.linksmart.network.networkmanager.core.impl;
  * Configuration parameters of the Network Manager
  */
 
-
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 
 
 import eu.linksmart.utils.Configurator;
-
 
 public class NetworkManagerCoreConfigurator extends Configurator {
 
@@ -67,11 +66,25 @@ public class NetworkManagerCoreConfigurator extends Configurator {
 	 */
 	public NetworkManagerCoreConfigurator(NetworkManagerCoreImpl networkManagerImpl, 
 			BundleContext context) {
-		
 		super(context, Logger.getLogger(NetworkManagerCoreConfigurator.class.getName()),
 			NM_PID, CONFIGURATION_FILE);
 		this.networkManagerCoreImpl = networkManagerImpl;
-		
+	}
+	
+	/**
+	 * Constructor. Creates a new "NetworkManagerCoreConfigurator" object
+	 * 
+	 * @param networkManagerCoreImpl the network manager implementation
+	 * @param context the bundle's execution context
+	 * @param context the config admin service
+	 */
+	public NetworkManagerCoreConfigurator(NetworkManagerCoreImpl networkManagerImpl, 
+			BundleContext context, ConfigurationAdmin configAdmin) {
+		super(context, Logger.getLogger(NetworkManagerCoreConfigurator.class.getName()),
+			NM_PID, CONFIGURATION_FILE, configAdmin);
+		//super.setConfigurationAdmin(configAdmin); // if not passed in through super constructor
+		super.init();
+		this.networkManagerCoreImpl = networkManagerImpl;
 	}
 	
 	/**
