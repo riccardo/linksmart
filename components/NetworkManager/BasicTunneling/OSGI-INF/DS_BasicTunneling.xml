@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="BasicTunneling" immediate="true">
-   <implementation class="eu.linksmart.network.tunnel.impl.BasicTunnelServiceImpl"/>
-   <reference bind="bindNetworkManager" cardinality="1..1" interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore" name="NetworkManagerCore" policy="dynamic" unbind="unbindNetworkManager"/>
-   <service>
-      <provide interface="eu.linksmart.network.tunnel.BasicTunnelService"/>
-   </service>
-</scr:component>
