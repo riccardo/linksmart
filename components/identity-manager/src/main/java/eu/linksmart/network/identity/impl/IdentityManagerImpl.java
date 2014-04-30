@@ -39,6 +39,7 @@ import eu.linksmart.network.identity.util.AttributeResolveResponse;
 import eu.linksmart.network.identity.util.BloomFilterFactory;
 import eu.linksmart.network.identity.util.ByteArrayCodec;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.utils.Part;
 import eu.linksmart.utils.PartConverter;
 
@@ -53,8 +54,7 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	public final static String SERVICE_ATTR_RESOLVE_RANDOM = "Random";
 	public final static String SERVICE_ATTR_RESOLVE_ID = "RequestIdentifier";
 
-	protected static String IDENTITY_MGR = IdentityManagerImpl.class
-			.getSimpleName();
+	protected static String IDENTITY_MGR = IdentityManagerImpl.class.getSimpleName();
 
 	protected static Logger LOG = Logger.getLogger(IDENTITY_MGR);
 
@@ -67,6 +67,8 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected ConcurrentHashMap<String, Object> locks;
 
 	protected NetworkManagerCore networkManagerCore;
+	
+	protected CryptoManager cryptoManager;
 
 	/**Thread to delete not updated Services.*/
 	protected Thread serviceClearerThread;
@@ -89,13 +91,65 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	private boolean serviceUpdaterThreadRunning;
 	/** Flag controlling Service clearer thread.*/
 	private boolean serviceClearerThreadRunning;
+	
+	protected void setNetworkManagerCore(NetworkManagerCore networkManagerCore) {
+		this.networkManagerCore = networkManagerCore;
+		// Start the threads once NetworkManagerCore is available
+		this.serviceClearerThread = new Thread(new ServiceClearer());
+		serviceClearerThread.start();
+		serviceClearerThreadRunning = true;
 
+		serviceUpdaterThread = new Thread(new ServiceUpdaterThread());
+		serviceUpdaterThread.start();
+		serviceUpdaterThreadRunning = true;
+
+		advertisingThread = new Thread(new AdvertisingThread());
+		advertisingThread.start();
+		advertisingThreadRunning = true;
+
+		// subscribe to messages sent by other identity managers
+		((MessageDistributor) this.networkManagerCore).subscribe(
+				IDMANAGER_NMADVERTISMENT_TOPIC, this);
+		((MessageDistributor) this.networkManagerCore).subscribe(
+				IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, this);
+		((MessageDistributor) this.networkManagerCore).subscribe(
+				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_REQ, this);
+		((MessageDistributor) this.networkManagerCore).subscribe(
+				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP, this);
+	}
+	
+	protected void unsetNetworkManagerCore(NetworkManagerCore networkManagerCore) {
+		advertisingThreadRunning = false;
+		serviceUpdaterThreadRunning = false;
+		serviceClearerThreadRunning = false;
+		this.networkManagerCore = null;
+		//TODO fix null reference for below code
+		//unsubscribe to messages sent by other identity managers
+		((MessageDistributor)this.networkManagerCore).unsubscribe(
+				IDMANAGER_NMADVERTISMENT_TOPIC, this);
+		((MessageDistributor)this.networkManagerCore).unsubscribe(
+				IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, this);
+	}
+	
+	protected void setCryptoManager(CryptoManager cryptoManager) {
+		this.cryptoManager = cryptoManager;
+	}
+	
+	protected void unsetCryptoManager(CryptoManager cryptoManager) {
+		this.cryptoManager = cryptoManager;
+	}
+	
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting " + IDENTITY_MGR);
 		init();
 		LOG.info(IDENTITY_MGR + " started");
 	}
 
+	protected void deactivate(ComponentContext context) {
+		LOG.info(IDENTITY_MGR + "stopped");
+		//TODO clear all data structures
+	}
+	
 	protected void init() {
 		this.localServices = new ConcurrentHashMap<VirtualAddress, Registration>();
 		this.remoteServices = new ConcurrentHashMap<VirtualAddress, Registration>();
@@ -103,10 +157,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 		this.serviceLastUpdate = new ConcurrentHashMap<VirtualAddress, Long>();
 		this.resolveResponses = new ConcurrentHashMap<String, List<Message>>();
 		this.locks = new ConcurrentHashMap<String, Object>();
-	}
-
-	protected void deactivate(ComponentContext context) {
-		LOG.info(IDENTITY_MGR + "stopped");
 	}
 
 	@Override
@@ -1055,46 +1105,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			}
 		}
 
-	}
-
-	public void bindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
-		this.networkManagerCore = networkManagerCore;
-
-		// Start the threads once NetworkManagerCore is available
-		this.serviceClearerThread = new Thread(new ServiceClearer());
-		serviceClearerThread.start();
-		serviceClearerThreadRunning = true;
-
-		serviceUpdaterThread = new Thread(new ServiceUpdaterThread());
-		serviceUpdaterThread.start();
-		serviceUpdaterThreadRunning = true;
-
-		advertisingThread = new Thread(new AdvertisingThread());
-		advertisingThread.start();
-		advertisingThreadRunning = true;
-
-		//subscribe to messages sent by other identity managers
-		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_NMADVERTISMENT_TOPIC, this);
-		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, this);
-		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_REQ, this);
-		((MessageDistributor)this.networkManagerCore).subscribe(
-				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP, this);
-	}
-
-	public void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
-		advertisingThreadRunning = false;
-		serviceUpdaterThreadRunning = false;
-		serviceClearerThreadRunning = false;
-		this.networkManagerCore = null;
-
-		//unsubscribe to messages sent by other identity managers
-		((MessageDistributor)this.networkManagerCore).unsubscribe(
-				IDMANAGER_NMADVERTISMENT_TOPIC, this);
-		((MessageDistributor)this.networkManagerCore).unsubscribe(
-				IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, this);
 	}
 
 	public String getIdentifier() {

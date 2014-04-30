@@ -4,10 +4,21 @@ import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.ComponentContext;
+
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.network.identity.impl.IdentityManagerImpl;
+import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
 import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.utils.Part;
 import eu.linksmart.utils.PartConverter;
@@ -19,16 +30,63 @@ import eu.linksmart.utils.PartConverter;
  * @author Vinkovits
  *
  */
+@Component(name="IdentityManager", immediate=true)
+@Service({IdentityManager.class})
 public class IdentityManagerCertImpl extends IdentityManagerImpl {
 	/**
 	 * The identifier of this implementation bundle.
 	 */
-	private static String IDENTITY_MGR = IdentityManagerCertImpl.class
-	.getSimpleName();
-	/**
-	 * Services are based on certificates.
-	 */
-	private CryptoManager cryptoManager;
+	private static String IDENTITY_MGR = IdentityManagerCertImpl.class.getSimpleName();
+	
+	@Reference(name="NetworkManagerCore",
+	cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+	bind="bindNetworkManagerCore", 
+	unbind="unbindNetworkManagerCore",
+	policy=ReferencePolicy.DYNAMIC)
+	protected NetworkManagerCore networkManagerCore;
+
+	@Reference(name="CryptoManager",
+	cardinality = ReferenceCardinality.MANDATORY_UNARY,
+	bind="bindCryptoManager", 
+	unbind="unbindCryptoManager",
+	policy=ReferencePolicy.DYNAMIC)
+	protected CryptoManager cryptoManager;
+	
+	protected void bindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
+		LOG.debug("IdentityManagerCert::binding networkmanager-core");
+		this.networkManagerCore = networkManagerCore;
+		super.setNetworkManagerCore(networkManagerCore);
+    }
+
+	protected void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
+		LOG.debug("IdentityManagerCert::un-binding networkmanager-core");
+		this.networkManagerCore = null;
+		super.unsetNetworkManagerCore(networkManagerCore);
+	}
+
+	protected void bindCryptoManager(CryptoManager cryptoManager) {
+		LOG.debug("IdentityManager::binding cryptomanager");
+		this.cryptoManager = cryptoManager;
+		super.setCryptoManager(this.cryptoManager);
+	}
+
+	protected void unbindCryptoManager(CryptoManager cryptoManager) {
+		LOG.debug("IdentityManager::un-binding cryptomanager");
+		this.cryptoManager = null;
+		super.unsetCryptoManager(cryptoManager);
+	}
+	
+	@Activate
+	protected void activate(ComponentContext context) {
+		LOG.info("[activating IdentityManagerCert]");
+		super.activate(context);
+	}
+
+	@Deactivate
+	protected void deactivate(ComponentContext context) {
+		LOG.info("de-activating IdentityManagerCert");
+		super.deactivate(context);
+	}
 
 	/**
 	 * Overrides the IdentityManager's createServiceByAttributes and creates
@@ -89,14 +147,11 @@ public class IdentityManagerCertImpl extends IdentityManagerImpl {
 		}
 	}
 
-	protected void bindCryptoManager(CryptoManager cryptoManager) {
+	protected void setCryptoManager(CryptoManager cryptoManager) {
 		this.cryptoManager = cryptoManager;
 	}
 
-	protected void unbindCryptoManager(CryptoManager cryptoManager) {
-		this.cryptoManager = null;
-	}
-
+	@Override
 	public String getIdentifier() {
 		return IDENTITY_MGR;
 	}
