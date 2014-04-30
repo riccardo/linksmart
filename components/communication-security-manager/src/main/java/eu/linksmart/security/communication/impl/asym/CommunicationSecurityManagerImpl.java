@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.felix.scr.annotations.*;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.clients.RemoteWSClientProvider;
@@ -25,54 +27,103 @@ import eu.linksmart.security.trustmanager.TrustManager;
  * @author Vinkovits
  *
  */
-public class CommunicationSecurityManagerImpl implements CommunicationSecurityManager{
+@Component(name="CommunicationSecurityManagerAsym", immediate=true)
+@Service
+public class CommunicationSecurityManagerImpl implements CommunicationSecurityManager {
+	
 	private static String COMMUNICATION_SEC_MGR = CommunicationSecurityManagerImpl.class.getSimpleName();
 	private static Logger logger = Logger.getLogger(SecurityProtocolAsym.class);
 
 	private BundleContext context = null;
-	private CryptoManager cryptoMgr = null;
-	private TrustManager trustMgr = null;
-	private RemoteWSClientProvider wsProvider = null;
+	
 	private CommunicationSecurityManagerConfigurator configurator = null;
 	private double trustThreshold;
 	private boolean isTrustManagerBundle = false;
+	
+	@Reference(name="ConfigurationAdmin",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindConfigAdmin",
+            unbind="unbindConfigAdmin",
+            policy=ReferencePolicy.STATIC)
+    protected ConfigurationAdmin configAdmin = null;
+	
+    @Reference(name="CryptoManager",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindCryptoManager",
+            unbind="unbindCryptoManager",
+            policy= ReferencePolicy.DYNAMIC)
+	private CryptoManager cryptoMgr = null;
+    
+    @Reference(name="TrustManager",
+            cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+            bind="bindTrustManager",
+            unbind="unbindTrustManager",
+            policy= ReferencePolicy.DYNAMIC)
+    private TrustManager trustMgr = null;
+    
+    @Reference(name="RemoteWSClientProvider",
+            cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+            bind="bindWSProvider",
+            unbind="unbindWSProvider",
+            policy= ReferencePolicy.DYNAMIC)
+    private RemoteWSClientProvider wsProvider = null;
+    
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+		logger.debug("SecurityManager-aSym::binding ConfigurationAdmin");
+        this.configAdmin = configAdmin;
+    }
 
-	protected void activate(ComponentContext context) {
-		this.context = context.getBundleContext();
-		configurator = new CommunicationSecurityManagerConfigurator(this, this.context);
-		logger.info(COMMUNICATION_SEC_MGR + " started");
-	}
-	protected void deactivate(ComponentContext context) {
-		this.context = null;
-		logger.info(COMMUNICATION_SEC_MGR + " stopped");
-	}
-
-	protected void bindCryptoManager(CryptoManager cryptoManager){
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	logger.debug("SecurityManager-aSym::un-binding ConfigurationAdmin");
+        this.configAdmin = null;
+    }
+    
+    protected void bindCryptoManager(CryptoManager cryptoManager) {
+    	logger.debug("SecurityManager-aSym::binding crypto-manager");
 		cryptoMgr = cryptoManager;
 	}
 
-	protected void unbindCryptoManager(CryptoManager cryptoManager){
+	protected void unbindCryptoManager(CryptoManager cryptoManager) {
+		logger.debug("SecurityManager-aSym::un-binding crypto-manager");
 		cryptoMgr = null;
 	}
 
-	protected void bindTrustManager(TrustManager trustManager){
+	protected void bindTrustManager(TrustManager trustManager) {
+		logger.debug("SecurityManager-aSym::binding trust-manager");
 		isTrustManagerBundle = true;
 		trustMgr = trustManager;
 	}
 
-	protected void unbindTrustManager(TrustManager trustManager){
+	protected void unbindTrustManager(TrustManager trustManager) {
+		logger.debug("SecurityManager-aSym::un-binding trust-manager");
 		trustMgr = null;
 		isTrustManagerBundle = false;
 	}
 	
-	protected void bindWSProvider(RemoteWSClientProvider wsProvider){
+	protected void bindWSProvider(RemoteWSClientProvider wsProvider) {
+		logger.debug("SecurityManager-aSym::binding wsclient-provider");
 		this.wsProvider = wsProvider;
 	}
 
-	protected void unbindWSProvider(RemoteWSClientProvider wsProvider){
+	protected void unbindWSProvider(RemoteWSClientProvider wsProvider) {
+		logger.debug("SecurityManager-aSym::un-binding wsclient-provider");
 		this.wsProvider = null;
 	}
-	
+
+    @Activate
+	protected void activate(ComponentContext context) {
+    	logger.info("[activating SecurityManager-aSym]");
+		this.context = context.getBundleContext();
+		configurator = new CommunicationSecurityManagerConfigurator(this, this.context, this.configAdmin);
+		logger.info(COMMUNICATION_SEC_MGR + " started");
+	}
+    @Deactivate
+	protected void deactivate(ComponentContext context) {
+    	logger.info("de-activating SecurityManager-aSym");
+		this.context = null;
+		logger.info(COMMUNICATION_SEC_MGR + " stopped");
+	}
+
 	public SecurityProtocol getSecurityProtocol(VirtualAddress clientVirtualAddress, VirtualAddress serverVirtualAddress) {
 		SecurityProtocol securityProtocol = new SecurityProtocolAsym(clientVirtualAddress, serverVirtualAddress, cryptoMgr, trustMgr, trustThreshold);
 		return securityProtocol;

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.utils.Configurator;
@@ -33,11 +34,11 @@ public class CommunicationSecurityManagerConfigurator extends Configurator {
 	 */
 	public final static String CONFIGURATION_FILE = "/resources/COMSECMGR.properties";
 	/**
-	 * Identifier to the property threshold as used by {@link CommunicationSecurityManager}.
+	 * Identifier to the property threshold as used by {@link eu.linksmart.security.communication.CommunicationSecurityManager}.
 	 */
 	public final static String TRUST_THRESHOLD = "CommunicationSecurityManager.trustThreshold";
 	/**
-	 * Identifier to the property TrustManager URL as used by {@link CommunicationSecurityManager}.
+	 * Identifier to the property TrustManager URL as used by {@link eu.linksmart.security.communication.CommunicationSecurityManager}.
 	 */
 	public final static String TRUST_MANAGER_URL = "CommunicationSecurityManager.trustManagerURL";
 	/**
@@ -73,6 +74,25 @@ public class CommunicationSecurityManagerConfigurator extends Configurator {
 		}
 		this.setConfiguration(SECURITY_PROVIDED, sb.toString());
 	}
+	
+	public CommunicationSecurityManagerConfigurator(CommunicationSecurityManagerImpl comSecMgr, BundleContext context, ConfigurationAdmin configurationAdmin) {
+        super(context, Logger.getLogger(CommunicationSecurityManagerConfigurator.class.getName()), COMSECMGR_PID, CONFIGURATION_FILE, configurationAdmin);
+        super.init();
+        this.comSecMgr = comSecMgr;
+        this.context = context;
+        StringBuilder sb = new StringBuilder();
+		List<SecurityProperty> securityProps = this.comSecMgr.getProperties();
+		int i = 0;
+		for(SecurityProperty prop : securityProps){
+			i++;
+			if (i == securityProps.size()) {
+				sb.append(prop.name());
+			} else {
+				sb.append(prop.name() + ", ");
+			}
+		}
+		this.setConfiguration(SECURITY_PROVIDED, sb.toString());
+    }
 
 	public void applyConfigurations(Hashtable updates) {
 		comSecMgr.applyConfigurations(updates);
