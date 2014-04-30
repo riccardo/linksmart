@@ -33,8 +33,10 @@ import net.jxta.rendezvous.RendezvousEvent;
 import net.jxta.rendezvous.RendezvousListener;
 import net.jxta.socket.JxtaMulticastSocket;
 
+import org.apache.felix.scr.annotations.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 
@@ -80,15 +82,18 @@ import eu.linksmart.security.communication.SecurityProperty;
  * @author Schneider
  * 
  */
+
+@Component(name="BackboneJXTA", immediate=true)
+@Service({Backbone.class})
 public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		DiscoveryListener {
 
-	private static String BACKBONE_JXTA = BackboneJXTAImpl.class
-			.getSimpleName();
+	private static String BACKBONE_JXTA = BackboneJXTAImpl.class.getSimpleName();
 	private static String BackboneJXTAStatusServletName = "/BackboneJXTAStatus";
 	
 	private Logger logger = Logger.getLogger(BackboneJXTAImpl.class.getName());
 	protected ComponentContext context;
+
 	private BackboneJXTAConfigurator configurator;
 	
 	private static String SEPARATOR = System.getProperty("file.separator");
@@ -96,50 +101,134 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		"linksmart" + SEPARATOR + "eu.linksmart.network.backbone" + SEPARATOR + ".jxta";
 
 	private String jxtaHome;
-	private BackboneRouter bbRouter;
+    
 	/** Length of multicast buffer.	 */
 	private int bufferLength = 64000;
 	/** Maximum length until multicast buffer is increased.	 */
 	private int maxBufferLength = 128000;
 	/** Only report maximum size reached once. */
 	private boolean bufferReported = false;
+	
+	/**
+	 * A map of VirtualAddress to JXTA Peer ID.
+	 */
+	protected Hashtable<VirtualAddress, String> listOfRemoteEndpoints = new Hashtable<VirtualAddress, String>();
 
-	private HttpService http;
 	private String httpPort;
 	public PipeSyncHandler pipeSyncHandler;
 	public SocketHandler socketHandler;
 	public ConfigMode jxtaMode;
 	private String synched;
 	protected MulticastSocket msocket;
+	
+	@Reference(name="ConfigurationAdmin",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindConfigAdmin",
+            unbind="unbindConfigAdmin",
+            policy=ReferencePolicy.STATIC)
+    private ConfigurationAdmin mConfigAdmin = null;
+	
+    @Reference(name="BackboneRouter",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindBackboneRouter",
+            unbind="unbindBackboneRouter",
+            policy= ReferencePolicy.STATIC)
+	private BackboneRouter bbRouter;
+    
+    @Reference(name="HttpService",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindHttpServlet", 
+			unbind="unbindHttpServlet", 
+			policy=ReferencePolicy.STATIC)
+	private HttpService http;
 
-	/**
-	 * A map of VirtualAddress to JXTA Peer ID.
-	 */
-	protected Hashtable<VirtualAddress, String> listOfRemoteEndpoints = new Hashtable<VirtualAddress, String>();
+    protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	logger.debug("BackboneJxta::binding configAdmin");
+        this.mConfigAdmin = configAdmin;
+    }
 
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	logger.debug("BackboneJxta::un-binding configAdmin");
+        this.mConfigAdmin = null;
+    }
+    
+    protected void bindBackboneRouter(BackboneRouter bbRouter) {
+    	logger.debug("BackboneJxta::binding backbone-router");
+        this.bbRouter = bbRouter;
+    }
+
+    protected void unbindBackboneRouter(BackboneRouter bbRouter) {
+    	logger.debug("BackboneJxta::un-binding backbone-router");
+        this.bbRouter = null;
+    }
+    
+    protected void bindHttpServlet(HttpService http) {
+		logger.debug("BackboneJxta::binding http-service");
+		this.http = http;
+	}
+	
+	protected void unbindHttpServlet(HttpService http) {
+		logger.debug("BackboneJxta::un-binding http-service");
+		this.http = null;
+	}
+	
+    @Activate
 	protected void activate(ComponentContext context) {
-		logger.info("**** Activating JXTA backbone!");
+		logger.info("[activating BackboneJxta]");
 
 		this.context = context;
 
-		this.bbRouter = (BackboneRouter) context
-				.locateService(BackboneRouter.class.getSimpleName());
+		//this.bbRouter = (BackboneRouter) context.locateService(BackboneRouter.class.getSimpleName());
 
 		try {
-			this.configurator = new BackboneJXTAConfigurator(this, context
-					.getBundleContext());
+            logger.debug("registering jxta configuration...");
+			this.configurator = new BackboneJXTAConfigurator(this, context.getBundleContext(), mConfigAdmin);
 			configurator.registerConfiguration();
+            logger.debug("done.");
 		} catch (NullPointerException e) {
-			logger.fatal("Configurator could not be initialized "
-					+ e.toString());
+			logger.fatal("Configurator could not be initialized " + e.toString());
 		}
 
-		this.name = (String) configurator
-				.get(BackboneJXTAConfigurator.PEER_NAME);
+		this.name = (String) configurator.get(BackboneJXTAConfigurator.PEER_NAME);
 		this.jxtaHome = JXTA_HOME_DIR + SEPARATOR + this.name;
 
-		boolean logs = Boolean.parseBoolean((String) configurator
-				.getConfiguration().get(BackboneJXTAConfigurator.JXTA_LOGS));
+        boolean logs = false;
+
+        int retry_counter = 0;
+        String response = null;
+
+
+        //TODO workaround code , will probably stay here till JXTA is replaced
+        // sometimes the configurator does not respond properly during activation
+        // the parameter JXTA_LOGS cannot be retrieved and a NPE is casted
+        // this happens only for the jxta backbone and mostly on slow machines
+        // the following code is a retry workaround
+        while((retry_counter < 3) && response==null ){
+            try{
+                response = (String) configurator.getConfiguration().get(BackboneJXTAConfigurator.JXTA_LOGS);
+                logger.debug("response from JXTAConfigurator : "+response);
+            }catch(NullPointerException ex){
+                logger.error(ex.toString());
+                response = null;
+            }
+            if(response!=null){
+                logs = Boolean.parseBoolean(response);
+            }else{
+                retry_counter++;
+                logger.warn("increasing retry counter to : "+retry_counter);
+                logger.warn("configurator not responding. retrying in 5 sec...");
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                logger.warn("woke up.");
+            }
+        }
+        if(response==null){
+            logger.error("Configurator not responded for 3 times in a row.");
+            logs = false;
+        }
 
 		if (!logs) {
 			System.setProperty(Logging.JXTA_LOGGING_PROPERTY, Level.OFF
@@ -181,10 +270,10 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 		logger.info("**** JXTA Backbone started succesfully");
 	}
 
+    @Deactivate
 	public void deactivate(ComponentContext context) {
-		// Unregister servlets
-		http.unregister(BackboneJXTAStatusServletName);
-
+    	logger.info("deactivating BackboneJxta");
+		
 		// stop JXTA traffic
 		configurator.stop();
 		pipeSyncHandler.stopPipes();
@@ -214,7 +303,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * 
 	 * @param senderVirtualAddress
 	 * @param receiverVirtualAddress
-	 * @param message
 	 */
 	private NMResponse sendData(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data, boolean synch) {
 		//check parameters
@@ -267,7 +355,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * 
 	 * @param senderVirtualAddress
 	 * @param receiverVirtualAddress
-	 * @param message
 	 */
 	public NMResponse receiveDataSynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
 			byte[] receivedData) {
@@ -289,7 +376,6 @@ public class BackboneJXTAImpl implements Backbone, RendezvousListener,
 	 * 
 	 * @param senderVirtualAddress
 	 * @param receiverVirtualAddress
-	 * @param message
 	 */
 	public NMResponse receiveDataAsynch(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress,
 			byte[] receivedData) {

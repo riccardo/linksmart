@@ -1,39 +1,29 @@
 package eu.linksmart.network.backbone.impl.jxta;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.osgi.service.component.ComponentContext;
-
-
 /**
- * NetworkManagerApplication Servlet
+ * TODO its not required since this servlet is not registered into servlet container
  */
-public class BackboneJXTAStatus extends HttpServlet {
+public class BackboneJXTAStatus {
+	
+}
+
+/*public class BackboneJXTAStatus extends HttpServlet {
 
 	ComponentContext context;
 
 
-	/**
+	*//**
 	 * Constructor
 	 * 
 	 * @param context
 	 *            the bundle's context
-	 * @param nmServiceImpl
-	 *            the Network Manager Service implementation
-	 */
+	 *//*
 	public BackboneJXTAStatus(ComponentContext context) {
 
 		this.context = context;
 	}
 
-	/**
+	*//**
 	 * Performs the HTTP GET operation
 	 * 
 	 * @param request
@@ -42,7 +32,7 @@ public class BackboneJXTAStatus extends HttpServlet {
 	 * @param response
 	 *            HttpServletResponse that encapsulates the response from the
 	 *            servlet
-	 */
+	 *//*
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 
@@ -76,4 +66,4 @@ public class BackboneJXTAStatus extends HttpServlet {
 		response.getWriter().println("</body></html>");
 	}
 
-}
+}*/

@@ -126,7 +126,7 @@ public class PipeSyncHandler extends Thread implements PipeMsgListener {
 	/**
 	 * Constructor
 	 * 
-	 * @param nm
+	 * @param bbjxta
 	 *            the Network Manager application
 	 */
 	public PipeSyncHandler(BackboneJXTAImpl bbjxta) {

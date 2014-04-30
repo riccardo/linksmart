@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 
 import eu.linksmart.utils.Configurator;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 public class BackboneJXTAConfigurator extends Configurator {
 
@@ -53,7 +54,24 @@ public class BackboneJXTAConfigurator extends Configurator {
 	private static Logger logger = Logger
 			.getLogger(BackboneJXTAConfigurator.class.getName());
 
-	/**
+
+    /**
+     * Initializes the JXTA backbone configurator.
+     *
+     * @param bbJXTAImpl
+     *            instantiation of JXTA backbone
+     * @param context
+     *            A bundle context
+     * @param configurationAdmin configAdmin reference for proper setup*
+     */
+    public BackboneJXTAConfigurator(BackboneJXTAImpl bbJXTAImpl,
+                                    BundleContext context, ConfigurationAdmin configurationAdmin) {
+        super(context, logger, BBJXTA_PID, CONFIGURATION_FILE,configurationAdmin);
+        super.init();
+        this.bbJXTAImpl = bbJXTAImpl;
+    }
+
+    /**
 	 * Initializes the JXTA backbone configurator.
 	 * 
 	 * @param bbJXTAImpl

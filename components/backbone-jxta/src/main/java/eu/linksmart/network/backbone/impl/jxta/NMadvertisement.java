@@ -186,7 +186,7 @@ public class NMadvertisement extends Advertisement
 	/**
 	 * Sets the VirtualAddress's managed
 	 * 
-	 * @param VirtualAddress the LinkSmartID
+	 * @param virtualAddress the LinkSmartID
 	 * @deprecated
 	 */
 	public void setVirtualAddress(String virtualAddress) {
