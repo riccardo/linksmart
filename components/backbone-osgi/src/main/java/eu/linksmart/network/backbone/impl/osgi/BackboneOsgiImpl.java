@@ -8,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +17,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.felix.scr.annotations.*;
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -33,14 +33,51 @@ import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.SecurityProperty;
 
+@Component(name="BackboneOSGI")
+@Service
 public class BackboneOsgiImpl implements Backbone{
 	private Map<VirtualAddress, String> addressEndpointMap = null;
 	private Logger LOG = Logger.getLogger(BackboneOsgiImpl.class.getName());
 	private BundleContext bundleContext;
+	
+    @Reference(name="BackboneRouter",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindBackboneRouter",
+            unbind="unbindBackboneRouter",
+            policy= ReferencePolicy.STATIC)
 	private BackboneRouter bRouter;
+    
 	private static final String ENDPOINT_UNREACHABLE = "Unknown how to reach endpoint";
 
-	@Override
+    protected void bindBackboneRouter(BackboneRouter bbRouter) {
+    	LOG.debug("BackboneOsgi::binding backbone-router");
+        this.bRouter = bbRouter;
+    }
+
+    protected void unbindBackboneRouter(BackboneRouter bbRouter) {
+    	LOG.debug("BackboneOsgi::un-binding backbone-router");
+        this.bRouter = null;
+    }
+    
+    @Activate
+    protected void activate (ComponentContext context) {
+    	LOG.info("[activating BackboneOsgi]");
+		this.bundleContext = context.getBundleContext();
+		this.addressEndpointMap = new ConcurrentHashMap<VirtualAddress, String>();
+
+        // is bound by static boundBackboneRouter method instead
+		//this.bRouter = (BackboneRouter) context
+        //				.locateService(BackboneRouter.class.getSimpleName());
+		
+		LOG.info("BackboneOsgi started");
+	}
+
+    @Deactivate
+	protected void deactivate (ComponentContext context) {
+		LOG.info("deactivating BackboneOsgi");
+	}
+
+    @Override
 	public NMResponse sendDataSynch(VirtualAddress senderVirtualAddress,
 			VirtualAddress receiverVirtualAddress, byte[] data) {
 		return executeServiceCall(receiverVirtualAddress, data);
@@ -201,20 +238,6 @@ public class BackboneOsgiImpl implements Backbone{
 			VirtualAddress remoteVirtualAddress) {
 		this.addressEndpointMap.put(
 				remoteVirtualAddress, this.addressEndpointMap.get(senderVirtualAddress));
-	}
-
-	protected void activate (ComponentContext context) {
-		this.bundleContext = context.getBundleContext();
-		this.addressEndpointMap = new ConcurrentHashMap<VirtualAddress, String>();
-		
-		this.bRouter = (BackboneRouter) context
-				.locateService(BackboneRouter.class.getSimpleName());
-		
-		LOG.info("BackboneOSGI started");
-	}
-
-	protected void deactivate (ComponentContext context) {
-		LOG.info("BackboneOSGI stopped");
 	}
 
 	private String getHttpBody(byte[] data) {
