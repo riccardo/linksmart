@@ -50,6 +50,10 @@ import java.rmi.Remote;
 import java.util.ArrayList;
 
 import org.apache.axis.EngineConfiguration;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Properties;
+import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
@@ -59,6 +63,13 @@ import eu.linksmart.clients.RemoteWSClientProvider;
 /**
  * Class that provides remotely WS Clients of LinkSmart Middleware
  */
+@Component(name="LinkSmartMiddlewareClients")
+@Service
+@Properties({
+        @Property(name="service.exported.interfaces", value="*"),
+        @Property(name="service.exported.configs", value="org.apache.cxf.ws"),
+        @Property(name="org.apache.cxf.ws.address", value="http://0.0.0.0:9090/cxf/services/RemoteWSClientProvider")
+})
 public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 
 	/**
@@ -131,7 +142,7 @@ public class RemoteWSClientProviderImpl implements RemoteWSClientProvider {
 	 * @param endpoint The endpoint to be used, or null if you want to use the 
 	 * default one
 	 * @param coreSecurityConfig true if you want use coreLinkSmartSecurity 
-	 * (will encrypt messages)
+	 * (will ncrypt messages)
 	 * @throws Exception if there is an exception during code generation 
 	 * @return {@link java.rmi.Remote} containing the client stubs for 
 	 * the required service
