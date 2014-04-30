@@ -56,19 +56,37 @@ public class ConfiguratorImpl implements Configurator {
 
 	private Logger logger = Logger.getLogger(ConfiguratorImpl.class.getName());
 	
-	private ComponentContext context;
-	private ConfigurationAdmin cm;
+	public ConfigurationAdmin cm = null;
+
+    public ConfiguratorImpl() {
+        // default constructor as a kind of work around here
+        // scr plugin requires a default constructor to proceed
+        // the initial class constructor has a parameter
+        // due the transition process the initalization of this class has to be preserved
+        logger.debug("Default constructor called. don't forget to initialize the class by invoking setConfigAdmin(ConfigurationAdmin configAdmin)");
+    }
+
+
+    /**
+     * Constructor of the class ConfiguratorImpl
+     *
+     * @param ctx the bundle's execution context
+     *
+     */
+    public ConfiguratorImpl(ComponentContext ctx) {
+        setConfigAdmin((ConfigurationAdmin) ctx.locateService("ConfigurationAdmin"));
+        logger.debug("ConfigurationAdmin set through ctx");
+
+    }
+    
+    public void setConfigAdmin(ConfigurationAdmin configAdmin) {
+		this.cm = configAdmin;
+    }
 	
-	/**
-	 * Constructor of the class ConfiguratorImpl
-	 * 
-	 * @param context the bundle's execution context
-	 */
-	public ConfiguratorImpl(ComponentContext context) {
-		this.context = context;
-		this.cm = (ConfigurationAdmin) context.locateService("ConfigurationAdmin");
-	}
-	
+    public ConfigurationAdmin getConfigAdmin(){
+        return this.cm;
+    }
+    
 	/**
 	 * Provides the list of identifiers of the available  middleware
 	 * configurations. It only returns the configurations that have been
@@ -159,5 +177,4 @@ public class ConfiguratorImpl implements Configurator {
 			logger.error("PID not available.", e);
 		}
 	}
-
 }

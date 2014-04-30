@@ -40,8 +40,8 @@ package eu.linksmart.configurator.shell;
 
 import java.util.Dictionary;
 
-import org.eclipse.osgi.framework.console.CommandInterpreter;
-import org.eclipse.osgi.framework.console.CommandProvider;
+//import org.eclipse.osgi.framework.console.CommandInterpreter;
+//import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleContext;
 
 import eu.linksmart.configurator.impl.ConfiguratorImpl;
@@ -51,8 +51,8 @@ import eu.linksmart.configurator.impl.ConfiguratorImpl;
  * Equinox Shell Configurator that provides support for configuring the 
  *  middleware bundles
  */
-public class EquinoxShellConfigurator
-		extends ShellConfigurator implements CommandProvider {
+//public class EquinoxShellConfigurator extends ShellConfigurator implements CommandProvider {
+public class EquinoxShellConfigurator extends ShellConfigurator {
 	
 	/**
 	 * Constructor of the class EquinoxShellConfigurator
@@ -65,88 +65,88 @@ public class EquinoxShellConfigurator
 			BundleContext context) {
 		
 		super(configurator, context);
-		context.registerService(CommandProvider.class.getName(), this, null);
+		//context.registerService(CommandProvider.class.getName(), this, null);
 	}
 	
-	/**
-	 * _configure method
-	 * @param ci Command Interpreter
-	 */
-	public void _configure(CommandInterpreter ci) {
-		StringBuffer buffer = new StringBuffer();
-		
-		String arg1 = ci.nextArgument();
-		if (arg1 == null) {
-			ci.print(getHelp());
-			return;
-		}
-		if (arg1.equals("-l")) {
-			buffer.append("List of available configurations\n");
-			/* List all configurations. */
-			String[] configs = configurator.getAvailableConfigurations();
-			for (int i = 0; i < configs.length; i++) {
-				buffer.append("[" + i + "] - " + configs[i] + "\n");
-			}
-			ci.print(buffer.toString());
-		}
-		else if (arg1.equals("-d")) {
-			String arg2 = ci.nextArgument();
-			if (arg2 == null) {
-				ci.print(getHelp());
-				return;
-			}
-			else {
-				configurator.configure(arg2, null);
-				buffer.append("Deleted configuration for " + arg2 + "\n");
-				ci.print(buffer.toString());
-			return;
-			}
-		}
-		else if (arg1 == null) {
-			ci.print(getHelp());
-			return;
-		}
-		else {
-			String arg2 = ci.nextArgument();
-			if (arg2 == null) {
-				Dictionary d = configurator.getConfiguration(arg1);
-				if (d != null) {
-					ci.printDictionary(d, "Current configuration for " + arg1 + "\n");
-				}
-				else {
-					buffer.append("No configuration found for " + arg1 + " or "
-						+ "the configuration is empty\n");
-					ci.print(buffer.toString());
-					return;
-				}
-			}
-			else {
-				String arg3 = ci.nextArgument();
-				if (arg3 == null) {
-					String value = (String) configurator.getConfiguration(arg1).get(arg2);
-					buffer.append(arg1 + " - " + arg2 + " = " + value);
-					ci.print(buffer.toString());
-					return;
-				}
-				else {
-					configurator.configure(arg1, arg2, arg3);
-					String value = (String) configurator.getConfiguration(arg1).get(arg2);
-					buffer.append(arg1 + " - " + arg2 + " = " + value);
-					ci.print(buffer.toString());
-					return;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Returns a string with launching information 
-	 * @return string the string with launching information
-	 */
-	public String getHelp() {
-		return "\tconfigure [-l] [-d] [<pid> , [<key> <value>]] - Provides "
-			+ "support for configuring the  middleware bundles\n";
-	}
+//	/**
+//	 * _configure method
+//	 * @param ci Command Interpreter
+//	 */
+//	public void _configure(CommandInterpreter ci) {
+//		StringBuffer buffer = new StringBuffer();
+//		
+//		String arg1 = ci.nextArgument();
+//		if (arg1 == null) {
+//			ci.print(getHelp());
+//			return;
+//		}
+//		if (arg1.equals("-l")) {
+//			buffer.append("List of available configurations\n");
+//			/* List all configurations. */
+//			String[] configs = configurator.getAvailableConfigurations();
+//			for (int i = 0; i < configs.length; i++) {
+//				buffer.append("[" + i + "] - " + configs[i] + "\n");
+//			}
+//			ci.print(buffer.toString());
+//		}
+//		else if (arg1.equals("-d")) {
+//			String arg2 = ci.nextArgument();
+//			if (arg2 == null) {
+//				ci.print(getHelp());
+//				return;
+//			}
+//			else {
+//				configurator.configure(arg2, null);
+//				buffer.append("Deleted configuration for " + arg2 + "\n");
+//				ci.print(buffer.toString());
+//			return;
+//			}
+//		}
+//		else if (arg1 == null) {
+//			ci.print(getHelp());
+//			return;
+//		}
+//		else {
+//			String arg2 = ci.nextArgument();
+//			if (arg2 == null) {
+//				Dictionary d = configurator.getConfiguration(arg1);
+//				if (d != null) {
+//					ci.printDictionary(d, "Current configuration for " + arg1 + "\n");
+//				}
+//				else {
+//					buffer.append("No configuration found for " + arg1 + " or "
+//						+ "the configuration is empty\n");
+//					ci.print(buffer.toString());
+//					return;
+//				}
+//			}
+//			else {
+//				String arg3 = ci.nextArgument();
+//				if (arg3 == null) {
+//					String value = (String) configurator.getConfiguration(arg1).get(arg2);
+//					buffer.append(arg1 + " - " + arg2 + " = " + value);
+//					ci.print(buffer.toString());
+//					return;
+//				}
+//				else {
+//					configurator.configure(arg1, arg2, arg3);
+//					String value = (String) configurator.getConfiguration(arg1).get(arg2);
+//					buffer.append(arg1 + " - " + arg2 + " = " + value);
+//					ci.print(buffer.toString());
+//					return;
+//				}
+//			}
+//		}
+//	}
+//
+//	/**
+//	 * Returns a string with launching information 
+//	 * @return string the string with launching information
+//	 */
+//	public String getHelp() {
+//		return "\tconfigure [-l] [-d] [<pid> , [<key> <value>]] - Provides "
+//			+ "support for configuring the  middleware bundles\n";
+//	}
 
 	/**
 	 * Unregisters a command

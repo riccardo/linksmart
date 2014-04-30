@@ -42,8 +42,16 @@ import java.net.UnknownHostException;
 
 import javax.servlet.ServletException;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+
 import org.apache.log4j.Logger;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
@@ -55,6 +63,7 @@ import eu.linksmart.configurator.webconf.LinkSmartStatus;
 /**
  * Activator class
  */
+@Component(name="LinkSmartManagerConfigurator", immediate=true)
 public class ConfiguratorActivator  {
 
 	/**
@@ -62,8 +71,7 @@ public class ConfiguratorActivator  {
 	 */
 	private static final String OSGI_HTTP_SERVICE_PORT_PROPERTY = System.getProperty("org.osgi.service.http.port");
 	private final static String WEB_SERVLET_ALIAS = "/LinkSmartConfigurator";
-	private final static String GETCONFIGURATION_SERVLET_ALIAS =
-		"/LinkSmartConfigurator/GetConfiguration";
+	private final static String GETCONFIGURATION_SERVLET_ALIAS = "/LinkSmartConfigurator/GetConfiguration";
 
 	private static String PID;
 
@@ -71,11 +79,28 @@ public class ConfiguratorActivator  {
 	 * fields
 	 */
 	private ComponentContext context;
+	
 	private ConfiguratorImpl configuratorImpl;
 	private ServiceRegistration configuratorReg;
-	private HttpService http;
 	private GetConfigurationServlet getConfigurationServlet;
 	private Logger logger = Logger.getLogger(ConfiguratorActivator.class.getName());
+	
+	private boolean servletsInitialized = false;
+	private boolean configAdminInitialized = false;
+	
+	@Reference(name="ConfigurationAdmin",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindConfigAdmin", 
+			unbind="unbindConfigAdmin",
+			policy=ReferencePolicy.STATIC)
+	public ConfigurationAdmin configAdmin = null;
+	
+	@Reference(name="HttpService",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="registerServlets", 
+			unbind="unregisterServlets", 
+			policy=ReferencePolicy.STATIC)
+	private HttpService http;
 
 	static {
 		try {
@@ -85,21 +110,81 @@ public class ConfiguratorActivator  {
 			PID = "Unknown";
 		}
 	}
+	
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+		logger.debug("ConfiguratorActivator::binding ConfigurationAdmin");
+		this.configAdmin = configAdmin;
+		this.configuratorImpl = new ConfiguratorImpl();
+        this.configuratorImpl.setConfigAdmin(this.configAdmin);
+        this.configAdminInitialized = true;
+    }
+    
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	logger.debug("ConfiguratorActivator::un-binding ConfigurationAdmin");
+    	this.configAdmin = null;
+    	this.configuratorImpl.setConfigAdmin(null);
+    	this.configAdminInitialized = false;
+    }
+    
+	protected void registerServlets(HttpService http) {
+		logger.debug("ConfiguratorActivator::binding http-service");
+		if(servletsInitialized)
+			return;
+		this.http = http;
+		if (configAdminInitialized) {
+			getConfigurationServlet = new GetConfigurationServlet(configuratorImpl);
+			try {
+				http.registerServlet("/LinkSmartStatus", new LinkSmartStatus(context), null, null);
+				logger.info("registering /LinkSmartStatus servlet");
+				http.registerServlet(GETCONFIGURATION_SERVLET_ALIAS, getConfigurationServlet, null, null);
+				logger.info("registering /LinkSmartConfigurator/GetConfiguration servlet");
+				servletsInitialized = true;
+			} catch (ServletException e) {
+				logger.error(e);
+			} catch (NamespaceException e) {
+				logger.error(e);
+			}
+		} 
+	}
+
+	/**
+	 * Unregister servlets from an Http Service
+	 * 
+	 * @param http the Http Service to unregister servlets
+	 */
+	protected void unregisterServlets(HttpService http) {
+		logger.debug("ConfiguratorActivator::un-binding http-service");
+		if(servletsInitialized) {
+			http.unregister(WEB_SERVLET_ALIAS);
+			http.unregister(GETCONFIGURATION_SERVLET_ALIAS);
+			http.unregister("/LinkSmartStatus");
+			this.http = null;
+			this.servletsInitialized = false;
+		}
+	}
 
 	/**
 	 * Activate method
 	 *
 	 * @param context the bundle's execution context
 	 */
+	@Activate
 	protected void activate(ComponentContext context) {
+		logger.info("[activating ConfiguratorActivator]");
 		this.context = context;
-		this.configuratorImpl = new ConfiguratorImpl(context);
+		
+		if(!configAdminInitialized) {
+			this.configuratorImpl = new ConfiguratorImpl(context);
+		} 
+		
 		configuratorReg = context.getBundleContext().registerService(
 				Configurator.class.getName(), this.configuratorImpl, null);
 
+        logger.debug("*** activated ****");
+
 		try {
-			if (http != null) {
-				registerServlets(http);
+			if (!servletsInitialized) {
+				registerServlets(this.http);
 			}
 		} catch (Exception e) {
 			logger.error(e);
@@ -111,42 +196,12 @@ public class ConfiguratorActivator  {
 	 * 
 	 * @param context the bundle's execution context
 	 */
+	@Deactivate
 	protected void deactivate(ComponentContext context) {
 		this.configuratorReg.unregister();
 		if (http != null) {
 			unregisterServlets(http);
 		}
-	}
-
-	/**
-	 * Register servlets into an Http Service
-	 * 
-	 * @param http the Http Service to register servlets
-	 */
-	protected void registerServlets(HttpService http) {
-		this.http = http;
-		if (configuratorImpl != null) {
-			getConfigurationServlet = new GetConfigurationServlet(configuratorImpl);
-			try {
-				http.registerServlet("/LinkSmartStatus", new LinkSmartStatus(context), null, null);
-				http.registerServlet(GETCONFIGURATION_SERVLET_ALIAS,
-						getConfigurationServlet, null, null);
-			} catch (ServletException e) {
-				logger.error(e);
-			} catch (NamespaceException e) {
-				logger.error(e);
-			}
-		}
-	}
-
-	/**
-	 * Unregister servlets from an Http Service
-	 * 
-	 * @param http the Http Service to unregister servlets
-	 */
-	protected void unregisterServlets(HttpService http) {
-		http.unregister(WEB_SERVLET_ALIAS);
-		http.unregister(GETCONFIGURATION_SERVLET_ALIAS);
-		http.unregister("/LinkSmartStatus");
+        logger.debug("*** de-activated ****");
 	}
 }
