@@ -37,28 +37,27 @@ public class TunnelServlet extends HttpServlet{
 
 	private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean hasData) throws IOException {
 		//get sender and receiver from request path
-		VirtualAddress senderVirtualAddress = 
-				tunnel.getBasicTunnelService().
-				getSenderVirtualAddressFromPath(
-						request, tunnel.getNM().getVirtualAddress());
+	
+		VirtualAddress senderVirtualAddress = tunnel.getBasicTunnelService().getSenderVirtualAddressFromPath(request, tunnel.getNM().getVirtualAddress());
+		
 		if(senderVirtualAddress == null) {
-			response.sendError(
-					HttpServletResponse.SC_BAD_REQUEST, BasicTunnelService.INVALID_VIRTUAL_ADDRESS_FORMAT);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, BasicTunnelService.INVALID_VIRTUAL_ADDRESS_FORMAT);
 			return;
 		}
+		
 		VirtualAddress receiverVirtualAddress = null;
 		try {
-			receiverVirtualAddress = 
-					tunnel.getBasicTunnelService().
-					getReceiverVirtualAddressFromPath(request);
+			receiverVirtualAddress = tunnel.getBasicTunnelService().getReceiverVirtualAddressFromPath(request);
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			return;
 		}
+		
 		if(receiverVirtualAddress == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, BasicTunnelService.NO_SERVICE);
 			return;
 		}
+		
 		//compose request and headers
 		String requestString = tunnel.getBasicTunnelService().processRequest(
 				request,
