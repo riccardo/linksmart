@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="BackboneJXTA">
-   <implementation class="eu.linksmart.network.backbone.impl.jxta.BackboneJXTAImpl"/>
-   <service>
-      <provide interface="eu.linksmart.network.backbone.Backbone"/>
-   </service>
-   <reference cardinality="1..1" interface="eu.linksmart.network.routing.BackboneRouter" name="BackboneRouter" policy="static"/>
-   <reference cardinality="1..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static"/>
-</scr:component>
