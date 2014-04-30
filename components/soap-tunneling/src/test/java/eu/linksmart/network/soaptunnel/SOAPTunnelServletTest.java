@@ -1,14 +1,10 @@
 package eu.linksmart.network.soaptunnel;
 
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 
