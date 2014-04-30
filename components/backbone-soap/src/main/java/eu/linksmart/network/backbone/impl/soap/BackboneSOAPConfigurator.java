@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import eu.linksmart.utils.Configurator;
 
@@ -30,14 +31,26 @@ public class BackboneSOAPConfigurator extends Configurator {
 	/**
 	 * Initializes the JXTA backbone configurator.
 	 * 
-	 * @param bbJXTAImpl
-	 *            instantiation of JXTA backbone
 	 * @param context
 	 *            A bundle context
 	 */
 	public BackboneSOAPConfigurator(BackboneSOAPImpl bbSOAPImpl,
 			BundleContext context) {
 		super(context, logger, BBSOAP_PID, CONFIGURATION_FILE);
+		this.bbSOAPImpl = bbSOAPImpl;
+	}
+    /**
+     * Initializes the JXTA backbone configurator.
+     *
+     * @param context
+     *            A bundle context
+     * @param configAdmin pass reference to SOAPConfigurator
+     */
+
+    public BackboneSOAPConfigurator(BackboneSOAPImpl bbSOAPImpl,
+			BundleContext context, ConfigurationAdmin configAdmin) {
+		super(context, logger, BBSOAP_PID, CONFIGURATION_FILE, configAdmin);
+		super.init();
 		this.bbSOAPImpl = bbSOAPImpl;
 	}
 

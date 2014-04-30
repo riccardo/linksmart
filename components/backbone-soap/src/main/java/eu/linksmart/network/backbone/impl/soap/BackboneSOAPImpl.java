@@ -8,20 +8,27 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.NMResponse;
 import eu.linksmart.network.backbone.Backbone;
+import eu.linksmart.network.routing.BackboneRouter;
 import eu.linksmart.security.communication.SecurityProperty;
 
 /**
@@ -29,6 +36,8 @@ import eu.linksmart.security.communication.SecurityProperty;
  * Can handle both GET and POST messages.
  *
  */
+@Component(name="BackboneSOAP", immediate=true)
+@Service
 public class BackboneSOAPImpl implements Backbone {
 
 	private static String BACKBONE_SOAP = BackboneSOAPImpl.class
@@ -45,13 +54,48 @@ public class BackboneSOAPImpl implements Backbone {
 	private static final int TIMEOUT = 30000;
 
 	private BackboneSOAPConfigurator configurator;
+	
+	@Reference(name="ConfigurationAdmin",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindConfigAdmin", 
+			unbind="unbindConfigAdmin",
+			policy=ReferencePolicy.STATIC)
+	protected ConfigurationAdmin configAdmin = null;
+	
+	@Reference(name="BackboneRouter",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindBackboneRouter",
+            unbind="unbindBackboneRouter",
+            policy= ReferencePolicy.STATIC)
+	private BackboneRouter bRouter;
+	
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+		LOG.debug("BackboneSoap::binding configAdmin");
+		this.configAdmin = configAdmin;
+    }
+    
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	LOG.debug("BackboneSoap::un-binding configAdmin");
+    	this.configAdmin = null;
+    }
+    
+    protected void bindBackboneRouter(BackboneRouter bbRouter) {
+    	LOG.debug("BackboneOsgi::binding backbone-router");
+        this.bRouter = bbRouter;
+    }
 
+    protected void unbindBackboneRouter(BackboneRouter bbRouter) {
+    	LOG.debug("BackboneOsgi::un-binding backbone-router");
+        this.bRouter = null;
+    }
+
+    @Activate
 	protected void activate(ComponentContext context) {
+    	LOG.info("[activating BackboneSoap]");
 		virtualAddressUrlMap = new HashMap<VirtualAddress, URL>();
 
 		try {
-			this.configurator = new BackboneSOAPConfigurator(this, context
-					.getBundleContext());
+			this.configurator = new BackboneSOAPConfigurator(this, context.getBundleContext(), this.configAdmin);
 			configurator.registerConfiguration();
 		} catch (NullPointerException e) {
 			LOG.fatal("Configurator could not be initialized " + e.toString());
@@ -60,8 +104,9 @@ public class BackboneSOAPImpl implements Backbone {
 		LOG.info(BACKBONE_SOAP + " started");
 	}
 
+    @Deactivate
 	protected void deactivate(ComponentContext context) {
-		LOG.info(BACKBONE_SOAP + " stopped");
+		LOG.info("de-activating" + BACKBONE_SOAP);
 	}
 
 	/**
@@ -308,9 +353,7 @@ public class BackboneSOAPImpl implements Backbone {
 
 	/**
 	 * @param resp
-	 * @param cis
-	 * @param response
-	 * @param buffer
+
 	 * @return
 	 * @throws IOException
 	 */
