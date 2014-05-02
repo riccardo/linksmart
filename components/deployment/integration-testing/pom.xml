@@ -25,7 +25,11 @@
         <module>basic-tunneling-it</module>
         <module>standard-tunneling-it</module>
         <module>soap-tunneling-it</module>
-<!--         <module>backbone-router-it</module> -->
+        <module>backbone-soap-it</module>
+        <module>backbone-osgi-it</module>
+        <module>backbone-jxta-it</module>
+        <module>backbone-router-it</module>
+       <!--         <module>backbone-router-it</module> -->
 <!--         <module>backbone-osgi-integration</module> -->
 <!--         <module>backbone-soap-integration</module> -->
 <!--         <module>backbone-jxta-integration</module> -->
