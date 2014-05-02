@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>backbone-router-integration-tests</artifactId>
-    <name>Backbone Router Integration Tests</name>
+    <name>backbone-router integration tests</name>
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>

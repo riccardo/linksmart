@@ -11,6 +11,7 @@
     </parent>
 
 	<artifactId>basic-tunneling-it</artifactId>
+    <name>basic-tunneling integration tests</name>
 
 	<packaging>jar</packaging>
 

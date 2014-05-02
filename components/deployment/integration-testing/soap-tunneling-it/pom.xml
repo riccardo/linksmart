@@ -11,6 +11,7 @@
     </parent>
 
 	<artifactId>soap-tunneling-it</artifactId>
+    <name>soap-tunneling integration tests</name>
 
 	<packaging>jar</packaging>
 

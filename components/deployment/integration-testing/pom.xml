@@ -12,7 +12,7 @@
 
 	<artifactId>linksmart-deployment-it</artifactId>
 	
-	<name>LinkSmart intetration test multimodule</name>
+	<name>LinkSmart Full Integration Suite</name>
     
     <packaging>pom</packaging>
     

@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cryptomanager-it</artifactId>
-    <name>cryptomanager Integration Tests</name>
+    <name>cryptomanager integration tests</name>
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
