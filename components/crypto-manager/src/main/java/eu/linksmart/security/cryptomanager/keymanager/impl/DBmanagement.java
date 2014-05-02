@@ -46,7 +46,8 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-import org.apache.derby.jdbc.EmbeddedDriver;
+import org.apache.derby.jdbc.*;
+import org.apache.derby.impl.jdbc.*;
 
 import org.apache.log4j.Logger;
 
@@ -94,6 +95,14 @@ public class DBmanagement implements KeyStore.Entry {
 	private DBmanagement() throws SQLException {
 		// Initialize the database
 		try {
+
+            //TODO workaround for derby initalization
+            // because of Class.forName DB initalization, the traditional import mechanisms are overriden
+            // initializing some classes from the derby package make sure , those are imported properly by
+            // maven bundle plugin
+            org.apache.derby.impl.jdbc.EmbedStatement es = null;
+            org.apache.derby.jdbc.EmbeddedDriver ed = null;
+
 			Class.forName("org.apache.derby.jdbc.EmbeddedDriver", true, this
 					.getClass().getClassLoader());
 			try {
