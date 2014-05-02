@@ -33,26 +33,11 @@
 
 package eu.linksmart.security.cryptomanager.impl;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
-import java.security.SignatureException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
-
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-
+import eu.linksmart.security.cryptomanager.CryptoManager;
+import eu.linksmart.security.cryptomanager.SecurityLevel;
+import eu.linksmart.security.cryptomanager.cryptoprocessor.CryptoMessageFormatProcessor;
+import eu.linksmart.security.cryptomanager.cryptoprocessor.impl.CryptoFactory;
+import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
 import org.apache.felix.scr.annotations.*;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -60,11 +45,17 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 
-import eu.linksmart.security.cryptomanager.CryptoManager;
-import eu.linksmart.security.cryptomanager.SecurityLevel;
-import eu.linksmart.security.cryptomanager.cryptoprocessor.CryptoMessageFormatProcessor;
-import eu.linksmart.security.cryptomanager.cryptoprocessor.impl.CryptoFactory;
-import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.sql.SQLException;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * Facade class that provides all public methods from different
@@ -91,6 +82,8 @@ public class CryptoManagerImpl implements CryptoManager{
 	private KeyManager keyManager;
 	private CryptoManagerConfigurator configurator;
 	private boolean activated = false;
+
+    BouncyCastleProvider mProvider;
 
     @Reference(name="ConfigurationAdmin",
             cardinality = ReferenceCardinality.MANDATORY_UNARY,
@@ -148,14 +141,22 @@ public class CryptoManagerImpl implements CryptoManager{
 
 		// Use this bundle's classloader to initialise the bouncycastle crypto
 		// provider
-		logger.debug("Loading bouncycastle crypto provider");
+		logger.debug("Loading bouncycastle crypto provider...");
+        //TODO workaround for bouncyCastel initalization
+        // because of Class.forName initalization, the traditional import mechanisms are overriden
+        // initializing some classes from the derby package make sure , those are imported properly by
+        // maven bundle plugin
+        org.bouncycastle.jce.provider.BouncyCastleProvider bouncyCastelProvider = null;
 		try {
-			ClassLoader sysloader =
-				Thread.currentThread().getContextClassLoader();
-			Class<?> loaded =
-				sysloader.loadClass(BouncyCastleProvider.class.getName());
-			Provider provider = (Provider) loaded.newInstance();
-			Security.addProvider(provider);
+//			ClassLoader sysloader =
+//				Thread.currentThread().getContextClassLoader();
+//			Class<?> loaded =
+//				sysloader.loadClass(BouncyCastleProvider.class.getName());
+//			Provider provider = (Provider) loaded.newInstance();
+//			Security.addProvider(provider);
+            mProvider = new BouncyCastleProvider();
+            Security.addProvider(mProvider);
+            logger.debug("done.");
 		} catch (Throwable t) {
 			logger.error(t);
 		}
