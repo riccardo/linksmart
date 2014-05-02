@@ -91,20 +91,24 @@
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
 			<artifactId>pax-exam-junit4</artifactId>
+            <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
 			<artifactId>pax-exam-link-mvn</artifactId>
+            <scope>provided</scope>
 		</dependency>
 		<!-- PaxExam decides on a specific OSGi Container for testing based on the 
 			maven dependecies, we are using Apache Karaf for in-container OSGi testing -->
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
-			<artifactId>pax-exam-container-karaf</artifactId>	
+			<artifactId>pax-exam-container-karaf</artifactId>
+            <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
+            <scope>provided</scope>
 		</dependency>
 	</dependencies>
 
