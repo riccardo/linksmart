@@ -173,9 +173,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/linksmart-parent</connection>
-        <developerConnection>scm:svn:https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/linksmart-parent</developerConnection>
-        <url>https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/linksmart-parent</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</developerConnection>
+        <url>https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</url>
     </scm>
 
 	<!-- this section define only the versions used by dependencies and not the dependencies itself -->
