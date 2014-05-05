@@ -33,53 +33,10 @@
 
 package eu.linksmart.security.cryptomanager.keymanager.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.InvalidPropertiesFormatException;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
+import eu.linksmart.security.cryptomanager.impl.Configuration;
+import eu.linksmart.security.cryptomanager.impl.CryptoManagerImpl;
+import eu.linksmart.security.cryptomanager.impl.CustomCertificateAttributes;
+import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
 import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PrincipalUtil;
@@ -87,10 +44,18 @@ import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
-import eu.linksmart.security.cryptomanager.impl.Configuration;
-import eu.linksmart.security.cryptomanager.impl.CryptoManagerImpl;
-import eu.linksmart.security.cryptomanager.impl.CustomCertificateAttributes;
-import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.math.BigInteger;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.*;
+import java.security.spec.InvalidKeySpecException;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Class for managing the keystore and creating cryptographic keys. <p>
@@ -106,7 +71,6 @@ public class KeyManagerImpl implements KeyManager {
 	private static final String PRIVATE_ENCRYPTION_KEY_PASS = "linksmartdemo";
 	private static int CACHE_SIZE = 10;
 	/**	 Unique random salt for LinkSmart. */
-	private static String KEY_DERIVATION_SALT = "52EA39FD2857E2C85EE291DA02BBC0708D1A3D26E83FBF1522B753A7086AA314";
 	/** Number of times to iterate the hash. */
 	private static int PASSWORD_DERIVATION_ITERATION = 1000;
 
@@ -874,7 +838,11 @@ public class KeyManagerImpl implements KeyManager {
 				MessageDigest md = MessageDigest.getInstance("SHA-256");
 				byte[] digest = null;
 				byte[] passBytes = Base64.decode(password);
-				byte[] saltBytes = hexStringToByteArray(KEY_DERIVATION_SALT);
+
+                Random r = new SecureRandom();
+                byte[] saltBytes = new byte[32];
+                r.nextBytes(saltBytes);
+
 				//concat password bytes with salt bytes
 				byte[] iterationValue = new byte[passBytes.length + saltBytes.length];
 				for (int i=0; i < passBytes.length; i++) {
