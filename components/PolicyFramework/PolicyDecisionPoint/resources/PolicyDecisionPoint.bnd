@@ -1,0 +1,31 @@
+# PolicyDecisionPoint bnd instructions
+# 
+# Note that we are currently still using a separate MANIFEST.MF and 
+# declarative services activation file; this will change in a future 
+# version. Changes in this file will not directly change the 
+# MANIFEST.MF until then.
+#
+# author Marco Tiemann
+#
+-manifest= ../META-INF/MANIFEST.MF
+version=1.0.0
+Include-Resource: resources/cs-xacml-schema-policy-01.xsd=cs-xacml-schema-policy-01.xsd,\
+ resources/pdpconfig.properties=pdpconfig.properties,\
+ OSGI-INF/eu.linksmart.policy.pdp.DSActivation.xml=../OSGI-INF/eu.linksmart.policy.pdp.DSActivation.xml
+#Import-Package: javax.xml.namespace.*, javax.xml.parsers.*,\
+# javax.xml.transform.*, javax.xml.transform.dom.*,\
+# javax.xml.transform.stream.*, javax.xml.xpath.*,\ 
+# org.w3c.dom.*, org.xml.sax.*,*
+Export-Package: eu.linksmart.policy.pdp.admin.impl.*;version=${version},\
+ eu.linksmart.policy.pdp.ext.attribute.impl.*;version=${version},\
+ eu.linksmart.policy.pdp.ext.function.impl.*;version=${version},\
+ eu.linksmart.policy.pdp.ext.impl.*;version=${version},\
+ eu.linksmart.policy.pdp.finder.impl.*;version=${version},\
+ eu.linksmart.policy.pdp.impl.*;version=${version}
+Service-Component: OSGI-INF/eu.linksmart.policy.pdp.DSActivation.xml
+Bundle-Version: ${version}
+Bundle-Name: LinkSmart PDP Implementation
+Bundle-Description: eu.linksmart.policy.pdp
+Bundle-Vendor: University of Reading
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
