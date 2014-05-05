@@ -155,7 +155,6 @@ public class ConfiguratorActivator  {
 	protected void unregisterServlets(HttpService http) {
 		logger.debug("ConfiguratorActivator::un-binding http-service");
 		if(servletsInitialized) {
-			http.unregister(WEB_SERVLET_ALIAS);
 			http.unregister(GETCONFIGURATION_SERVLET_ALIAS);
 			http.unregister("/LinkSmartStatus");
 			this.http = null;
