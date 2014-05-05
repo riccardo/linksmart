@@ -3,53 +3,27 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-
+	<modelVersion>4.0.0</modelVersion>
+	
     <parent>
         <groupId>eu.linksmart</groupId>
         <artifactId>linksmart-deployment-it</artifactId>
         <version>2.2.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-
+    
     <artifactId>cryptomanager-it</artifactId>
-    <name>cryptomanager integration tests</name>
+    
+    <name>Crypto Manager Integration Tests</name>
+    
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- PaxExam dependencies -->
-        <dependency>
-            <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam-junit4</artifactId>
-            <version>3.3.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam-link-mvn</artifactId>
-            <version>3.3.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam-container-karaf</artifactId>
-            <version>3.3.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.scr.annotations</artifactId>
-            <version>1.9.6</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>eu.linksmart</groupId>
             <artifactId>eu.linksmart.security.cryptomanager</artifactId>
-            <version>${project.version}</version>
         </dependency>
+        <dependency>
+			<groupId>eu.linksmart</groupId>
+			<artifactId>it-utils</artifactId>
+		</dependency>
     </dependencies>
 
     <build>
@@ -69,6 +43,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
