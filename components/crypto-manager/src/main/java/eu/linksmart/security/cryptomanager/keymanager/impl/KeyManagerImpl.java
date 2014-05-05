@@ -150,6 +150,7 @@ public class KeyManagerImpl implements KeyManager {
 	 */
 	private void init() throws KeyStoreException, NoSuchAlgorithmException,
 	CertificateException, IOException {
+		logger.info("initializing crypto-key-manager");
 		// Keystore-Datei laden (Konfiguration in conf/config.xml)
 		ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(
@@ -190,6 +191,8 @@ public class KeyManagerImpl implements KeyManager {
 			privateKeyCacheUse = new HashMap<String, Integer>();
 			privateKeyRefCache = new HashMap<String, String>();
 
+			logger.info("crypto-key-manager initialized");
+			
 		} catch (SQLException e) {
 			logger.error("Error while initialising KeyManager", e);
 		}

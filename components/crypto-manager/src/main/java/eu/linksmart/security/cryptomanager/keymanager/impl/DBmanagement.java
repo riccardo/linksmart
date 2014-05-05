@@ -111,6 +111,7 @@ public class DBmanagement implements KeyStore.Entry {
 								.getConnection("jdbc:derby:cryptomanager_db;create=false;");
 				con.setAutoCommit(true);
 				con.setHoldability(ResultSet.HOLD_CURSORS_OVER_COMMIT);
+				logger.info("Crypto-dbmanagement is initialized");
 			} catch (SQLException e) {
 				// Database does not exist. Create it and run scripts
 				con =
@@ -123,6 +124,7 @@ public class DBmanagement implements KeyStore.Entry {
 				
 				executeScript(new File(CryptoManagerImpl.RESOURCEFOLDERPATH
 						+ "/create_cryptomanager_db.sql"));
+				logger.info("Crypto-dbmanagement is initialized by creating database through scripts");
 			}
 		} catch (ClassNotFoundException e) {
 			logger.error("Unable to load derby driver.", e);
