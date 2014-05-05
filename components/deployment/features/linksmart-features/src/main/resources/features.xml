@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <features name="${project.artifactId}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
-    <feature name="linksmart-boot-feature" version="${project.version}">
+	<feature name="linksmart-boot-feature" version="${project.version}">
         <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
-        <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle> 
-        
+        <!--
+        no need to deploy it, Karaf already provision this bundle   
+      	<bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>  
+      	-->
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${project.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${project.version}</bundle>
@@ -13,37 +15,91 @@
     
     <feature name="osgi-http-service" version="${project.version}">
     	<feature version="${karaf.version}">http</feature>
-<!--     	<bundle>mvn:org.apache.felix/org.apache.felix.http.jetty/${felix.http.version}</bundle>	 -->
+		<!--     	
+		<bundle>mvn:org.apache.felix/org.apache.felix.http.jetty/${felix.http.version}</bundle>	 
+		-->
     </feature>
     
-    <feature name="network-manager-core" version="${project.version}">  
+    <feature name="crypto-manager" version="${project.version}">
+    	<feature version="${project.version}">linksmart-boot-feature</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.cryptomanager/${project.version}</bundle>
+        <bundle dependency="true">mvn:org.bouncycastle/bcprov-jdk16/1.46</bundle>
+        <bundle dependency="true">mvn:org.bouncycastle/bcpg-jdk16/1.46</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/1.1_4</bundle>
+        <bundle>mvn:org.apache.commons/commons-jexl/2.1.1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.derby/10.9.1.0_1</bundle>
+        <bundle>mvn:javax.transaction/com.springsource.javax.transaction/1.1.0</bundle>
+        <bundle>mvn:commons-configuration/commons-configuration/1.9</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.security.cryptomanager/${project.version}</bundle>
+    </feature>
+    
+    <feature name="security-manager-sym" version="${project.version}">
+        <feature version="${project.version}">crypto-manager</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.security.communicationsecuritymanager.sym/${project.version}</bundle>
+    </feature>
+    
+    <feature name="security-manager-asym" version="${project.version}">
+        <feature version="${project.version}">crypto-manager</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.security.communicationsecuritymanager.asym/${project.version}</bundle>
+    </feature>
+    
+    <feature name="identity-manager" version="${project.version}">
+    	<feature version="${project.version}">crypto-manager</feature>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.identitymanager/${project.version}</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${project.version}</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.identitymanager/${project.version}</bundle>
+    </feature>
+    
+    <feature name="backbone-router" version="${project.version}">
+		<feature version="${project.version}">linksmart-boot-feature</feature>		       
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${parent.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.router/${parent.version}</bundle>
+    </feature>
+    
+    <feature name="network-manager" version="${project.version}">  
     	<feature version="${project.version}">linksmart-boot-feature</feature> 
     	<feature version="${project.version}">osgi-http-service</feature>  
-    		
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.cryptomanager/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/crypto-manager-dummy/${project.version}</bundle>
-        
+    	<feature version="${project.version}">crypto-manager</feature>	
+    	<feature version="${project.version}">identity-manager</feature>
+        <feature version="${project.version}">security-manager-sym</feature>
+        <feature version="${project.version}">security-manager-asym</feature>
+        <feature version="${project.version}">backbone-router</feature>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/communication-security-manager-sym-dummy/${project.version}</bundle>
-        
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.identitymanager/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/identity-manager-dummy/${project.version}</bundle>
-        
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/trust-manager-dummy/${project.version}</bundle>
-        
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/backbone-router-dummy/${project.version}</bundle>
-        
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle> 
         <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${project.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/network-manager-dummy/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.networkmanager/${project.version}</bundle>
+    </feature>
+    
+    <feature name="trust-manager" version="${project.version}">
+    	<feature version="${project.version}">network-manager</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${project.version}</bundle>
+    	<bundle>mvn:org.bouncycastle/bcprov-jdk16/1.46</bundle>
+        <bundle>mvn:org.bouncycastle/bcpg-jdk16/1.46</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.security.trustmanager/${project.version}</bundle>
     </feature>
     
     <feature name="basic-tunnel" version="${project.version}">
-    	<feature version="${project.version}">network-manager-core</feature>
+    	<feature version="${project.version}">network-manager</feature>
     	<bundle>mvn:eu.linksmart/eu.linksmart.network.tunnel/${project.version}</bundle>
     </feature>
     
@@ -55,12 +111,59 @@
     </feature>
     
     <feature name="soap-tunnel" version="${project.version}">
-    	<feature version="${project.version}">network-manager-core</feature>
+    	<feature version="${project.version}">network-manager</feature>
     	<bundle>mvn:eu.linksmart/eu.linksmart.network.soaptunneling/${project.version}</bundle>
     	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-codec/${commons-codec.version}</bundle>
     	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/${commons-httpclient.version}</bundle>
     </feature>
-
+    
+    <feature name="backbone-osgi" version="${project.version}">
+        <feature version="${project.version}">backbone-router</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.impl.osgi/${parent.version}</bundle>
+    </feature>
+    
+    <feature name="backbone-soap" version="${project.version}">
+        <feature version="${project.version}">backbone-router</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.soap/${parent.version}</bundle>
+    </feature>
+    
+    <feature name="backbone-jxta" version="${project.version}">
+        <feature version="${project.version}">backbone-router</feature>
+        <bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/4.2.22</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.jxta/${parent.version}</bundle>
+    </feature>
+    
+    <feature name="backbone-data" version="${project.version}">
+        <feature version="${project.version}">backbone-router</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.data/${parent.version}</bundle>
+    </feature>
+    
+    <feature name="configurator-manager" version="${project.version}">
+        <feature version="${project.version}">linksmart-boot-feature</feature> 
+    	<feature version="${project.version}">osgi-http-service</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
+    </feature>
+    
+    <feature name="grand-message-handler" version="${project.version}">
+        <feature version="${project.version}">network-manager</feature>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.network.tunnel/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.grand/${parent.version}</bundle>
+    </feature>
+    
+    <feature name="linksmart" version="${project.version}">
+    	<feature version="${project.version}">network-manager</feature>
+        <feature version="${project.version}">trust-manager</feature>
+        <feature version="${project.version}">basic-tunnel</feature>
+        <feature version="${project.version}">standard-tunnel</feature>
+        <feature version="${project.version}">soap-tunnel</feature>
+        <feature version="${project.version}">backbone-osgi</feature>
+        <feature version="${project.version}">backbone-soap</feature>
+        <feature version="${project.version}">backbone-jxta</feature>
+        <feature version="${project.version}">backbone-data</feature>
+        <feature version="${project.version}">configurator-manager</feature>
+        <feature version="${project.version}">grand-message-handler</feature>
+    </feature>
+       
     <!-- ****************************** -->
     <!--  BACKBONE INTEGRATION FEATURE -->
 
