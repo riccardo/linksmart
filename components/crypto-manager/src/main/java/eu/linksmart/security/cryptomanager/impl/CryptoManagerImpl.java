@@ -120,6 +120,7 @@ public class CryptoManagerImpl implements CryptoManager{
 		CryptoManagerImpl.context = context.getBundleContext();
 		// Extract all configuration files from the bundle's jar file to the
 		// filesystem
+        // TODO due loading problems the code is duplicated  @CryptoManagerAdminImpl
 		Hashtable<String, String> HashFilesExtract =
 			new Hashtable<String, String>();
 		logger.debug("Deploying CryptoManager config files");
@@ -131,36 +132,19 @@ public class CryptoManagerImpl implements CryptoManager{
 		"resources/delete_cryptomanager_db.sql");
 		HashFilesExtract
 		.put(RESOURCEFOLDERPATH + SEPARATOR + "keystore.bks", "resources/keystore.bks");
+        logger.debug("number of files to extract : "+HashFilesExtract.size());
 		try {
 			JarUtil.createDirectory(CONFIGFOLDERPATH);
 			JarUtil.createDirectory(RESOURCEFOLDERPATH);
 			JarUtil.extractFilesJar(HashFilesExtract);
-		} catch (IOException e) {
+        } catch (IOException e) {
 			logger.error("Needed folder has not been created...", e);
 		}
 
-		// Use this bundle's classloader to initialise the bouncycastle crypto
-		// provider
-		logger.debug("Loading bouncycastle crypto provider...");
-        //TODO workaround for bouncyCastel initalization
-        // because of Class.forName initalization, the traditional import mechanisms are overriden
-        // initializing some classes from the derby package make sure , those are imported properly by
-        // maven bundle plugin
-        org.bouncycastle.jce.provider.BouncyCastleProvider bouncyCastelProvider = null;
-		try {
-//			ClassLoader sysloader =
-//				Thread.currentThread().getContextClassLoader();
-//			Class<?> loaded =
-//				sysloader.loadClass(BouncyCastleProvider.class.getName());
-//			Provider provider = (Provider) loaded.newInstance();
-//			Security.addProvider(provider);
-            mProvider = new BouncyCastleProvider();
-            Security.addProvider(mProvider);
-            logger.debug("done.");
-		} catch (Throwable t) {
-			logger.error(t);
-		}
+        logger.debug("initalizing keystore provider.");
+        ProviderInit.initProvider();
 
+        logger.debug("grabing keymanager from crypto factory");
 		keyManager = CryptoFactory.getKeyManagerInstance();
 		cryptoProcessor = CryptoFactory.getProcessorInstance("XMLEnc");
 		//configurator = new CryptoManagerConfigurator(this, context.getBundleContext());

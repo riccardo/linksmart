@@ -33,18 +33,13 @@
 
 package eu.linksmart.security.cryptomanager.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.apache.log4j.Logger;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
-
-import org.apache.log4j.Logger;
 
 /**
  * Provides some utility functions for deploying files from a Jar file. <p>
@@ -86,7 +81,9 @@ public final class JarUtil {
 					log.debug("Again not found");
 				}
 			}
-		}
+		}else{
+            log.warn(localpath + " already exists, skipping extraction.");
+        }
 	}
 
 	private static void writefile(File finalfile, InputStream is)
@@ -123,7 +120,8 @@ public final class JarUtil {
 
 	private static void createFolder(String path) {
 		File directory = new File(path);
-		directory.mkdir();
+        boolean r = directory.mkdir();
+        log.debug(path+" directory created: "+r);
 	}
 
 	public static void extractFilesJar(Hashtable fileshash) throws IOException {

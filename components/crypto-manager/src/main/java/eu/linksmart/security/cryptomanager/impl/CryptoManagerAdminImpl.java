@@ -33,19 +33,21 @@
 
 package eu.linksmart.security.cryptomanager.impl;
 
-import java.util.Arrays;
-import java.util.Vector;
-
+import eu.linksmart.security.cryptomanager.CryptoManagerAdmin;
+import eu.linksmart.security.cryptomanager.cryptoprocessor.impl.CryptoFactory;
+import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
-import eu.linksmart.security.cryptomanager.CryptoManagerAdmin;
-import eu.linksmart.security.cryptomanager.cryptoprocessor.impl.CryptoFactory;
-import eu.linksmart.security.cryptomanager.keymanager.KeyManager;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Vector;
 
 @Component(name="CryptoManagerAdmin", immediate=true)
 @Service
@@ -56,7 +58,15 @@ public class CryptoManagerAdminImpl implements CryptoManagerAdmin {
 	public static BundleContext context;
 	private KeyManager keyManager;
 
-	/**
+    private static String SEPARATOR = System.getProperty("file.separator");
+
+    final static public String CONFIGFOLDERPATH =
+            "linksmart" + SEPARATOR + "eu.linksmart.security.cryptomanager" + SEPARATOR + "configuration";
+    final static public String RESOURCEFOLDERPATH =
+            "linksmart" + SEPARATOR + "eu.linksmart.security.cryptomanager" + SEPARATOR + "resources";
+    private BouncyCastleProvider mProvider;
+
+    /**
 	 * Constructor.
 	 */
 	public CryptoManagerAdminImpl() {
@@ -71,6 +81,31 @@ public class CryptoManagerAdminImpl implements CryptoManagerAdmin {
 	protected void activate(ComponentContext context) {
 		this.context = context.getBundleContext();
 
+        // TODO due loading problems the code is duplicated  @CryptoManagerImpl
+        Hashtable<String, String> HashFilesExtract =
+                new Hashtable<String, String>();
+        logger.debug("Deploying CryptoManager config files");
+        HashFilesExtract.put(CONFIGFOLDERPATH + SEPARATOR + "cryptomanager-config.xml",
+                "configuration/cryptomanager-config.xml");
+        HashFilesExtract.put(RESOURCEFOLDERPATH + SEPARATOR + "create_cryptomanager_db.sql",
+                "resources/create_cryptomanager_db.sql");
+        HashFilesExtract.put(RESOURCEFOLDERPATH + SEPARATOR + "delete_cryptomanager_db.sql",
+                "resources/delete_cryptomanager_db.sql");
+        HashFilesExtract
+                .put(RESOURCEFOLDERPATH + SEPARATOR + "keystore.bks", "resources/keystore.bks");
+        logger.debug("number of files to extract : "+HashFilesExtract.size());
+        try {
+            JarUtil.createDirectory(CONFIGFOLDERPATH);
+            JarUtil.createDirectory(RESOURCEFOLDERPATH);
+            JarUtil.extractFilesJar(HashFilesExtract);
+        } catch (IOException e) {
+            logger.error("Needed folder has not been created...", e);
+        }
+
+        logger.debug("initalizing keystore provider.");
+        ProviderInit.initProvider();
+
+        logger.debug("grabing keymanager instance from crypto factory.");
 		keyManager = CryptoFactory.getKeyManagerInstance();
 		logger.info("CryptoManager Admin activated");
 
