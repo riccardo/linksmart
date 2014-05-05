@@ -33,14 +33,14 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/deployment-integration</connection>
-        <developerConnection>scm:svn:https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/deployment-integration</developerConnection>
-        <url>https://forge.fit.fraunhofer.de/svn/linksmart/trunk/linksmart-maven/deployment-integration</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/integration-testing</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/integration-testing</developerConnection>
+        <url>https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/integration-testing</url>
     </scm>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- LinkSmart dependencies -->
+			<!-- tunnel dependencies -->
 			<dependency>
 				<groupId>eu.linksmart</groupId>
 				<artifactId>eu.linksmart.network.tunnel</artifactId>
@@ -56,6 +56,7 @@
 				<artifactId>eu.linksmart.network.tunnel.standard</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<!-- tunnel dependencies -->
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.backbone.jxta</artifactId>
@@ -71,6 +72,12 @@
                 <artifactId>eu.linksmart.network.backbone.soap</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- security dependencies -->
+            <dependency>
+            	<groupId>eu.linksmart</groupId>
+            	<artifactId>eu.linksmart.security.cryptomanager</artifactId>
+            	<version>${project.version}</version>
+        	</dependency>
             <!-- testing related dependencies -->
             <dependency>
 				<groupId>eu.linksmart</groupId>
