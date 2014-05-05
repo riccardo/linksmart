@@ -5,18 +5,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.Security;
 
-/**
- * Created by carlos on 05.05.14.
- */
 public class ProviderInit {
 
-    private static boolean intialized = false;
+    private static boolean initialized = false;
 
     private final static Logger logger = Logger.getLogger(ProviderInit.class.getName());
-    private static  org.bouncycastle.jce.provider.BouncyCastleProvider mProvider;
+    private static org.bouncycastle.jce.provider.BouncyCastleProvider mProvider;
 
-    private ProviderInit(){
-
+    private ProviderInit() {
     }
 
     //TODO workaround for bouncyCastel initalization
@@ -25,19 +21,20 @@ public class ProviderInit {
     // maven bundle plugin
 
     static boolean initProvider() {
-        if (intialized == false) {
-            logger.debug("initializing bouncy castle provider...");
-            mProvider = null;
-            try {
+    	try {
+        	if (!initialized) {
+                logger.debug("initializing & adding bouncy castle provider");
+                mProvider = null;
                 mProvider = new BouncyCastleProvider();
                 Security.addProvider(mProvider);
-                logger.debug("done.");
-            } catch (Throwable t) {
-                logger.error(t);
-                return false;
+                logger.debug("bouncy castel provider is added");
+                initialized = true;
+        	} else {
+                logger.debug("Bouncy castle provider already initialized.");
             }
-        }else{
-            logger.debug("Bouncy castle provider already initialized.");
+        } catch (Throwable t) {
+            logger.error(t);
+            return false;
         }
         return true;
     }
