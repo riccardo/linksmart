@@ -53,7 +53,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
-import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -118,29 +117,9 @@ public class CryptoManagerImpl implements CryptoManager{
 	protected void activate(ComponentContext context) {
     	logger.info("[activating CryptoManager]");
 		CryptoManagerImpl.context = context.getBundleContext();
-		// Extract all configuration files from the bundle's jar file to the
-		// filesystem
-        // TODO due loading problems the code is duplicated  @CryptoManagerAdminImpl
-		Hashtable<String, String> HashFilesExtract =
-			new Hashtable<String, String>();
-		logger.debug("Deploying CryptoManager config files");
-		HashFilesExtract.put(CONFIGFOLDERPATH + SEPARATOR + "cryptomanager-config.xml",
-		"configuration/cryptomanager-config.xml");
-		HashFilesExtract.put(RESOURCEFOLDERPATH + SEPARATOR + "create_cryptomanager_db.sql",
-		"resources/create_cryptomanager_db.sql");
-		HashFilesExtract.put(RESOURCEFOLDERPATH + SEPARATOR + "delete_cryptomanager_db.sql",
-		"resources/delete_cryptomanager_db.sql");
-		HashFilesExtract
-		.put(RESOURCEFOLDERPATH + SEPARATOR + "keystore.bks", "resources/keystore.bks");
-        logger.debug("number of files to extract : "+HashFilesExtract.size());
-		try {
-			JarUtil.createDirectory(CONFIGFOLDERPATH);
-			JarUtil.createDirectory(RESOURCEFOLDERPATH);
-			JarUtil.extractFilesJar(HashFilesExtract);
-        } catch (IOException e) {
-			logger.error("Needed folder has not been created...", e);
-		}
 
+        // key store should be extracted before calling it
+        // see CryptoManagerAdminImpl for extraction snippet
         logger.debug("initalizing keystore provider.");
         ProviderInit.initProvider();
 

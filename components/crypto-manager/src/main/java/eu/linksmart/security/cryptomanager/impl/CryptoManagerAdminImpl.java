@@ -81,7 +81,10 @@ public class CryptoManagerAdminImpl implements CryptoManagerAdmin {
 	protected void activate(ComponentContext context) {
 		this.context = context.getBundleContext();
 
-        // TODO due loading problems the code is duplicated  @CryptoManagerImpl
+
+        // TODO this should be refactored in to a resource bundle
+        // suggested loading sequence
+        // resource bundle -> CryptoManagerAdminImpl -> CryptoManagerImpl
         Hashtable<String, String> HashFilesExtract =
                 new Hashtable<String, String>();
         logger.debug("Deploying CryptoManager config files");
