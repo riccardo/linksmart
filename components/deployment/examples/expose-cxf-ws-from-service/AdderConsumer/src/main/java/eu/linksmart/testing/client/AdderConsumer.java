@@ -13,11 +13,13 @@ import java.net.URL;
 
 /**
  * Created by carlos on 07.05.14.
+ * Simple consumer of AdderService
  */
 @Component(name="AdderConsumer", immediate=true)
 public class AdderConsumer{
 
         URL wsdlURL;
+        Object[] response;
 
         @Activate
         protected void activate(ComponentContext ccontext){
@@ -34,8 +36,13 @@ public class AdderConsumer{
             Client client = dcf.createClient("http://localhost:9191/cxf/services/AdderService?wsdl");
 
             try {
-                Object[] response = client.invoke(new QName("http://service.testing.linksmart.eu/","add"),10,10);
-                System.out.println("response from service: "+ response[0]);
+
+                // ten continous calls of the ws
+                for(int i=0; i < 10; i++){
+                    response = client.invoke(new QName("http://service.testing.linksmart.eu/","add"),i,0);
+                    System.out.println("response from service: "+ response[0]);
+
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
