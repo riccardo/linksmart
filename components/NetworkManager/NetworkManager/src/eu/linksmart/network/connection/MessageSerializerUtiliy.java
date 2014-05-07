@@ -93,7 +93,7 @@ public class MessageSerializerUtiliy {
 					senderVirtualAddress, receiverVirtualAddress, e.getMessage().getBytes());
 		}
 
-		if(properties.contains(Connection.TOPIC) && properties.contains(Connection.APPLICATION_DATA)) {
+		if(properties.containsKey(Connection.TOPIC) && properties.containsKey(Connection.APPLICATION_DATA)) {
 			// create real message
 			Message message = new Message((String) properties.remove(Connection.TOPIC),
 					senderVirtualAddress, receiverVirtualAddress, (Base64.decode((String) properties
@@ -111,7 +111,7 @@ public class MessageSerializerUtiliy {
 			if (showException)
 			{
 				logger.debug(MISSING_FIELD + " sender:" + senderVirtualAddress + " receiver:" + receiverVirtualAddress);
-				logger.trace("Contains topic:" + properties.contains(Connection.TOPIC) + " payload:" + properties.containsKey(Connection.APPLICATION_DATA));
+				logger.trace("Contains topic:" + properties.containsKey(Connection.TOPIC) + " payload:" + properties.containsKey(Connection.APPLICATION_DATA));
 			}
 			return new ErrorMessage(ErrorMessage.ERROR, senderVirtualAddress, receiverVirtualAddress, MISSING_FIELD.getBytes());
 		}
