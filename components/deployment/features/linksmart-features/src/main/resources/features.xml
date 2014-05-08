@@ -173,7 +173,6 @@
     <!-- Feature needed for SOAP-WS exposal of CXF annotated OSGI components/services -->
     <feature name="expose-cxf-annotated-soap-webservices" version="${project.version}">
         <feature version="${cxf.version}">cxf-core</feature>
-        <feature version="${cxf.version}">cxf-ws-discovery</feature>
         <feature version="${cxf.dosgi.version}">cxf-dosgi-discovery-distributed</feature>
     </feature>
        
