@@ -163,13 +163,25 @@
         <feature version="${project.version}">configurator-manager</feature>
         <feature version="${project.version}">grand-message-handler</feature>
     </feature>
-       
-    <!-- ****************************** -->
-    <!--  BACKBONE INTEGRATION FEATURE -->
 
-    <feature name="cryptomanager-it" version="${project.version}">
+    <!-- Feature needed for exposal of Felix SCR annotated OSGI components/services -->
+    <feature name="expose-scr-annotated-services" version="${project.version}">
         <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+    </feature>
+
+    <!-- Feature needed for SOAP-WS exposal of CXF annotated OSGI components/services -->
+    <feature name="expose-cxf-annotated-soap-webservices" version="${project.version}">
+        <feature version="${cxf.version}">cxf-core</feature>
+        <feature version="${cxf.version}">cxf-ws-discovery</feature>
+        <feature version="${cxf.dosgi.version}">cxf-dosgi-discovery-distributed</feature>
+    </feature>
+       
+    <!-- ****************************** -->
+    <!--  CRYPTOMANAGER INTEGRATION FEATURE -->
+
+    <feature name="cryptomanager-it" version="${project.version}">
+        <feature version="${project.version}">expose-scr-annotated-services</feature>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${project.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.cryptomanager/${project.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-jxpath/1.3_1</bundle>
@@ -193,8 +205,7 @@
     <!--  BACKBONE INTEGRATION FEATURES -->
 
     <feature name="backbone-osgi-it" version="${project.version}">
-        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
-        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <feature version="${project.version}">expose-scr-annotated-services</feature>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
@@ -210,8 +221,7 @@
     </feature>
 
     <feature name="backbone-soap-it" version="${project.version}">
-        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
-        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <feature version="${project.version}">expose-scr-annotated-services</feature>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
@@ -227,8 +237,7 @@
     </feature>
 
     <feature name="backbone-jxta-it" version="${project.version}">
-        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
-        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <feature version="${project.version}">expose-scr-annotated-services</feature>
         <bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/4.2.22</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcpg-jdk16/${servicemix.bcpg-jdk16}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
@@ -246,9 +255,7 @@
     </feature>
 
     <feature name="backbone-router-it" version="${project.version}">
-        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
-        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
-        <!--<bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/4.2.22</bundle>-->
+        <feature version="${project.version}">expose-scr-annotated-services</feature>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcpg-jdk16/${servicemix.bcpg-jdk16}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>
