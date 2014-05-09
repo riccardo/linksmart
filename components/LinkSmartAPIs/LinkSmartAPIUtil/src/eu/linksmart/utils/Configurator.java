@@ -237,7 +237,12 @@ public abstract class Configurator implements ManagedService{
 	 * @param updates the configuration changes
 	 */
 	public abstract void applyConfigurations(Hashtable updates);
-
+	
+	/**
+	 * Sets a new configuration with a given configuration in the configuration
+	 * 
+	 * @param Properties props new configuration 
+	 */
 	public synchronized final void setConfiguration(Properties props) {
 		Configuration config;
 
