@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <features name="${project.artifactId}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
-	<feature name="linksmart-boot-feature" version="${project.version}">
+	<feature name="osgi-core" version="${project.version}">
+		<!--
+        core OSGi bundles are provisioned by Karaf, hence no need to deploy these bundles     
+      	-->
         <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
         <!--
-        no need to deploy it, Karaf already provision this bundle   
+        no need to deploy configAdmin, Karaf already provision this bundle   
       	<bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>  
       	-->
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${project.version}</bundle>
     </feature>
     
     <feature name="osgi-http-service" version="${project.version}">
@@ -20,8 +20,15 @@
 		-->
     </feature>
     
+    <feature name="linksmart-boot" version="${project.version}">
+    	<feature version="${karaf.version}">osgi-core</feature>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${project.version}</bundle>
+    </feature>
+    
     <feature name="crypto-manager" version="${project.version}">
-    	<feature version="${project.version}">linksmart-boot-feature</feature>
+    	<feature version="${project.version}">linksmart-boot</feature>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.cryptomanager/${project.version}</bundle>
         <bundle dependency="true">mvn:org.bouncycastle/bcprov-jdk16/1.46</bundle>
         <bundle dependency="true">mvn:org.bouncycastle/bcpg-jdk16/1.46</bundle>
@@ -65,7 +72,7 @@
     </feature>
     
     <feature name="backbone-router" version="${project.version}">
-		<feature version="${project.version}">linksmart-boot-feature</feature>		       
+		<feature version="${project.version}">linksmart-boot</feature>		       
         <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${parent.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${parent.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${parent.version}</bundle>
@@ -75,7 +82,7 @@
     </feature>
     
     <feature name="network-manager" version="${project.version}">  
-    	<feature version="${project.version}">linksmart-boot-feature</feature> 
+    	<feature version="${project.version}">linksmart-boot</feature> 
     	<feature version="${project.version}">osgi-http-service</feature>  
     	<feature version="${project.version}">crypto-manager</feature>	
     	<feature version="${project.version}">identity-manager</feature>
@@ -139,7 +146,7 @@
     </feature>
     
     <feature name="configurator-manager" version="${project.version}">
-        <feature version="${project.version}">linksmart-boot-feature</feature> 
+        <feature version="${project.version}">linksmart-boot</feature> 
     	<feature version="${project.version}">osgi-http-service</feature>
         <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
     </feature>
@@ -160,8 +167,12 @@
         <feature version="${project.version}">backbone-soap</feature>
         <feature version="${project.version}">backbone-jxta</feature>
         <feature version="${project.version}">backbone-data</feature>
-        <feature version="${project.version}">configurator-manager</feature>
         <feature version="${project.version}">grand-message-handler</feature>
+        <feature version="${project.version}">configurator-manager</feature>
+    </feature>
+    
+    <feature name="linksmart-ws-provider" version="${project.version}"> 
+		<feature>cxf-dosgi-discovery-distributed</feature>
     </feature>
 
     <!-- Feature needed for exposal of Felix SCR annotated OSGI components/services -->
