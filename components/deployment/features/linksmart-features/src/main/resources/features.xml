@@ -13,7 +13,7 @@
       	-->
     </feature>
     
-    <feature name="osgi-http-service" version="${project.version}">
+    <feature name="osgi-http" version="${project.version}">
     	<feature version="${karaf.version}">http</feature>
 		<!--     	
 		<bundle>mvn:org.apache.felix/org.apache.felix.http.jetty/${felix.http.version}</bundle>	 
@@ -83,7 +83,7 @@
     
     <feature name="network-manager" version="${project.version}">  
     	<feature version="${project.version}">linksmart-boot</feature> 
-    	<feature version="${project.version}">osgi-http-service</feature>  
+    	<feature version="${project.version}">osgi-http</feature>  
     	<feature version="${project.version}">crypto-manager</feature>	
     	<feature version="${project.version}">identity-manager</feature>
         <feature version="${project.version}">security-manager-sym</feature>
