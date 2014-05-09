@@ -21,7 +21,7 @@
     </feature>
     
     <feature name="linksmart-boot" version="${project.version}">
-    	<feature version="${karaf.version}">osgi-core</feature>
+    	<feature version="${project.version}">osgi-core</feature>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${project.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${project.version}</bundle>
@@ -147,7 +147,7 @@
     
     <feature name="configurator-manager" version="${project.version}">
         <feature version="${project.version}">linksmart-boot</feature> 
-    	<feature version="${project.version}">osgi-http-service</feature>
+    	<feature version="${project.version}">osgi-http</feature>
         <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
     </feature>
     
