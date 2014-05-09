@@ -107,6 +107,13 @@ public class CalculatorClient {
             
 			int result = calculatorPortType.add(31, 11);
 			LOG.info("*** calculation result: " + result);
+			//
+			// clean up the environment after service all to make sure resources are de-allocated
+			//
+			client.destroy();
+			client = null;
+			calculatorPortType = null;
+			calculatorService = null;
 		} catch (Exception e) {
 			LOG.error("unable to access calculator service", e);
 		}
