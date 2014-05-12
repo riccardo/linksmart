@@ -107,6 +107,10 @@ public class ITConfiguration {
     	HTTP_PORT = port;
     }
     
+    public static int getContainerHttpPort(int port) {
+    	return HTTP_PORT;
+    }
+    
     public static String getFeaturesRepositoryURL() {
     	return FEATURES_REPOSITORY_URL;
     }
