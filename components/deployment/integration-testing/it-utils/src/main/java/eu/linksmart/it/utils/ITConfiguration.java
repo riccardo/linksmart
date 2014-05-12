@@ -26,7 +26,7 @@ public class ITConfiguration {
 	private static boolean DEBUG = false;
 	private static int DEBUG_PORT = 8889;
 	
-	private static int HTTP_PORT = 9090;
+	private static int HTTP_PORT = 8882;
 	
 	private static final String FEATURES_REPOSITORY_URL = "mvn:eu.linksmart/linksmart-features/2.2.0-SNAPSHOT/xml/features";
 	
@@ -107,7 +107,7 @@ public class ITConfiguration {
     	HTTP_PORT = port;
     }
     
-    public static int getContainerHttpPort(int port) {
+    public static int getContainerHttpPort() {
     	return HTTP_PORT;
     }
     
