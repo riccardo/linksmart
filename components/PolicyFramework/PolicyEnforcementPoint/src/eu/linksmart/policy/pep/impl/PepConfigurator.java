@@ -48,29 +48,9 @@ import eu.linksmart.policy.pep.impl.PepApplication;
  * @author Marco Tiemann
  *
  */
-public class PepConfigurator extends Configurator  {
-	
-	/** PEP PID */
-	public static final String PEP_PID = "Pep.PID";
-	
-	/** certificate reference */
-	public static final String CERT_REF = "Pep.CertificateReference";
-	
-	/** renew certificate flag */
-	public static final String RENEW_CERT = "Pep.RenewCertificate";
-
-	/** human-readable description flag */
-	public static final String DESC = "PepService.Description";
-	
+public class PepConfigurator extends Configurator  {	
 	/** PEP service PID */
 	public static final String PEP_SERVICE_PID = "eu.linksmart.policy.pep";
-	
-	/** PDP service PID */
-	public static final String PDP_SERVICE_PID = "eu.linksmart.policy.pdp";
-	
-	/** PDP admin service PID */
-	public static final String PDP_ADMIN_SERVICE_PID 
-			= "eu.linksmart.policy.pdp.admin";
 	
 	/** PDP PID */
 	public static final String PDP_PID = "Pep.PdpPID";
@@ -94,17 +74,6 @@ public class PepConfigurator extends Configurator  {
 	 */
 	public static final String PEP_DEFAULT_TO_DENY_RESPONSE
 			= "Pep.DefaultToDenyResponse";
-	
-	/** 
-	 * flag indicating whether to stop evaluating an obligation once it has 
-	 * been handled successfully by one {@link PepObligationObserver}
-	 */
-	public static final String PEP_LAZY_OBLIGATION_HANDLING
-			= "Pep.LazyObligationHandling";
-	
-	/** flag indicating whether to use local sessions */
-	public static final String PEP_USE_LOCAL_SESSIONS
-			= "Pep.UseLocalSessions";
 
 	/** configuration file location */
 	private static final String CONFIGURATION_FILE 

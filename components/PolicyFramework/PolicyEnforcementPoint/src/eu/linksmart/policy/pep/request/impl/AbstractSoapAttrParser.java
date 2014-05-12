@@ -34,7 +34,8 @@ package eu.linksmart.policy.pep.request.impl;
 
 import java.util.Arrays;
 
-import com.sun.xacml.attr.AttributeFactory;
+import org.wso2.balana.attr.AttributeFactory;
+
 
 import eu.linksmart.policy.pep.impl.LinkSmartAttributeFactory;
 import eu.linksmart.policy.pep.request.SoapAttrParser;

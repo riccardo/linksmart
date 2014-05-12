@@ -57,14 +57,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.wso2.balana.ParsingException;
+import org.wso2.balana.UnknownIdentifierException;
+import org.wso2.balana.XACMLConstants;
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.attr.DateTimeAttribute;
+import org.wso2.balana.attr.StringAttribute;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.xacml3.Attributes;
 import org.xml.sax.SAXException;
-
-import com.sun.xacml.ParsingException;
-import com.sun.xacml.UnknownIdentifierException;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.DateTimeAttribute;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.Attribute;
 
 import eu.linksmart.policy.pep.impl.PepXacmlConstants;
 import eu.linksmart.policy.pep.request.impl.AbstractSoapAttrParser;
@@ -105,7 +106,7 @@ public class DomSoapAttrParser extends AbstractSoapAttrParser {
 	 * 		java.lang.String)
 	 */
 	@Override
-	public Set<Attribute> extractActionsFromSoapMsg(String theSoapMsg) {
+	public Attributes extractActionsFromSoapMsg(String theSoapMsg) {
 		HashSet<Attribute> attrs = new HashSet<Attribute>();
 		try {
 			int xmlIdx = theSoapMsg.indexOf("<?xml");
@@ -121,7 +122,7 @@ public class DomSoapAttrParser extends AbstractSoapAttrParser {
 					new ByteArrayInputStream(xmlPart.getBytes("UTF-8")));
 			Node firstChild = null;
 			if ((doc == null) || ((firstChild = doc.getFirstChild()) == null)) {
-				return attrs;
+				return null;
 			}
 			/* skip through to first after body */
 			// skip past envelope
@@ -133,7 +134,7 @@ public class DomSoapAttrParser extends AbstractSoapAttrParser {
 				mother = firstChild.getChildNodes().item(1).getChildNodes();
 			} else {
 				// do not process
-				return attrs;
+				return null;
 			}
 			// extract method call
 			int ml = mother.getLength();
@@ -149,7 +150,8 @@ public class DomSoapAttrParser extends AbstractSoapAttrParser {
 				attrs.add(new Attribute(
 						URI.create(PepXacmlConstants.ACTION_ACTION_ID.getUrn()), 
 						null, new DateTimeAttribute(), 
-						new StringAttribute(name)));
+						new StringAttribute(name),
+						XACMLConstants.XACML_VERSION_2_0));
 				// extract method arguments
 				NodeList childNodes = aName.getChildNodes();
 				int cArg = 0;
@@ -232,7 +234,8 @@ public class DomSoapAttrParser extends AbstractSoapAttrParser {
 					attrs.add(new Attribute(URI.create(
 							PepXacmlConstants.ACTION_LINK_SMART_PREFIX.getUrn() 
 									+ lName),
-									null, new DateTimeAttribute(), av));
+									null, new DateTimeAttribute(), av,
+									XACMLConstants.XACML_VERSION_2_0));
 				}
 			}
 		} catch (UnsupportedEncodingException uee) {
@@ -251,7 +254,9 @@ public class DomSoapAttrParser extends AbstractSoapAttrParser {
 				logger.debug("Stack trace: ", sae);
 			}
 		}
-		return attrs;
+		
+		Attributes attrAction = new Attributes(URI.create(XACMLConstants.ACTION_CATEGORY), attrs);
+		return attrAction;
 	}
 	
 	/**

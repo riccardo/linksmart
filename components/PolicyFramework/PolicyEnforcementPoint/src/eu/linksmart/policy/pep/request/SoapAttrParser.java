@@ -34,8 +34,10 @@ package eu.linksmart.policy.pep.request;
 
 import java.util.Set;
 
-import com.sun.xacml.attr.AttributeFactory;
-import com.sun.xacml.ctx.Attribute;
+import org.wso2.balana.attr.AttributeFactory;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.xacml3.Attributes;
+
 
 /**
  * <p>Extracts {@link Attribute}s from a SOAP message</p>
@@ -73,6 +75,6 @@ public interface SoapAttrParser {
 	 * @return
 	 * 				the {@link Attribute}s
 	 */
-	public Set<Attribute> extractActionsFromSoapMsg(String theSoapMsg);
+	public Attributes extractActionsFromSoapMsg(String theSoapMsg);
 	
 }

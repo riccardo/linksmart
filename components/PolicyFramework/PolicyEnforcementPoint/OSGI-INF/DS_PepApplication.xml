@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="eu.linksmart.policy.pep" immediate="true">
+   <implementation class="eu.linksmart.policy.pep.impl.PepApplication"/>
+   <reference cardinality="0..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static"/>
+   <service>
+      <provide interface="eu.linksmart.policy.pep.PepService"/>
+   </service>
+   <reference bind="bindPolicyDecisionPoint" cardinality="0..1" interface="eu.linksmart.policy.pdp.PolicyDecisionPoint" name="PolicyDecisionPoint" policy="dynamic" unbind="unbindPolicyDecisionPoint"/>
+   <reference bind="bindIdentityManager" cardinality="1..1" interface="eu.linksmart.network.identity.IdentityManager" name="IdentityManager" policy="dynamic" unbind="unbindIdentityManager"/>
+</scr:component>

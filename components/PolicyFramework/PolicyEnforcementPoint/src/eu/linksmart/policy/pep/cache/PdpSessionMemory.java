@@ -105,7 +105,7 @@ public interface PdpSessionMemory {
 	 * @return
 	 * 				the found {@link PdpSessionItem} or <code>null</code>
 	 */
-	public PdpSessionItem find(String theSessionId,	String theParameters, 
+	public PdpSessionItem find(String theParameters, 
 			long theTimestamp);
 	
 	/** Empties the session cache */

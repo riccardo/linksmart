@@ -51,13 +51,14 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 import org.apache.log4j.Logger;
-
-import com.sun.xacml.ParsingException;
-import com.sun.xacml.UnknownIdentifierException;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.DateTimeAttribute;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.Attribute;
+import org.wso2.balana.ParsingException;
+import org.wso2.balana.UnknownIdentifierException;
+import org.wso2.balana.XACMLConstants;
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.attr.DateTimeAttribute;
+import org.wso2.balana.attr.StringAttribute;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.xacml3.Attributes;
 
 import eu.linksmart.policy.pep.impl.PepXacmlConstants;
 import eu.linksmart.policy.pep.request.impl.AbstractSoapAttrParser;
@@ -73,14 +74,14 @@ public class StaxSoapAttrParser extends AbstractSoapAttrParser {
 
 	/** logger */
 	private static final Logger logger 
-			= Logger.getLogger(StaxSoapAttrParser.class); 
-	
+	= Logger.getLogger(StaxSoapAttrParser.class); 
+
 	/** SOAP body tag */
 	private static final String SOAP_BODY = "body";
-	
+
 	/** STAX {@link XMLInputFactory} */
 	private XMLInputFactory staxFactory = null;	
-	
+
 	/** No-args constructor */
 	public StaxSoapAttrParser() {
 		super();
@@ -90,14 +91,14 @@ public class StaxSoapAttrParser extends AbstractSoapAttrParser {
 		staxFactory.setProperty("javax.xml.stream.isNamespaceAware", 
 				new Boolean(false));
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see eu.linksmart.policy.pep.SoapAttrParser#extractActionsFromSoapMsg(
 	 * 		java.lang.String)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<Attribute> extractActionsFromSoapMsg(String theSoapMsg) {
+	public Attributes extractActionsFromSoapMsg(String theSoapMsg) {
 		HashSet<Attribute> attrs = new HashSet<Attribute>();
 		int xmlIdx = theSoapMsg.indexOf("<?xml");
 		String xmlPart;
@@ -146,9 +147,11 @@ public class StaxSoapAttrParser extends AbstractSoapAttrParser {
 						attrs.add(new Attribute(
 								URI.create(PepXacmlConstants.ACTION_ACTION_ID
 										.getUrn()), 
-								null, 
-								new DateTimeAttribute(), 
-								new StringAttribute(sQName)));					
+										null, 
+										new DateTimeAttribute(), 
+										new StringAttribute(sQName),
+										true,
+										XACMLConstants.XACML_VERSION_3_0));					
 					}
 					// else do nothing
 				} else {
@@ -160,10 +163,10 @@ public class StaxSoapAttrParser extends AbstractSoapAttrParser {
 							aQName = qName;
 							cArgs++;
 							Iterator<javax.xml.stream.events.Attribute> atIt 
-									= stEl.getAttributes();
+							= stEl.getAttributes();
 							while (atIt.hasNext()) {
 								javax.xml.stream.events.Attribute attr 
-										= atIt.next();
+								= atIt.next();
 								int p = Arrays.binarySearch(xmlTypeKeys, 
 										attr.toString().split("=")[0]);
 								if (p >= 0) {
@@ -234,10 +237,12 @@ public class StaxSoapAttrParser extends AbstractSoapAttrParser {
 							}
 							attrs.add(new Attribute(URI.create(
 									PepXacmlConstants.ACTION_LINK_SMART_PREFIX
-											.getUrn() + aName),
-											null, 
-											new DateTimeAttribute(), 
-											av));
+									.getUrn() + aName),
+									null, 
+									new DateTimeAttribute(), 
+									av,
+									true,
+									XACMLConstants.XACML_VERSION_3_0));
 							aStartFound = false;
 							aQName = null;
 							aDataIsComplex = false;
@@ -265,7 +270,8 @@ public class StaxSoapAttrParser extends AbstractSoapAttrParser {
 				logger.debug("Stack trace: ", xse);
 			}
 		}
-		return attrs;
+		Attributes attrAction = new Attributes(URI.create(XACMLConstants.ACTION_CATEGORY), attrs);
+		return attrAction;
 	}
 
 }

@@ -34,8 +34,10 @@ package eu.linksmart.policy.pep.request.impl;
 
 import java.util.Set;
 
-import com.sun.xacml.ctx.Attribute;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.xacml3.Attributes;
 
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.policy.pep.request.impl.PepRequest;
 
 /**
@@ -47,25 +49,16 @@ import eu.linksmart.policy.pep.request.impl.PepRequest;
 public class PepRequest {
 	
 	/** action {@link Attributes} */
-	private Set<Attribute> actionAttrs = null;
+	private Attributes actionAttrs = null;
 	
 	/** action attribute string */
 	private String actionAttrString = null;
 	
-	/** sender HID */
-	private String sndHid = null;
+	/** sender VAD */
+	private VirtualAddress sndVad = null;
 	
-	/** sender certificate reference */
-	private String sndCert = null;
-	
-	/** receiver HID */
-	private String recHid = null;
-	
-	/** receiver certificate reference */
-	private String recCert = null;
-	
-	/** session ID */
-	private String sessionId = null;
+	/** receiver VAD */
+	private VirtualAddress recVad = null;
 	
 	/**
 	 * Constructor
@@ -74,35 +67,31 @@ public class PepRequest {
 	 * 				the action {@link Attributes}
 	 * @param theAttrString
 	 * 				the action attribute string
-	 * @param theSndHid
+	 * @param theSndVad
 	 * 				the sender HID
 	 * @param theSndCert
 	 * 				the sender certificate reference
-	 * @param theRecHid
+	 * @param theRecVad
 	 * 				the receiver HID
 	 * @param theRecCert
 	 * 				the receiver certificate reference
 	 * @param theSessionId
 	 * 				the session ID
 	 */
-	public PepRequest(Set<Attribute> theAttributes, String theAttrString, 
-			String theSndHid, String theSndCert, String theRecHid, 
-			String theRecCert, String theSessionId) {
+	public PepRequest(Attributes theAttributes, String theAttrString, 
+			VirtualAddress theSndVad,  VirtualAddress theRecVad) {
 		super();
 		actionAttrs = theAttributes;
 		actionAttrString = theAttrString;
-		sndHid = theSndHid;
-		sndCert = theSndCert;
-		recHid = theRecHid;
-		recCert = theRecCert;
-		sessionId = theSessionId;
+		sndVad = theSndVad;
+		recVad = theRecVad;
 	}
 
 	/**
 	 * @return
 	 * 			the action {@link Attributes}
 	 */
-	public Set<Attribute> getActionAttrs() {
+	public Attributes getActionAttrs() {
 		return actionAttrs;
 	}
 	
@@ -118,40 +107,16 @@ public class PepRequest {
 	 * @return
 	 * 			the sender HID
 	 */
-	public String getSndHid() {
-		return sndHid;
-	}
-
-	/**
-	 * @return
-	 * 			the sender certificate reference
-	 */
-	public String getSndCert() {
-		return sndCert;
+	public VirtualAddress getSndVad() {
+		return sndVad;
 	}
 
 	/**
 	 * @return
 	 * 			the receiver HID
 	 */
-	public String getRecHid() {
-		return recHid;
-	}
-
-	/**
-	 * @return
-	 * 			the receiver certificate reference
-	 */
-	public String getRecCert() {
-		return recCert;
-	}
-
-	/**
-	 * @return
-	 * 			the session ID
-	 */
-	public String getSessionId() {
-		return sessionId;
+	public VirtualAddress getRecVad() {
+		return recVad;
 	}
 	
 	/* (non-Javadoc)
@@ -165,16 +130,10 @@ public class PepRequest {
 				? 0 : actionAttrString.hashCode());
 		result = prime * result + ((actionAttrs == null) 
 				? 0 : actionAttrs.hashCode());
-		result = prime * result + ((recCert == null) 
-				? 0 : recCert.hashCode());
-		result = prime * result + ((recHid == null) 
-				? 0 : recHid.hashCode());
-		result = prime * result + ((sessionId == null) 
-				? 0 : sessionId.hashCode());
-		result = prime * result + ((sndCert == null) 
-				? 0 : sndCert.hashCode());
-		result = prime * result + ((sndHid == null) 
-				? 0 : sndHid.hashCode());
+		result = prime * result + ((recVad == null) 
+				? 0 : recVad.hashCode());
+		result = prime * result + ((sndVad == null) 
+				? 0 : sndVad.hashCode());
 		return result;
 	}
 
@@ -207,39 +166,18 @@ public class PepRequest {
 		} else if (!actionAttrs.equals(other.actionAttrs)) {
 			return false;
 		}
-		if (recCert == null) {
-			if (other.recCert != null) {
+		if (recVad == null) {
+			if (other.recVad != null) {
 				return false;
 			}
-		} else if (!recCert.equals(other.recCert)) {
+		} else if (!recVad.equals(other.recVad)) {
 			return false;
 		}
-		if (recHid == null) {
-			if (other.recHid != null) {
+		if (sndVad == null) {
+			if (other.sndVad != null) {
 				return false;
 			}
-		} else if (!recHid.equals(other.recHid)) {
-			return false;
-		}
-		if (sessionId == null) {
-			if (other.sessionId != null) {
-				return false;
-			}
-		} else if (!sessionId.equals(other.sessionId)) {
-			return false;
-		}
-		if (sndCert == null) {
-			if (other.sndCert != null) {
-				return false;
-			}
-		} else if (!sndCert.equals(other.sndCert)) {
-			return false;
-		}
-		if (sndHid == null) {
-			if (other.sndHid != null) {
-				return false;
-			}
-		} else if (!sndHid.equals(other.sndHid)) {
+		} else if (!sndVad.equals(other.sndVad)) {
 			return false;
 		}
 		return true;

@@ -57,48 +57,48 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 
 	/** logger */
 	private static final Logger logger 
-			= Logger.getLogger(MemPdpSessionMemory.class); 
-	
+	= Logger.getLogger(MemPdpSessionMemory.class); 
+
 	/** session item memory */
 	List<PdpSessionItem> sessionItems
-			= Collections.synchronizedList(new ArrayList<PdpSessionItem>());
-	
+	= Collections.synchronizedList(new ArrayList<PdpSessionItem>());
+
 	/** comparator for sorting <code>sessionItems</code> */
 	Comparator<PdpSessionItem> comparator = null;
-	
+
 	/** 
 	 * flag to determine whether to sort by time (if TRUE) or by session ID 
 	 * (if FALSE) 
 	 */
 	boolean sortByTime = false;
-	
+
 	/** session lifetime */
 	long sessionLifetime = 100000000L;
-	
+
 	/** 
 	 * flag to determine whether sessions are extended when new matching calls 
 	 * are added to the memory
 	 */
 	private boolean keepAlive = true;
-	
+
 	/** flag to determine whether to run an background memory cleaning thread */
 	private boolean useCleaner = false;
-	
+
 	/** cleaner {@link Timer} */
 	private Timer cleanerTimer = new Timer();
-	
+
 	/** cleaner interval */
 	private long cleanerInterval = 100000000L;
-	
+
 	/** No-args constructor */
 	public MemPdpSessionMemory() {
 		super();
 		comparator = (sortByTime) ? new TimestampComparator()
-				: new SessionIdComparator();
+		: new SessionIdComparator();
 		cleanerTimer.scheduleAtFixedRate(new Cleaner(), cleanerInterval, 
 				cleanerInterval);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see eu.linksmart.policy.pep.cache.PdpSessionMemory#getLifetime()
 	 */
@@ -148,7 +148,7 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 			sessionItems.clear();
 		}
 	}
-	
+
 	/**
 	 * @param theSortByTime
 	 * 				a flag inidicting whether to sort cached sessions by 
@@ -158,7 +158,7 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 	public void setSortByTime(boolean theSortByTime) {
 		sortByTime = theSortByTime;
 		comparator = (sortByTime) ? new TimestampComparator()
-				: new SessionIdComparator();
+		: new SessionIdComparator();
 		Collections.sort(sessionItems, comparator); 
 	}
 
@@ -170,7 +170,7 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 	public boolean getUseCleaner() {
 		return useCleaner;
 	}
-	
+
 	/**
 	 * @param theUseCleaner
 	 * 				a flag to determine whether a background cleaner process is 
@@ -179,7 +179,7 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 	public void setUseCleaner(boolean theUseCleaner) {
 		useCleaner = theUseCleaner;
 	}
-	
+
 	/**
 	 * Restarts cleaner timer with the argument cleaner timer interval
 	 * 
@@ -194,94 +194,94 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 		cleanerTimer.scheduleAtFixedRate(new Cleaner(), cleanerInterval, 
 				cleanerInterval);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see eu.linksmart.policy.pep.cache.PdpSessionMemory#add(
 	 * 		eu.linksmart.policy.pep.cache.impl.PdpSessionItem)
 	 */
 	@Override
 	public void add(PdpSessionItem theNtry) {
-		if (sortByTime) {
-			if ((theNtry.getSessionId() != null) 
-					&& (theNtry.getParameters() != null)) {
-				int sis = sessionItems.size();
-				for (int j=0; j < sis; j++) {
-					PdpSessionItem ntry = sessionItems.get(j);				
-					if ((ntry.getSessionId() != null) 
-							&& (ntry.getSessionId().equals(
-									theNtry.getSessionId()))
-							&& (ntry.getParameters() != null)
-							&& (ntry.getParameters().equals(
-									theNtry.getParameters()))) {
-						sessionItems.set(j, ntry);
-						return;
-					}
-				}
-				int i = Collections.binarySearch(sessionItems, theNtry,
-						comparator);
-				sessionItems.add((-i - 1), theNtry);
-			}
-		} else {
-			int i = Collections.binarySearch(sessionItems, theNtry, comparator);
-			if (i >= 0) {
-				// there already exists an entry for this session ID/parameter
-				sessionItems.set(i, theNtry);
-			} else {
-				sessionItems.add((-i - 1), theNtry);
-			}
-		}
+		//		if (sortByTime) {
+		//			if ((theNtry.getSessionId() != null) 
+		//					&& (theNtry.getParameters() != null)) {
+		//				int sis = sessionItems.size();
+		//				for (int j=0; j < sis; j++) {
+		//					PdpSessionItem ntry = sessionItems.get(j);				
+		//					if ((ntry.getSessionId() != null) 
+		//							&& (ntry.getSessionId().equals(
+		//									theNtry.getSessionId()))
+		//							&& (ntry.getParameters() != null)
+		//							&& (ntry.getParameters().equals(
+		//									theNtry.getParameters()))) {
+		//						sessionItems.set(j, ntry);
+		//						return;
+		//					}
+		//				}
+		//				int i = Collections.binarySearch(sessionItems, theNtry,
+		//						comparator);
+		//				sessionItems.add((-i - 1), theNtry);
+		//			}
+		//		} else {
+		//			int i = Collections.binarySearch(sessionItems, theNtry, comparator);
+		//			if (i >= 0) {
+		//				// there already exists an entry for this session ID/parameter
+		//				sessionItems.set(i, theNtry);
+		//			} else {
+		//				sessionItems.add((-i - 1), theNtry);
+		//			}
+		//		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see eu.linksmart.policy.pep.cache.PdpSessionMemory#find(
 	 * 		java.lang.String, java.lang.String, long)
 	 */
 	@Override
-	public PdpSessionItem find(String theSessionId, String theParameters, 
+	public PdpSessionItem find(String theParameters, 
 			long theTimestamp) {
-		if ((theSessionId == null) || (theParameters == null)) {
-			return null;
-		}
-		int i = -1;
-		if (sortByTime) {
-			for (int j=0; j < sessionItems.size(); j++) {
-				PdpSessionItem ntry = sessionItems.get(j);				
-				if ((ntry.getSessionId() != null) 
-						&& (ntry.getSessionId().equals(theSessionId))
-						&& (ntry.getParameters() != null)
-						&& (ntry.getParameters().equals(theParameters))) {
-					i = j;
-					break;
-				}
-			}			
-		} else {
-			PdpSessionItem lookupNtry = new PdpSessionItem(theSessionId, 
-					theParameters);
-			i = Collections.binarySearch(sessionItems, lookupNtry, comparator);
-		}
-		if (i >= 0) {
-			PdpSessionItem ntry = sessionItems.get(i);
-			if (checkTimestamp(ntry)) {
-				// only keep alive if no timeout is set 
-				if ((keepAlive) && (sessionItems.get(i).getTimeout() == null)) {
-					sessionItems.get(i).setTimestamp(new Long(theTimestamp));
-					if (sortByTime) {
-						// move item to the new appropriate position
-						PdpSessionItem rentry = sessionItems.remove(i);
-						int k = Collections.binarySearch(sessionItems, rentry, 
-								comparator);
-						sessionItems.add(-k - 1, rentry);
-					}
-				}
-				return ntry;
-			} else if (sortByTime) {
-				for (int j=0; j <= i; j++) {
-					sessionItems.remove(0);
-				}
-			} else {
-				sessionItems.remove(i);
-			}			
-		}
+		//		if ((theSessionId == null) || (theParameters == null)) {
+		//			return null;
+		//		}
+		//		int i = -1;
+		//		if (sortByTime) {
+		//			for (int j=0; j < sessionItems.size(); j++) {
+		//				PdpSessionItem ntry = sessionItems.get(j);				
+		//				if ((ntry.getSessionId() != null) 
+		//						&& (ntry.getSessionId().equals(theSessionId))
+		//						&& (ntry.getParameters() != null)
+		//						&& (ntry.getParameters().equals(theParameters))) {
+		//					i = j;
+		//					break;
+		//				}
+		//			}			
+		//		} else {
+		//			PdpSessionItem lookupNtry = new PdpSessionItem(theSessionId, 
+		//					theParameters);
+		//			i = Collections.binarySearch(sessionItems, lookupNtry, comparator);
+		//		}
+		//		if (i >= 0) {
+		//			PdpSessionItem ntry = sessionItems.get(i);
+		//			if (checkTimestamp(ntry)) {
+		//				// only keep alive if no timeout is set 
+		//				if ((keepAlive) && (sessionItems.get(i).getTimeout() == null)) {
+		//					sessionItems.get(i).setTimestamp(new Long(theTimestamp));
+		//					if (sortByTime) {
+		//						// move item to the new appropriate position
+		//						PdpSessionItem rentry = sessionItems.remove(i);
+		//						int k = Collections.binarySearch(sessionItems, rentry, 
+		//								comparator);
+		//						sessionItems.add(-k - 1, rentry);
+		//					}
+		//				}
+		//				return ntry;
+		//			} else if (sortByTime) {
+		//				for (int j=0; j <= i; j++) {
+		//					sessionItems.remove(0);
+		//				}
+		//			} else {
+		//				sessionItems.remove(i);
+		//			}			
+		//		}
 		return null;
 	}
 
@@ -292,7 +292,7 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 	public void flush() {
 		sessionItems.clear();
 	}	
-	
+
 	/**
 	 * Checks whether timestamp is within session lifetime range
 	 * 
@@ -311,7 +311,7 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 		}
 		return (life <= sessionLifetime) ? true : false;
 	}
-	
+
 	/**
 	 * Converts time value with unit qualifier to millisecond time value
 	 * 
@@ -343,8 +343,8 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 			return Long.parseLong(strTime);
 		}
 	}
-	
-	
+
+
 	/**
 	 * <p>{@link Comparator} implementation that compares {@link PdpSessionItem}s 
 	 * in order of session ID and parameters</p>
@@ -353,43 +353,45 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 	 *
 	 */
 	final class SessionIdComparator 
-			implements Comparator<PdpSessionItem> {
+	implements Comparator<PdpSessionItem> {
 
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		@Override
 		public int compare(PdpSessionItem theSub, PdpSessionItem theRef) {
-			if (theSub == null) {
-				return (theRef == null) ? 0 : -1;
-			}
-			if (theRef == null) {
-				return 1;
-			}
-			if (theSub.getSessionId() == null) {
-				return (theRef.getSessionId() == null) ? 0 : -1;
-			}
-			if (theRef.getSessionId() == null) {
-				return (theRef.getSessionId() == null) 
-						? (theRef.getParameters() == null) 
-						? (theRef.getParameters() == null) 
-						? 0 : -1 : (theRef.getParameters() == null) 
-						? 1 : theRef.getParameters().compareTo(
-								theRef.getParameters()) : -1;
-			}
-			int r = theSub.getSessionId().compareTo(theRef.getSessionId());
-			if (r != 0) {
-				return r;
-			}
-			return (theSub.getParameters() == null) 
-					? (theRef.getParameters() == null) 
-							? 0 : -1 : (theRef.getParameters() == null) 
-									? 1 : theSub.getParameters().compareTo(
-													theRef.getParameters());
+			//			if (theSub == null) {
+			//				return (theRef == null) ? 0 : -1;
+			//			}
+			//			if (theRef == null) {
+			//				return 1;
+			//			}
+			//			if (theSub.getSessionId() == null) {
+			//				return (theRef.getSessionId() == null) ? 0 : -1;
+			//			}
+			//			if (theRef.getSessionId() == null) {
+			//				return (theRef.getSessionId() == null) 
+			//						? (theRef.getParameters() == null) 
+			//						? (theRef.getParameters() == null) 
+			//						? 0 : -1 : (theRef.getParameters() == null) 
+			//						? 1 : theRef.getParameters().compareTo(
+			//								theRef.getParameters()) : -1;
+			//			}
+			//			int r = theSub.getSessionId().compareTo(theRef.getSessionId());
+			//			if (r != 0) {
+			//				return r;
+			//			}
+			//			return (theSub.getParameters() == null) 
+			//					? (theRef.getParameters() == null) 
+			//							? 0 : -1 : (theRef.getParameters() == null) 
+			//									? 1 : theSub.getParameters().compareTo(
+			//													theRef.getParameters());
+			//		}
+			return 0;
+
 		}
-		
 	}
-	
+
 
 	/**
 	 * <p>{@link Comparator} implementation that compares {@link PdpSessionItem}s 
@@ -399,11 +401,11 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 	 *
 	 */
 	final class TimestampComparator
-			implements Comparator<PdpSessionItem> {
-		
+	implements Comparator<PdpSessionItem> {
+
 		/** session comparator */
 		private Comparator<PdpSessionItem> sessionComparator
-				= new SessionIdComparator();
+		= new SessionIdComparator();
 
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -437,9 +439,9 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 			return (d < 0) ? -1 : (d > 0) ? 1
 					: sessionComparator.compare(theSub, theRef);
 		}
-		
+
 	}
-	
+
 	/**
 	 * <p><code>sessionItems</code> cleaner {@link TimerTask}</p>
 	 * 
@@ -477,7 +479,7 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 			}
 			sessionItems = cleanedSessionItems;
 		}
-		
+
 		/**
 		 * Checks whether a session lifetime has expired
 		 * 
@@ -499,7 +501,7 @@ public class MemPdpSessionMemory implements PdpSessionMemory {
 			}
 			return false;
 		}
-		
+
 	}
-	
+
 }

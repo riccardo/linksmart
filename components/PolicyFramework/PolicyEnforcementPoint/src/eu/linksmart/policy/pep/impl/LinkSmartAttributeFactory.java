@@ -34,24 +34,13 @@ package eu.linksmart.policy.pep.impl;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import com.sun.xacml.attr.AttributeProxy;
-import com.sun.xacml.attr.BaseAttributeFactory;
-import com.sun.xacml.attr.StandardAttributeFactory;
-import com.sun.xacml.attr.proxy.AnyURIAttributeProxy;
-import com.sun.xacml.attr.proxy.Base64BinaryAttributeProxy;
-import com.sun.xacml.attr.proxy.BooleanAttributeProxy;
-import com.sun.xacml.attr.proxy.DateAttributeProxy;
-import com.sun.xacml.attr.proxy.DateTimeAttributeProxy;
-import com.sun.xacml.attr.proxy.DayTimeDurationAttributeProxy;
-import com.sun.xacml.attr.proxy.DoubleAttributeProxy;
-import com.sun.xacml.attr.proxy.HexBinaryAttributeProxy;
-import com.sun.xacml.attr.proxy.IntegerAttributeProxy;
-import com.sun.xacml.attr.proxy.RFC822NameAttributeProxy;
-import com.sun.xacml.attr.proxy.StringAttributeProxy;
-import com.sun.xacml.attr.proxy.TimeAttributeProxy;
-import com.sun.xacml.attr.proxy.X500NameAttributeProxy;
-import com.sun.xacml.attr.proxy.YearMonthDurationAttributeProxy;
+import org.wso2.balana.XACMLConstants;
+import org.wso2.balana.attr.AttributeProxy;
+import org.wso2.balana.attr.BaseAttributeFactory;
+import org.wso2.balana.attr.StandardAttributeFactory;
+import org.wso2.balana.attr.proxy.*;
 
 /**
  * <p>LinkSmart {@link AttributeFactory} implementation</p>
@@ -68,11 +57,7 @@ public class LinkSmartAttributeFactory extends BaseAttributeFactory {
 	@SuppressWarnings("unchecked")
 	public LinkSmartAttributeFactory() {
 		super();
-		Map<String, AttributeProxy> standardDataTypes 
-				= StandardAttributeFactory.getFactory().getStandardDatatypes();
-		for (Entry<String, AttributeProxy> ntr : standardDataTypes.entrySet()) {
-			addDatatype(ntr.getKey(), ntr.getValue());
-		}
+
 		// some of this is redundant
 		addDatatype("anyURI", new AnyURIAttributeProxy());
 		addDatatype("base64Binary", new Base64BinaryAttributeProxy());

@@ -32,7 +32,10 @@
  */
 package eu.linksmart.policy.pep.cache.impl;
 
-import com.sun.xacml.ctx.ResponseCtx;
+import org.wso2.balana.ctx.ResponseCtx;
+
+import eu.linksmart.network.VirtualAddress;
+
 
 /**
  * <p>Composite data type for LinkSmart session and PDP decision data</p> 
@@ -41,10 +44,6 @@ import com.sun.xacml.ctx.ResponseCtx;
  *
  */
 public class PdpSessionItem implements Comparable<PdpSessionItem> {
-
-	/** session ID */
-	private String sessionId = null;
-	
 	/** method call */
 	private String parameters = null;
 	
@@ -57,11 +56,11 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	/** PDP decision {@link ResponseCtx} */
 	private ResponseCtx decision = null;
 	
-	/** sender HID */
-	private String sndHid = null;
+	/** sender VAD */
+	private VirtualAddress sndVad = null;
 	
-	/** receiver HID */
-	private String recHid  = null;
+	/** receiver VAD */
+	private VirtualAddress recVad  = null;
 	
 	/**
 	 * Constructor
@@ -82,9 +81,8 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	 * @param theParamters
 	 * 				the method call
 	 */
-	public PdpSessionItem(String theSessionId, String theParamters) {
+	public PdpSessionItem(String theParamters) {
 		super();
-		sessionId = theSessionId;
 		parameters = theParamters;
 	}
 	
@@ -98,9 +96,9 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	 * @param theTimestamp
 	 * 				the timestamp
 	 */
-	public PdpSessionItem(String theSessionId, String theParameters, 
+	public PdpSessionItem(String theParameters, 
 			long theTimestamp) {
-		this(theSessionId, theParameters);
+		this(theParameters);
 		timestamp = new Long(theTimestamp);
 	}
 	
@@ -116,9 +114,9 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	 * @param theTimestamp
 	 * 				the timestamp
 	 */
-	public PdpSessionItem(String theSessionId, String theParameters,
+	public PdpSessionItem(String theParameters,
 			ResponseCtx theDecision, long theTimestamp) {
-		this(theSessionId, theParameters);
+		this(theParameters);
 		decision = theDecision;
 		timestamp = new Long(theTimestamp);
 	}
@@ -137,9 +135,9 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	 * @param theTimeout
 	 * 				the timeout value in milliseconds
 	 */
-	public PdpSessionItem(String theSessionId, String theParameters,
+	public PdpSessionItem(String theParameters,
 			ResponseCtx theDecision, long theTimestamp, long theTimeout) {
-		this(theSessionId, theParameters);
+		this(theParameters);
 		decision = theDecision;
 		timestamp = new Long(theTimestamp);
 		timeout = new Long(theTimeout);
@@ -161,12 +159,12 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	 * @param theTimestamp
 	 * 				the timestamp
 	 */
-	public PdpSessionItem(String theSessionId, String theSndHid, 
-			String theRecHid, String theParameters,
+	public PdpSessionItem(VirtualAddress theSndVad, 
+			VirtualAddress theRecVad, String theParameters,
 			ResponseCtx theDecision, long theTimestamp) {
-		this(theSessionId, theParameters, theDecision, theTimestamp);
-		sndHid = theSndHid;
-		recHid = theRecHid;
+		this(theParameters, theDecision, theTimestamp);
+		sndVad = theSndVad;
+		recVad = theRecVad;
 	}
 	
 	/**
@@ -187,22 +185,14 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	 * @param theTimeout
 	 * 				the timeout value in milliseconds
 	 */
-	public PdpSessionItem(String theSessionId, String theSndHid, 
-			String theRecHid, String theParameters,
+	public PdpSessionItem(VirtualAddress theSndVad, 
+			VirtualAddress theRecVad, String theParameters,
 			ResponseCtx theDecision, long theTimestamp, long theTimeout) {
-		this(theSessionId, theParameters, theDecision, theTimestamp);
-		sndHid = theSndHid;
-		recHid = theRecHid;
+		this(theParameters, theDecision, theTimestamp);
+		sndVad = theSndVad;
+		recVad = theRecVad;
 		timeout = new Long(theTimeout);
 	}
-
-	/**
-	 * @return
-	 * 				the session ID
-	 */
-	public String getSessionId() {
-		return sessionId;
-	}	
 	
 
 	/**
@@ -255,18 +245,18 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	
 	/**
 	 * @return
-	 * 				the sender HID
+	 * 				the sender Virtual Address
 	 */
-	public String getSenderHid() {
-		return sndHid;
+	public VirtualAddress getSenderVad() {
+		return sndVad;
 	}
 
 	/**
 	 * @return
-	 * 				the receiver HID
+	 * 				the receiver Virtual Address
 	 */
-	public String getReceiverHid() {
-		return recHid;
+	public VirtualAddress getReceiverVad() {
+		return recVad;
 	}
 
 	/* (non-Javadoc)
@@ -276,20 +266,6 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 	public int compareTo(PdpSessionItem theRef) {	
 		if (theRef == null) {
 			return 1;
-		}
-		if (getSessionId() == null) {
-			return (theRef.getSessionId() == null) ? (getParameters() == null) 
-					? (theRef.getParameters() == null) 
-							? 0 : -1 : (theRef.getParameters() == null) 
-									? 1	: getParameters().compareTo(
-											theRef.getParameters()) : -1;
-		}
-		if (theRef.getSessionId() == null) {
-			return 1;
-		}
-		int r = getSessionId().compareTo(theRef.getSessionId());
-		if (r != 0) {
-			return r;
 		}
 		return (getParameters() == null) ? (theRef.getParameters() == null) 
 				? 0 : -1 : (theRef.getParameters() == null) 
@@ -325,25 +301,18 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 		} else if (!parameters.equals(obj.parameters)) {
 			return false;
 		}
-		if (recHid == null) {
-			if (obj.recHid != null) {
+		if (recVad == null) {
+			if (obj.recVad != null) {
 				return false;
 			}
-		} else if (!recHid.equals(obj.recHid)) {
+		} else if (!recVad.equals(obj.recVad)) {
 			return false;
 		}
-		if (sessionId == null) {
-			if (obj.sessionId != null) {
+		if (sndVad == null) {
+			if (obj.sndVad != null) {
 				return false;
 			}
-		} else if (!sessionId.equals(obj.sessionId)) {
-			return false;
-		}
-		if (sndHid == null) {
-			if (obj.sndHid != null) {
-				return false;
-			}
-		} else if (!sndHid.equals(obj.sndHid)) {
+		} else if (!sndVad.equals(obj.sndVad)) {
 			return false;
 		}
 		if (timestamp == null) {
@@ -367,12 +336,10 @@ public class PdpSessionItem implements Comparable<PdpSessionItem> {
 				? 0 : decision.hashCode());
 		result = prime * result + ((parameters == null) 
 				? 0 : parameters.hashCode());
-		result = prime * result + ((recHid == null) 
-				? 0 : recHid.hashCode());
-		result = prime * result + ((sessionId == null) 
-				? 0 : sessionId.hashCode());
-		result = prime * result + ((sndHid == null) 
-				? 0 : sndHid.hashCode());
+		result = prime * result + ((recVad == null) 
+				? 0 : recVad.hashCode());
+		result = prime * result + ((sndVad == null) 
+				? 0 : sndVad.hashCode());
 		result = prime * result + ((timestamp == null) 
 				? 0 : timestamp.hashCode());
 		return result;

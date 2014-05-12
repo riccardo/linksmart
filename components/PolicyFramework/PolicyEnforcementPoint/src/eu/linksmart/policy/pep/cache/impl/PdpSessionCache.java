@@ -32,8 +32,10 @@
  */
 package eu.linksmart.policy.pep.cache.impl;
 
-import com.sun.xacml.ctx.ResponseCtx;
 
+import org.wso2.balana.ctx.ResponseCtx;
+
+import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.policy.pep.cache.PdpSessionMemory;
 
 /**
@@ -84,9 +86,9 @@ public class PdpSessionCache {
 	 * @param theTimestamp
 	 * 				the time stamp
 	 */
-	public void add(String theSessionId, String theParameters, 
+	public void add(String theParameters, 
 			ResponseCtx theDecision, long theTimestamp) {
-		PdpSessionItem ntry = new PdpSessionItem(theSessionId, 
+		PdpSessionItem ntry = new PdpSessionItem( 
 				theParameters, theDecision, theTimestamp);
 		sessionMemory.add(ntry);
 	}
@@ -103,10 +105,9 @@ public class PdpSessionCache {
 	 * @param theTimeout
 	 * 				the timeout value in milliseconds
 	 */
-	public void add(String theSessionId, String theParameters, 
+	public void add(String theParameters, 
 			ResponseCtx theDecision, long theTimestamp, long theTimeout) {
-		PdpSessionItem ntry = new PdpSessionItem(theSessionId, 
-				theParameters, theDecision, theTimestamp, theTimeout);
+		PdpSessionItem ntry = new PdpSessionItem(theParameters, theDecision, theTimestamp, theTimeout);
 		sessionMemory.add(ntry);
 	}
 	
@@ -124,10 +125,10 @@ public class PdpSessionCache {
 	 * @param theTimestamp
 	 * 				the time stamp
 	 */
-	public void add(String theSessionId, String sndHid, String recHid, 
+	public void add(VirtualAddress sndVad, VirtualAddress recVad, 
 			String theParameters, ResponseCtx theDecision, long theTimestamp) {
-		PdpSessionItem ntry = new PdpSessionItem(theSessionId, sndHid, 
-				recHid, theParameters, theDecision, theTimestamp);
+		PdpSessionItem ntry = new PdpSessionItem(sndVad, 
+				recVad, theParameters, theDecision, theTimestamp);
 		sessionMemory.add(ntry);
 	}
 	
@@ -147,11 +148,11 @@ public class PdpSessionCache {
 	 * @param theTimeout
 	 * 				the timeout value in milliseconds
 	 */
-	public void add(String theSessionId, String sndHid, String recHid, 
+	public void add(VirtualAddress sndVad, VirtualAddress recVad, 
 			String theParameters, ResponseCtx theDecision, long theTimestamp,
 			long theTimeout) {
-		PdpSessionItem ntry = new PdpSessionItem(theSessionId, sndHid, 
-				recHid, theParameters, theDecision, theTimestamp, theTimeout);
+		PdpSessionItem ntry = new PdpSessionItem(sndVad, 
+				recVad, theParameters, theDecision, theTimestamp, theTimeout);
 		sessionMemory.add(ntry);
 	}
 	
@@ -165,10 +166,9 @@ public class PdpSessionCache {
 	 * @return
 	 * 				the stored decision or <code>null</code> if no match found
 	 */
-	public ResponseCtx evaluate(String theSessionId, String theParameters, 
+	public ResponseCtx evaluate(String theParameters, 
 			long theTimestamp) {
-		PdpSessionItem ntry = sessionMemory.find(theSessionId, 
-				theParameters, theTimestamp);
+		PdpSessionItem ntry = sessionMemory.find(theParameters, theTimestamp);
 		if (ntry != null) {			
 			return ntry.getDecision();
 		}
@@ -178,9 +178,9 @@ public class PdpSessionCache {
 	/**
 	 * @param theSessionId
 	 * 				the session ID
-	 * @param theSndHid
+	 * @param theSndVad
 	 * 				the sender HID
-	 * @param theRecHid
+	 * @param theRecVad
 	 * 				the receiver HID
 	 * @param theParameters
 	 * 				the method call
@@ -189,15 +189,15 @@ public class PdpSessionCache {
 	 * @return
 	 * 				the stored decision or <code>null</code> if no match found
 	 */
-	public ResponseCtx evaluate(String theSessionId, String theSndHid, 
-			String theRecHid, String theParameters, long theTimestamp) {
-		PdpSessionItem ntry = sessionMemory.find(theSessionId, 
+	public ResponseCtx evaluate(VirtualAddress theSndVad, 
+			VirtualAddress theRecVad, String theParameters, long theTimestamp) {
+		PdpSessionItem ntry = sessionMemory.find( 
 				theParameters, theTimestamp);
-		if ((ntry != null) && (ntry.getSenderHid() != null) 
-				&& (ntry.getReceiverHid() != null)
-				&& (theSndHid != null) && (theRecHid != null)
-				&& (theSndHid.equals(ntry.getSenderHid())) 
-				&& (theRecHid.equals(ntry.getReceiverHid()))) {
+		if ((ntry != null) && (ntry.getSenderVad() != null) 
+				&& (ntry.getReceiverVad() != null)
+				&& (theSndVad != null) && (theRecVad != null)
+				&& (theSndVad.equals(ntry.getSenderVad())) 
+				&& (theRecVad.equals(ntry.getReceiverVad()))) {
 			return ntry.getDecision();
 		}
 		return null;

@@ -39,8 +39,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import com.sun.xacml.ctx.Attribute;
+import org.wso2.balana.ctx.Attribute;
 
 import eu.linksmart.policy.pep.request.SoapAttrParser;
 
