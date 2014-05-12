@@ -18,7 +18,7 @@ import eu.linksmart.it.utils.ITConfiguration;
 @RunWith(PaxExam.class)
 public class StandardTunnelServiceIT {
 	
-	private final String HTTP_PORT = "9090";
+	private final String HTTP_PORT = "8882";
 
     @Configuration
     public Option[] config() {
