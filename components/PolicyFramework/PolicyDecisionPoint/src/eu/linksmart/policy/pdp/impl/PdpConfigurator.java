@@ -50,23 +50,10 @@ public class PdpConfigurator extends Configurator  {
 
 	/** PDP PID */
 	public static final String PDP_PID = "PdpService.PID";
-	
-	/** PDP admin PID */
-	public static final String PDPADMIN_PID = "PdpAdminService.PID";	
 
 	/** PDP certificate reference */
 	public static final String PDPSERVICE_CERT_REF 
 			= "PdpService.CertificateReference";
-	
-	/** PDP admin certificate reference */
-	public static final String PDPADMINSERVICE_CERT_REF 
-			= "PdpAdminService.CertificateReference";
-	
-	/** PEP service PID */
-	public static final String PEP_SERVICE_PID = "eu.linksmart.policy.pep";
-	
-	/** PEP PID */
-	public static final String PEP_PID = "Pdp.PepPID";
 	
 	/** flag indicating whether to use policy database or file repository */
 	public static final String PDP_POLICY_REPOSITORY 
@@ -79,24 +66,8 @@ public class PdpConfigurator extends Configurator  {
 	public static final String PDPSERVICE_DESCRIPTION 
 			= "PdpService.Description";
 	
-	/** PDP admin service description */
-	public static final String PDPADMINSERVICE_DESCRIPTION 
-			= "PdpAdminService.Description";
-	
 	/** PDP service PID */
 	public static final String PDP_SERVICE_PID = "eu.linksmart.policy.pdp";
-	
-	/** PDP admin service PID */
-	public static final String PDPADMIN_SERVICE_PID 
-			= "eu.linksmart.policy.pdp.admin";
-	
-	/** PEP cache session lifetime to be tested against */ 
-	public static final String PEP_CACHE_SESSION_LIFETIME 
-			= "Pdp.PepCacheSessionLifetime";
-	
-	/** Default caching behavior for PDP responses */
-	public static final String PDP_DEFAULT_ALLOW_SESSION_CHACHING
-			= "Pdp.DefaultAllowSessionCaching";
 
 	/** configuration file name and location */
 	private static final String CONFIGURATION_FILE 

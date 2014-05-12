@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="eu.linksmart.policy.pdp" immediate="true">
+  	<implementation class="eu.linksmart.policy.pdp.impl.PdpApplication"/>
+  	<reference bind="bindNetworkManager" cardinality="0..1" interface="eu.linksmart.network.networkmanager.NetworkManager" name="NetworkManager" policy="dynamic" unbind="unbindNetworkManager"/>
+	<reference cardinality="0..1" interface="org.osgi.service.cm.ConfigurationAdmin" name="ConfigurationAdmin" policy="static"/>
+	<property name="service.exported.interfaces" type="String" value="*"/>
+ 	<property name="service.exported.configs" type="String" value="org.apache.cxf.ws"/>
+ 	<property name="org.apache.cxf.ws.address" type="String" value="http://0.0.0.0:9090/cxf/services/PolicyDecisionPoint"/>
+  <service>
+     <provide interface="eu.linksmart.policy.pdp.PolicyDecisionPoint"/>
+  </service>
+</scr:component>

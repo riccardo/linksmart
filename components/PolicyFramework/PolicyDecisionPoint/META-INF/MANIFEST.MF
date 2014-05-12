@@ -1,23 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: LinkSmart PDP Implementation
+Bundle-Name: LinkSmart PolicyDecisionPoint
 Bundle-SymbolicName: eu.linksmart.policy.pdp
-Bundle-Version: 1.0.0
-Service-Component: OSGI-INF/eu.linksmart.policy.pdp.DSActivation.xml
+Bundle-Version: 2.1.0
+Service-Component: OSGI-INF/DS_PdpApplication.xml
 Import-Package: 
  eu.linksmart.network,
- eu.linksmart.policy.pep,
- eu.linksmart.policy.pep.client,
- eu.linksmart.utils,
- com.sun.xacml,
- com.sun.xacml.attr,
- com.sun.xacml.attr.proxy,
- com.sun.xacml.cond,
- com.sun.xacml.ctx,
- com.sun.xacml.finder,
- com.sun.xacml.finder.impl,
+ eu.linksmart.network.networkmanager;version="2.1.0",
  eu.linksmart.policy.pdp,
- eu.linksmart.policy.pdp.finder.impl,
+ eu.linksmart.policy.pep,
+ eu.linksmart.utils,
  javax.xml.namespace,
  javax.xml.parsers;version="1.3.0",
  javax.xml.rpc,
@@ -31,12 +23,10 @@ Import-Package:
  org.osgi.service.component;version="1.0.0",
  org.osgi.util.tracker;version="1.3.3",
  org.w3c.dom;version="3.0.0",
+ org.wso2.balana,
+ org.wso2.balana.ctx,
+ org.wso2.balana.finder,
+ org.wso2.balana.finder.impl,
  org.xml.sax;version="2.0.2"
-Bundle-Vendor: University of Reading
-Export-Package: eu.linksmart.policy.pdp.admin.impl,
- eu.linksmart.policy.pdp.ext.attribute.impl,
- eu.linksmart.policy.pdp.ext.function.impl,
- eu.linksmart.policy.pdp.ext.impl,
- eu.linksmart.policy.pdp.finder.impl,
- eu.linksmart.policy.pdp.impl
+Bundle-Vendor: Fraunhofer FIT
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
