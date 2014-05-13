@@ -346,7 +346,7 @@ public class JunitMemPdpSessionMemoryTest {
 				response, System.currentTimeMillis());
 		theMemory.add(item1);
 		// retrieve the item that was just stored
-		logger.debug("Item 1");
+		logger.debug("Item 1");s
 		PdpSessionItem sesResponse = theMemory.find("abcdef", "callAMethod", 
 				System.currentTimeMillis());
 		assertEquals(Result.DECISION_PERMIT, ((Result) sesResponse

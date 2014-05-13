@@ -40,7 +40,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -68,8 +67,6 @@ import org.wso2.balana.xacml3.Attributes;
 import org.xml.sax.SAXException;
 
 import eu.linksmart.policy.pep.impl.PepXacmlConstants;
-import eu.linksmart.policy.pep.request.impl.AbstractSoapAttrParser;
-import eu.linksmart.policy.pep.request.impl.DomSoapAttrParser;
 
 /**
  * <p>Extracts {@link Attribute}s from a SOAP message with a DOM parser</p>

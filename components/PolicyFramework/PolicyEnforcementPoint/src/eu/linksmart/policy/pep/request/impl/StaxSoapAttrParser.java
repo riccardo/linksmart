@@ -39,7 +39,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
@@ -61,8 +60,6 @@ import org.wso2.balana.ctx.Attribute;
 import org.wso2.balana.xacml3.Attributes;
 
 import eu.linksmart.policy.pep.impl.PepXacmlConstants;
-import eu.linksmart.policy.pep.request.impl.AbstractSoapAttrParser;
-import eu.linksmart.policy.pep.request.impl.StaxSoapAttrParser;
 
 /**
  * <p>Extracts {@link Attribute}s from a SOAP message with a STAX parser</p>

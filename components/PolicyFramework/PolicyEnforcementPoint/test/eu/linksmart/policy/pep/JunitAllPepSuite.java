@@ -38,19 +38,7 @@ import org.junit.runners.Suite;
 import eu.linksmart.policy.pep.cache.impl.JunitMemPdpSessionMemoryTest;
 import eu.linksmart.policy.pep.cache.impl.JunitPdpSessionBufferTest;
 import eu.linksmart.policy.pep.cache.impl.JunitPdpSessionItemTest;
-import eu.linksmart.policy.pep.impl.JunitComponentHidManagerTest;
-import eu.linksmart.policy.pep.impl.JunitLinkSmartAttributeFactoryTest;
-import eu.linksmart.policy.pep.impl.JunitPepApplicationTest;
-import eu.linksmart.policy.pep.impl.JunitPepConfiguratorTest;
 import eu.linksmart.policy.pep.impl.JunitPepXacmlConstantsTest;
-import eu.linksmart.policy.pep.impl.JunitPropertyParserTest;
-import eu.linksmart.policy.pep.request.impl.JunitDomSoapAttrParserTest;
-import eu.linksmart.policy.pep.request.impl.JunitPepRequestTest;
-import eu.linksmart.policy.pep.request.impl.JunitStaxSoapAttrParserTest;
-import eu.linksmart.policy.pep.response.impl.JunitBundlePepObligationObserverWrapperTest;
-import eu.linksmart.policy.pep.response.impl.JunitDebugPepObligationObserverTest;
-import eu.linksmart.policy.pep.response.impl.JunitOsgiTrackerPepObligationObserverTest;
-import eu.linksmart.policy.pep.response.impl.JunitSessionCachePepObligationObserverTest;
 
 /**
  * Unit test suite for PEP
@@ -63,19 +51,7 @@ import eu.linksmart.policy.pep.response.impl.JunitSessionCachePepObligationObser
 	JunitMemPdpSessionMemoryTest.class,
 	JunitPdpSessionBufferTest.class,
 	JunitPdpSessionItemTest.class,
-	JunitComponentHidManagerTest.class,
-	JunitLinkSmartAttributeFactoryTest.class,
-	JunitPepApplicationTest.class,
-	JunitPepConfiguratorTest.class,
-	JunitPepXacmlConstantsTest.class,
-	JunitPropertyParserTest.class,
-	JunitDomSoapAttrParserTest.class,
-	JunitPepRequestTest.class,
-	JunitStaxSoapAttrParserTest.class,
-	JunitBundlePepObligationObserverWrapperTest.class,
-	JunitDebugPepObligationObserverTest.class,
-	JunitOsgiTrackerPepObligationObserverTest.class,
-	JunitSessionCachePepObligationObserverTest.class
+	JunitPepXacmlConstantsTest.class
 })
 public class JunitAllPepSuite {
 	// intentionally left blank

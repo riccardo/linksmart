@@ -35,9 +35,8 @@ package eu.linksmart.policy.pep.cache.impl;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
+import org.wso2.balana.ctx.ResponseCtx;
+import org.wso2.balana.ctx.xacml3.Result;
 
 import eu.linksmart.policy.pep.cache.impl.MemPdpSessionMemory;
 import eu.linksmart.policy.pep.cache.impl.PdpSessionCache;
