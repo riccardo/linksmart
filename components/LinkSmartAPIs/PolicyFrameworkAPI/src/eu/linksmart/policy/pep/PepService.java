@@ -32,6 +32,9 @@
  */
 package eu.linksmart.policy.pep;
 
+import eu.linksmart.network.Message;
+import eu.linksmart.network.VirtualAddress;
+
 /**
  * Interface that defines interactions between Network Manager and PEP/PDP
  * 
@@ -44,51 +47,33 @@ public interface PepService extends PepCacheService {
 	/**
 	 * Main PEP function to be called by the Network Manager
 	 * 
-	 * Passes HID and CryptoHID certificate of Sender and Receiver, as well as 
-	 * SOAP message being passed and Session ID. 
+	 * Passes Virtual Address of Sender and Receiver, as well as 
+	 * message being passed. 
 	 * 
-	 * @param theSenderHid
-	 * 				the sender HID
-	 * @param theSenderCert
-	 * 				the sender certificate reference
-	 * @param theReceiverHid
-	 * 				the receiver HID
-	 * @param theReceiverCert
-	 * 				the receiver certificate reference
-	 * @param theSoapMsg
+	 * @param theSenderVad
+	 * 				the sender Virtual Address
+	 * @param theReceiverVad
+	 * 				the receiver Virtual Address
+	 * @param msg
 	 * 				the SOAP access request message
-	 * @param theSessionId
-	 * 				the LinkSmart session ID
 	 * @return
 	 * 				the {@link PepResponse}
 	 */
-	public PepResponse requestAccessDecision(String theSenderHid, 
-			String theSenderCert, String theReceiverHid, String theReceiverCert, 
-			String theSoapMsg, String theSessionId);
+	public PepResponse requestAccessDecision(final VirtualAddress theSndVad,
+			final VirtualAddress theRecVad, final String topic, final byte[] msg);
 
 	/**
 	 * Main PEP function to be called by the Network Manager
 	 * 
-	 * Passes HID and CryptoHID certificate of Sender and Receiver, as well as 
-	 * SOAP message being passed and Session ID. 
+	 * Passes Message to be authorized. 
 	 * 
-	 * @param theSenderHid
-	 * 				the sender HID
-	 * @param theSenderCert
-	 * 				the sender certificate reference
-	 * @param theReceiverHid
-	 * 				the receiver HID
-	 * @param theReceiverCert
-	 * 				the receiver certificate reference
-	 * @param theMethod
-	 * 				the method call
-	 * @param theSessionId
-	 * 				the LinkSmart session ID
+	 * @param msg
+	 * 				the Message object to be controlled
 	 * @return
 	 * 				the {@link PepResponse}
 	 */
-	public PepResponse requestAccessDecisionWMethod(String theSenderHid, 
-			String theSenderCert, String theReceiverHid, String theReceiverCert, 
-			String method, String theSessionId);
+	public PepResponse requestAccessDecisionWMessage(Message msg);
+
+	
 
 }

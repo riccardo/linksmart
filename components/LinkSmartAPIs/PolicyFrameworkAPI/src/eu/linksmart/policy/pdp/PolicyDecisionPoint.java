@@ -35,6 +35,9 @@ package eu.linksmart.policy.pdp;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import org.wso2.balana.ctx.AbstractRequestCtx;
+import org.wso2.balana.ctx.ResponseCtx;
+
 /**
  * Policy Decision Point interface
  * 
@@ -58,5 +61,14 @@ public interface PolicyDecisionPoint extends Remote {
 	 * 				any {@link RemoteException} that is thrown
 	 */
     public String evaluate(String theRequest) throws RemoteException;
+
+    /**
+     * Evaluates the received request and returns the decision. Method
+     * executes faster then the XML string based version.
+     * @param ctx
+     * @return
+     * @throws RemoteException
+     */
+	ResponseCtx evaluate(AbstractRequestCtx ctx) throws RemoteException;
     
 }
