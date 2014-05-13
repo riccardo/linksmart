@@ -14,6 +14,7 @@ import org.osgi.service.component.ComponentContext;
 
 
 @Component(name="${artifactId}", immediate=true)
+@Service
 public class ${artifactId}{
 
     private Logger mLogger = Logger.getLogger(${artifactId}.class.getName());
