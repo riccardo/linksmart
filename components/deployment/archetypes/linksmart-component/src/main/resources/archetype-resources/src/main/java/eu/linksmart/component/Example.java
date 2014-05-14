@@ -1,4 +1,4 @@
-package eu.linksmart.${artifactId};
+package eu.linksmart.component;
 
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;

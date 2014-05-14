@@ -1,4 +1,4 @@
-package eu.linksmart.${artifactId};
+package eu.linksmart.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
