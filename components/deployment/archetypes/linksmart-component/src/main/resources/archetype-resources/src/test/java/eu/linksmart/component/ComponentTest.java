@@ -1,4 +1,4 @@
-package eu.linksmart.${artifactId}.testing;
+package eu.linksmart.${artifactId};
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -9,18 +9,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 
 import org.apache.log4j.Logger;
 
-public class ${artifactId}Test {
+public class ComponentTest {
 
-    private Logger mlogger = Logger.getLogger(${artifactId}Test.class.getName());
+    private static Logger LOG = Logger.getLogger(ComponentTest.class.getName());
 
+    @Before
+    public void beforeTest() {
+    	
+    }
+    
+    @After
+    public void afterTest() {
+    	
+    }
+    
     @Test
     public void testSomething() {
         //TODO dummy assertion. Add your proper tests
         assertTrue(true);
-
     }
 }

@@ -8,24 +8,55 @@ import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.ReferencePolicy;
 import org.apache.felix.scr.annotations.Service;
 
-import org.apache.log4j.Logger;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 
+import org.apache.log4j.Logger;
 
-@Component(name="${artifactId}", immediate=true)
-public class ${artifactId}{
+//
+// documentation on Maven SCR plugin: 
+// http://felix.apache.org/documentation/subprojects/apache-felix-maven-scr-plugin/scr-annotations.html
+//
 
-    private Logger mLogger = Logger.getLogger(${artifactId}.class.getName());
-    protected ComponentContext mContext;
+//
+// @Component is used for consuming a service that is declared by @Reference
+//
+@Component(name="ExampleComponent", immediate=true)
+
+//
+// @Service is used for declaring a service so that SCR would register this object as a service into
+// OSGi service registry
+// @Service :: if object is implementing only one interface, then plugin automatically adds the interface name
+// @Service({ObjectNameA.class, ObjectNameB.class}) :: in case of multiple interfaces are implemented by this class, and you want to include only 
+// some of those interfaces in Component XML
+//
+
+public class Example {
+
+    private static Logger LOG = Logger.getLogger(Example.class.getName());
+    
+    @Reference(name="ExampleService",
+			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+			policy=ReferencePolicy.DYNAMIC,
+			bind="bindService", 
+			unbind="unbindService")
+    String exampleService;
+    
+    protected void bindService(String exampleService) {
+    	this.exampleService = exampleService;
+    }
+    
+    protected void unbindService(String exampleService) {
+    	this.exampleService = null;
+    }
 
     @Activate
     protected void activate(ComponentContext context) {
-        mLogger.info("${artifactId} activated");
+    	LOG.info("Example activated");
     }
 
     @Deactivate
     protected void deactivate(ComponentContext context) {
-        mLogger.info("${artifactId} deactivated");
+    	LOG.info("Example deactivated");
     }
+        
 }

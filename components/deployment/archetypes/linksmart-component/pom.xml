@@ -11,7 +11,7 @@
 
     <artifactId>linksmart-component-archetype</artifactId>
     
-    <description>A maven template for creation of LinkSmart components</description>
+    <description>A maven template for creation LinkSmart OSGi Components</description>
 
     <packaging>maven-archetype</packaging>
 
