@@ -20,6 +20,7 @@
     <modules>
         <module>linksmart-component</module>
         <module>linksmart-service</module>
+        <module>linksmart-component-it</module>
     </modules>
 
 </project>
