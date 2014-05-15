@@ -93,7 +93,7 @@ public class CalculatorClient {
 		
 		try {
 			//String calculatorEndPoint_wsdl = "http://localhost:9090/cxf/services/Calculator?wsdl";
-			String calculator_base_endpoint = "http://localhost:8080/SOAPTunneling/0/";
+			String calculator_base_endpoint = "http://localhost:8082/SOAPTunneling/0/";
 			String calculator_tunneling_endpoint = calculator_base_endpoint + virtualAddress;
 			String calculator_tunneling_wsdl_endpoint = calculator_tunneling_endpoint + "?wsdl";
 			
