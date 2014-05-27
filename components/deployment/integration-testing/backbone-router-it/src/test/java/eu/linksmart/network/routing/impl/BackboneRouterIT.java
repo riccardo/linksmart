@@ -1,0 +1,277 @@
+package eu.linksmart.network.routing.impl;
+
+import java.io.File;
+import java.util.List;
+
+import eu.linksmart.network.NMResponse;
+import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.network.backbone.Backbone;
+import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
+import eu.linksmart.network.routing.BackboneRouter;
+import junit.framework.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
+import org.ops4j.pax.exam.karaf.options.LogLevelOption;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerMethod;
+
+import javax.inject.Inject;
+
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: carlos
+ * Date: 03.04.14
+ * Time: 14:02
+ * To change this template use File | Settings | File Templates.
+ */
+@RunWith(PaxExam.class)
+
+@ExamReactorStrategy(PerMethod.class)
+public class  BackboneRouterIT  {
+
+    @Inject
+    private BackboneRouter backboneRouter;
+    @Inject
+    private Backbone backboneOSGI;
+
+    private NetworkManagerCore networkManagerCore;
+    private VirtualAddress receiverVirtualAddress = new VirtualAddress("354.453.455.323");
+    private VirtualAddress senderVirtualAddress = new VirtualAddress("354.453.993.323");
+    private String endpoint0 = "endpoint_sender";
+    private String endpoint1 = "endpoint_reciever";
+
+
+    private byte[] recieveBuffer = {0,0};
+
+    @Configuration
+        public Option[] config() {
+            return new Option[] {
+                    // Provision and launch a container based on a distribution of Karaf (Apache ServiceMix)
+                    karafDistributionConfiguration()
+                            .frameworkUrl(
+                                    maven()
+                                            .groupId("org.apache.servicemix")
+                                            .artifactId("apache-servicemix")
+                                            .type("zip")
+                                            .version("5.0.0"))
+                            .karafVersion("3.3.0")
+                            .name("Apache ServiceMix")
+                            .unpackDirectory(new File("target/servicemix-karaf"))
+                            .useDeployFolder(false),
+
+                    //KarafDistributionOption.debugConfiguration("5005", true) ,
+                    /*
+                    * keeping container sticks around after the test so we can check the contents
+                   // of the data directory when things go wrong.
+                    */
+                    keepRuntimeFolder(),
+                    /*
+                    * don't bother with local console output as it just ends up cluttering the logs
+                    */
+                    configureConsole().ignoreLocalConsole(),
+                    /*
+                    * force the log level to INFO so we have more details during the test. It defaults to WARN.
+                    */
+                    logLevel(LogLevelOption.LogLevel.INFO),
+                    /*
+                    * karaf feature will be provisioned to the test container from a local or remote Maven repository
+                    * using the standard Maven lookup and caching procedures
+                    */
+                    features("mvn:eu.linksmart/linksmart-features/2.2.0-SNAPSHOT/xml/features","backbone-router-it")
+                    //features("mvn:eu.linksmart/router-integration-feature/1.0.0/xml/features","router-integration-feature")
+
+            };
+        }
+
+      @Ignore
+      public void basicTest(){
+          assertTrue(true);
+      }
+    
+    @Before
+    public void setUp(){
+        //networkManagerCore = mock(NetworkManagerCore.class);
+    }
+
+
+    @Test
+    public void basicTest2(){
+
+
+       // TEST #01  , add two endpoints to OSGI backbone, add route to backbone router
+       //boolean re = backboneOSGI.addEndpoint(this.senderVirtualAddress, this.endpoint0);
+       //re = backboneOSGI.addEndpoint(this.receiverVirtualAddress, this.endpoint1);
+        //backboneOSGI.
+
+
+
+       boolean fromRouter = backboneRouter.addRouteToBackbone(senderVirtualAddress, backboneOSGI.getClass().getName(), endpoint0);
+       fromRouter = backboneRouter.addRouteToBackbone(receiverVirtualAddress, backboneOSGI.getClass().getName(), endpoint1);
+       //boolean fromRouter = backboneRouter.addRoute(this.senderVirtualAddress, backboneOSGI.getClass().getName());
+       //fromRouter = backboneRouter.addRoute(this.receiverVirtualAddress, backboneOSGI.getClass().getName());
+
+       List fromService = backboneRouter.getAvailableBackbones();
+       System.out.println("available backbones : " + fromService.size());
+       Assert.assertEquals(1,fromService.size());
+
+       // TEST #02 , send asynchronous
+
+       byte[] sendBuffer = {1,1};
+       NMResponse a = backboneRouter.sendDataAsynch(senderVirtualAddress, receiverVirtualAddress, sendBuffer);
+
+       System.out.println("status from backbone (async) : "+a.getStatus());
+       assertEquals(NMResponse.STATUS_SUCCESS,a.getStatus());
+
+       // TEST #03 , send synchronous
+       //TODO not running at the moment
+//        String bb = backboneRouter.getAvailableBackbones().get(0);
+//
+//        //RecieveThread rt = new RecieveThread("recieverThread",backboneOSGI );
+//        //rt.start();
+//
+//
+//        a = backboneRouter.sendDataSynch(senderVirtualAddress, receiverVirtualAddress, sendBuffer);
+//
+//        System.out.println("status from backbone (sync) : "+a.getStatus());
+//        assertEquals(NMResponse.STATUS_SUCCESS,a.getStatus());
+
+
+
+
+    }
+    class RecieveThread extends Thread {
+        private Backbone bb;
+        private int status = 1;
+        public RecieveThread(String str,Backbone bb) {
+            super(str);
+            System.out.println("Reciever thread initalized");
+            this.bb = bb;
+        }
+        public void run() {
+            System.out.println("Reciever thread started");
+            try {
+                while(recieveBuffer[0]==0){
+                    NMResponse res = bb.receiveDataSynch(senderVirtualAddress, receiverVirtualAddress, recieveBuffer);
+                    status = res.getStatus();
+                    System.out.println("recieve data synch status : "+res.getStatus());
+                    //sleep(10);
+                }
+                System.out.println("YAY! Recieved data");
+                System.out.println("data: "+ recieveBuffer[0]+" , "+ recieveBuffer[1]);
+            } catch (Exception e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+    }
+
+//    @Test
+//    public void basicIntegrationChain() throws InterruptedException {
+//
+////        System.out.println("testing sleep workaround for slow VM...");
+////        Thread.currentThread().sleep(10000);
+////        System.out.println("woke up after 10 sec.");
+//
+//        // TEST #1
+//        // this test retrieves class name & list of security types
+//
+//        String fromService = backboneJXTA.getName().toString();
+//        System.out.println("class name : "+fromService);
+//        Assert.assertEquals("eu.linksmart.network.backbone.impl.jxta.BackboneJXTAImpl",fromService);
+//        List<SecurityProperty> securityTypes = backboneJXTA.getSecurityTypesRequired();
+//        System.out.println("number of security types : "+securityTypes.size());
+//        assertNotNull(securityTypes);
+//
+//        // TEST #2
+//        // test addition and removal of simple virtual-adress & endpoint as pair
+//        VirtualAddress va;
+//        va = new VirtualAddress();
+//        va.setContextID1(0);
+//        va.setContextID1(0);
+//        va.setContextID1(0);
+//        va.setDeviceID(109499400);
+//        va.setLevel(0);
+//
+//        // has to be a valid URL for the soap impl
+//        String endpoint = "http://is.gd/qNNIop";
+//
+//        // add endpoint + virtual adress to backbone
+//        System.out.println("Virtual adress : "+va);
+//        System.out.println("Endpoint, enjoy ;-) "+endpoint);
+//        boolean result = backboneJXTA.addEndpoint(va,endpoint);
+//        assertTrue(result);
+//        System.out.println("Endpoint added : "+result);
+//
+//        String EPfromService = backboneJXTA.getEndpoint(va);
+//        System.out.println("Retrieved endpoint from backbone : "+EPfromService);
+//        assertEquals(endpoint, EPfromService);
+//
+//        // remove endpoint from backbone
+//        result = backboneJXTA.removeEndpoint(va);
+//        assertTrue(result);
+//        System.out.println("Endpoint removed : "+result);
+//
+//        EPfromService = backboneJXTA.getEndpoint(va);
+//        Assert.assertEquals(null,EPfromService);
+//        System.out.println("Endpoint after removal : "+EPfromService);
+//
+//        // TEST #3
+//        // test addition and removal of sender & remote service endpoints
+//
+//        // sender virtual adress
+//        VirtualAddress va0;
+//        va0 = new VirtualAddress();
+//        va0.setContextID1(0);
+//        va0.setContextID1(0);
+//        va0.setContextID1(0);
+//        va0.setDeviceID(666);
+//        va0.setLevel(0);
+//
+//        // remote service virtual adress
+//        VirtualAddress va1;
+//        va1 = new VirtualAddress();
+//        va1.setContextID1(0);
+//        va1.setContextID1(0);
+//        va1.setContextID1(0);
+//        va1.setDeviceID(777);
+//        va1.setLevel(0);
+//
+//        String endpointSender = "http://is.gd/CW1BeO";
+//        String endpointRemoteService = "http://is.gd/u4z8Jl";
+//        result = backboneJXTA.addEndpoint(va0, endpointSender);
+//
+//        backboneJXTA.addEndpointForRemoteService(va0, va1);
+//
+//
+//        String ep = backboneJXTA.getEndpoint(va0);
+//        System.out.println("Endpoint sender : "+ep);
+//        ep = backboneJXTA.getEndpoint(va1);
+//        System.out.println("Endpoint remote service  : "+ep);
+//
+//        result = backboneJXTA.removeEndpoint(va1);
+//        System.out.println("Endpoint remote service removed  : "+result);
+//
+//        assertTrue(result);
+//
+//        result = backboneJXTA.removeEndpoint(va0);
+//        System.out.println("Endpoint sender removed  : "+result);
+//
+//        assertTrue(result);
+//
+//    }
+
+}

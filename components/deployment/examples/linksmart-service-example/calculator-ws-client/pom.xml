@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.linksmart.examples</groupId>
+		<artifactId>calculator-service-example</artifactId>
+		<version>2.2.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>calculator-ws-client</artifactId>
+
+	<name>Calculator Web Service Client</name>
+
+	<packaging>bundle</packaging>
+
+	<properties>
+		<apache-cxf.version>2.6.0</apache-cxf.version>
+		<xercesImpl.version>2.8.0</xercesImpl.version>
+		<wsdl.location>${basedir}/src/main/resources/calculator.wsdl</wsdl.location>
+		<service.name>Calculator</service.name>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<version>${apache-cxf.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>${apache-cxf.version}</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>${apache-cxf.version}</version>
+				<executions>
+					<execution>
+						<id>generate-calculator-stub-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<sourceRoot>${basedir}/target/generated-sources/cxf/src/main/java</sourceRoot>
+							<wsdlOptions>
+								<wsdlOption>
+									<wsdl>${wsdl.location}</wsdl>
+									<serviceName>${service.name}</serviceName>
+									<extraargs>
+										<extraarg>-client</extraarg>
+									</extraargs>
+								</wsdlOption>
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+						<version>${xercesImpl.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>			
+	</build>
+			
+</project>

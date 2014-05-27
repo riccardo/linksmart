@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="SOAPTunneling">
-   <implementation class="eu.linksmart.network.soaptunnel.SOAPTunnel"/>
-   <reference bind="bindNetworkManagerCore" cardinality="1..1" interface="eu.linksmart.network.networkmanager.core.NetworkManagerCore" name="NetworkManagerCore" policy="dynamic" unbind="unbindNetworkManagerCore"/>
-   <reference cardinality="1..1" interface="org.osgi.service.http.HttpService" name="HttpService" policy="static"/>
-</scr:component>

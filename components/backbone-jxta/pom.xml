@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.linksmart</groupId>
+        <artifactId>linksmart-osgi-component</artifactId>
+        <version>2.2.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>eu.linksmart.network.backbone.jxta</artifactId>
+
+    <packaging>bundle</packaging>
+
+    <name>LinkSmart Backbone JXTA</name>
+    <description>LinkSmart jxta backbone</description>
+    
+    <dependencyManagement>
+        <dependencies>
+        	<dependency>
+				<groupId>net.jxta</groupId>
+            	<artifactId>jxta-jxse</artifactId>
+            	<version>2.5</version>
+			</dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>eu.linksmart</groupId>
+            <artifactId>eu.linksmart.api.backbone</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.linksmart</groupId>
+            <artifactId>eu.linksmart.api.backbone.router</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.linksmart</groupId>
+            <artifactId>eu.linksmart.api.utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.linksmart</groupId>
+            <artifactId>eu.linksmart.api.security.communication</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.jetty</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>net.jxta</groupId>
+            <artifactId>jxta-jxse</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Embed-Dependency>jxta-jxse</Embed-Dependency>
+                        <Embed-Transitive>false</Embed-Transitive>
+                        <Export-Package>!*</Export-Package>
+                        <Import-Package>!org.mortbay.jetty,org.mortbay.util;version="[4.2,5)",org.mortbay.jetty.servlet;version="[4.2,5)",javax.servlet.resources; version="2.4.0",javax.servlet.http; version="2.4.0",javax.servlet; version="2.4.0",*</Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,433 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>eu.linksmart</groupId>
+    <artifactId>linksmart-parent</artifactId>
+    
+    <version>2.2.0-SNAPSHOT</version>
+
+    <name>LinkSmart Parent</name>
+    <url>http://www.fit.fraunhofer.de/linksmart</url>
+
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- versions for OSGi dependencies -->
+        <felix.osgi.core.version>1.4.0</felix.osgi.core.version>
+        <felix.osgi.configadmin.version>1.8.0</felix.osgi.configadmin.version>
+        <felix.scr.version>1.8.2</felix.scr.version>
+        <felix.scr.annotations.version>1.9.6</felix.scr.annotations.version>
+        <felix.maven.bundle.version>2.4.0</felix.maven.bundle.version>
+        <felix.maven.scr.version>1.15.0</felix.maven.scr.version>
+        <felix.metatype.version>1.0.10</felix.metatype.version>
+        <felix.http.version>2.2.2</felix.http.version>
+        <!-- versions for maven and java compiler plugins -->
+        <java.compiler.version>1.7</java.compiler.version>
+        <maven.compiler.version>3.1</maven.compiler.version>
+        <maven.source.version>2.2.1</maven.source.version>
+        <maven.enforcer.version>1.3.1</maven.enforcer.version>
+        <maven.resources.version>2.4.3</maven.resources.version>
+        <!-- versions for testing plugins -->
+        <maven.surefire.version>2.16</maven.surefire.version>
+        <surefire-report.version>2.13</surefire-report.version>
+        <junit.version>4.8.2</junit.version>
+        <maven.failsafe.version>2.16</maven.failsafe.version>
+        <mockito.version>1.9.5</mockito.version>
+        <!-- versions for integration test plugins -->
+        <pax.exam.version>3.4.0</pax.exam.version>
+        <karaf.tooling.exam.version>1.9.6</karaf.tooling.exam.version>
+        <karaf.version>3.0.0</karaf.version>
+        <karaf.tooling.features.version>2.3.3</karaf.tooling.features.version>
+        <!-- versions for logging -->
+        <log4j.version>1.2.16</log4j.version>
+        <slf4j.version>1.4.3</slf4j.version>
+        <!-- apache dependencies (misc) -->
+        <servicemix.xmlsec.version>1.4.5_1</servicemix.xmlsec.version>
+        <servicemix.commons-configuration.version>1.9_1</servicemix.commons-configuration.version>
+        <servicemix.commons-lang.version>2.4_6</servicemix.commons-lang.version>
+        <servicemix.bcpg-jdk16>1.46_2</servicemix.bcpg-jdk16>
+        <!-- apache cxf dependencies>-->
+        <cxf.version>2.7.9</cxf.version>
+        <cxf.dosgi.version>1.6.0</cxf.dosgi.version>
+        <!-- other -->
+        <javadoc-plugin.version>2.9</javadoc-plugin.version>
+    </properties>
+
+    <developers>
+    	<developer>
+            <id>hrasheed</id>
+            <email>hassan.rasheed&lt;at&gt;fit.fraunhofer.de</email>
+            <name>Hassan Rasheed</name>
+            <roles>
+                <role>Java developer</role>
+            </roles>
+            <timezone>UTC+1</timezone>
+            <organization>Fraunhofer FIT</organization>
+            <organizationUrl>http://www.fit.fraunhofer.de/</organizationUrl>
+            <url>http://www.fit.fraunhofer.de/</url>
+        </developer>
+        <developer>
+            <id>kcatewicz</id>
+            <name>Karl Catewicz</name>
+            <email>karl.catewicz&lt;at&gt;fit.fraunhofer.de</email>
+            <roles>
+                <role>Java developer</role>
+            </roles>
+            <timezone>UTC+1</timezone>
+            <organization>Fraunhofer FIT</organization>
+            <organizationUrl>http://www.fit.fraunhofer.de/</organizationUrl>
+            <url>http://www.fit.fraunhofer.de/</url>
+        </developer>
+        <developer>
+            <id>mvinkovits</id>
+            <name>Mark Vinkovits</name>
+            <email>mark.vinkovits&lt;at&gt;fit.fraunhofer.de</email>
+            <roles>
+                <role>Java developer</role>
+            </roles>
+            <timezone>UTC+1</timezone>
+            <organization>Fraunhofer FIT</organization>
+            <organizationUrl>http://www.fit.fraunhofer.de/</organizationUrl>
+            <url>http://www.fit.fraunhofer.de/</url>
+        </developer>
+    </developers>
+
+    <organization>
+        <name>Fraunhofer Institute FIT</name>
+        <url>http://www.fit.fraunhofer.de</url>
+    </organization>
+
+    <repositories>
+	    <repository>
+    		<id>linksmart-repo</id>
+    		<name>liksmart artifacts repository</name>
+    		<url>http://greatfool.fit.fraunhofer.de:8081/nexus/content/groups/public</url>
+    		<snapshots>
+    			<enabled>true</enabled>
+    			<updatePolicy>daily</updatePolicy>
+    		</snapshots>
+    		<releases>
+    			<enabled>true</enabled>
+    			<updatePolicy>never</updatePolicy>
+    		</releases>
+    	</repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>linksmart-repo</id>
+            <name>linksmart (maven) plugins repository</name>
+            <url>http://greatfool.fit.fraunhofer.de:8081/nexus/content/repositories/central</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <distributionManagement>
+        <!-- For releases , do not change id otherwise deployment will fail -->
+        <repository>
+            <id>releases</id>
+            <name>LinkSmartReleases</name>
+            <url>http://greatfool.fit.fraunhofer.de:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <!-- For snapshots , do not change id otherwise deployment will fail -->
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>LinkSmartSnapshots</name>
+            <url>http://greatfool.fit.fraunhofer.de:8081/nexus/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <!-- site generation -->
+        <site>
+            <id>repo</id>
+            <name>linksmart-site-repository</name>
+            <url>dav:https://fit.fraunhofer.de/linksmart</url>
+        </site>
+    </distributionManagement>
+
+    <ciManagement>
+        <system>Jenkins</system>
+        <url>http://greatfool.fit.fraunhofer.de:8080</url>
+        <notifiers>
+            <notifier>
+                <type>mail</type>
+                <address>hassan.rasheed@fit.fraunhofer.de</address>
+            </notifier>
+            <notifier>
+                <type>mail</type>
+                <address>karl.catewicz@fit.fraunhofer.de</address>
+            </notifier>
+        </notifiers>
+    </ciManagement>
+
+    <issueManagement>
+        <system>Jira</system>
+        <url>https://jira.fit.fraunhofer.de/</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</developerConnection>
+        <url>https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</url>
+    </scm>
+
+	<!-- this section define only the versions used by dependencies and not the dependencies itself -->
+    <dependencyManagement>
+        <dependencies>
+        	<!-- unit test dependencies -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+        	<!-- Integration test dependencies -->
+        	<dependency>
+            	<groupId>org.apache.karaf.tooling.exam</groupId>
+            	<artifactId>org.apache.karaf.tooling.exam.container</artifactId>
+            	<version>${karaf.tooling.exam.version}</version>
+            	<scope>test</scope>
+        	</dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-container-karaf</artifactId>
+                <version>${pax.exam.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-junit4</artifactId>
+                <version>${pax.exam.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-link-mvn</artifactId>
+                <version>${pax.exam.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- logging dependencies -->
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+            	<groupId>org.slf4j</groupId>
+            	<artifactId>slf4j-api</artifactId>
+            	<version>${slf4j.version}</version>
+        	</dependency>
+        	 <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- LinkSmart API dependencies -->
+        	<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.utils</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.network</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.networkmanager</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.networkmanager.core</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.trustmanager</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.security.communication</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.identitymanager</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.cryptomanager</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.backbone</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.backbone.router</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.clients</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
+      		<!-- LinkSmart tunnel dependencies -->
+      		<dependency>
+				<groupId>eu.linksmart</groupId>
+				<artifactId>eu.linksmart.network.tunnel</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.linksmart</groupId>
+				<artifactId>eu.linksmart.network.soaptunneling</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.linksmart</groupId>
+				<artifactId>eu.linksmart.network.tunnel.standard</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<!-- LinkSmart backbone dependencies -->
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.backbone.data</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.backbone.router</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.backbone.jxta</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- Apache dependencies -->
+      		<dependency>
+            	<groupId>org.apache.servicemix.bundles</groupId>
+            	<artifactId>org.apache.servicemix.bundles.xmlsec</artifactId>
+            	<version>${servicemix.xmlsec.version}</version>
+        	</dependency>
+            <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.commons-configuration</artifactId>
+                <version>${servicemix.commons-configuration.version}</version>
+            </dependency>
+            <!-- other dependencies -->
+        </dependencies>
+    </dependencyManagement>
+    
+	<!-- dependencies inherited in all projects -->
+    <dependencies>
+        <!-- unit test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+             <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+            	<!-- compiler plugins -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven.source.version}</version>
+                </plugin>
+                <plugin>
+                	<groupId>org.apache.maven.plugins</groupId>
+                	<artifactId>maven-enforcer-plugin</artifactId>
+                	<version>${maven.enforcer.version}</version>
+            	</plugin>
+            	<plugin>
+            		<groupId>org.apache.maven.plugins</groupId>
+                	<artifactId>maven-resources-plugin</artifactId>
+                	<version>${maven.resources.version}</version>
+                </plugin>
+            	<!-- unit & integration testing plugins -->
+            	<plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.version}</version>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <buildDirectory>${project.build.directory}</buildDirectory>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+            	<plugin>
+            	    <groupId>org.apache.maven.plugins</groupId>
+                	<artifactId>maven-failsafe-plugin</artifactId>
+                	<version>${maven.failsafe.version}</version>
+            	</plugin>
+            	<plugin>
+                	<groupId>org.apache.karaf.tooling</groupId>
+                	<artifactId>features-maven-plugin</artifactId>
+                	<version>${karaf.tooling.features.version}</version>
+	            </plugin>    
+            </plugins>
+        </pluginManagement>
+        <!-- plugins inherited in all projects -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-source</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.compiler.version}</source>
+                    <target>${java.compiler.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
