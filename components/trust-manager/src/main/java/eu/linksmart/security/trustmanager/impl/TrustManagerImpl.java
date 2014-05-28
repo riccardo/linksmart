@@ -43,7 +43,6 @@ import java.util.Properties;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
@@ -77,7 +76,7 @@ import eu.linksmart.utils.Part;
  */
 @Component(name="TrustManager")
 @Service({TrustManager.class})
-@Properties({
+@org.apache.felix.scr.annotations.Properties({
     @Property(name="service.exported.interfaces", value="*"),
     @Property(name="service.exported.configs", value="org.apache.cxf.ws"),
     @Property(name="org.apache.cxf.ws.address", value="http://0.0.0.0:9090/cxf/services/TrustManager")
