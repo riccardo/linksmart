@@ -32,8 +32,11 @@
  */
 package eu.linksmart.policy.pep;
 
+import java.util.Set;
+
 import eu.linksmart.network.Message;
 import eu.linksmart.network.VirtualAddress;
+import eu.linksmart.security.communication.SecurityProperty;
 
 /**
  * Interface that defines interactions between Network Manager and PEP/PDP
@@ -69,11 +72,10 @@ public interface PepService extends PepCacheService {
 	 * 
 	 * @param msg
 	 * 				the Message object to be controlled
+	 * @param appliedSecurity
+	 * 				the SecurityProperties that were applied to the message
 	 * @return
 	 * 				the {@link PepResponse}
 	 */
-	public PepResponse requestAccessDecisionWMessage(Message msg);
-
-	
-
+	public PepResponse requestAccessDecisionForNetworkManager(final Message msg, final Set<SecurityProperty> appliedSecurity);
 }
