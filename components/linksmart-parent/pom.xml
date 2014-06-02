@@ -50,6 +50,10 @@
         <servicemix.commons-configuration.version>1.9_1</servicemix.commons-configuration.version>
         <servicemix.commons-lang.version>2.4_6</servicemix.commons-lang.version>
         <servicemix.bcpg-jdk16>1.46_2</servicemix.bcpg-jdk16>
+        <bcprov-jdk16.version>1.46</bcprov-jdk16.version>
+        <bcpg-jdk16.version>1.46</bcpg-jdk16.version>
+        <jdom.version>1.1_4</jdom.version>
+        <derby.version>10.9.1.0_1</derby.version>
         <!-- apache cxf dependencies>-->
         <cxf.version>2.7.9</cxf.version>
         <cxf.dosgi.version>1.6.0</cxf.dosgi.version>
@@ -176,9 +180,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/linksmart-parent</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-parent</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-parent</developerConnection>
+        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-parent</url>
     </scm>
 
 	<!-- this section define only the versions used by dependencies and not the dependencies itself -->
@@ -295,22 +299,53 @@
         		<artifactId>eu.linksmart.api.clients</artifactId>
         		<version>${project.version}</version>
       		</dependency>
-      		<!-- LinkSmart tunnel dependencies -->
-      		<dependency>
-				<groupId>eu.linksmart</groupId>
-				<artifactId>eu.linksmart.network.tunnel</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.linksmart</groupId>
-				<artifactId>eu.linksmart.network.soaptunneling</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.linksmart</groupId>
-				<artifactId>eu.linksmart.network.tunnel.standard</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+            <!-- LinkSmart security dependencies -->
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.security.cryptomanager</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.security.communicationsecuritymanager.asym</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.security.communicationsecuritymanager.sym</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.identitymanager</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.security.trustmanager</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- LinkSmart general dependencies -->
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.networkmanager</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.config.managerconfigurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.grand</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.tools.log4jfragment</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<!-- LinkSmart backbone dependencies -->
             <dependency>
                 <groupId>eu.linksmart</groupId>
@@ -327,18 +362,32 @@
                 <artifactId>eu.linksmart.network.backbone.jxta</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
-            <!-- Apache dependencies -->
-      		<dependency>
-            	<groupId>org.apache.servicemix.bundles</groupId>
-            	<artifactId>org.apache.servicemix.bundles.xmlsec</artifactId>
-            	<version>${servicemix.xmlsec.version}</version>
-        	</dependency>
             <dependency>
-                <groupId>org.apache.servicemix.bundles</groupId>
-                <artifactId>org.apache.servicemix.bundles.commons-configuration</artifactId>
-                <version>${servicemix.commons-configuration.version}</version>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.backbone.impl.osgi</artifactId>
+                <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.backbone.soap</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- LinkSmart tunnel dependencies -->
+      		<dependency>
+				<groupId>eu.linksmart</groupId>
+				<artifactId>eu.linksmart.network.tunnel</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.linksmart</groupId>
+				<artifactId>eu.linksmart.network.soaptunneling</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>eu.linksmart</groupId>
+				<artifactId>eu.linksmart.network.tunnel.standard</artifactId>
+				<version>${project.version}</version>
+			</dependency>
             <!-- other dependencies -->
         </dependencies>
     </dependencyManagement>
