@@ -39,13 +39,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.Set;
+
+import javax.security.auth.Subject;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.w3c.dom.Node;
+import org.wso2.balana.ObligationResult;
 import org.wso2.balana.XACMLConstants;
 import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.attr.DateTimeAttribute;
@@ -56,18 +58,22 @@ import org.wso2.balana.ctx.Status;
 import org.wso2.balana.ctx.xacml3.RequestCtx;
 import org.wso2.balana.ctx.xacml3.Result;
 import org.wso2.balana.xacml3.Attributes;
+import org.wso2.balana.xacml3.Obligation;
 
 import eu.linksmart.network.Message;
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.identity.IdentityManager;
+import eu.linksmart.policy.LinkSmartXacmlConstants;
 import eu.linksmart.policy.pdp.PolicyDecisionPoint;
+import eu.linksmart.policy.pep.ObligationExecutor;
 import eu.linksmart.policy.pep.PepResponse;
 import eu.linksmart.policy.pep.PepService;
 import eu.linksmart.policy.pep.cache.impl.PdpSessionCache;
 import eu.linksmart.policy.pep.request.SoapAttrParser;
 import eu.linksmart.policy.pep.request.impl.PepRequest;
 import eu.linksmart.policy.pep.request.impl.StaxSoapAttrParser;
+import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.utils.Part;
 
 /**
@@ -77,6 +83,7 @@ import eu.linksmart.utils.Part;
  * @author Marco Tiemann
  * 
  */
+@Component(name="eu.linksmart.policy.pep", immediate=true)
 public class PepApplication implements PepService {
 
 	/** logger */
@@ -96,6 +103,11 @@ public class PepApplication implements PepService {
 	//TODO add IdentityMgr
 
 	/** PDP bundle when available **/
+	@Reference(name="PolicyDecisionPoint",
+			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+			bind="bindPolicyDecisionPoint",
+			unbind="unbindPolicyDecisionPoint",
+			policy= ReferencePolicy.DYNAMIC)
 	PolicyDecisionPoint pdp = null;
 
 	/** If using remote PDP this contains its attributes **/
@@ -122,16 +134,22 @@ public class PepApplication implements PepService {
 	 */
 	private boolean defaultToDeny = false;
 
+	/**
+	 * The list of possible executors to evaluate obligations against.
+	 */
+	private List<ObligationExecutor> obligationExecs = new ArrayList<ObligationExecutor>(); 
+
+	@Reference(name="ObligationExecutor",
+			cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
+			bind="bindObligationExecutor",
+			unbind="unbindPolicyExecutor",
+			policy= ReferencePolicy.DYNAMIC)
+	private ObligationExecutor oblExe;
+
 	private IdentityManager idMgr;
 
-	/* (non-Javadoc)
-	 * @see eu.linksmart.policy.pep.PepService#requestAccessDecision(
-	 * 		java.lang.String, java.lang.String, java.lang.String, 
-	 * 		java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public PepResponse requestAccessDecision(final VirtualAddress theSndVad,
-			final VirtualAddress theRecVad, final String topic, final byte[] msg) {
+	private PepResponse requestAccessDecision(final VirtualAddress theSndVad,
+			final VirtualAddress theRecVad, final String topic, final byte[] msg, final Set<SecurityProperty> appliedSecurity) {
 		if(theSndVad == null || theRecVad == null) {
 			throw new IllegalArgumentException("Cannot make access decision without service information!");
 		}
@@ -150,7 +168,7 @@ public class PepApplication implements PepService {
 			AttributeValue av = new StringAttribute(topic);
 			Set<Attribute> attrs = new HashSet<Attribute>();
 			attrs.add(new Attribute(
-					URI.create(PepXacmlConstants.ACTION_ACTION_ID.getUrn()),
+					URI.create(LinkSmartXacmlConstants.ACTION_ACTION_ID.getUrn()),
 					null, 
 					new DateTimeAttribute(), 
 					av,
@@ -162,6 +180,37 @@ public class PepApplication implements PepService {
 		return evalAccessRequest(new PepRequest(actionAttrs, 
 				extrActionAsStringFromAttrs(actionAttrs),
 				theSndVad, theRecVad));
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.linksmart.policy.pep.PepService#requestAccessDecisionWMethod(
+	 * 		java.lang.String, java.lang.String, java.lang.String, 
+	 * 		java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public PepResponse requestAccessDecisionForNetworkManager(final Message msg, final Set<SecurityProperty> appliedSecurity) {
+		return requestAccessDecision(
+				msg.getSenderVirtualAddress(),
+				msg.getReceiverVirtualAddress(),
+				msg.getTopic(),
+				msg.getData(),
+				appliedSecurity);
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.linksmart.policy.pep.PepService#requestAccessDecision(
+	 * 		java.lang.String, java.lang.String, java.lang.String, 
+	 * 		java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	private PepResponse requestAccessDecision(final VirtualAddress theSndVad,
+			final VirtualAddress theRecVad, final String topic, final byte[] msg) {
+		return requestAccessDecision(
+				msg.getSenderVirtualAddress(),
+				msg.getReceiverVirtualAddress(),
+				msg.getTopic(),
+				msg.getData(),
+				null);
 	}
 
 
@@ -180,7 +229,7 @@ public class PepApplication implements PepService {
 
 		AttributeValue av = new StringAttribute(action);
 		attrs.add(new Attribute(
-				URI.create(PepXacmlConstants.ACTION_ACTION_ID.getUrn()),
+				URI.create(LinkSmartXacmlConstants.ACTION_ACTION_ID.getUrn()),
 				null, 
 				new DateTimeAttribute(), 
 				av,
@@ -208,21 +257,6 @@ public class PepApplication implements PepService {
 	private boolean isSoapMessage(byte[] msg) {
 		// TODO Auto-generated method stub
 		return true;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see eu.linksmart.policy.pep.PepService#requestAccessDecisionWMethod(
-	 * 		java.lang.String, java.lang.String, java.lang.String, 
-	 * 		java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public PepResponse requestAccessDecisionWMessage(final Message msg) {
-		return requestAccessDecision(
-				msg.getSenderVirtualAddress(),
-				msg.getReceiverVirtualAddress(),
-				msg.getTopic(),
-				msg.getData());
 	}
 
 	/* (non-Javadoc)
@@ -363,6 +397,7 @@ public class PepApplication implements PepService {
 	 * @param theContext
 	 * 				the {@link ComponentContext}
 	 */
+	@Activate
 	protected void activate(final ComponentContext theContext) {
 		logger.info("Activating");
 		bundleContext = theContext.getBundleContext();
@@ -377,6 +412,7 @@ public class PepApplication implements PepService {
 	 * @param theContext
 	 * 				the {@link ComponentContext}
 	 */
+	@Deactivate
 	protected void deactivate(ComponentContext theContext) {
 		logger.debug("Deactivating");
 	}
@@ -395,6 +431,27 @@ public class PepApplication implements PepService {
 
 	protected void unbindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
 		pdp = null;
+	}
+
+	protected void bindObligationExecutor(ObligationExecutor obligationEx) {
+		obligationExecs.add(obligationEx);
+	}
+
+	protected void unbindObligationExecutor(ObligationExecutor obligationEx) {
+		int index = 0;
+		boolean found = false;
+		//find index of ObligationExecutor with same id
+		for (ObligationExecutor oe : this.obligationExecs) {
+			if (oe.getId() != null && oe.getId().equals(obligationEx.getId())) {
+				found = true;
+				break;
+			}
+			index++;
+		}
+		if(found) {
+			//remove item based on index
+			this.obligationExecs.remove(index);
+		}
 	}
 
 	//	/**
@@ -421,29 +478,17 @@ public class PepApplication implements PepService {
 	 * @return
 	 * 				the {@link Subject}s
 	 */
-	private Attributes extrSubject(Registration theSenderAttrs) {
+	private Attributes extrSubject(VirtualAddress senderVad) {
 		HashSet<Attribute> attrs = new HashSet<Attribute>();
 		Attribute attr = new Attribute(
-				URI.create(PepXacmlConstants.SUBJECT_SUBJECT_ID.getUrn()),
+				URI.create(LinkSmartXacmlConstants.SUBJECT_SUBJECT_ID.getUrn()),
 				null,
 				new DateTimeAttribute(),
-				new StringAttribute(theSenderAttrs.getVirtualAddressAsString()),
+				new StringAttribute(senderVad.toString()),
 				true,
 				XACMLConstants.XACML_VERSION_3_0);
 		attrs.add(attr);
-		for (Part part : theSenderAttrs.getAttributes()) {
-			String key = part.getKey();
-			String value = part.getValue();
-			attr = new Attribute(
-					URI.create(PepXacmlConstants.SUBJECT_LINK_SMART_PREFIX
-							.getUrn() + key.toLowerCase()), 
-							null,
-							new DateTimeAttribute(),
-							new StringAttribute(value),
-							true,
-							XACMLConstants.XACML_VERSION_3_0);
-			attrs.add(attr);
-		}
+
 		Attributes attrSubject = new Attributes(URI.create(XACMLConstants.SUBJECT_CATEGORY),attrs);
 		return attrSubject;
 	}
@@ -487,29 +532,16 @@ public class PepApplication implements PepService {
 	 * @return
 	 * 				the {@link Attribute} <code>Set</code>
 	 */
-	private Attributes extrResource(Registration theRecAttrs) {
+	private Attributes extrResource(VirtualAddress receiverVad) {
 		Set<Attribute> attrs = new HashSet<Attribute>();
 		Attribute attr = new Attribute(
-				URI.create(PepXacmlConstants.RESOURCE_RESOURCE_ID.getUrn()), 
+				URI.create(LinkSmartXacmlConstants.RESOURCE_RESOURCE_ID.getUrn()), 
 				null,
 				new DateTimeAttribute(),
-				new StringAttribute(theRecAttrs.getVirtualAddressAsString()),
+				new StringAttribute(receiverVad.toString()),
 				true,
 				XACMLConstants.XACML_VERSION_3_0);
 		attrs.add(attr);
-		for (Part part : theRecAttrs.getAttributes()) {
-			String key = part.getKey();
-			String value = part.getValue();
-			attr = new Attribute(URI.create(
-					PepXacmlConstants.RESOURCE_LINK_SMART_PREFIX.getUrn()
-					+ key.toLowerCase()), 
-					null,
-					new DateTimeAttribute(),
-					new StringAttribute(value),
-					true,
-					XACMLConstants.XACML_VERSION_3_0);
-			attrs.add(attr);
-		}
 
 		Attributes attrResource = new Attributes(URI.create(XACMLConstants.RESOURCE_CATEGORY), attrs);
 		return attrResource;
@@ -610,7 +642,7 @@ public class PepApplication implements PepService {
 	 * 				the {@link PepResponse}
 	 */
 	private PepResponse evalPdpResponse(ResponseCtx theResp, 
-			PepRequest theRequest) {
+			PepRequest theRequest, RequestCtx theRequestCtx) {
 		// only handle the first result from the response
 		Result result = (Result) theResp.getResults().iterator().next();
 		String msg = result.getStatus().getMessage();
@@ -673,7 +705,7 @@ public class PepApplication implements PepService {
 			// intentionally left blank
 		}
 		}
-		boolean fulfilled = fulfillObligations(result, theRequest, theResp);
+		boolean fulfilled = fulfillObligations(result, theRequestCtx, theResp);
 		//check if obligations are fulfilled, else deny
 		if ((denyOnUnfulfilledObligations) && (!fulfilled)) {
 			logger.info("One or more obligations could not be satisfied, "
@@ -698,9 +730,23 @@ public class PepApplication implements PepService {
 	 * @return
 	 * 				a flag indicating whether all obligations were fulfilled
 	 */
-	private boolean fulfillObligations(Result theResult, PepRequest theRequest,
+	private boolean fulfillObligations(Result theResult, RequestCtx theRequest,
 			ResponseCtx theResponse) {	
-		//TODO
+		for(ObligationResult obl : theResult.getObligations()) {
+			boolean fulfilled = false;
+			//go through each executor to try to fulfill obligations
+			for(ObligationExecutor oblExec : this.obligationExecs) {
+				if(oblExec.evaluate(obl, theRequest, theResponse)) {
+					fulfilled = true;
+					break;
+				}
+			}
+			//if this obligation was not fulfilled stop evaluation
+			if(!fulfilled){
+				return false;
+			}
+		}
+		//if we get here all obligations were fulfilled
 		return true;
 	}
 
@@ -713,9 +759,6 @@ public class PepApplication implements PepService {
 	 * 				the {@link PepResponse}
 	 */
 	private PepResponse evalAccessRequest(final PepRequest theRequest) {
-		//get all properties that are available locally
-		Registration sndReg = getRegistrationForVad(theRequest.getSndVad());
-		Registration recReg = getRegistrationForVad(theRequest.getRecVad());
 		//		if ((usePdpSessionCache) && (pdpSessionCache != null)) {
 		//			// evaluate session
 		//			ResponseCtx sesResponse = qrySessionCache(theRequest.getSndVad(), 
@@ -735,11 +778,16 @@ public class PepApplication implements PepService {
 		//		}	
 
 		Set<Attributes> attrs = new HashSet<Attributes>();
-		Attributes subject = extrSubject(sndReg);
+		Attributes subject = extrSubject(theRequest.getSndVad());
 		attrs.add(subject);
-		Attributes resource = extrResource(recReg);
+		Attributes resource = extrResource(theRequest.getRecVad());
 		attrs.add(resource);
 		attrs.add(theRequest.getActionAttrs());
+		if(theRequest.getAppliedSecurity() != null) {
+			Attributes connection = extrConnection(theRequest.getAppliedSecurity());
+			attrs.add(connection);
+		}
+
 		RequestCtx req = new RequestCtx(attrs, null);
 		ResponseCtx pdpResponse = qryPdp(req);
 		//		if ((usePdpSessionCache) && (pdpSessionCache != null)) {
@@ -752,7 +800,24 @@ public class PepApplication implements PepService {
 		//									r.getResource(), responseOblis)), 
 		//									System.currentTimeMillis());			
 		//		}
-		return evalPdpResponse(pdpResponse, theRequest);
+		return evalPdpResponse(pdpResponse, theRequest, req);
+	}
+
+	private Attributes extrConnection(Set<SecurityProperty> appliedSecurity) {
+		Set<Attribute> attrs = new HashSet<Attribute>();
+		for(SecurityProperty prop : appliedSecurity) {
+			Attribute attr = new Attribute(
+					URI.create(LinkSmartXacmlConstants.CONNECTION_PROPERTY_APPLIED.getUrn()), 
+					null,
+					new DateTimeAttribute(),
+					new StringAttribute(prop.name()),
+					true,
+					XACMLConstants.XACML_VERSION_3_0);
+			attrs.add(attr);
+		}
+
+		Attributes attrResource = new Attributes(URI.create(LinkSmartXacmlConstants.CONNECTION_PROPERTY_CATEGORY.getUrn()), attrs);
+		return attrResource;
 	}
 
 	/**

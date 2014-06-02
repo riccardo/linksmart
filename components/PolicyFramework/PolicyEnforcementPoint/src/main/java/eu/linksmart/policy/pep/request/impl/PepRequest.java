@@ -32,6 +32,7 @@
  */
 package eu.linksmart.policy.pep.request.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.wso2.balana.ctx.Attribute;
@@ -39,6 +40,7 @@ import org.wso2.balana.xacml3.Attributes;
 
 import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.policy.pep.request.impl.PepRequest;
+import eu.linksmart.security.communication.SecurityProperty;
 
 /**
  * <p>PEP request data POJO</p>
@@ -59,7 +61,13 @@ public class PepRequest {
 	
 	/** receiver VAD */
 	private VirtualAddress recVad = null;
+
+	private Set<SecurityProperty> appliedSecurity;
 	
+	public Set<SecurityProperty> getAppliedSecurity() {
+		return appliedSecurity;
+	}
+
 	/**
 	 * Constructor
 	 * 
@@ -79,12 +87,13 @@ public class PepRequest {
 	 * 				the session ID
 	 */
 	public PepRequest(Attributes theAttributes, String theAttrString, 
-			VirtualAddress theSndVad,  VirtualAddress theRecVad) {
+			VirtualAddress theSndVad,  VirtualAddress theRecVad, Set<SecurityProperty> theAppliedSecurity) {
 		super();
 		actionAttrs = theAttributes;
 		actionAttrString = theAttrString;
 		sndVad = theSndVad;
 		recVad = theRecVad;
+		appliedSecurity = theAppliedSecurity;
 	}
 
 	/**
@@ -178,6 +187,13 @@ public class PepRequest {
 				return false;
 			}
 		} else if (!sndVad.equals(other.sndVad)) {
+			return false;
+		}
+		if(appliedSecurity == null) {
+			if(other.appliedSecurity != null) {
+				return false;
+			}
+		} else if (!appliedSecurity.equals(other.appliedSecurity)) {
 			return false;
 		}
 		return true;

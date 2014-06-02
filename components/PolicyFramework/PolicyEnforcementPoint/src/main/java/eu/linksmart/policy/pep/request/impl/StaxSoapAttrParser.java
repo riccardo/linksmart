@@ -59,7 +59,7 @@ import org.wso2.balana.attr.StringAttribute;
 import org.wso2.balana.ctx.Attribute;
 import org.wso2.balana.xacml3.Attributes;
 
-import eu.linksmart.policy.pep.impl.PepXacmlConstants;
+import eu.linksmart.policy.LinkSmartXacmlConstants;
 
 /**
  * <p>Extracts {@link Attribute}s from a SOAP message with a STAX parser</p>
@@ -142,7 +142,7 @@ public class StaxSoapAttrParser extends AbstractSoapAttrParser {
 						mStartFound = true;
 						mQName = qName;
 						attrs.add(new Attribute(
-								URI.create(PepXacmlConstants.ACTION_ACTION_ID
+								URI.create(LinkSmartXacmlConstants.ACTION_ACTION_ID
 										.getUrn()), 
 										null, 
 										new DateTimeAttribute(), 
@@ -233,7 +233,7 @@ public class StaxSoapAttrParser extends AbstractSoapAttrParser {
 								av = new StringAttribute(aData);
 							}
 							attrs.add(new Attribute(URI.create(
-									PepXacmlConstants.ACTION_LINK_SMART_PREFIX
+									LinkSmartXacmlConstants.ACTION_LINK_SMART_PREFIX
 									.getUrn() + aName),
 									null, 
 									new DateTimeAttribute(), 

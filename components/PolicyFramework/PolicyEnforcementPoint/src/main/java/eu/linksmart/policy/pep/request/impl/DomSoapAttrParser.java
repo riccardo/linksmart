@@ -66,7 +66,7 @@ import org.wso2.balana.ctx.Attribute;
 import org.wso2.balana.xacml3.Attributes;
 import org.xml.sax.SAXException;
 
-import eu.linksmart.policy.pep.impl.PepXacmlConstants;
+import eu.linksmart.policy.LinkSmartXacmlConstants;
 
 /**
  * <p>Extracts {@link Attribute}s from a SOAP message with a DOM parser</p>
@@ -145,7 +145,7 @@ public class DomSoapAttrParser extends AbstractSoapAttrParser {
 					}
 				}
 				attrs.add(new Attribute(
-						URI.create(PepXacmlConstants.ACTION_ACTION_ID.getUrn()), 
+						URI.create(LinkSmartXacmlConstants.ACTION_ACTION_ID.getUrn()), 
 						null, new DateTimeAttribute(), 
 						new StringAttribute(name),
 						XACMLConstants.XACML_VERSION_2_0));
@@ -229,7 +229,7 @@ public class DomSoapAttrParser extends AbstractSoapAttrParser {
 						av = new StringAttribute(ct);
 					}
 					attrs.add(new Attribute(URI.create(
-							PepXacmlConstants.ACTION_LINK_SMART_PREFIX.getUrn() 
+							LinkSmartXacmlConstants.ACTION_LINK_SMART_PREFIX.getUrn() 
 									+ lName),
 									null, new DateTimeAttribute(), av,
 									XACMLConstants.XACML_VERSION_2_0));
