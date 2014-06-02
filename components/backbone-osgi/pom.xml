@@ -22,10 +22,6 @@
             <groupId>eu.linksmart</groupId>
             <artifactId>eu.linksmart.api.backbone.router</artifactId>
         </dependency>
-        <dependency>
-            <groupId>eu.linksmart</groupId>
-            <artifactId>eu.linksmart.network.backbone.router</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
