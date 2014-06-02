@@ -16,31 +16,7 @@
 
     <name>LinkSmart Crypto Manager</name>
     <description>LinkSmart Crypto Manager</description>
-    <dependencyManagement>
-        <dependencies>
-        	<dependency>
-            	<groupId>org.bouncycastle</groupId>
-            	<artifactId>bcprov-jdk16</artifactId>
-            	<version>1.46</version>
-        	</dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpg-jdk16</artifactId>
-                <version>1.46</version>
-            </dependency>
-            <dependency>
-            	<groupId>org.apache.servicemix.bundles</groupId>
-            	<artifactId>org.apache.servicemix.bundles.jdom</artifactId>
-            	<version>1.1_4</version>
-        	</dependency>
-        	<dependency>
-            	<groupId>org.apache.servicemix.bundles</groupId>
-            	<artifactId>org.apache.servicemix.bundles.derby</artifactId>
-            	<version>10.9.1.0_1</version> <!-- 10.10.1.1_1 -->
-        	</dependency>
-        </dependencies>
-    </dependencyManagement>
-
+     
     <dependencies>
         <dependency>
             <groupId>eu.linksmart</groupId>
@@ -53,22 +29,27 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>
+            <version>${bcprov-jdk16.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.jdom</artifactId>
+            <version>${jdom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.xmlsec</artifactId>
+            <version>${servicemix.xmlsec.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.commons-configuration</artifactId>
+            <version>${servicemix.commons-configuration.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.derby</artifactId>
+            <version>${derby.version}</version>
         </dependency>
     </dependencies>
 
