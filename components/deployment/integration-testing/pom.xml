@@ -33,51 +33,13 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/integration-testing</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/integration-testing</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/integration-testing</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/integration-testing</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/integration-testing</developerConnection>
+        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/integration-testing</url>
     </scm>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- tunnel dependencies -->
-			<dependency>
-				<groupId>eu.linksmart</groupId>
-				<artifactId>eu.linksmart.network.tunnel</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.linksmart</groupId>
-				<artifactId>eu.linksmart.network.soaptunneling</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.linksmart</groupId>
-				<artifactId>eu.linksmart.network.tunnel.standard</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<!-- tunnel dependencies -->
-            <dependency>
-                <groupId>eu.linksmart</groupId>
-                <artifactId>eu.linksmart.network.backbone.jxta</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>eu.linksmart</groupId>
-                <artifactId>eu.linksmart.network.backbone.impl.osgi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>eu.linksmart</groupId>
-                <artifactId>eu.linksmart.network.backbone.soap</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <!-- security dependencies -->
-            <dependency>
-            	<groupId>eu.linksmart</groupId>
-            	<artifactId>eu.linksmart.security.cryptomanager</artifactId>
-            	<version>${project.version}</version>
-        	</dependency>
             <!-- testing related dependencies -->
             <dependency>
 				<groupId>eu.linksmart</groupId>
