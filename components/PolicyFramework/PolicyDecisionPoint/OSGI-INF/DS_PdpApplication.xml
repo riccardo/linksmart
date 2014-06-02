@@ -9,4 +9,5 @@
   <service>
      <provide interface="eu.linksmart.policy.pdp.PolicyDecisionPoint"/>
   </service>
+  <reference bind="bindPolicyInformationPoint" cardinality="0..n" interface="eu.linksmart.policy.pip.PolicyInformationPoint" name="PolicyInformationPoint" policy="dynamic" unbind="unbindPolicyInformationPoint"/>
 </scr:component>

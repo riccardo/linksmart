@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
@@ -48,10 +49,13 @@ import org.wso2.balana.PDP;
 import org.wso2.balana.PDPConfig;
 import org.wso2.balana.ctx.AbstractRequestCtx;
 import org.wso2.balana.ctx.ResponseCtx;
+import org.wso2.balana.finder.AttributeFinder;
+import org.wso2.balana.finder.AttributeFinderModule;
 import org.wso2.balana.finder.impl.FileBasedPolicyFinderModule;
 
 import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.policy.pdp.PolicyDecisionPoint;
+import eu.linksmart.policy.pip.PolicyInformationPoint;
 
 /**
  * Default LinkSmart {@link PolicyDecisionPoint} implementation
@@ -60,6 +64,7 @@ import eu.linksmart.policy.pdp.PolicyDecisionPoint;
  * @author Marco Tiemann
  *
  */
+@Component(name="eu.linksmart.policy.pdp", immediate=true)
 public class PdpApplication implements PolicyDecisionPoint {
 
 	/** logger */
@@ -78,6 +83,15 @@ public class PdpApplication implements PolicyDecisionPoint {
 	private static ArrayList<String> PERMITTED_REPOSITORIES
 	= new ArrayList<String>();
 
+	@Reference(name="PolicyInformationPoint",
+            cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
+            bind="bindPolicyInformationPoint",
+            unbind="unbindPolicyInformationPoint",
+            policy= ReferencePolicy.DYNAMIC)
+	private PolicyInformationPoint pip;
+	
+	private List<AttributeFinderModule> pips = new ArrayList<AttributeFinderModule>();
+
 	static {
 		//		PERMITTED_REPOSITORIES.add("bundle");
 		//		PERMITTED_REPOSITORIES.add("db");
@@ -94,6 +108,11 @@ public class PdpApplication implements PolicyDecisionPoint {
 	private LinkSmartServiceManager serviceManager = null;
 
 	/** {@link NetworkManagerApplication} */
+	@Reference(name="NetworkManager",
+            cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+            bind="bindNetworkManager",
+            unbind="unbindNetworkManager",
+            policy= ReferencePolicy.DYNAMIC)
 	private NetworkManager nm = null;
 
 	/** {@link PdpConfigurator} */
@@ -106,11 +125,13 @@ public class PdpApplication implements PolicyDecisionPoint {
 
 	private ConfigurationAdmin configurationAdmin;
 
+	private AttributeFinder attributeFinder;
+
 	@Override
 	public String evaluate(String theReqXml) throws RemoteException {
 		return pdp.evaluate(theReqXml);
 	}
-	
+
 	@Override
 	public ResponseCtx evaluate(AbstractRequestCtx ctx) throws RemoteException {
 		return pdp.evaluate(ctx);
@@ -164,6 +185,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	 * 				the {@link ComponentContext}
 	 */
 	@SuppressWarnings("unchecked")
+	@Activate
 	protected void activate(ComponentContext theContext) {
 		logger.info("Activating");
 		bundleCtx = theContext.getBundleContext();
@@ -189,13 +211,13 @@ public class PdpApplication implements PolicyDecisionPoint {
 
 		balana = Balana.getInstance();
 		PDPConfig pdpConfig = balana.getPdpConfig();
+		attributeFinder = pdpConfig.getAttributeFinder();
+		attributeFinder.setModules(pips);
 
-		//TODO add PIP finderModule to config
-
-		// instantiate PluginLinkSmartPDP and set configuration parameters
+		// instantiate PDP with linksmart attributefindermodule
 		pdp = new PDP(
 				new PDPConfig(
-						pdpConfig.getAttributeFinder(),
+						attributeFinder,
 						pdpConfig.getPolicyFinder(),
 						pdpConfig.getResourceFinder(),
 						true));
@@ -217,6 +239,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	 * @param theContext
 	 * 				the {@link ComponentContext}
 	 */
+	@Deactivate
 	protected void deactivate(ComponentContext theContext) {
 		logger.debug("Deactivating");
 		if(serviceManager != null) {
@@ -273,6 +296,34 @@ public class PdpApplication implements PolicyDecisionPoint {
 				File directory = new File(path);
 				directory.mkdir();
 				path = path + "/";
+			}
+		}
+	}
+
+	protected void bindPolicyInformationPoint(PolicyInformationPoint pip) {
+		pips.add(new PipAttachementPoint(pip));
+		if(attributeFinder != null) {
+			attributeFinder.setModules(pips);
+		}
+	}
+
+	protected synchronized void unbindPolicyInformationPoint(PolicyInformationPoint pip) {
+		int index = 0;
+		boolean match = false;
+		//find the unbinded pip from the list
+		for(AttributeFinderModule attrFinder : pips) {
+			PipAttachementPoint piap = (PipAttachementPoint)attrFinder;
+			if(piap.getPip().getId().equals(pip.getId())) {
+				match = true;
+				break;
+			}
+			index++;
+		}
+		//remove found pip and replace list in attributefinder
+		if(match) {
+			pips.remove(index);
+			if(attributeFinder != null) {
+				this.attributeFinder.setModules(pips);
 			}
 		}
 	}
