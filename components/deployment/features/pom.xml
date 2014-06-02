@@ -27,9 +27,9 @@
     </properties> 
 
     <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/features</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/features</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/branches/mavenized/components/deployment/features</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/features</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/features</developerConnection>
+        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/features</url>
     </scm>
 
 	<build>
