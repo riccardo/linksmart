@@ -16,17 +16,7 @@
 
 	<name>LinkSmart Trust Manager</name>
 	<description>LinkSmart Trust Manager</description>
-
-	<dependencyManagement>
-        <dependencies>
-        	<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcpg-jdk16</artifactId>
-				<version>1.46</version>
-			</dependency>
-        </dependencies>
-    </dependencyManagement>
-        
+    
 	<dependencies>
 		<dependency>
         	<groupId>eu.linksmart</groupId>
@@ -47,6 +37,7 @@
       	<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpg-jdk16</artifactId>
+			<version>${bcpg-jdk16.version}</version>
 		</dependency>
 	</dependencies>
 
