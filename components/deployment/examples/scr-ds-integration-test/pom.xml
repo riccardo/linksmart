@@ -7,7 +7,7 @@
 	<parent>
         <groupId>eu.linksmart</groupId>
 		<artifactId>linksmart-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>2.2.0-SNAPSHOT</version>
     </parent>
 
 	<artifactId>scr-ds-integration-test</artifactId>

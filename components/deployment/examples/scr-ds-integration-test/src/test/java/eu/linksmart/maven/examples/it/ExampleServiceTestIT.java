@@ -1,6 +1,8 @@
 package eu.linksmart.maven.examples.it;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
@@ -10,7 +12,6 @@ import javax.inject.Inject;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -50,6 +51,7 @@ public class ExampleServiceTestIT {
      */
     @Configuration
     public Option[] config() {
+    	switchPlatformEncodingToUTF8();
         return new Option[] {
                 // Provision and launch a container based on a distribution of Karaf (Apache ServiceMix)
                 karafDistributionConfiguration()
@@ -82,7 +84,7 @@ public class ExampleServiceTestIT {
                  */  
                 mavenBundle("org.apache.felix","org.apache.felix.scr","1.6.2"),
                 mavenBundle("org.apache.felix","org.apache.felix.metatype","1.0.4"),
-                mavenBundle("eu.linksmart","scr-declerative-service","3.0.0-SNAPSHOT")
+                mavenBundle("eu.linksmart","scr-declerative-service","2.2.0-SNAPSHOT")
                 /*
                  * bundle() provisions an OSGi bundle from any kind of URL supported by Pax URL,
                  * this includes the standard file: and http: protocols.
@@ -92,8 +94,7 @@ public class ExampleServiceTestIT {
     }
     
     @Test
-    public void testExampleService() throws Exception {
-    	       
+    public void testExampleService() throws Exception {      
         try {
             String fromService = exampleService.sayHi("Weee!");
             System.out.println("response from service: " + fromService);
@@ -102,6 +103,20 @@ public class ExampleServiceTestIT {
         	e.printStackTrace();
         	fail(e.getMessage());
         }
-
+    }
+    
+    //
+    // hack for plateform encodind error (bug in Apache Karaf used version)
+    // "Underlying stream encoding 'Cp1252' and input paramter for writeStartDocument() method 'UTF-8' do not match"
+    //
+    private static void switchPlatformEncodingToUTF8() {
+        try {
+          System.setProperty("file.encoding","UTF-8");
+          Field charset = Charset.class.getDeclaredField("defaultCharset");
+          charset.setAccessible(true);
+          charset.set(null,null);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
