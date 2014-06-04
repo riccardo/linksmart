@@ -92,6 +92,10 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	/** Flag controlling Service clearer thread.*/
 	private boolean serviceClearerThreadRunning;
 	
+	public IdentityManagerImpl() {
+		init();
+	}
+	
 	protected void setNetworkManagerCore(NetworkManagerCore networkManagerCore) {
 		this.networkManagerCore = networkManagerCore;
 		// Start the threads once NetworkManagerCore is available
@@ -141,7 +145,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	
 	protected void activate(ComponentContext context) {
 		LOG.info("Starting " + IDENTITY_MGR);
-		init();
 		LOG.info(IDENTITY_MGR + " started");
 	}
 

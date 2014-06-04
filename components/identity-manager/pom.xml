@@ -30,6 +30,10 @@
 			<groupId>eu.linksmart</groupId>
 			<artifactId>eu.linksmart.api.networkmanager.core</artifactId>
 		</dependency>  	
+		<dependency>
+			<groupId>eu.linksmart</groupId>
+			<artifactId>eu.linksmart.api.policy</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
