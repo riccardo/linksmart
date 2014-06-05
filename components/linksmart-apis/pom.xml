@@ -28,6 +28,7 @@
         <module>linksmart-api-clients</module>
         <module>linksmart-api-networkmanager</module>
         <module>linksmart-api-networkmanagercore</module>
+        <module>linksmart-api-policy</module>
     </modules>
     
     <dependencyManagement>
