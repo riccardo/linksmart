@@ -59,6 +59,7 @@
         <cxf.dosgi.version>1.6.0</cxf.dosgi.version>
         <!-- other -->
         <javadoc-plugin.version>2.9</javadoc-plugin.version>
+        <xacml-wso2-balana.version>1.0.0-wso2v7</xacml-wso2-balana.version>
     </properties>
 
     <developers>
