@@ -36,6 +36,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import eu.linksmart.utils.Configurator;
 
@@ -85,8 +86,13 @@ public class PdpConfigurator extends Configurator  {
 	 * 				the {@link PdpApplication} to configure
 	 */
 	public PdpConfigurator(BundleContext theContext, PdpApplication thePdp) {
-		super(theContext,  Logger.getLogger(PdpApplication.class.getName()), 
-				PDP_SERVICE_PID, CONFIGURATION_FILE);
+		super(theContext,  Logger.getLogger(PdpApplication.class.getName()), PDP_SERVICE_PID, CONFIGURATION_FILE);
+		pdp = thePdp;
+	}
+	
+	public PdpConfigurator(BundleContext context, PdpApplication thePdp, ConfigurationAdmin configurationAdmin) {
+		super(context, Logger.getLogger(PdpApplication.class.getName()), PDP_SERVICE_PID, CONFIGURATION_FILE, configurationAdmin);
+		super.init();
 		pdp = thePdp;
 	}
 

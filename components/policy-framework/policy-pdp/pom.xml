@@ -37,7 +37,7 @@
       	<dependency>
             <groupId>org.wso2.balana</groupId>
             <artifactId>org.wso2.balana</artifactId>
-            <version>1.0.0</version>
+            <version>${xacml-wso2-balana.version}</version>
         </dependency>
 	</dependencies>
 

@@ -57,6 +57,13 @@ import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.policy.pdp.PolicyDecisionPoint;
 import eu.linksmart.policy.pip.PolicyInformationPoint;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+
 /**
  * Default LinkSmart {@link PolicyDecisionPoint} implementation
  * 
@@ -80,16 +87,8 @@ public class PdpApplication implements PolicyDecisionPoint {
 	= "linksmart" + SEPARATOR + "eu.linksmart.policy" + SEPARATOR + "PolicyDecisionPoint" + SEPARATOR + "PolicyFolder";
 
 	/** Permitted policy repository identifiers */
-	private static ArrayList<String> PERMITTED_REPOSITORIES
-	= new ArrayList<String>();
+	private static ArrayList<String> PERMITTED_REPOSITORIES = new ArrayList<String>();
 
-	@Reference(name="PolicyInformationPoint",
-            cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
-            bind="bindPolicyInformationPoint",
-            unbind="unbindPolicyInformationPoint",
-            policy= ReferencePolicy.DYNAMIC)
-	private PolicyInformationPoint pip;
-	
 	private List<AttributeFinderModule> pips = new ArrayList<AttributeFinderModule>();
 
 	static {
@@ -107,14 +106,6 @@ public class PdpApplication implements PolicyDecisionPoint {
 	/** {@link LinkSmartServiceManager} */
 	private LinkSmartServiceManager serviceManager = null;
 
-	/** {@link NetworkManagerApplication} */
-	@Reference(name="NetworkManager",
-            cardinality = ReferenceCardinality.OPTIONAL_UNARY,
-            bind="bindNetworkManager",
-            unbind="unbindNetworkManager",
-            policy= ReferencePolicy.DYNAMIC)
-	private NetworkManager nm = null;
-
 	/** {@link PdpConfigurator} */
 	private PdpConfigurator configurator = null;
 
@@ -123,63 +114,90 @@ public class PdpApplication implements PolicyDecisionPoint {
 
 	Balana balana = null;
 
-	private ConfigurationAdmin configurationAdmin;
-
 	private AttributeFinder attributeFinder;
+	
+	@Reference(name="ConfigurationAdmin",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+		    bind="bindConfigAdmin",
+		    unbind="unbindConfigAdmin",
+		    policy=ReferencePolicy.STATIC)
+	protected ConfigurationAdmin configAdmin = null;
+	
+	/** {@link NetworkManagerApplication} */
+	@Reference(name="NetworkManager",
+            cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+            bind="bindNetworkManager",
+            unbind="unbindNetworkManager",
+            policy= ReferencePolicy.DYNAMIC)
+	private NetworkManager nm = null;
+	
+	@Reference(name="PolicyInformationPoint",
+            cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
+            bind="bindPolicyInformationPoint",
+            unbind="unbindPolicyInformationPoint",
+            policy= ReferencePolicy.DYNAMIC)
+	private PolicyInformationPoint pip;
+	
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = configAdmin;
+    }
 
-	@Override
-	public String evaluate(String theReqXml) throws RemoteException {
-		return pdp.evaluate(theReqXml);
-	}
-
-	@Override
-	public ResponseCtx evaluate(AbstractRequestCtx ctx) throws RemoteException {
-		return pdp.evaluate(ctx);
-	}
-
-	/**
-	 * @param theUpdates
-	 * 				the configuration update <code>Hashtable</code>
-	 */
-	@SuppressWarnings("unchecked")
-	public void applyConfigurations(Hashtable<?, ?> theUpdates) {
-		if(!activated) {
-			return;
-		}
-		if ((theUpdates == null) || (theUpdates.size() == 0)) {
-			return;
-		}
-		if(serviceManager == null) {
-			return;
-		}
-		logger.info("Configuring");
-		try {
-			//provide any kind of update into method, even if its null - method handles check of null parameters
-			String renew = (String)theUpdates.get(PdpConfigurator.RENEW_CERTS);
-			serviceManager.registerService(
-					(String)theUpdates.get(PdpConfigurator.PDPSERVICE_DESCRIPTION),
-					(String)theUpdates.get(PdpConfigurator.PDP_PID),
-					null,
-					(String)theUpdates.get(PdpConfigurator.PDPSERVICE_CERT_REF),
-					(renew == null)? false : Boolean.parseBoolean(renew));
-		} catch (IOException ioe) {
-			logger.error("Error renewing service: " 
-					+ ioe.getLocalizedMessage());
-			if (logger.isDebugEnabled()) {
-				logger.debug("Stack trace: ", ioe);
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = null;
+    }
+	
+	protected void bindNetworkManager(NetworkManager nm) {
+		this.nm = nm;
+		if(activated) {
+			serviceManager = new LinkSmartServiceManager(this, nm);
+			try {
+				serviceManager.init();
+			} catch (IOException e) {
+				logger.error("PolicyDecisionPoint could not be registered because PID was not unique and not generateable!",e);
 			}
 		}
-		logger.info("Configured");
 	}
 
-	/**
-	 * @return
-	 * 				the {@link PdpConfigurator}
-	 */
-	public PdpConfigurator getConfigurator() {
-		return configurator;
+	protected void unbindNetworkManager(NetworkManager nm) {
+		if(serviceManager != null) {
+			try {
+				serviceManager.unregisterService();
+			} catch (RemoteException e) {
+				//should not occur at local invocation and cannot do anything about it
+				logger.warn("Error deregistering from Network Manager", e);
+			}
+		}
+		this.nm = null;
+	}
+	
+	protected void bindPolicyInformationPoint(PolicyInformationPoint pip) {
+		pips.add(new PipAttachementPoint(pip));
+		if(attributeFinder != null) {
+			attributeFinder.setModules(pips);
+		}
 	}
 
+	protected synchronized void unbindPolicyInformationPoint(PolicyInformationPoint pip) {
+		int index = 0;
+		boolean match = false;
+		//find the unbinded pip from the list
+		for(AttributeFinderModule attrFinder : pips) {
+			PipAttachementPoint piap = (PipAttachementPoint)attrFinder;
+			if(piap.getPip().getId().equals(pip.getId())) {
+				match = true;
+				break;
+			}
+			index++;
+		}
+		//remove found pip and replace list in attributefinder
+		if(match) {
+			pips.remove(index);
+			if(attributeFinder != null) {
+				this.attributeFinder.setModules(pips);
+			}
+		}
+	}
+	
 	/**
 	 * @param theContext
 	 * 				the {@link ComponentContext}
@@ -189,7 +207,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	protected void activate(ComponentContext theContext) {
 		logger.info("Activating");
 		bundleCtx = theContext.getBundleContext();
-		configurator = new PdpConfigurator(bundleCtx, this);
+		configurator = new PdpConfigurator(bundleCtx, this, configAdmin);
 		configurator.registerConfiguration();
 		if(nm != null) {
 			serviceManager = new LinkSmartServiceManager(this, nm);
@@ -252,28 +270,57 @@ public class PdpApplication implements PolicyDecisionPoint {
 		}
 	}
 
-	protected void bindNetworkManager(NetworkManager nm) {
-		this.nm = nm;
-		if(activated) {
-			serviceManager = new LinkSmartServiceManager(this, nm);
-			try {
-				serviceManager.init();
-			} catch (IOException e) {
-				logger.error("PolicyDecisionPoint could not be registered because PID was not unique and not generateable!",e);
-			}
-		}
+	@Override
+	public String evaluate(String theReqXml) throws RemoteException {
+		return pdp.evaluate(theReqXml);
 	}
 
-	protected void unbindNetworkManager(NetworkManager nm) {
-		if(serviceManager != null) {
-			try {
-				serviceManager.unregisterService();
-			} catch (RemoteException e) {
-				//should not occur at local invocation and cannot do anything about it
-				logger.warn("Error deregistering from Network Manager", e);
+	@Override
+	public ResponseCtx evaluate(AbstractRequestCtx ctx) throws RemoteException {
+		return pdp.evaluate(ctx);
+	}
+
+	/**
+	 * @param theUpdates
+	 * 				the configuration update <code>Hashtable</code>
+	 */
+	@SuppressWarnings("unchecked")
+	public void applyConfigurations(Hashtable<?, ?> theUpdates) {
+		if(!activated) {
+			return;
+		}
+		if ((theUpdates == null) || (theUpdates.size() == 0)) {
+			return;
+		}
+		if(serviceManager == null) {
+			return;
+		}
+		logger.info("Configuring");
+		try {
+			//provide any kind of update into method, even if its null - method handles check of null parameters
+			String renew = (String)theUpdates.get(PdpConfigurator.RENEW_CERTS);
+			serviceManager.registerService(
+					(String)theUpdates.get(PdpConfigurator.PDPSERVICE_DESCRIPTION),
+					(String)theUpdates.get(PdpConfigurator.PDP_PID),
+					null,
+					(String)theUpdates.get(PdpConfigurator.PDPSERVICE_CERT_REF),
+					(renew == null)? false : Boolean.parseBoolean(renew));
+		} catch (IOException ioe) {
+			logger.error("Error renewing service: " 
+					+ ioe.getLocalizedMessage());
+			if (logger.isDebugEnabled()) {
+				logger.debug("Stack trace: ", ioe);
 			}
 		}
-		this.nm = null;
+		logger.info("Configured");
+	}
+
+	/**
+	 * @return
+	 * 				the {@link PdpConfigurator}
+	 */
+	public PdpConfigurator getConfigurator() {
+		return configurator;
 	}
 
 	public static void createDirectory(String stringpath) {
@@ -300,31 +347,4 @@ public class PdpApplication implements PolicyDecisionPoint {
 		}
 	}
 
-	protected void bindPolicyInformationPoint(PolicyInformationPoint pip) {
-		pips.add(new PipAttachementPoint(pip));
-		if(attributeFinder != null) {
-			attributeFinder.setModules(pips);
-		}
-	}
-
-	protected synchronized void unbindPolicyInformationPoint(PolicyInformationPoint pip) {
-		int index = 0;
-		boolean match = false;
-		//find the unbinded pip from the list
-		for(AttributeFinderModule attrFinder : pips) {
-			PipAttachementPoint piap = (PipAttachementPoint)attrFinder;
-			if(piap.getPip().getId().equals(pip.getId())) {
-				match = true;
-				break;
-			}
-			index++;
-		}
-		//remove found pip and replace list in attributefinder
-		if(match) {
-			pips.remove(index);
-			if(attributeFinder != null) {
-				this.attributeFinder.setModules(pips);
-			}
-		}
-	}
 }

@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
+import org.wso2.balana.XACMLConstants;
 import org.wso2.balana.attr.BagAttribute;
 import org.wso2.balana.cond.EvaluationResult;
 import org.wso2.balana.ctx.Attribute;
