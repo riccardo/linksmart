@@ -300,6 +300,11 @@
         		<artifactId>eu.linksmart.api.clients</artifactId>
         		<version>${project.version}</version>
       		</dependency>
+      		<dependency>
+        		<groupId>eu.linksmart</groupId>
+        		<artifactId>eu.linksmart.api.policy</artifactId>
+        		<version>${project.version}</version>
+      		</dependency>
             <!-- LinkSmart security dependencies -->
             <dependency>
                 <groupId>eu.linksmart</groupId>
