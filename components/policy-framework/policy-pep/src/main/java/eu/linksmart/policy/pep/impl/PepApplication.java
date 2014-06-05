@@ -109,21 +109,6 @@ public class PepApplication implements PepService {
 	/** {@link BundleContext} */
 	private BundleContext bundleContext = null;
 
-	@Reference(name="ConfigurationAdmin",
-			cardinality = ReferenceCardinality.MANDATORY_UNARY,
-		    bind="bindConfigAdmin",
-		    unbind="unbindConfigAdmin",
-		    policy=ReferencePolicy.STATIC)
-	protected ConfigurationAdmin configAdmin = null;
-
-	/** PDP bundle when available **/
-	@Reference(name="PolicyDecisionPoint",
-			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
-			bind="bindPolicyDecisionPoint",
-			unbind="unbindPolicyDecisionPoint",
-			policy= ReferencePolicy.DYNAMIC)
-	PolicyDecisionPoint pdp = null;
-
 	/** If using remote PDP this contains its attributes **/
 	Registration pdpRegistration = null;
 
@@ -152,13 +137,91 @@ public class PepApplication implements PepService {
 	 * The list of possible executors to evaluate obligations against.
 	 */
 	private List<ObligationExecutor> obligationExecs = new ArrayList<ObligationExecutor>(); 
+	
+	@Reference(name="ConfigurationAdmin",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+		    bind="bindConfigAdmin",
+		    unbind="unbindConfigAdmin",
+		    policy=ReferencePolicy.STATIC)
+	protected ConfigurationAdmin configAdmin = null;
+
+	/** PDP bundle when available **/
+	@Reference(name="PolicyDecisionPoint",
+			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+			bind="bindPolicyDecisionPoint",
+			unbind="unbindPolicyDecisionPoint",
+			policy= ReferencePolicy.DYNAMIC)
+	PolicyDecisionPoint pdp = null;
 
 	@Reference(name="ObligationExecutor",
 			cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
 			bind="bindObligationExecutor",
-			unbind="unbindPolicyExecutor",
+			unbind="unbindObligationExecutor",
 			policy= ReferencePolicy.DYNAMIC)
 	private ObligationExecutor oblExe;
+	
+	protected void bindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
+		this.pdp = pdp;
+	}
+
+	protected void unbindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
+		pdp = null;
+	}
+
+	protected void bindObligationExecutor(ObligationExecutor obligationEx) {
+		obligationExecs.add(obligationEx);
+	}
+
+	protected void unbindObligationExecutor(ObligationExecutor obligationEx) {
+		int index = 0;
+		boolean found = false;
+		//find index of ObligationExecutor with same id
+		for (ObligationExecutor oe : this.obligationExecs) {
+			if (oe.getId() != null && oe.getId().equals(obligationEx.getId())) {
+				found = true;
+				break;
+			}
+			index++;
+		}
+		if(found) {
+			//remove item based on index
+			this.obligationExecs.remove(index);
+		}
+	}
+	
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = configAdmin;
+    }
+
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = null;
+    }
+    
+    /**
+	 * Activates instance in bundle
+	 * 
+	 * @param theContext
+	 * 				the {@link ComponentContext}
+	 */
+	@Activate
+	protected void activate(final ComponentContext theContext) {
+		logger.info("Activating");
+		bundleContext = theContext.getBundleContext();
+		configurator = new PepConfigurator(bundleContext, this, configAdmin);
+		configurator.registerConfiguration();
+		logger.info("Activated");
+	}
+
+	/**
+	 * Deactivates instance in bundle
+	 * 
+	 * @param theContext
+	 * 				the {@link ComponentContext}
+	 */
+	@Deactivate
+	protected void deactivate(ComponentContext theContext) {
+		logger.debug("Deactivating");
+	}
 
 	private PepResponse requestAccessDecision(final VirtualAddress theSndVad,
 			final VirtualAddress theRecVad, final String topic, final byte[] msg, final Set<SecurityProperty> appliedSecurity) {
@@ -402,69 +465,6 @@ public class PepApplication implements PepService {
 	public void setUseSessionCache(boolean theFlag) {
 		usePdpSessionCache = theFlag;
 	}
-
-	/**
-	 * Activates instance in bundle
-	 * 
-	 * @param theContext
-	 * 				the {@link ComponentContext}
-	 */
-	@Activate
-	protected void activate(final ComponentContext theContext) {
-		logger.info("Activating");
-		bundleContext = theContext.getBundleContext();
-		configurator = new PepConfigurator(bundleContext, this);
-		configurator.registerConfiguration();
-		logger.info("Activated");
-	}
-
-	/**
-	 * Deactivates instance in bundle
-	 * 
-	 * @param theContext
-	 * 				the {@link ComponentContext}
-	 */
-	@Deactivate
-	protected void deactivate(ComponentContext theContext) {
-		logger.debug("Deactivating");
-	}
-
-	protected void bindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
-		this.pdp = pdp;
-	}
-
-	protected void unbindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
-		pdp = null;
-	}
-
-	protected void bindObligationExecutor(ObligationExecutor obligationEx) {
-		obligationExecs.add(obligationEx);
-	}
-
-	protected void unbindObligationExecutor(ObligationExecutor obligationEx) {
-		int index = 0;
-		boolean found = false;
-		//find index of ObligationExecutor with same id
-		for (ObligationExecutor oe : this.obligationExecs) {
-			if (oe.getId() != null && oe.getId().equals(obligationEx.getId())) {
-				found = true;
-				break;
-			}
-			index++;
-		}
-		if(found) {
-			//remove item based on index
-			this.obligationExecs.remove(index);
-		}
-	}
-	
-	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
-        this.configAdmin = configAdmin;
-    }
-
-    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
-        this.configAdmin = null;
-    }
 
 	//	/**
 	//	 * @param theSenderHid
