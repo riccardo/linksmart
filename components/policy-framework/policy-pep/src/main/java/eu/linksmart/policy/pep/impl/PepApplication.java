@@ -39,12 +39,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.Subject;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.w3c.dom.Node;
 import org.wso2.balana.ObligationResult;
@@ -76,6 +78,13 @@ import eu.linksmart.policy.pep.request.impl.StaxSoapAttrParser;
 import eu.linksmart.security.communication.SecurityProperty;
 import eu.linksmart.utils.Part;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+
 /**
  * <p>Default {@link PepService} implementation</p>
  * 
@@ -101,14 +110,6 @@ public class PepApplication implements PepService {
 	private BundleContext bundleContext = null;
 
 	//TODO add IdentityMgr
-
-	/** PDP bundle when available **/
-	@Reference(name="PolicyDecisionPoint",
-			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
-			bind="bindPolicyDecisionPoint",
-			unbind="unbindPolicyDecisionPoint",
-			policy= ReferencePolicy.DYNAMIC)
-	PolicyDecisionPoint pdp = null;
 
 	/** If using remote PDP this contains its attributes **/
 	Registration pdpRegistration = null;
@@ -138,15 +139,105 @@ public class PepApplication implements PepService {
 	 * The list of possible executors to evaluate obligations against.
 	 */
 	private List<ObligationExecutor> obligationExecs = new ArrayList<ObligationExecutor>(); 
+	
+	@Reference(name="ConfigurationAdmin",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+		    bind="bindConfigAdmin",
+		    unbind="unbindConfigAdmin",
+		    policy=ReferencePolicy.STATIC)
+	protected ConfigurationAdmin configAdmin = null;
+	
+	@Reference(name="IdentityManager",
+            cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+            bind="bindIdentityManager",
+            unbind="unbindIdentityManager",
+            policy= ReferencePolicy.DYNAMIC)
+	protected IdentityManager idMgr;
 
+	@Reference(name="PolicyDecisionPoint",
+			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+			bind="bindPolicyDecisionPoint",
+			unbind="unbindPolicyDecisionPoint",
+			policy= ReferencePolicy.DYNAMIC)
+	protected PolicyDecisionPoint pdp = null;
+	
 	@Reference(name="ObligationExecutor",
 			cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
 			bind="bindObligationExecutor",
-			unbind="unbindPolicyExecutor",
+			unbind="unbindObligationExecutor",
 			policy= ReferencePolicy.DYNAMIC)
-	private ObligationExecutor oblExe;
+	protected ObligationExecutor oblExe;
+	
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = configAdmin;
+    }
 
-	private IdentityManager idMgr;
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = null;
+    }
+	
+	protected void bindIdentityManager(IdentityManager idMgr) {
+		this.idMgr = idMgr;
+	}
+
+	protected void unbindIdentityManager(IdentityManager idMgr) {
+		this.idMgr = null;
+	}
+
+	protected void bindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
+		this.pdp = pdp;
+	}
+
+	protected void unbindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
+		pdp = null;
+	}
+
+	protected void bindObligationExecutor(ObligationExecutor obligationEx) {
+		obligationExecs.add(obligationEx);
+	}
+
+	protected void unbindObligationExecutor(ObligationExecutor obligationEx) {
+		int index = 0;
+		boolean found = false;
+		//find index of ObligationExecutor with same id
+		for (ObligationExecutor oe : this.obligationExecs) {
+			if (oe.getId() != null && oe.getId().equals(obligationEx.getId())) {
+				found = true;
+				break;
+			}
+			index++;
+		}
+		if(found) {
+			//remove item based on index
+			this.obligationExecs.remove(index);
+		}
+	}
+	
+	/**
+	 * Activates instance in bundle
+	 * 
+	 * @param theContext
+	 * 				the {@link ComponentContext}
+	 */
+	@Activate
+	protected void activate(final ComponentContext theContext) {
+		logger.info("Activating");
+		bundleContext = theContext.getBundleContext();
+		configurator = new PepConfigurator(bundleContext, this, configAdmin);
+		configurator.registerConfiguration();
+		logger.info("Activated");
+	}
+
+	/**
+	 * Deactivates instance in bundle
+	 * 
+	 * @param theContext
+	 * 				the {@link ComponentContext}
+	 */
+	@Deactivate
+	protected void deactivate(ComponentContext theContext) {
+		logger.debug("Deactivating");
+	}
 
 	private PepResponse requestAccessDecision(final VirtualAddress theSndVad,
 			final VirtualAddress theRecVad, final String topic, final byte[] msg, final Set<SecurityProperty> appliedSecurity) {
@@ -389,69 +480,6 @@ public class PepApplication implements PepService {
 	 */
 	public void setUseSessionCache(boolean theFlag) {
 		usePdpSessionCache = theFlag;
-	}
-
-	/**
-	 * Activates instance in bundle
-	 * 
-	 * @param theContext
-	 * 				the {@link ComponentContext}
-	 */
-	@Activate
-	protected void activate(final ComponentContext theContext) {
-		logger.info("Activating");
-		bundleContext = theContext.getBundleContext();
-		configurator = new PepConfigurator(bundleContext, this);
-		configurator.registerConfiguration();
-		logger.info("Activated");
-	}
-
-	/**
-	 * Deactivates instance in bundle
-	 * 
-	 * @param theContext
-	 * 				the {@link ComponentContext}
-	 */
-	@Deactivate
-	protected void deactivate(ComponentContext theContext) {
-		logger.debug("Deactivating");
-	}
-
-	protected void bindIdentityManager(IdentityManager idMgr) {
-		this.idMgr = idMgr;
-	}
-
-	protected void unbindIdentityManager(IdentityManager idMgr) {
-		this.idMgr = null;
-	}
-
-	protected void bindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
-		this.pdp = pdp;
-	}
-
-	protected void unbindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
-		pdp = null;
-	}
-
-	protected void bindObligationExecutor(ObligationExecutor obligationEx) {
-		obligationExecs.add(obligationEx);
-	}
-
-	protected void unbindObligationExecutor(ObligationExecutor obligationEx) {
-		int index = 0;
-		boolean found = false;
-		//find index of ObligationExecutor with same id
-		for (ObligationExecutor oe : this.obligationExecs) {
-			if (oe.getId() != null && oe.getId().equals(obligationEx.getId())) {
-				found = true;
-				break;
-			}
-			index++;
-		}
-		if(found) {
-			//remove item based on index
-			this.obligationExecs.remove(index);
-		}
 	}
 
 	//	/**

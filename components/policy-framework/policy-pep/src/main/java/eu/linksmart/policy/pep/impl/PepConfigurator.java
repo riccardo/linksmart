@@ -36,9 +36,9 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import eu.linksmart.utils.Configurator;
-
 import eu.linksmart.policy.pep.impl.PepApplication;
 
 /**
@@ -93,6 +93,13 @@ public class PepConfigurator extends Configurator  {
 	public PepConfigurator(BundleContext theContext, PepApplication thePepApp) {
 		super(theContext, Logger.getLogger(PepApplication.class.getName()), 
 				PEP_SERVICE_PID, CONFIGURATION_FILE);
+		pep = thePepApp;
+	}
+	
+	public PepConfigurator(BundleContext theContext, PepApplication thePepApp, ConfigurationAdmin configurationAdmin) {
+		super(theContext, Logger.getLogger(PepApplication.class.getName()), 
+				PEP_SERVICE_PID, CONFIGURATION_FILE, configurationAdmin);
+		super.init();
 		pep = thePepApp;
 	}
 
