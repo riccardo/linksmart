@@ -97,8 +97,8 @@ public class IdentityMgrPolicyInformationPointTest {
 						.parse(new ByteArrayInputStream(response.getBytes()))
 						.getDocumentElement();
 				//convert xml into attribute
-				Attribute attrResp = Attribute.getInstance(node);
-				assertEquals("Retrieved attribute is not the same as expected", ATTR_1.getValue(), ((StringAttribute)attrResp.getValue()).getValue());
+				Attribute attrResponse = Attribute.getInstance(node, XACMLConstants.XACML_VERSION_3_0);
+				assertEquals("Retrieved attribute is not the same as expected", ATTR_1.getValue(), ((StringAttribute)attrResponse.getValue()).getValue());
 			} catch (Exception e) {
 				fail("Cannot parse attribute received from PIP");
 			} 
@@ -145,7 +145,7 @@ public class IdentityMgrPolicyInformationPointTest {
 						.parse(new ByteArrayInputStream(response.getBytes()))
 						.getDocumentElement();
 				//convert xml into attribute
-				Attribute attrResponse = Attribute.getInstance(node);
+				Attribute attrResponse = Attribute.getInstance(node, XACMLConstants.XACML_VERSION_3_0);
 				assertEquals("Retrieved attribute is not the same as expected", ATTR_2.getValue(), ((StringAttribute)attrResponse.getValue()).getValue());
 			} catch (Exception e) {
 				fail("Cannot parse attribute received from PIP");

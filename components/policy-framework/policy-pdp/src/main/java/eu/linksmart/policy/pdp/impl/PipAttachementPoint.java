@@ -55,7 +55,7 @@ public class PipAttachementPoint extends AttributeFinderModule {
 						.newDocumentBuilder()
 						.parse(new ByteArrayInputStream(attribute.getBytes()))
 						.getDocumentElement();
-				Attribute attr = Attribute.getInstance(node);
+				Attribute attr = Attribute.getInstance(node, XACMLConstants.XACML_VERSION_3_0);
 				if(attr != null) {
 					return new EvaluationResult(new BagAttribute(attributeType, attr.getValues()));
 				}

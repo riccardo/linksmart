@@ -88,9 +88,9 @@ public class IdentityMgrPolicyInformationPoint implements PolicyInformationPoint
 																true,
 																XACMLConstants.XACML_VERSION_3_0);
 
-														ByteArrayOutputStream bos = new ByteArrayOutputStream();
-														foundAttr.encode(bos);
-														return bos.toString();
+														StringBuilder sb = new StringBuilder();
+														foundAttr.encode(sb);
+														return sb.toString();
 													}
 												}
 												//if we get here we do not have the requested information locally
