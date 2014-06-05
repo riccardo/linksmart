@@ -46,8 +46,8 @@ import javax.security.auth.Subject;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.w3c.dom.Node;
 import org.wso2.balana.ObligationResult;
 import org.wso2.balana.XACMLConstants;
@@ -65,7 +65,6 @@ import org.wso2.balana.xacml3.Obligation;
 import eu.linksmart.network.Message;
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.VirtualAddress;
-import eu.linksmart.network.identity.IdentityManager;
 import eu.linksmart.policy.LinkSmartXacmlConstants;
 import eu.linksmart.policy.pdp.PolicyDecisionPoint;
 import eu.linksmart.policy.pep.ObligationExecutor;
@@ -90,6 +89,7 @@ import org.apache.felix.scr.annotations.ReferencePolicy;
  * 
  * @author Michael Crouch
  * @author Marco Tiemann
+ * @author Mark Vinkovits
  * 
  */
 @Component(name="eu.linksmart.policy.pep", immediate=true)
@@ -109,7 +109,20 @@ public class PepApplication implements PepService {
 	/** {@link BundleContext} */
 	private BundleContext bundleContext = null;
 
-	//TODO add IdentityMgr
+	@Reference(name="ConfigurationAdmin",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+		    bind="bindConfigAdmin",
+		    unbind="unbindConfigAdmin",
+		    policy=ReferencePolicy.STATIC)
+	protected ConfigurationAdmin configAdmin = null;
+
+	/** PDP bundle when available **/
+	@Reference(name="PolicyDecisionPoint",
+			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+			bind="bindPolicyDecisionPoint",
+			unbind="unbindPolicyDecisionPoint",
+			policy= ReferencePolicy.DYNAMIC)
+	PolicyDecisionPoint pdp = null;
 
 	/** If using remote PDP this contains its attributes **/
 	Registration pdpRegistration = null;
@@ -139,105 +152,13 @@ public class PepApplication implements PepService {
 	 * The list of possible executors to evaluate obligations against.
 	 */
 	private List<ObligationExecutor> obligationExecs = new ArrayList<ObligationExecutor>(); 
-	
-	@Reference(name="ConfigurationAdmin",
-			cardinality = ReferenceCardinality.MANDATORY_UNARY,
-		    bind="bindConfigAdmin",
-		    unbind="unbindConfigAdmin",
-		    policy=ReferencePolicy.STATIC)
-	protected ConfigurationAdmin configAdmin = null;
-	
-	@Reference(name="IdentityManager",
-            cardinality = ReferenceCardinality.OPTIONAL_UNARY,
-            bind="bindIdentityManager",
-            unbind="unbindIdentityManager",
-            policy= ReferencePolicy.DYNAMIC)
-	protected IdentityManager idMgr;
 
-	@Reference(name="PolicyDecisionPoint",
-			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
-			bind="bindPolicyDecisionPoint",
-			unbind="unbindPolicyDecisionPoint",
-			policy= ReferencePolicy.DYNAMIC)
-	protected PolicyDecisionPoint pdp = null;
-	
 	@Reference(name="ObligationExecutor",
 			cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE,
 			bind="bindObligationExecutor",
-			unbind="unbindObligationExecutor",
+			unbind="unbindPolicyExecutor",
 			policy= ReferencePolicy.DYNAMIC)
-	protected ObligationExecutor oblExe;
-	
-	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
-        this.configAdmin = configAdmin;
-    }
-
-    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
-        this.configAdmin = null;
-    }
-	
-	protected void bindIdentityManager(IdentityManager idMgr) {
-		this.idMgr = idMgr;
-	}
-
-	protected void unbindIdentityManager(IdentityManager idMgr) {
-		this.idMgr = null;
-	}
-
-	protected void bindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
-		this.pdp = pdp;
-	}
-
-	protected void unbindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
-		pdp = null;
-	}
-
-	protected void bindObligationExecutor(ObligationExecutor obligationEx) {
-		obligationExecs.add(obligationEx);
-	}
-
-	protected void unbindObligationExecutor(ObligationExecutor obligationEx) {
-		int index = 0;
-		boolean found = false;
-		//find index of ObligationExecutor with same id
-		for (ObligationExecutor oe : this.obligationExecs) {
-			if (oe.getId() != null && oe.getId().equals(obligationEx.getId())) {
-				found = true;
-				break;
-			}
-			index++;
-		}
-		if(found) {
-			//remove item based on index
-			this.obligationExecs.remove(index);
-		}
-	}
-	
-	/**
-	 * Activates instance in bundle
-	 * 
-	 * @param theContext
-	 * 				the {@link ComponentContext}
-	 */
-	@Activate
-	protected void activate(final ComponentContext theContext) {
-		logger.info("Activating");
-		bundleContext = theContext.getBundleContext();
-		configurator = new PepConfigurator(bundleContext, this, configAdmin);
-		configurator.registerConfiguration();
-		logger.info("Activated");
-	}
-
-	/**
-	 * Deactivates instance in bundle
-	 * 
-	 * @param theContext
-	 * 				the {@link ComponentContext}
-	 */
-	@Deactivate
-	protected void deactivate(ComponentContext theContext) {
-		logger.debug("Deactivating");
-	}
+	private ObligationExecutor oblExe;
 
 	private PepResponse requestAccessDecision(final VirtualAddress theSndVad,
 			final VirtualAddress theRecVad, final String topic, final byte[] msg, final Set<SecurityProperty> appliedSecurity) {
@@ -270,7 +191,7 @@ public class PepApplication implements PepService {
 
 		return evalAccessRequest(new PepRequest(actionAttrs, 
 				extrActionAsStringFromAttrs(actionAttrs),
-				theSndVad, theRecVad));
+				theSndVad, theRecVad, appliedSecurity));
 	}
 
 	/* (non-Javadoc)
@@ -287,20 +208,20 @@ public class PepApplication implements PepService {
 				msg.getData(),
 				appliedSecurity);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see eu.linksmart.policy.pep.PepService#requestAccessDecision(
-	 * 		java.lang.String, java.lang.String, java.lang.String, 
-	 * 		java.lang.String, java.lang.String, java.lang.String)
+	 * 		eu.linksmart.network.VirtualAddress, eu.linksmart.network.VirtualAddress, 
+	 * 		java.lang.String, java.lang.byte[])
 	 */
 	@Override
-	private PepResponse requestAccessDecision(final VirtualAddress theSndVad,
+	public PepResponse requestAccessDecision(final VirtualAddress theSndVad,
 			final VirtualAddress theRecVad, final String topic, final byte[] msg) {
 		return requestAccessDecision(
-				msg.getSenderVirtualAddress(),
-				msg.getReceiverVirtualAddress(),
-				msg.getTopic(),
-				msg.getData(),
+				theSndVad,
+				theRecVad,
+				topic,
+				msg,
 				null);
 	}
 
@@ -482,6 +403,69 @@ public class PepApplication implements PepService {
 		usePdpSessionCache = theFlag;
 	}
 
+	/**
+	 * Activates instance in bundle
+	 * 
+	 * @param theContext
+	 * 				the {@link ComponentContext}
+	 */
+	@Activate
+	protected void activate(final ComponentContext theContext) {
+		logger.info("Activating");
+		bundleContext = theContext.getBundleContext();
+		configurator = new PepConfigurator(bundleContext, this);
+		configurator.registerConfiguration();
+		logger.info("Activated");
+	}
+
+	/**
+	 * Deactivates instance in bundle
+	 * 
+	 * @param theContext
+	 * 				the {@link ComponentContext}
+	 */
+	@Deactivate
+	protected void deactivate(ComponentContext theContext) {
+		logger.debug("Deactivating");
+	}
+
+	protected void bindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
+		this.pdp = pdp;
+	}
+
+	protected void unbindPolicyDecisionPoint(PolicyDecisionPoint pdp) {
+		pdp = null;
+	}
+
+	protected void bindObligationExecutor(ObligationExecutor obligationEx) {
+		obligationExecs.add(obligationEx);
+	}
+
+	protected void unbindObligationExecutor(ObligationExecutor obligationEx) {
+		int index = 0;
+		boolean found = false;
+		//find index of ObligationExecutor with same id
+		for (ObligationExecutor oe : this.obligationExecs) {
+			if (oe.getId() != null && oe.getId().equals(obligationEx.getId())) {
+				found = true;
+				break;
+			}
+			index++;
+		}
+		if(found) {
+			//remove item based on index
+			this.obligationExecs.remove(index);
+		}
+	}
+	
+	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = configAdmin;
+    }
+
+    protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = null;
+    }
+
 	//	/**
 	//	 * @param theSenderHid
 	//	 * 				the sender HID
@@ -533,9 +517,9 @@ public class PepApplication implements PepService {
 			String[] orderedAttributes = new String[theAttrs.getAttributes().size()];
 			int i = 0;
 			for (Attribute attribute : theAttrs.getAttributes()) {
-				ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-				attribute.encode(outstream);
-				orderedAttributes[i] = outstream.toString();
+				StringBuilder sb = new StringBuilder();
+				attribute.encode(sb);
+				orderedAttributes[i] = sb.toString();
 				i++;
 			}
 			if (orderedAttributes.length > 1) {
@@ -857,11 +841,12 @@ public class PepApplication implements PepService {
 	 */
 	private void resPdpPid(String thePdpPid) {
 		if(pdpRegistration == null) {
-			Registration[] regs = idMgr.getServiceByAttributes(
-					new Part[]{}, IdentityManager.SERVICE_RESOLVE_TIMEOUT, true, true);
-			if(regs != null && regs.length == 1) {
-				pdpRegistration = regs[0];
-			}
+			//TODO
+//			Registration[] regs = idMgr.getServiceByAttributes(
+//					new Part[]{}, IdentityManager.SERVICE_RESOLVE_TIMEOUT, true, true);
+//			if(regs != null && regs.length == 1) {
+//				pdpRegistration = regs[0];
+//			}
 		}
 	}
 
@@ -880,9 +865,4 @@ public class PepApplication implements PepService {
 	//		return "http://localhost:" + httpPort + "/SOAPTunneling/" + pepHid + "/" 
 	//				+ theRecHid + "/" + theSessionId + "/";
 	//	}
-
-	private Registration getRegistrationForVad(VirtualAddress vad) {
-		return idMgr.getServiceInfo(vad);
-	}
-
 }
