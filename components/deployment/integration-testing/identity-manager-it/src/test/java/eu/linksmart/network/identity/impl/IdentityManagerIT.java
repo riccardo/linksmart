@@ -46,9 +46,7 @@ public class IdentityManagerIT {
     public void testIdentityManager() throws Exception {   
         try {
         	System.out.println("starting identity manager test");
-        	String fromService = identityManager.getClass().getName();
-            System.out.println("identityManager class name : " + fromService);
-            Assert.assertEquals("eu.linksmart.network.identity.impl.IdentityManagerImpl",fromService);
+            Assert.assertEquals("eu.linksmart.network.identity.impl.crypto.IdentityManagerCertImpl",identityManager.getClass().getName());
 			System.out.println("identity manager test successfully completed");
         } catch(Exception e) {
         	e.printStackTrace();
