@@ -191,7 +191,8 @@
     </feature>
 
     <feature name="backbone-jxta-it" version="${project.version}">
-        <feature version="${project.version}">expose-scr-annotated-services</feature>
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
         <bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/4.2.22</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcpg-jdk16/${servicemix.bcpg-jdk16}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
@@ -207,5 +208,7 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.router/${parent.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.jxta/${parent.version}</bundle>
     </feature>
+
+
 
 </features>
