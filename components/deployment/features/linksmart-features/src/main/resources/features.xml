@@ -67,6 +67,7 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${project.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle>
     	<bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${project.version}</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.policy/${project.version}</bundle>
     	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.network.identitymanager/${project.version}</bundle>
     </feature>
