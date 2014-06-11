@@ -1,8 +1,8 @@
 package eu.linksmart.policy.pep;
 
-import org.wso2.balana.ObligationResult;
-import org.wso2.balana.ctx.AbstractRequestCtx;
-import org.wso2.balana.ctx.ResponseCtx;
+//import org.wso2.balana.ObligationResult;
+//import org.wso2.balana.ctx.AbstractRequestCtx;
+//import org.wso2.balana.ctx.ResponseCtx;
 
 public interface ObligationExecutor {
 	
@@ -16,7 +16,7 @@ public interface ObligationExecutor {
 	 * @param response
 	 * @return true if obligation was fulfilled, false else
 	 */
-	boolean evaluate(ObligationResult obligation, AbstractRequestCtx request, ResponseCtx response);
+//	boolean evaluate(ObligationResult obligation, AbstractRequestCtx request, ResponseCtx response);
 	
 	
 	/**
