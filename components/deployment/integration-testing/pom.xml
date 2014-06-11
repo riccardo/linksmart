@@ -79,6 +79,12 @@
 			<artifactId>slf4j-log4j12</artifactId>
             <scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>eu.linksmart</groupId>
+            <artifactId>linksmart-features</artifactId>
+            <version>${parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
