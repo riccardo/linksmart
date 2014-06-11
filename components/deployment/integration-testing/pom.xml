@@ -22,14 +22,15 @@
     
     <modules>
     	<module>it-utils</module>
-        <!--<module>basic-tunneling-it</module>-->
+    	<module>cryptomanager-it</module>
+    	<module>identity-manager-it</module>
+        <module>basic-tunneling-it</module>
         <module>standard-tunneling-it</module>
         <module>soap-tunneling-it</module>
         <module>backbone-soap-it</module>
         <module>backbone-osgi-it</module>
         <module>backbone-jxta-it</module>
         <module>backbone-router-it</module>
-        <module>cryptomanager-it</module>
     </modules>
 
     <scm>
