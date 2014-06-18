@@ -31,6 +31,8 @@
         <module>backbone-osgi-it</module>
         <module>backbone-jxta-it</module>
         <module>backbone-router-it</module>
+        <module>communication-security-manager-it</module>
+        <module>communication-security-manager-sym-it</module>
     </modules>
 
     <scm>
