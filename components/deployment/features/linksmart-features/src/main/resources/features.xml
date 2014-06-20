@@ -177,12 +177,12 @@
     </feature>
     
     <!--  Calculator Example Service FEATURE -->
-    <feature name="linksmart-example-service" version="${project.version}"> 
-    	<feature version="${project.version}">linksmart</feature>
-    	<feature version="${project.version}">linksmart-ws-provider</feature>
-    	<bundle>mvn:eu.linksmart.examples/calculator-service/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart.examples/calculator-consumer/${project.version}</bundle>
-    </feature>
+<!--     <feature name="linksmart-example-service" version="${project.version}">  -->
+<!--     	<feature version="${project.version}">linksmart</feature> -->
+<!--     	<feature version="${project.version}">linksmart-ws-provider</feature> -->
+<!--     	<bundle>mvn:eu.linksmart.examples/calculator-service/${project.version}</bundle> -->
+<!--         <bundle>mvn:eu.linksmart.examples/calculator-consumer/${project.version}</bundle> -->
+<!--     </feature> -->
        
     <!--  INTEGRATION FEATURES -->
     
@@ -209,7 +209,6 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.router/${parent.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.jxta/${parent.version}</bundle>
     </feature>
-
 
 
 </features>
