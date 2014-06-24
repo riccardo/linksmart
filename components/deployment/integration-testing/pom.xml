@@ -33,7 +33,7 @@
         <module>communication-security-manager-it</module>
         <module>communication-security-manager-sym-it</module>
         <module>backbone-data-it</module>
-    <module>configurator-manager-it</module>
+    <!--  module>configurator-manager-it</module -->
   </modules>
 
     <scm>
