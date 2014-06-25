@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1402498096028
+Build-Jdk: 1.7.0_51
+Built-By: rachev
+Bundle-Description: LinkSmart Backbone Data
+Bundle-DocURL: http://www.fit.fraunhofer.de
+Bundle-ManifestVersion: 2
+Bundle-Name: LinkSmart Backbone Data
+Bundle-SymbolicName: eu.linksmart.network.backbone.data
+Bundle-Vendor: Fraunhofer Institute FIT
+Bundle-Version: 2.2.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: eu.linksmart.network.backbone.data;uses:="eu.linksmart.n
+ etwork";version="2.2.0.SNAPSHOT"
+Import-Package: eu.linksmart.network;version="[2.2,3)",eu.linksmart.netw
+ ork.backbone;version="[2.2,3)",eu.linksmart.network.backbone.data,eu.li
+ nksmart.network.routing;version="[2.2,3)",eu.linksmart.security.communi
+ cation;version="[2.2,3)",org.apache.log4j,org.osgi.framework;version="[
+ 1.5,2)",org.osgi.service.component;version="[1.2,2)"
+Service-Component: OSGI-INF/eu.linksmart.network.backbone.impl.data.Back
+ boneData.xml
+Tool: Bnd-2.1.0.20130426-122213
