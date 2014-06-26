@@ -34,9 +34,9 @@
         <module>communication-security-manager-sym-it</module>
         <module>backbone-data-it</module>
 <!--     	<module>configurator-manager-it</module> -->
-<!--     	<module>network-manager-it</module> -->
+    	<module>network-manager-it</module>
 <!--     	<module>grand-message-handler-it</module> -->
-<!--     	<module>trust-manager-it</module> -->
+    	<module>trust-manager-it</module>
   </modules>
 
     <scm>
