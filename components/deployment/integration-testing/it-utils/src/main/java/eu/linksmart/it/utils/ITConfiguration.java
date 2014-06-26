@@ -20,7 +20,7 @@ public class ITConfiguration {
 	private static String KARAF_DISTRO_GROUP_ID = "org.apache.karaf"; 
 	private static String KARAF_DISTRO_ARTIFACT_ID = "apache-karaf";  
 	private static String KARAF_DISTRO_BINARY_TYPE = "zip"; 
-	private static String KARAF_DISTRO_VERSION = "3.0.0"; 
+	private static String KARAF_DISTRO_VERSION = "3.0.1"; 
 	private static String KARAF_DISTRO_NAME = "Apache Karaf"; 
 	
 	private static boolean DEBUG = false;
