@@ -158,7 +158,7 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.network.grand/${parent.version}</bundle>
     </feature>
     
-    <feature name="linksmart" version="${project.version}">
+    <feature name="linksmart-core" version="${project.version}">
     	<feature version="${project.version}">network-manager</feature>
         <feature version="${project.version}">trust-manager</feature>
         <feature version="${project.version}">basic-tunnel</feature>
@@ -174,6 +174,11 @@
     
     <feature name="linksmart-ws-provider" version="${project.version}"> 
 		<feature>cxf-dosgi-discovery-distributed</feature>
+    </feature>
+    
+    <feature name="linksmart" version="${project.version}">
+    	<feature version="${project.version}">linksmart-core</feature>
+        <feature version="${project.version}">linksmart-ws-provider</feature>
     </feature>
     
     <!--  Calculator Example Service FEATURE -->
