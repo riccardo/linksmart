@@ -27,6 +27,12 @@
             <version>${linksmart.kar.version}</version>
             <type>kar</type>
         </dependency>
+        <dependency>
+            <groupId>org.apache.karaf</groupId>
+            <artifactId>apache-karaf</artifactId>
+            <version>3.0.1</version>
+            <type>tar.gz</type>
+        </dependency>
     </dependencies>
     
     <profiles>
@@ -60,6 +66,24 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
+                            <execution>
+                                <!-- Uncompress the standard Karaf distribution -->
+                                <id>unpack</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.karaf</groupId>
+                                            <artifactId>apache-karaf</artifactId>
+                                            <type>tar.gz</type>
+                                            <outputDirectory>target/dependencies</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
 							<execution>
 								<id>copy-linksmart-karaf-archive-resources</id>
 								<phase>process-resources</phase>

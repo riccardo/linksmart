@@ -9,7 +9,13 @@
 
     <fileSets>
         <fileSet>
-			<directory>src/main/resources/osgi-container/apache-karaf-3.0.1</directory>
+            <directory>src/main/resources/config</directory>
+            <outputDirectory>/etc</outputDirectory>
+            <fileMode>775</fileMode>
+        </fileSet>
+        <fileSet>
+			<!--<directory>src/main/resources/osgi-container/apache-karaf-3.0.1</directory>-->
+            <directory>target/dependencies/apache-karaf-3.0.1</directory>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>755</fileMode>
 		</fileSet>
@@ -25,5 +31,6 @@
             <outputDirectory>/</outputDirectory>
             <destName>README</destName>
         </file>
+
     </files>
 </assembly>
