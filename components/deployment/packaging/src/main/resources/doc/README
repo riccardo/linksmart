@@ -1,0 +1,33 @@
+LinkSmart 2.2.0-SNAPSHOT
+-------------------
+
+Requirements
+------------
+Java 1.7
+
+
+Starting and Stopping LinkSmart
+------------------------------
+
+To start the server, run the following command in Windows:
+
+bin\linksmart.bat
+
+respectively on Unix:
+
+bin/linksmart
+
+
+To stop Server from the console, enter ^D in the console:
+
+^D
+
+Alternatively, you can also run the following command:
+
+system:shutdown
+
+or simply
+
+shutdown -f
+
+
