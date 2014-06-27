@@ -10,10 +10,42 @@
     </parent>
 
 	<artifactId>it-utils</artifactId>
+    <version>${project.parent.version}</version>
 
 	<packaging>jar</packaging>
 
 	<name>LinkSmart Integration Testing Utils</name>
 	<description>LinkSmart Integration Testing Utils</description>
+
+
+    <build>
+        <sourceDirectory>target/filtered-sources/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <filtering>true</filtering>
+                <targetPath>../filtered-sources/java</targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>templating-maven-plugin</artifactId>
+                <version>1.0-alpha-3</version>
+                <executions>
+                    <execution>
+                        <id>filter-src</id>
+                        <goals>
+                            <goal>filter-sources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 	
 </project>

@@ -19,16 +19,19 @@ public class ITConfiguration {
 	
 	private static String KARAF_DISTRO_GROUP_ID = "org.apache.karaf"; 
 	private static String KARAF_DISTRO_ARTIFACT_ID = "apache-karaf";  
-	private static String KARAF_DISTRO_BINARY_TYPE = "zip"; 
-	private static String KARAF_DISTRO_VERSION = "3.0.1"; 
-	private static String KARAF_DISTRO_NAME = "Apache Karaf"; 
+	private static String KARAF_DISTRO_BINARY_TYPE = "zip";
+    // the version will be filtered by maven plugin
+	private static String KARAF_DISTRO_VERSION = "${karaf.version}";
+	private static String KARAF_DISTRO_NAME = "Apache Karaf";
+    // the version will be filtered by maven plugin
+    private static String LINKSMART_VERSION = "${project.version}";
 	
 	private static boolean DEBUG = false;
 	private static int DEBUG_PORT = 8889;
 	
 	private static int HTTP_PORT = 8882;
 	
-	private static final String FEATURES_REPOSITORY_URL = "mvn:eu.linksmart/linksmart-features/2.2.0-SNAPSHOT/xml/features";
+	private static final String FEATURES_REPOSITORY_URL = "mvn:eu.linksmart/linksmart-features/"+LINKSMART_VERSION+"/xml/features";
 	
 	public static Option regressionDefaults() {
         return regressionDefaults(OSGI_CONTAINER_KARAF);
@@ -120,7 +123,7 @@ public class ITConfiguration {
     		KARAF_DISTRO_GROUP_ID = "org.apache.karaf"; 
     		KARAF_DISTRO_ARTIFACT_ID = "apache-karaf";  
     		KARAF_DISTRO_BINARY_TYPE = "zip"; 
-    		KARAF_DISTRO_VERSION = "3.0.1"; 
+    		KARAF_DISTRO_VERSION = "${karaf.version}";
     		KARAF_DISTRO_NAME = "Apache Karaf"; 
     	}
     	if(osgiContainerType.equals(OSGI_CONTAINER_SERVICEMIX)) {
