@@ -120,7 +120,7 @@ public class ITConfiguration {
     		KARAF_DISTRO_GROUP_ID = "org.apache.karaf"; 
     		KARAF_DISTRO_ARTIFACT_ID = "apache-karaf";  
     		KARAF_DISTRO_BINARY_TYPE = "zip"; 
-    		KARAF_DISTRO_VERSION = "3.0.0"; 
+    		KARAF_DISTRO_VERSION = "3.0.1"; 
     		KARAF_DISTRO_NAME = "Apache Karaf"; 
     	}
     	if(osgiContainerType.equals(OSGI_CONTAINER_SERVICEMIX)) {
