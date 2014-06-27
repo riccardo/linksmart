@@ -18,6 +18,7 @@
      
     <modules>
     	<module>linksmart-features</module>
+        <module>linksmart-distribution</module>
     </modules>
     
     <properties>
