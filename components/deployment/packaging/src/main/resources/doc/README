@@ -17,6 +17,15 @@ respectively on Unix:
 
 bin/linksmart
 
+upon successful startup, a welcome message would appear. Type in the following command on console to activate LinkSmart components:
+karaf@root()> feature:install linksmart
+
+to view the log: 
+karaf@root()> log:display
+
+to see the (OSGi) bundles status:
+karaf@root()> bundle:list
+
 
 To stop Server from the console, enter ^D in the console:
 
