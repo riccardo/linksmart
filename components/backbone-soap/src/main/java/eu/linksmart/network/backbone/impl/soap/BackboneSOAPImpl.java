@@ -207,7 +207,7 @@ public class BackboneSOAPImpl implements Backbone {
 				header = new StringBuilder("Host: ").append(
 						urlEndpoint.getHost()).append(":").append(
 						urlEndpoint.getPort()).append("\r\n").toString();
-			} else {
+			} else if (!aux.startsWith("POST")){
 				header = aux + "\r\n";
 			}
 
