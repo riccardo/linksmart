@@ -40,7 +40,7 @@
         <!-- versions for integration test plugins -->
         <pax.exam.version>3.4.0</pax.exam.version>
         <karaf.tooling.exam.version>1.9.6</karaf.tooling.exam.version>
-        <karaf.version>3.0.1</karaf.version>
+        <karaf.version>3.0.0</karaf.version>
         <karaf.tooling.features.version>2.3.3</karaf.tooling.features.version>
         <!-- versions for logging -->
         <log4j.version>1.2.16</log4j.version>
