@@ -11,11 +11,11 @@ Starting and Stopping LinkSmart
 
 To start the server, run the following command in Windows:
 
-bin\linksmart.bat
+bin\karaf.bat
 
 respectively on Unix:
 
-bin/linksmart
+bin/karaf
 
 upon successful startup, a welcome message would appear. Type in the following command on console to activate LinkSmart components:
 karaf@root()> feature:install linksmart
