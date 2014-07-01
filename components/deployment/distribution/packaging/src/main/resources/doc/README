@@ -17,14 +17,19 @@ respectively on Unix:
 
 bin/karaf
 
-upon successful startup, a welcome message would appear. Type in the following command on console to activate LinkSmart components:
-karaf@root()> feature:install linksmart
+upon successful startup, a welcome message would appear. 
 
-to view the log: 
+Please wait for a while (7-10 seconds) so that LinkSmart components are installed and activated by the container.
+
+you can view the the log from LinkSmart components: 
 karaf@root()> log:display
 
 to see the (OSGi) bundles status:
 karaf@root()> bundle:list
+
+
+LinkSmart status page can be viewed in a browser with the following URL:
+http://localhost:8082/LinkSmartStatus
 
 
 To stop Server from the console, enter ^D in the console:

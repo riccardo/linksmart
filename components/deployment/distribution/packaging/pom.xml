@@ -79,7 +79,7 @@
                                             <groupId>org.apache.karaf</groupId>
                                             <artifactId>apache-karaf</artifactId>
                                             <type>tar.gz</type>
-                                            <outputDirectory>target/dependencies</outputDirectory>
+                                            <outputDirectory>target/linksmart-resources</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
