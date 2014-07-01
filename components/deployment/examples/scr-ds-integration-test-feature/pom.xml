@@ -6,7 +6,9 @@
 
 	<artifactId>scr-ds-integration-test-feature</artifactId>
     <version>3.0.0-SNAPSHOT</version>
-    <groupId>eu.linksmart</groupId>
+    <groupId>eu.linksmart.examples</groupId>
+
+    <name>IT from feature - parent</name>
 
 	<packaging>pom</packaging>
 
