@@ -8,13 +8,12 @@
         <module>AdderConsumer</module>
     </modules>
 
+    <groupId>eu.linksmart.examples</groupId>
 
-
-    <groupId>eu.linksmart</groupId>
-    <artifactId>testCXFDependencies</artifactId>
+    <artifactId>expose-cxf-ws</artifactId>
+    <name>Expose CXF-WS from OSGi service</name>
     <version>1.0.0</version>
-    <name>testCXFDependencies</name>
-    <description>testing exposure of web service through CXF</description>
+    <description>Exposure and consumption of web a service through CXF</description>
 
     <packaging>pom</packaging>
 

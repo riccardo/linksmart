@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>AdderConsumer</artifactId>
+    <name>CXF WS - Adder consumer</name>
+    <description>Consumes the Adder Service</description>
     <version>1.0.0</version>
 
     <dependencies>

@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>AdderService</artifactId>
+    <name>CXF WS - Adder service</name>
+    <description>Exposes an CXF based webservice by using SCR annotations</description>
     <version>1.0.0</version>
 
     <packaging>bundle</packaging>
