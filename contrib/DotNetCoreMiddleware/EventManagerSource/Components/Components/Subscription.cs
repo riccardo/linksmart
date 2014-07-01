@@ -282,26 +282,34 @@ namespace Components
             try
             {
                 isMatch = IsRegexMatch(publishedTopic);
+			//	System.Console.WriteLine("IsMatch1:"+ isMatch.ToString());
             }
-            catch { }
+            catch(Exception e1)
+			{ 
+				//System.Console.WriteLine("Exception at IsMatch1:"+ e1.Message);
+			}
             if (!isMatch)
             {
                 try
                 {
                     isMatch = IsXpathMatch(publishedTopic);
+					//System.Console.WriteLine("IsMatch2:"+ isMatch.ToString());
                     if (!isMatch)
                     {
                         try
                         {
                             isMatch = IsMatchToTopicStringInXmlEvent(publishedTopic);
+							//System.Console.WriteLine("IsMatch3:"+ isMatch.ToString());
                         }
                         catch (Exception e)
                         {
+							//System.Console.WriteLine("Exception at IsMatch3:"+ e.Message);
                         }
                     }
                 }
                 catch (Exception e)
                 {
+					//System.Console.WriteLine("Exception at IsMatch2:"+ e.Message);
                 }
             }
             return isMatch;
@@ -311,7 +319,7 @@ namespace Components
         private bool IsRegexMatch(string publishedTopic)
         {
             bool isMatch = false;
-            Regex regex = new Regex("^" + this.topic + "$", RegexOptions.None);
+            Regex regex = new Regex("^" + this.topic + "$", RegexOptions.Singleline);
             isMatch = regex.IsMatch(publishedTopic);
             return isMatch;
         }
