@@ -26,6 +26,14 @@ namespace EventManager
         public static bool IsRunning;
         private static JSONServer jss = new JSONServer();
         private static  ServiceHost serviceHost;
+
+		public static bool IsRunningOnMono()
+		{
+			return Type.GetType("Mono.Runtime") != null;
+		}
+
+
+
         public static void Start()
         {
             try
@@ -33,8 +41,11 @@ namespace EventManager
                 Log.IsConsoleOutEnabled = Properties.Settings.Default.WriteToConsoleOut;
             }
             catch (Exception e){ Log.Error(e.Message+ e.StackTrace); }
-            if (!IsRunning)
-            {
+				if (!IsRunning)
+				{
+					if (IsRunningOnMono())
+						if (Environment.GetEnvironmentVariable("MONO_STRICT_MS_COMPLIANT") != "yes")
+							Environment.SetEnvironmentVariable("MONO_STRICT_MS_COMPLIANT", "yes");
                 InitiateStoredSubscriptions();
                 String ipAddress = "";
                 if (!Properties.Settings.Default.UseIPv6)
@@ -59,7 +70,7 @@ namespace EventManager
                     {
                         smb = new ServiceMetadataBehavior();
                         smb.HttpGetEnabled = true;
-                        smb.HttpGetUrl = new Uri(address + "/Meta");
+                        smb.HttpGetUrl = new Uri(address);
                         serviceHost.Description.Behaviors.Add(smb);
                     }
                     ServiceThrottlingBehavior throttleBehavior = new ServiceThrottlingBehavior
