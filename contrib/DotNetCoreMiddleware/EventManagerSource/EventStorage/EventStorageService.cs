@@ -100,13 +100,20 @@ namespace EventStorageService
     public class EventStorageService
     {
         DbConnection eventDB = null;
-        public EventStorageService()
-        {
-            SQLiteConnection cnn = new SQLiteConnection();
-            //DbProviderFactory fact = DbProviderFactories.GetFactory("System.Data.SQLite");
-            //eventDB = fact.CreateConnection();
-            eventDB = cnn;
-        }
+		private static string SelectDBDriver()
+		{
+			if (Type.GetType("Mono.Runtime") != null)
+				return "Mono.Data.SQLite";
+			else
+				return "System.Data.SQLite";
+		}
+		public EventStorageService()
+		{
+			//SQLiteConnection cnn = new SQLiteConnection();
+			DbProviderFactory fact = DbProviderFactories.GetFactory(SelectDBDriver());
+			eventDB = fact.CreateConnection();
+			//eventDB = cnn;
+		}
         public void Init(string type)
         {
     

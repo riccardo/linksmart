@@ -22,9 +22,18 @@ namespace EventStorage
         DbConnection eventDB = null;
         public static SubscriptionStore Store = new SubscriptionStore();
 
-        private SubscriptionStore()
-        {
-            SQLiteConnection cnn = new SQLiteConnection();
+		private static string SelectDBDriver()
+		{
+			if (Type.GetType("Mono.Runtime") != null)
+				return "Mono.Data.SQLite";
+			else
+				return "System.Data.SQLite";
+		}
+
+		private SubscriptionStore()
+		{
+			DbProviderFactory fact = DbProviderFactories.GetFactory(SelectDBDriver());
+			DbConnection cnn = fact.CreateConnection();
             eventDB = cnn;
             eventDB.ConnectionString = "Data Source=Subscriptions.db3; Pooling=true; Journal Mode=Off";
 
