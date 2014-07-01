@@ -10,7 +10,8 @@
 		<artifactId>linksmart-osgi-component</artifactId>
 		<version>2.2.0-SNAPSHOT</version>
     </parent>
-    
+
+    <groupId>eu.linksmart.examples</groupId>
     <artifactId>scr-declerative-service-consumer</artifactId>
     
     <packaging>bundle</packaging>
@@ -21,7 +22,7 @@
 	<dependencies>
         <!-- scr-declerative-service dependency is required to consume this service -->
         <dependency>
-            <groupId>eu.linksmart</groupId>
+            <groupId>eu.linksmart.examples</groupId>
             <artifactId>scr-declerative-service</artifactId>
             <!-- version is not defined in dependencyManagement section, so we have to explicitly set the artifact version --> 
             <version>${project.version}</version>
