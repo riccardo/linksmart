@@ -9,7 +9,8 @@
 		<version>2.2.0-SNAPSHOT</version>
 	</parent>
 
-    <!-- <groupId> is inherited from linksmart-parent -->
+    <!-- <groupId> is implicitly set to eu.linksmart.examples -->
+    <groupId>eu.linksmart.examples</groupId>
 	<artifactId>maven-bundle-example</artifactId>
 	<!-- <version> is inherited from linksmart-parent -->
 
