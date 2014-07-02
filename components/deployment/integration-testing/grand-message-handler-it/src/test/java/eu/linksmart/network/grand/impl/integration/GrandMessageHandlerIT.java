@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import junit.framework.Assert;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,8 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import org.apache.log4j.Logger;
 
 import eu.linksmart.it.utils.ITConfiguration;
+
+import eu.linksmart.network.VirtualAddress;
 
 import eu.linksmart.network.grand.impl.GrandMessageHandlerImpl;
 
@@ -49,7 +52,20 @@ public class GrandMessageHandlerIT {
     @Test
     public void testService() throws Exception {   
         try {
-        	assertTrue(true);
+        	System.out.println("starting grand-message-handler IT");
+        	
+        	VirtualAddress senderVirtualAddress = new VirtualAddress("0.0.0.123");
+			VirtualAddress receiverVirtualAddress = new VirtualAddress("0.0.0.456");
+			String URL_PATH = "/" + senderVirtualAddress.toString() + "/" + receiverVirtualAddress;
+        	
+        	HttpServletRequest httpRequest = new HttpServletRequestWrapper(URL_PATH);
+            
+            assertEquals(senderVirtualAddress, grandMsgHandler.getSenderVirtualAddressFromPath(httpRequest, senderVirtualAddress));
+			
+			assertEquals(receiverVirtualAddress, grandMsgHandler.getReceiverVirtualAddressFromPath(httpRequest));
+			
+			System.out.println("grand-message-handler IT successfully completed");
+       	assertTrue(true);
         } catch(Exception e) {
         	fail(e.getMessage());
         }
