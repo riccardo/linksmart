@@ -50,6 +50,16 @@
             </resource>
         </resources>
 		<plugins>
+            <!-- skip execution of the install plugin for the feature parent pom -->
+            <!-- it's needed for maven > 3.0.x  environments -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <inherited>false</inherited>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
