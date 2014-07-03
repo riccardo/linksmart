@@ -154,6 +154,7 @@
     
     <feature name="grand-message-handler" version="${project.version}">
         <feature version="${project.version}">network-manager</feature>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.data/${parent.version}</bundle>
     	<bundle>mvn:eu.linksmart/eu.linksmart.network.tunnel/${project.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.network.grand/${parent.version}</bundle>
     </feature>
