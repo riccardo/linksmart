@@ -40,9 +40,19 @@ public class ComponentIT {
     @Configuration
     public Option[] config() {
         return new Option[] {
+        		//
+        		// this feature will install all LinkSmart bundles including their required dependencies
+        		//
         		ITConfiguration.regressionDefaults(),
-                mavenBundle("${groupId}","${artifactId}","${version}"), // change those values to fit your service artifact
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"linksmart"),  // this feature will install all bundles including required dependencies without web-service provider                  
+        		//
+        		// this feature will install all LinkSmart bundles including their required dependencies
+        		//
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"linksmart"),
+        		//
+        		// since this integration test is for a given bundle, therefore, that bundle also need to be provisioned inside OSGi container.
+        		// any bundle can be installed by following parameter, change those values to fit your service artifact
+        		//
+        		mavenBundle("${groupId}","${artifactId}","${version}"),                  
         };
     }
     
