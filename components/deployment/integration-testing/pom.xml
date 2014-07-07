@@ -9,6 +9,7 @@
 		<version>2.2.0-SNAPSHOT</version>
 	</parent>
 
+	<groupId>eu.linksmart.testing</groupId>
 	<artifactId>linksmart-deployment-it</artifactId>
 	
 	<name>LinkSmart Full Integration Suite</name>
@@ -20,7 +21,6 @@
     </properties>     
     
     <modules>
-    	<module>it-utils</module>
     	<module>cryptomanager-it</module>
     	<module>identity-manager-it</module>
         <module>basic-tunneling-it</module>
@@ -47,12 +47,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-            <!-- testing related dependencies -->
-            <dependency>
-				<groupId>eu.linksmart</groupId>
-				<artifactId>it-utils</artifactId>
-				<version>${project.version}</version>
-			</dependency>
             <dependency>
 				<groupId>org.apache.servicemix.bundles</groupId>
 				<artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
@@ -63,6 +57,12 @@
 	</dependencyManagement>
 	
 	<dependencies>
+		<!-- Integration Testing Utils -->
+		<dependency>
+			<groupId>eu.linksmart.testing</groupId>
+			<artifactId>integration-testing-utils</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- PaxExam dependencies -->
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
