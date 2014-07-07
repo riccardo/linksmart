@@ -41,6 +41,7 @@ public class ComponentIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
+                mavenBundle("${groupId}","${artifactId}","${version}"), // change those values to fit your service artifact
         		features(ITConfiguration.getFeaturesRepositoryURL(),"linksmart"),  // this feature will install all bundles including required dependencies without web-service provider                  
         };
     }
