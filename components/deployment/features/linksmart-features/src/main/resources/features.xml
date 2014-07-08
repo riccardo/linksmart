@@ -60,7 +60,6 @@
     </feature>
     
     <feature name="identity-manager" version="${project.version}">
-    	<feature version="${project.version}">crypto-manager</feature>
     	<bundle>mvn:eu.linksmart/eu.linksmart.api.identitymanager/${project.version}</bundle>
     	<bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${project.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${project.version}</bundle>
@@ -70,6 +69,19 @@
     	<bundle>mvn:eu.linksmart/eu.linksmart.api.policy/${project.version}</bundle>
     	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.network.identitymanager/${project.version}</bundle>
+    </feature>
+    
+    <feature name="identity-manager-crypto" version="${project.version}">
+    	<feature version="${project.version}">crypto-manager</feature>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.identitymanager/${project.version}</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${project.version}</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${project.version}</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.policy/${project.version}</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.identitymanager.crypto/${project.version}</bundle>
     </feature>
     
     <feature name="backbone-router" version="${project.version}">
@@ -86,7 +98,7 @@
     	<feature version="${project.version}">linksmart-boot</feature> 
     	<feature version="${project.version}">osgi-http</feature>  
     	<feature version="${project.version}">crypto-manager</feature>	
-    	<feature version="${project.version}">identity-manager</feature>
+    	<feature version="${project.version}">identity-manager-crypto</feature>
         <feature version="${project.version}">security-manager-sym</feature>
         <feature version="${project.version}">security-manager-asym</feature>
         <feature version="${project.version}">backbone-router</feature>
@@ -183,12 +195,11 @@
     </feature>
     
     <!--  Calculator Example Service FEATURE -->
-<!--     <feature name="linksmart-example-service" version="${project.version}">  -->
-<!--     	<feature version="${project.version}">linksmart</feature> -->
-<!--     	<feature version="${project.version}">linksmart-ws-provider</feature> -->
-<!--     	<bundle>mvn:eu.linksmart.examples/calculator-service/${project.version}</bundle> -->
-<!--         <bundle>mvn:eu.linksmart.examples/calculator-consumer/${project.version}</bundle> -->
-<!--     </feature> -->
+    <feature name="linksmart-example-service" version="${project.version}"> 
+    	<feature version="${project.version}">linksmart</feature>
+    	<bundle>mvn:eu.linksmart.examples/calculator-service/${project.version}</bundle>
+        <bundle>mvn:eu.linksmart.examples/calculator-consumer/${project.version}</bundle>
+    </feature>
        
     <!--  INTEGRATION FEATURES -->
     
