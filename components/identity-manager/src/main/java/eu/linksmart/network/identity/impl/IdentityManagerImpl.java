@@ -22,6 +22,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
@@ -66,10 +71,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	protected ConcurrentHashMap<String, List<Message>> resolveResponses;
 	protected ConcurrentHashMap<String, Object> locks;
 
-	protected NetworkManagerCore networkManagerCore;
-	
-	protected CryptoManager cryptoManager;
-
 	/**Thread to delete not updated Services.*/
 	protected Thread serviceClearerThread;
 
@@ -92,13 +93,44 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	/** Flag controlling Service clearer thread.*/
 	private boolean serviceClearerThreadRunning;
 	
-	public IdentityManagerImpl() {
-		init();
+	@Reference(name="NetworkManagerCore",
+			cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+			bind="bindNetworkManagerCore", 
+			unbind="unbindNetworkManagerCore",
+			policy=ReferencePolicy.DYNAMIC)
+	protected NetworkManagerCore networkManagerCore;
+
+	@Reference(name="CryptoManager",
+			cardinality = ReferenceCardinality.MANDATORY_UNARY,
+			bind="bindCryptoManager", 
+			unbind="unbindCryptoManager",
+			policy=ReferencePolicy.DYNAMIC)
+	protected CryptoManager cryptoManager;
+			
+	protected void bindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
+		LOG.debug("IdentityManager::binding networkmanager-core");
+		this.networkManagerCore = networkManagerCore;
+	}
+
+	protected void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
+		LOG.debug("IdentityManager::un-binding networkmanager-core");
+		this.networkManagerCore = null;
+	}
+
+	protected void bindCryptoManager(CryptoManager cryptoManager) {
+		LOG.debug("IdentityManager::binding cryptomanager");
+		this.cryptoManager = cryptoManager;
+	}
+
+	protected void unbindCryptoManager(CryptoManager cryptoManager) {
+		LOG.debug("IdentityManager::un-binding cryptomanager");
+		this.cryptoManager = null;
 	}
 	
-	protected void setNetworkManagerCore(NetworkManagerCore networkManagerCore) {
-		this.networkManagerCore = networkManagerCore;
-		// Start the threads once NetworkManagerCore is available
+	@Activate
+	protected void activate(ComponentContext context) {
+		LOG.info("Starting " + IDENTITY_MGR);
+		
 		this.serviceClearerThread = new Thread(new ServiceClearer());
 		serviceClearerThread.start();
 		serviceClearerThreadRunning = true;
@@ -120,37 +152,27 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_REQ, this);
 		((MessageDistributor) this.networkManagerCore).subscribe(
 				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP, this);
+		
+		LOG.info(IDENTITY_MGR + " started");
 	}
-	
-	protected void unsetNetworkManagerCore(NetworkManagerCore networkManagerCore) {
+
+	@Deactivate
+	protected void deactivate(ComponentContext context) {
 		advertisingThreadRunning = false;
 		serviceUpdaterThreadRunning = false;
 		serviceClearerThreadRunning = false;
-		this.networkManagerCore = null;
 		//TODO fix null reference for below code
 		//unsubscribe to messages sent by other identity managers
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
 				IDMANAGER_NMADVERTISMENT_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
 				IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, this);
-	}
-	
-	protected void setCryptoManager(CryptoManager cryptoManager) {
-		this.cryptoManager = cryptoManager;
-	}
-	
-	protected void unsetCryptoManager(CryptoManager cryptoManager) {
-		this.cryptoManager = cryptoManager;
-	}
-	
-	protected void activate(ComponentContext context) {
-		LOG.info("Starting " + IDENTITY_MGR);
-		LOG.info(IDENTITY_MGR + " started");
-	}
-
-	protected void deactivate(ComponentContext context) {
 		LOG.info(IDENTITY_MGR + "stopped");
 		//TODO clear all data structures
+	}
+	
+	public IdentityManagerImpl() {
+		init();
 	}
 	
 	protected void init() {
