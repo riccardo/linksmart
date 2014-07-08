@@ -14,7 +14,7 @@
 
 	<packaging>bundle</packaging>
 
-	<name>LinkSmart Identity Manager X.509 based Attribute</name>
+	<name>LinkSmart Identity Manager-Crypto X.509 based Attribute</name>
 	<description>LinkSmart Identity Manager based on X.509 attribution</description>
 
 	<dependencies>
