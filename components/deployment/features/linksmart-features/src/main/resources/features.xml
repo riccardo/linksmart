@@ -196,12 +196,12 @@
         <feature version="${project.version}">linksmart-ws-provider</feature>
     </feature>
     
-    <!--  Calculator Example Service FEATURE -->
-    <feature name="linksmart-example-service" version="${project.version}"> 
-    	<feature version="${project.version}">linksmart</feature>
-    	<bundle>mvn:eu.linksmart.examples/calculator-service/${project.version}</bundle>
-        <bundle>mvn:eu.linksmart.examples/calculator-consumer/${project.version}</bundle>
-    </feature>
+<!--      Calculator Example Service FEATURE -->
+<!--     <feature name="linksmart-example-service" version="${project.version}">  -->
+<!--     	<feature version="${project.version}">linksmart</feature> -->
+<!--     	<bundle>mvn:eu.linksmart.examples/calculator-service/${project.version}</bundle> -->
+<!--         <bundle>mvn:eu.linksmart.examples/calculator-consumer/${project.version}</bundle> -->
+<!--     </feature> -->
        
     <!--  INTEGRATION FEATURES -->
     
