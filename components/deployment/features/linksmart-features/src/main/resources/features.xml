@@ -211,22 +211,10 @@
     </feature>
 
     <feature name="backbone-jxta-it" version="${project.version}">
-        <bundle>mvn:org.apache.felix/org.apache.felix.scr/${felix.scr.version}</bundle>
-        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
-        <bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/4.2.22</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcpg-jdk16/${servicemix.bcpg-jdk16}</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/${servicemix.commons-lang.version}</bundle>
-        <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/${felix.osgi.configadmin.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.utils/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.network/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.backbone.router/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager.core/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.router/${parent.version}</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.jxta/${parent.version}</bundle>
+        <!--<feature version="${project.version}">network-manager</feature>-->
+        <feature version="${project.version}">trust-manager</feature>
+        <feature version="${project.version}">backbone-jxta</feature>
+        <feature version="${project.version}">configurator-manager</feature>
     </feature>
 
 
