@@ -162,6 +162,8 @@
         <feature version="${project.version}">linksmart-boot</feature> 
     	<feature version="${project.version}">osgi-http</feature>
         <bundle>mvn:eu.linksmart/eu.linksmart.config.managerconfigurator/${parent.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-codec/${commons-codec.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/${commons-httpclient.version}</bundle>
     </feature>
     
     <feature name="grand-message-handler" version="${project.version}">
