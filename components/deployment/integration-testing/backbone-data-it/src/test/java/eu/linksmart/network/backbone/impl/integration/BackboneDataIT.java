@@ -1,11 +1,10 @@
-package eu.linksmart.network.backbone.impl.data.integration;
+package eu.linksmart.network.backbone.impl.integration;
 
 import static org.junit.Assert.*;
 
 import java.util.List;
 
 import eu.linksmart.it.utils.ITConfiguration;
-import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.network.backbone.Backbone;
 import eu.linksmart.security.communication.SecurityProperty;
 import junit.framework.Assert;
