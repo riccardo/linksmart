@@ -11,8 +11,11 @@ import org.osgi.service.cm.ConfigurationAdmin;
 public class BackboneGrandConfigurator extends Configurator {
 
 	/* Configuration PID & file path. */
-	public static String BBSOAP_PID = "eu.linksmart.network.backbone.soap";
-	public static String CONFIGURATION_FILE = "/resources/BBSOAP.properties";
+//	public static String BBSOAP_PID = "eu.linksmart.network.backbone.soap";
+//	public static String CONFIGURATION_FILE = "/resources/BBSOAP.properties";
+	
+	public static String BBSOAP_PID = "eu.linksmart.network.backbone.grand";
+	public static String CONFIGURATION_FILE = "/resources";
 
 	/* Configuration Keys. */
 	//see enum SecurityProperty in API, file SecurityProperty.java

@@ -54,13 +54,12 @@ public class BackboneGrandImpl implements Backbone {
         this.configurationAdmin = configurationAdmin;
 		virtualAddressUrlMap = new HashMap<VirtualAddress, URL>();
 
-		try {
-			this.configurator = new BackboneGrandConfigurator(this, context
-					.getBundleContext(),this.configurationAdmin);
-			configurator.registerConfiguration();
-		} catch (NullPointerException e) {
-			LOG.fatal("Configurator could not be initialized " + e.toString());
-		}
+//		try {
+//			this.configurator = new BackboneGrandConfigurator(this, context.getBundleContext(),this.configurationAdmin);
+//			configurator.registerConfiguration();
+//		} catch (NullPointerException e) {
+//			LOG.fatal("Configurator could not be initialized " + e.toString());
+//		}
 
 		this.bbRouter = bbRouter;
 
