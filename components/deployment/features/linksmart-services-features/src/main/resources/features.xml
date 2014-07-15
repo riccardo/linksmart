@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<features name="${project.artifactId}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+    <!-- Calculator Example Service -->
+    <feature name="linksmart-example-service" version="${linksmart.example.version}">
+    	<bundle>mvn:eu.linksmart.examples/calculator-service/${linksmart.example.version}</bundle>
+        <bundle>mvn:eu.linksmart.examples/calculator-consumer/${linksmart.example.version}</bundle>
+    </feature>
+       
+</features>

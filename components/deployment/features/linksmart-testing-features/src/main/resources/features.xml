@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<features name="${project.artifactId}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+	<!--  INTEGRATION FEATURES -->
+	
+    <feature name="crypto-manager-it" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">crypto-manager</feature>
+    </feature>
+    
+    <feature name="security-manager-sym-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">security-manager-sym</feature>
+    </feature>
+    
+    <feature name="security-manager-asym-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">security-manager-asym</feature>
+    </feature>
+    
+    <feature name="identity-manager-it" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">identity-manager</feature>
+    </feature>
+    
+    <feature name="identity-manager-crypto-it" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">identity-manager-crypto</feature>
+    </feature>
+    
+    <feature name="backbone-router-it" version="${linksmart.version}">
+		<feature version="${linksmart.version}">backbone-router</feature>	
+		<bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.impl.osgi/${parent.version}</bundle>	       
+    </feature>
+    
+    <feature name="network-manager-it" version="${linksmart.version}">  
+    	<feature version="${linksmart.version}">network-manager</feature> 
+    </feature>
+    
+    <feature name="trust-manager-it" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">trust-manager</feature>
+    </feature>
+    
+    <feature name="basic-tunnel-it" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">basic-tunnel</feature>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.network.tunnel/${linksmart.version}</bundle>
+    </feature>
+    
+    <feature name="standard-tunnel-it" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">standard-tunnel</feature>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-codec/${commons-codec.version}</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/${commons-httpclient.version}</bundle>
+    </feature>
+    
+    <feature name="soap-tunnel-it" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">soap-tunnel</feature>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-codec/${commons-codec.version}</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/${commons-httpclient.version}</bundle>
+    </feature>
+    
+    <feature name="backbone-osgi-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">backbone-osgi</feature>
+    </feature>
+    
+    <feature name="backbone-soap-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">backbone-soap</feature>
+    </feature>
+    
+    <feature name="backbone-jxta-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">backbone-jxta</feature>
+        <feature version="${linksmart.version}">configurator-manager</feature>
+    </feature>
+    
+    <feature name="backbone-data-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">backbone-data</feature>
+    </feature>
+    
+    <feature name="configurator-manager-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">configurator-manager</feature> 
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-codec/${commons-codec.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/${commons-httpclient.version}</bundle>
+    </feature>
+    
+    <feature name="grand-message-handler-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">grand-message-handler</feature>
+    </feature>
+       
+</features>

@@ -10,10 +10,10 @@
 		<version>2.2.0-SNAPSHOT</version>
     </parent>
 
-	<artifactId>linksmart-features</artifactId>
+	<artifactId>linksmart-services-features</artifactId>
 	
 	<packaging>jar</packaging>
 	
-    <name>LinkSmart Features</name>
+    <name>LinkSmart (custom) Services Features</name>
     
 </project>
