@@ -26,7 +26,7 @@ public class TrustManagerIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"trust-manager"),                    
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"trust-manager-it"),                    
         };
     }
     

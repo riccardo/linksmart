@@ -24,7 +24,7 @@ public class SoapTunnelServiceIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"soap-tunnel"),
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"soap-tunnel-it"),
         };
     }
     

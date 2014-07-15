@@ -23,7 +23,7 @@ public class  CryptoManagerIT  {
         public Option[] config() {
             return new Option[] {
             		ITConfiguration.regressionDefaults(),
-            		features(ITConfiguration.getFeaturesRepositoryURL(),"crypto-manager"),  
+            		features(ITConfiguration.getFeaturesRepositoryURL(),"crypto-manager-it"),  
             };
         }
 

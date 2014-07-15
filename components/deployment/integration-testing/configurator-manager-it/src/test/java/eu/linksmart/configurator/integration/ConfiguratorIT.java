@@ -22,7 +22,7 @@ public class ConfiguratorIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"configurator-manager")
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"configurator-manager-it")
         };
     }
 

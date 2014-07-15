@@ -32,7 +32,7 @@ public class  BackboneOSGIIT  {
         public Option[] config() {
         	return new Option[] {
             		ITConfiguration.regressionDefaults(),
-            		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-osgi"),  
+            		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-osgi-it"),  
             };
         }
 

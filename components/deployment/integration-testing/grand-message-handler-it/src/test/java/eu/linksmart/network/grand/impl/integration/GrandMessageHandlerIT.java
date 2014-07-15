@@ -29,7 +29,7 @@ public class GrandMessageHandlerIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"grand-message-handler")                    
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"grand-message-handler-it")                    
         };
     }
     

@@ -32,7 +32,7 @@ public class  BackboneSOAPIT  {
         public Option[] config() {
         	return new Option[] {
             		ITConfiguration.regressionDefaults(),
-            		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-soap"),  
+            		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-soap-it"),  
         	};
         }
 

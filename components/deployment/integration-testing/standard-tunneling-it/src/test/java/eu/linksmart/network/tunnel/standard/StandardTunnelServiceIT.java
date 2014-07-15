@@ -24,7 +24,7 @@ public class StandardTunnelServiceIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"standard-tunnel"),
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"standard-tunnel-it"),
         };
     }
     

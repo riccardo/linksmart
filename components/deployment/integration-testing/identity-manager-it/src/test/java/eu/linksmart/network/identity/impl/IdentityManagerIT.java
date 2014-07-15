@@ -38,7 +38,7 @@ public class IdentityManagerIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"identity-manager-crypto"),                      
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"identity-manager-crypto-it"),                      
         };
     }
     

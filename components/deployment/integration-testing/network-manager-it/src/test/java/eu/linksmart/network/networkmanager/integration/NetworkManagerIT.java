@@ -42,7 +42,7 @@ public class NetworkManagerIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"network-manager"),  // this feature will install all bundles including required dependencies without web-service provider                  
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"network-manager-it"),  // this feature will install all bundles including required dependencies without web-service provider                  
         };
     }
     

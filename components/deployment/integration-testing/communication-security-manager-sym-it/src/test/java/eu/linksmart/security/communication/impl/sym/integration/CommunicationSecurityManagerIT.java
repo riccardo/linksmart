@@ -38,7 +38,7 @@ public class CommunicationSecurityManagerIT {
     public Option[] config() {
     	return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"security-manager-sym"),  
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"security-manager-sym-it"),  
         };
     }
  

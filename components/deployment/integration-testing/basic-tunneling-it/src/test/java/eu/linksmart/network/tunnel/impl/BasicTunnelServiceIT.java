@@ -40,7 +40,7 @@ public class BasicTunnelServiceIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"basic-tunnel"),                      
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"basic-tunnel-it"),                      
         };
     }
     

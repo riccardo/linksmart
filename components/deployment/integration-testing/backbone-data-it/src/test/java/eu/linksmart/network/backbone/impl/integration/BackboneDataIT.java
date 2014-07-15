@@ -49,7 +49,7 @@ public class BackboneDataIT {
     public Option[] config() {
     	return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-data"),  
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-data-it"),  
         };
     }
 
