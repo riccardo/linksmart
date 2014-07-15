@@ -31,7 +31,11 @@ public class ITConfiguration {
 	
 	private static int HTTP_PORT = 8882;
 	
-	private static final String FEATURES_REPOSITORY_URL = "mvn:eu.linksmart/linksmart-features/"+LINKSMART_VERSION+"/xml/features";
+	private static final String CORE_FEATURES_REPOSITORY_URL = "mvn:eu.linksmart.features/linksmart-features/" + LINKSMART_VERSION + "/xml/features";
+	
+	private static final String TESTING_FEATURES_REPOSITORY_URL = "mvn:eu.linksmart.features/linksmart-testing-features/" + LINKSMART_VERSION + "/xml/features";
+	
+	private static final String SERVICES_FEATURES_REPOSITORY_URL = "mvn:eu.linksmart.features/linksmart-services-features/" + LINKSMART_VERSION + "/xml/features";
 	
 	public static Option regressionDefaults() {
         return regressionDefaults(OSGI_CONTAINER_KARAF);
@@ -86,6 +90,12 @@ public class ITConfiguration {
                 // set the system property for pax web
                 KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", Integer.toString(HTTP_PORT)),
                 
+                // extend feature repositories list with linksmart-features
+                KarafDistributionOption.editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresRepositories", CORE_FEATURES_REPOSITORY_URL),
+                
+                // extend feature repositories list with linksmart-services-features
+                KarafDistributionOption.editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresRepositories", SERVICES_FEATURES_REPOSITORY_URL),
+                
                 /*
                  * activates debugging on the Karaf container using the provided port and holds
                  * the vm till you've attached the debugger.
@@ -115,7 +125,7 @@ public class ITConfiguration {
     }
     
     public static String getFeaturesRepositoryURL() {
-    	return FEATURES_REPOSITORY_URL;
+    	return TESTING_FEATURES_REPOSITORY_URL;
     }
     
     private static void setOSGiContainer(String osgiContainerType) {
