@@ -23,10 +23,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 
@@ -44,11 +46,12 @@ import eu.linksmart.network.identity.util.AttributeResolveResponse;
 import eu.linksmart.network.identity.util.BloomFilterFactory;
 import eu.linksmart.network.identity.util.ByteArrayCodec;
 import eu.linksmart.network.networkmanager.core.NetworkManagerCore;
-import eu.linksmart.security.cryptomanager.CryptoManager;
 import eu.linksmart.utils.Part;
 import eu.linksmart.utils.PartConverter;
 
 @SuppressWarnings("deprecation")
+@Component(name="IdentityManager", immediate=true)
+@Service({IdentityManager.class})
 public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 	public final static String IDMANAGER_UPDATE_SERVICE_LIST_TOPIC = "IDManagerServiceListUpdate";
 	public final static String IDMANAGER_NMADVERTISMENT_TOPIC = "NMAdvertisement";
@@ -99,38 +102,33 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 			unbind="unbindNetworkManagerCore",
 			policy=ReferencePolicy.DYNAMIC)
 	protected NetworkManagerCore networkManagerCore;
-
-	@Reference(name="CryptoManager",
-			cardinality = ReferenceCardinality.MANDATORY_UNARY,
-			bind="bindCryptoManager", 
-			unbind="unbindCryptoManager",
-			policy=ReferencePolicy.DYNAMIC)
-	protected CryptoManager cryptoManager;
-			
+		
 	protected void bindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
 		LOG.debug("IdentityManager::binding networkmanager-core");
 		this.networkManagerCore = networkManagerCore;
+		startThreads();
 	}
 
 	protected void unbindNetworkManagerCore(NetworkManagerCore networkManagerCore) {
 		LOG.debug("IdentityManager::un-binding networkmanager-core");
 		this.networkManagerCore = null;
+		stopThreads();
 	}
 
-	protected void bindCryptoManager(CryptoManager cryptoManager) {
-		LOG.debug("IdentityManager::binding cryptomanager");
-		this.cryptoManager = cryptoManager;
-	}
-
-	protected void unbindCryptoManager(CryptoManager cryptoManager) {
-		LOG.debug("IdentityManager::un-binding cryptomanager");
-		this.cryptoManager = null;
-	}
-	
 	@Activate
 	protected void activate(ComponentContext context) {
-		LOG.info("Starting " + IDENTITY_MGR);
-		
+		LOG.info("[activating IdentityManager]");
+		LOG.info(IDENTITY_MGR + " started");
+	}
+
+	@Deactivate
+	protected void deactivate(ComponentContext context) {
+		LOG.info(IDENTITY_MGR + "stopped");
+		//TODO clear all data structures
+	}
+	
+	private void startThreads() {
+		// Start the threads once NetworkManagerCore is available
 		this.serviceClearerThread = new Thread(new ServiceClearer());
 		serviceClearerThread.start();
 		serviceClearerThreadRunning = true;
@@ -152,12 +150,9 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_REQ, this);
 		((MessageDistributor) this.networkManagerCore).subscribe(
 				IDMANAGER_SERVICE_ATTRIBUTE_RESOLVE_RESP, this);
-		
-		LOG.info(IDENTITY_MGR + " started");
 	}
-
-	@Deactivate
-	protected void deactivate(ComponentContext context) {
+	
+	private void stopThreads() {
 		advertisingThreadRunning = false;
 		serviceUpdaterThreadRunning = false;
 		serviceClearerThreadRunning = false;
@@ -167,8 +162,6 @@ public class IdentityManagerImpl implements IdentityManager, MessageProcessor {
 				IDMANAGER_NMADVERTISMENT_TOPIC, this);
 		((MessageDistributor)this.networkManagerCore).unsubscribe(
 				IDMANAGER_UPDATE_SERVICE_LIST_TOPIC, this);
-		LOG.info(IDENTITY_MGR + "stopped");
-		//TODO clear all data structures
 	}
 	
 	public IdentityManagerImpl() {

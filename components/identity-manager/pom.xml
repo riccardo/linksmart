@@ -22,10 +22,6 @@
 			<groupId>eu.linksmart</groupId>
 			<artifactId>eu.linksmart.api.identitymanager</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>eu.linksmart</groupId>
-			<artifactId>eu.linksmart.api.cryptomanager</artifactId>
-		</dependency>
     	<dependency>
 			<groupId>eu.linksmart</groupId>
 			<artifactId>eu.linksmart.api.networkmanager.core</artifactId>
