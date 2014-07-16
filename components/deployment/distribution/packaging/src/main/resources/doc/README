@@ -44,4 +44,28 @@ or simply
 
 shutdown -f
 
+LinkSmart Features
+------------------------------
+LinkSmart provides different deployment modes with the help of Karaf's feature concept. Following are the current features:
+
+- linksmart-core
+start all LinkSmart components without web service layer.
+
+- linksmart-ws-provider
+setup & start web services container (based on CXF)
+
+- linksmart
+start all LinkSmart components with web service layer and expose web services for relevant components.
+
+- linksmart-light
+start LinkSmart without security components (crypto, trust, security-manager etc). Currently, JXTA backbone is also excluded.
+
+The feature:install command installs a feature as follows: 
+
+karaf@root()> feature:install linksmart
+
+The feature:uninstall command uninstalls a feature as shown below: 
+
+karaf@root()> feature:uninstall linksmart
+
 
