@@ -275,11 +275,6 @@ public class PdpApplication implements PolicyDecisionPoint {
 		return pdp.evaluate(theReqXml);
 	}
 
-	@Override
-	public ResponseCtx evaluate(AbstractRequestCtx ctx) throws RemoteException {
-		return pdp.evaluate(ctx);
-	}
-
 	/**
 	 * @param theUpdates
 	 * 				the configuration update <code>Hashtable</code>

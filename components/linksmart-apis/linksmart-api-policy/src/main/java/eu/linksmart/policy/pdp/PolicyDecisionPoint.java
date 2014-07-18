@@ -50,7 +50,7 @@ import java.rmi.RemoteException;
 public interface PolicyDecisionPoint extends Remote {
 	
 	/**
-	 * Evaluates a request encoded as an XML <code>String</code> and returns 
+	 * Evaluates a request encoded as an XACML XML <code>String</code> and returns 
 	 * the response as an XML <code>String</code> 
 	 * 
 	 * @param theRequest
@@ -61,14 +61,5 @@ public interface PolicyDecisionPoint extends Remote {
 	 * 				any {@link RemoteException} that is thrown
 	 */
     public String evaluate(String theRequest) throws RemoteException;
-
-    /**
-     * Evaluates the received request and returns the decision. Method
-     * executes faster then the XML string based version.
-     * @param ctx
-     * @return
-     * @throws RemoteException
-     */
-//	ResponseCtx evaluate(AbstractRequestCtx ctx) throws RemoteException;
     
 }

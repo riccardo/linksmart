@@ -32,7 +32,9 @@
  */
 package eu.linksmart.policy.pep.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -43,11 +45,13 @@ import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.Subject;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.wso2.balana.ObligationResult;
 import org.wso2.balana.XACMLConstants;
@@ -597,16 +601,23 @@ public class PepApplication implements PepService {
 	@SuppressWarnings({"unchecked" })
 	private ResponseCtx qryPdp(RequestCtx theRequest) {
 		try {
+			//transform query into xml and make request
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			theRequest.encode(baos);
+			String reqXml = baos.toString();
 			if (pdp != null) {
-				return pdp.evaluate(theRequest);
+				String response = pdp.evaluate(reqXml);
+				Element node =  DocumentBuilderFactory
+						.newInstance()
+						.newDocumentBuilder()
+						.parse(new ByteArrayInputStream(response.getBytes()))
+						.getDocumentElement();
+				ResponseCtx respObject = ResponseCtx.getInstance(node);
+				return respObject;
 			} else {
 				//get PDP over LinkSmart
 				resPdpPid(configurator.get(PepConfigurator.PDP_PID));
 				if(pdpRegistration != null) {
-					//transform query into xml and make request
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					theRequest.encode(baos);
-					String reqXml = baos.toString();
 					qryPdpOverNetwork(reqXml);
 					//TODO query PDP over LinkSmart
 					return null;
@@ -748,7 +759,13 @@ public class PepApplication implements PepService {
 			boolean fulfilled = false;
 			//go through each executor to try to fulfill obligations
 			for(ObligationExecutor oblExec : this.obligationExecs) {
-				if(oblExec.evaluate(obl, theRequest, theResponse)) {
+				StringBuilder sbObl = new StringBuilder();
+				obl.encode(sbObl);
+				ByteArrayOutputStream reqStream = new ByteArrayOutputStream();
+				theRequest.encode(reqStream);
+				ByteArrayOutputStream respStream = new ByteArrayOutputStream();
+				theRequest.encode(respStream);
+				if(oblExec.evaluate(sbObl.toString(), reqStream.toString(), respStream.toString())) {
 					fulfilled = true;
 					break;
 				}
