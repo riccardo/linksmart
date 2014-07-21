@@ -23,6 +23,7 @@
     <modules>
     	<module>cryptomanager-it</module>
     	<module>identity-manager-it</module>
+    	<module>identity-manager-crypto-it</module>
         <module>basic-tunneling-it</module>
         <module>standard-tunneling-it</module>
         <module>soap-tunneling-it</module>
@@ -37,6 +38,8 @@
     	<module>network-manager-it</module>
      	<module>grand-message-handler-it</module>
     	<module>trust-manager-it</module>
+<!--     	<module>policy-pdp-it</module> -->
+<!--     	<module>policy-pep-it</module> -->
   </modules>
 
     <scm>

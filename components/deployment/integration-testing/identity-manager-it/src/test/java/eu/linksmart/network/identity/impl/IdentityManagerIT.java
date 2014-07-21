@@ -38,7 +38,7 @@ public class IdentityManagerIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"identity-manager-crypto-it"),                      
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"identity-manager-it"),                      
         };
     }
     
@@ -46,7 +46,7 @@ public class IdentityManagerIT {
     public void testIdentityManager() throws Exception {   
         try {
         	System.out.println("starting identity manager test");
-            Assert.assertEquals("eu.linksmart.network.identity.impl.crypto.IdentityManagerCertImpl",identityManager.getClass().getName());
+            Assert.assertEquals("eu.linksmart.network.identity.impl.IdentityManagerImpl",identityManager.getClass().getName());
 			System.out.println("identity manager test successfully completed");
         } catch(Exception e) {
         	e.printStackTrace();
