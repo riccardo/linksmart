@@ -1,0 +1,24 @@
+# PolicyEnforcementPoint bnd instructions
+# 
+# Note that we are currently still using a separate MANIFEST.MF and 
+# declarative services activation file; this will change in a future 
+# version. Changes in this file will not directly change the 
+# MANIFEST.MF until then.
+#
+# author Marco Tiemann
+#
+-manifest= ../META-INF/MANIFEST.MF
+version=1.0.1
+Include-Resource: resources/pepconfig.properties=pepconfig.properties,\
+ OSGI-INF/eu.linksmart.policy.pep.DSActivation.xml=../OSGI-INF/eu.linksmart.policy.pep.DSActivation.xml
+Export-Package: eu.linksmart.policy.pep.impl.*;version=${version},\
+ eu.linksmart.policy.pep.request.*;version=${version},\
+ eu.linksmart.policy.pep.response.*;version=${version},\
+ eu.linksmart.policy.pep.cache.*;version=${version}
+Service-Component: OSGI-INF/eu.linksmart.policy.pep.DSActivation.xml
+Bundle-Version: ${version}
+Bundle-Name: LinkSmart PEP 
+Bundle-Description: eu.linksmart.policy.pep
+Bundle-Vendor: University of Reading
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
