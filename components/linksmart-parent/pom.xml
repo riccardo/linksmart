@@ -16,6 +16,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- versions for LINKSMART dependencies -->
+        <linksmart.version>2.2.0-SNAPSHOT</linksmart.version>
         <!-- versions for OSGi dependencies -->
         <felix.osgi.core.version>1.4.0</felix.osgi.core.version>
         <felix.osgi.configadmin.version>1.8.0</felix.osgi.configadmin.version>
@@ -248,151 +250,166 @@
         	<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.utils</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.network</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.networkmanager</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.networkmanager.core</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.trustmanager</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.security.communication</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.identitymanager</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.cryptomanager</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.backbone</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.backbone.router</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.clients</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
       		<dependency>
         		<groupId>eu.linksmart</groupId>
         		<artifactId>eu.linksmart.api.policy</artifactId>
-        		<version>${project.version}</version>
+        		<version>${linksmart.version}</version>
       		</dependency>
             <!-- LinkSmart security dependencies -->
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.security.cryptomanager</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.security.communicationsecuritymanager.asym</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.security.communicationsecuritymanager.sym</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.identitymanager</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.identitymanager.crypto</artifactId>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.security.trustmanager</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.policy.pdp</artifactId>
+                <version>${linksmart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.policy.pep</artifactId>
+                <version>${linksmart.version}</version>
             </dependency>
             <!-- LinkSmart general dependencies -->
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.networkmanager</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.config.managerconfigurator</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.grand</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.tools.log4jfragment</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
 			<!-- LinkSmart backbone dependencies -->
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.backbone.data</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.backbone.router</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.backbone.jxta</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.backbone.impl.osgi</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.backbone.soap</artifactId>
-                <version>${project.version}</version>
+                <version>${linksmart.version}</version>
             </dependency>
             <!-- LinkSmart tunnel dependencies -->
       		<dependency>
 				<groupId>eu.linksmart</groupId>
 				<artifactId>eu.linksmart.network.tunnel</artifactId>
-				<version>${project.version}</version>
+				<version>${linksmart.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.linksmart</groupId>
 				<artifactId>eu.linksmart.network.soaptunneling</artifactId>
-				<version>${project.version}</version>
+				<version>${linksmart.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.linksmart</groupId>
 				<artifactId>eu.linksmart.network.tunnel.standard</artifactId>
-				<version>${project.version}</version>
+				<version>${linksmart.version}</version>
 			</dependency>
             <!-- other dependencies -->
         </dependencies>
