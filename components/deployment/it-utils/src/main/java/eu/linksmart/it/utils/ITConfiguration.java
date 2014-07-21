@@ -128,6 +128,14 @@ public class ITConfiguration {
     	return TESTING_FEATURES_REPOSITORY_URL;
     }
     
+    public static String getCoreFeaturesRepositoryURL() {
+    	return TESTING_FEATURES_REPOSITORY_URL;
+    }
+    
+    public static String getServicesFeaturesRepositoryURL() {
+    	return TESTING_FEATURES_REPOSITORY_URL;
+    }
+    
     private static void setOSGiContainer(String osgiContainerType) {
     	if(osgiContainerType.equals(OSGI_CONTAINER_KARAF)) {
     		KARAF_DISTRO_GROUP_ID = "org.apache.karaf"; 
