@@ -87,6 +87,7 @@ import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 
 /**
  * <p>Default {@link PepService} implementation</p>
@@ -97,6 +98,7 @@ import org.apache.felix.scr.annotations.ReferencePolicy;
  * 
  */
 @Component(name="eu.linksmart.policy.pep", immediate=true)
+@Service({PepService.class})
 public class PepApplication implements PepService {
 
 	/** logger */
@@ -209,11 +211,11 @@ public class PepApplication implements PepService {
 	 */
 	@Activate
 	protected void activate(final ComponentContext theContext) {
-		logger.info("Activating");
+		logger.info("activating policy-pep");
 		bundleContext = theContext.getBundleContext();
 		configurator = new PepConfigurator(bundleContext, this, configAdmin);
 		configurator.registerConfiguration();
-		logger.info("Activated");
+		logger.info("activated policy-pep");
 	}
 
 	/**
@@ -224,7 +226,7 @@ public class PepApplication implements PepService {
 	 */
 	@Deactivate
 	protected void deactivate(ComponentContext theContext) {
-		logger.debug("Deactivating");
+		logger.debug("deactivating policy-pep");
 	}
 
 	private PepResponse requestAccessDecision(final VirtualAddress theSndVad,
