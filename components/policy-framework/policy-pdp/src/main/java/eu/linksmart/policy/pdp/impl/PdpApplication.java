@@ -97,9 +97,6 @@ public class PdpApplication implements PolicyDecisionPoint {
 		PERMITTED_REPOSITORIES.add("file");
 	}
 
-	/** {@link BundleContext} */
-	private BundleContext bundleCtx = null;
-
 	/** {@link PluginLinkSmartPDP} */
 	private PDP pdp = null;
 
@@ -123,7 +120,6 @@ public class PdpApplication implements PolicyDecisionPoint {
 		    policy=ReferencePolicy.STATIC)
 	protected ConfigurationAdmin configAdmin = null;
 	
-	/** {@link NetworkManagerApplication} */
 	@Reference(name="NetworkManager",
             cardinality = ReferenceCardinality.OPTIONAL_UNARY,
             bind="bindNetworkManager",
@@ -139,14 +135,17 @@ public class PdpApplication implements PolicyDecisionPoint {
 	private PolicyInformationPoint pip;
 	
 	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
+		logger.info("binding policy-pdp:configAdmin");
         this.configAdmin = configAdmin;
     }
 
     protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
+    	logger.info("un-binding policy-pdp:configAdmin");
         this.configAdmin = null;
     }
 	
 	protected void bindNetworkManager(NetworkManager nm) {
+		logger.info("binding policy-pdp:networkmanager");
 		this.nm = nm;
 		if(activated) {
 			serviceManager = new LinkSmartServiceManager(this, nm);
@@ -159,6 +158,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	}
 
 	protected void unbindNetworkManager(NetworkManager nm) {
+		logger.info("un-binding policy-pdp:networkmanager");
 		if(serviceManager != null) {
 			try {
 				serviceManager.unregisterService();
@@ -171,6 +171,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	}
 	
 	protected void bindPolicyInformationPoint(PolicyInformationPoint pip) {
+		logger.info("binding policy-pdp:policy information point");
 		pips.add(new PipAttachementPoint(pip));
 		if(attributeFinder != null) {
 			attributeFinder.setModules(pips);
@@ -178,6 +179,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	}
 
 	protected synchronized void unbindPolicyInformationPoint(PolicyInformationPoint pip) {
+		logger.info("unbinding policy-pdp:policy information point");
 		int index = 0;
 		boolean match = false;
 		//find the unbinded pip from the list
@@ -198,20 +200,13 @@ public class PdpApplication implements PolicyDecisionPoint {
 		}
 	}
 	
-	/**
-	 * @param theContext
-	 * 				the {@link ComponentContext}
-	 */
-	@SuppressWarnings("unchecked")
 	@Activate
 	protected void activate(ComponentContext theContext) {
-		logger.info("Activating");
-		bundleCtx = theContext.getBundleContext();
-		//configurator = new PdpConfigurator(bundleCtx, this, configAdmin);
-		//configurator.registerConfiguration();
-		if(nm != null) {
-			serviceManager = new LinkSmartServiceManager(this, nm);
-		}
+		logger.info("activating policy-pdp");
+		
+		configurator = new PdpConfigurator(theContext.getBundleContext(), this, configAdmin);
+		configurator.registerConfiguration();
+				
 		//set up PDP
 
 		//check repository location - at the moment only file based supported
@@ -240,8 +235,9 @@ public class PdpApplication implements PolicyDecisionPoint {
 						pdpConfig.getResourceFinder(),
 						true));
 
-		if(serviceManager != null) {
+		if(nm != null) {
 			try {
+				serviceManager = new LinkSmartServiceManager(this, nm);
 				serviceManager.init();
 			} catch (IOException e) {
 				logger.error("Error getting hostname of machine, please configure a unique PID and restart", e);
@@ -249,17 +245,14 @@ public class PdpApplication implements PolicyDecisionPoint {
 				logger.error("Error registering with NetworkManager because of PID problem", ei);
 			}
 		}
+			
 		activated = true;
-		logger.info("Activated");
+		logger.info("policy-pdp is activated");
 	}
 
-	/**
-	 * @param theContext
-	 * 				the {@link ComponentContext}
-	 */
 	@Deactivate
 	protected void deactivate(ComponentContext theContext) {
-		logger.debug("Deactivating");
+		logger.debug("deactivating policy-pdp");
 		if(serviceManager != null) {
 			try {
 				serviceManager.unregisterService();
@@ -269,7 +262,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 			}
 		}
 	}
-
+	
 	@Override
 	public String evaluate(String theReqXml) throws RemoteException {
 		return pdp.evaluate(theReqXml);
