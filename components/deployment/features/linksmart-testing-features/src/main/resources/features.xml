@@ -79,5 +79,13 @@
     <feature name="grand-message-handler-it" version="${linksmart.version}">
         <feature version="${linksmart.version}">grand-message-handler</feature>
     </feature>
+    
+    <feature name="policy-pdp-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">policy-pdp</feature>
+    </feature>
+    
+    <feature name="policy-pep-it" version="${linksmart.version}">
+        <feature version="${linksmart.version}">policy-pep</feature>
+    </feature>
        
 </features>
