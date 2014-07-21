@@ -61,8 +61,7 @@ import eu.linksmart.utils.Part;
 public class LinkSmartServiceManager {
 
 	/** logger */
-	private static final Logger logger 
-	= Logger.getLogger(PdpApplication.class);
+	private static final Logger logger = Logger.getLogger(LinkSmartServiceManager.class);
 
 	/** PDP PID default prefix */
 	private static final String DEFAULT_PDP_PREFIX = "PDP:";
@@ -137,6 +136,7 @@ public class LinkSmartServiceManager {
 		registerService(desc, pid, SID, cert, renewCert);
 		//		Thread thread = new Thread(new ServiceRegistrator(desc, pid, SID, cert, renewCert));
 		//		thread.start();
+		logger.info("policy-pdp:service manager is initialized");
 	}
 
 	protected VirtualAddress getVirtualAddress() {
