@@ -262,6 +262,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 				logger.warn("Error deregistering from Network Manager", e);
 			}
 		}
+		activated = false;
 	}
 	
 	@Override
