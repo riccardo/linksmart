@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.balana.Balana;
@@ -63,6 +62,7 @@ import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.Service;
 
 /**
  * Default LinkSmart {@link PolicyDecisionPoint} implementation
@@ -72,6 +72,7 @@ import org.apache.felix.scr.annotations.ReferencePolicy;
  *
  */
 @Component(name="eu.linksmart.policy.pdp", immediate=true)
+@Service({PolicyDecisionPoint.class})
 public class PdpApplication implements PolicyDecisionPoint {
 
 	/** logger */
@@ -135,17 +136,17 @@ public class PdpApplication implements PolicyDecisionPoint {
 	private PolicyInformationPoint pip;
 	
 	protected void bindConfigAdmin(ConfigurationAdmin configAdmin) {
-		logger.info("binding policy-pdp:configAdmin");
+		logger.debug("binding policy-pdp:configAdmin");
         this.configAdmin = configAdmin;
     }
 
     protected void unbindConfigAdmin(ConfigurationAdmin configAdmin) {
-    	logger.info("un-binding policy-pdp:configAdmin");
+    	logger.debug("un-binding policy-pdp:configAdmin");
         this.configAdmin = null;
     }
 	
 	protected void bindNetworkManager(NetworkManager nm) {
-		logger.info("binding policy-pdp:networkmanager");
+		logger.debug("binding policy-pdp:networkmanager");
 		this.nm = nm;
 		if(activated) {
 			serviceManager = new LinkSmartServiceManager(this, nm);
@@ -158,7 +159,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	}
 
 	protected void unbindNetworkManager(NetworkManager nm) {
-		logger.info("un-binding policy-pdp:networkmanager");
+		logger.debug("un-binding policy-pdp:networkmanager");
 		if(serviceManager != null) {
 			try {
 				serviceManager.unregisterService();
@@ -171,7 +172,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	}
 	
 	protected void bindPolicyInformationPoint(PolicyInformationPoint pip) {
-		logger.info("binding policy-pdp:policy information point");
+		logger.debug("binding policy-pdp:policy information point");
 		pips.add(new PipAttachementPoint(pip));
 		if(attributeFinder != null) {
 			attributeFinder.setModules(pips);
@@ -179,7 +180,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 	}
 
 	protected synchronized void unbindPolicyInformationPoint(PolicyInformationPoint pip) {
-		logger.info("unbinding policy-pdp:policy information point");
+		logger.debug("unbinding policy-pdp:policy information point");
 		int index = 0;
 		boolean match = false;
 		//find the unbinded pip from the list
