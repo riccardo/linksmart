@@ -207,21 +207,21 @@ public class PdpApplication implements PolicyDecisionPoint {
 	protected void activate(ComponentContext theContext) {
 		logger.info("Activating");
 		bundleCtx = theContext.getBundleContext();
-		configurator = new PdpConfigurator(bundleCtx, this, configAdmin);
-		configurator.registerConfiguration();
+		//configurator = new PdpConfigurator(bundleCtx, this, configAdmin);
+		//configurator.registerConfiguration();
 		if(nm != null) {
 			serviceManager = new LinkSmartServiceManager(this, nm);
 		}
 		//set up PDP
 
 		//check repository location - at the moment only file based supported
-		String dataSource = (String) configurator.getConfiguration().get(
-				PdpConfigurator.PDP_POLICY_REPOSITORY);
-		if ((dataSource == null) 
-				|| (!PERMITTED_REPOSITORIES.contains(dataSource))) {
-			dataSource = DEFAULT_REPOSITORY;
-			logger.warn("Only file based policy store supported at the moment");
-		}
+		//String dataSource = (String) configurator.getConfiguration().get(
+		//		PdpConfigurator.PDP_POLICY_REPOSITORY);
+		//if ((dataSource == null) 
+		//		|| (!PERMITTED_REPOSITORIES.contains(dataSource))) {
+		//	dataSource = DEFAULT_REPOSITORY;
+		//	logger.warn("Only file based policy store supported at the moment");
+		//}
 		// using file based policy repository. so set the policy location as system property
 		logger.debug("Using file policy repository");
 		createDirectory(PDP_FILEFOLDER_LOC);
