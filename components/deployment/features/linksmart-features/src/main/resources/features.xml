@@ -173,7 +173,10 @@
     </feature>
     
     <feature name="policy-pdp" version="${linksmart.version}">
-    	<feature version="${linksmart.version}">network-manager</feature>
+    	<feature version="${linksmart.version}">linksmart-boot</feature> 
+<!--     	<feature version="${linksmart.version}">network-manager</feature> -->
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${linksmart.version}</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.networkmanager/${linksmart.version}</bundle>
     	<bundle>mvn:eu.linksmart/eu.linksmart.api.policy/${linksmart.version}</bundle>
         <bundle>mvn:org.wso2.balana/org.wso2.balana/${xacml-wso2-balana.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.policy.pdp/${linksmart.version}</bundle>
