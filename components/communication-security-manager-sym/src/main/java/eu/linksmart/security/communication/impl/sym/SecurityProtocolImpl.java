@@ -305,6 +305,11 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		if(!isInitialized){
 			throw new Exception("Cannot protect message as not initialized");
 		}
+		if(localCounter == Integer.MAX_VALUE) {
+			//reset protocol and establish new keys before wrap around
+			resetProtocol();
+			processMessage(msg);
+		}
 
 		// Transform input string to an linksmart:InsideProtected-XML document
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -447,6 +452,13 @@ public class SecurityProtocolImpl implements SecurityProtocol {
 		
 		String result = document.getElementsByTagName(INSIDE_CONTENT_ELEMENT).item(0).getTextContent();
 		msg.setData(result.getBytes());
+		
+		if(remoteCounter == Integer.MAX_VALUE - 1) {
+			//we reached the maximum value for the counter so we do not accept more messages
+			//remote side should also recognize this
+			resetProtocol();
+		}
+		
 		return msg;
 	}
 
