@@ -30,7 +30,7 @@
         <file>
             <source>src/main/resources/doc/README</source>
             <outputDirectory>/</outputDirectory>
-            <destName>README</destName>
+            <destName>README-LS</destName>
         </file>
 
     </files>
