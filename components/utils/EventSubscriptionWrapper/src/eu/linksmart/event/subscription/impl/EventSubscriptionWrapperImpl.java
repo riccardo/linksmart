@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 
 import eu.linksmart.event.subscription.EventSubscriptionWrapper;
@@ -39,6 +40,8 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 	private Map<String, EventManagerPort> eventManagers;
 	// Subscriber Service ID <-> HID
 	private Map<String, VirtualAddress> subscriberHIDs;
+	// Subscriber Service ID <-> ServiceRegistration
+	private Map<String, ServiceRegistration> serviceRegistrations;
 	// Topic -> Service IDs
 	private Map<String, List<String>> topicIDs;
 	// Topic-ServiceID combinations which still must be subscribed
@@ -52,6 +55,7 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 		subscriberHIDs = new HashMap<String, VirtualAddress>();
 		eventManagers = new HashMap<String, EventManagerPort>();
 		topicIDs = new HashMap<String, List<String>>();
+		serviceRegistrations = new HashMap<String, ServiceRegistration>();
 
 		// Get the NetworkManager
 		networkManager = (NetworkManager) context
@@ -108,8 +112,10 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 		props.put("service.exported.interfaces", "*");
 		props.put("service.exported.configs", "org.apache.cxf.ws");
 		props.put("org.apache.cxf.ws.address", subscriberURL);
-		context.getBundleContext().registerService(
-				EventSubscriber.class.getName(), subscriber, props);
+		serviceRegistrations.put(
+				serviceID,
+				context.getBundleContext().registerService(
+						EventSubscriber.class.getName(), subscriber, props));
 	}
 
 	@Override
@@ -120,6 +126,10 @@ public class EventSubscriptionWrapperImpl implements EventSubscriptionWrapper {
 			networkManager.removeService(subscriberHID);
 		} catch (RemoteException e) {
 			LOG.error("Unable to deregister HID: " + subscriberHID, e);
+		}
+		ServiceRegistration sr = serviceRegistrations.remove(serviceID);
+		if (sr != null) {
+			sr.unregister();
 		}
 	}
 
