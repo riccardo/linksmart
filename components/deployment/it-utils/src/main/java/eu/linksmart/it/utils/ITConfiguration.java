@@ -85,7 +85,7 @@ public class ITConfiguration {
                 /*
                  * force the log level to INFO so we have more details during the test. It defaults to WARN.
                  */
-                logLevel(LogLevel.INFO),
+                logLevel(LogLevel.TRACE),
                 
                 // set the system property for pax web
                 KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", Integer.toString(HTTP_PORT)),
