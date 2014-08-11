@@ -20,6 +20,7 @@ import static junit.framework.Assert.assertNotNull;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 import javax.inject.Inject;
 
@@ -38,6 +39,10 @@ public class CommunicationSecurityManagerIT {
     public Option[] config() {
     	return new Option[] {
         		ITConfiguration.regressionDefaults(),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8108"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1124"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44470"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8090"),
         		features(ITConfiguration.getFeaturesRepositoryURL(),"security-manager-sym-it"),  
         };
     }

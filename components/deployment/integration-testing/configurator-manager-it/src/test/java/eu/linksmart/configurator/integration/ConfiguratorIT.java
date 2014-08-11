@@ -12,16 +12,21 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 
 import eu.linksmart.it.utils.ITConfiguration;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 @RunWith(PaxExam.class)
 public class ConfiguratorIT {
 	
-	private final String HTTP_PORT = "8882";
+	private final String HTTP_PORT = "8091";
 
     @Configuration
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8109"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1125"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44471"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", HTTP_PORT),
         		features(ITConfiguration.getFeaturesRepositoryURL(),"configurator-manager-it")
         };
     }

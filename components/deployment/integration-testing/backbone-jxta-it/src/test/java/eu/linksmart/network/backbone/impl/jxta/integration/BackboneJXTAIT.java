@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
@@ -41,6 +42,10 @@ public class  BackboneJXTAIT  {
     public Option[] config() {
         return new Option[] {
                 ITConfiguration.regressionDefaults(),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8102"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1118"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44464"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8084"),
                 //features(ITConfiguration.getFeaturesRepositoryURL(),"jxta-integration-feature"),
                 features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-jxta-it"),
         };

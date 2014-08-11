@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 import javax.inject.Inject;
 
@@ -32,6 +33,10 @@ public class  BackboneSOAPIT  {
         public Option[] config() {
         	return new Option[] {
             		ITConfiguration.regressionDefaults(),
+                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8105"),
+                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1121"),
+                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44467"),
+                    KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8087"),
             		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-soap-it"),  
         	};
         }

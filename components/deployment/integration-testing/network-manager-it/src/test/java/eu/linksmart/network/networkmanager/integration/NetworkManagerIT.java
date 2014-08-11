@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import eu.linksmart.it.utils.ITConfiguration;
 
 import eu.linksmart.network.networkmanager.NetworkManager;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 /* 
  * @RunWith(PaxExam.class) hooks Pax Exam into JUnit and does its magic of 
@@ -42,6 +43,10 @@ public class NetworkManagerIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8113"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1129"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44475"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8095"),
         		features(ITConfiguration.getFeaturesRepositoryURL(),"network-manager-it"),  // this feature will install all bundles including required dependencies without web-service provider                  
         };
     }

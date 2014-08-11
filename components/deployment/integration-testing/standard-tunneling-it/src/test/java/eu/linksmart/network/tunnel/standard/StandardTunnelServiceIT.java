@@ -14,6 +14,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 
 import eu.linksmart.it.utils.ITConfiguration;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 @RunWith(PaxExam.class)
 public class StandardTunnelServiceIT {
@@ -24,6 +25,10 @@ public class StandardTunnelServiceIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8115"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1131"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44477"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8097"),
         		features(ITConfiguration.getFeaturesRepositoryURL(),"standard-tunnel-it"),
         };
     }

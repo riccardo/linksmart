@@ -16,6 +16,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import eu.linksmart.it.utils.ITConfiguration;
 import eu.linksmart.network.backbone.data.DataEndpoint;
 import eu.linksmart.network.backbone.Backbone;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 @RunWith(PaxExam.class)
 public class GrandMessageHandlerIT {
@@ -29,6 +30,10 @@ public class GrandMessageHandlerIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8111"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1127"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44473"),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8093"),
         		features(ITConfiguration.getFeaturesRepositoryURL(),"grand-message-handler-it")                    
         };
     }
