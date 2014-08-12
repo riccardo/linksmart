@@ -17,7 +17,7 @@ import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 @RunWith(PaxExam.class)
 public class ConfiguratorIT {
 	
-	private final String HTTP_PORT = "8082";
+	private final String HTTP_PORT = "8882";
 
     @Configuration
     public Option[] config() {
