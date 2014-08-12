@@ -1,6 +1,7 @@
 package eu.linksmart.it.utils;
 
 import org.apache.log4j.Logger;
+import org.ops4j.pax.exam.Constants;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
