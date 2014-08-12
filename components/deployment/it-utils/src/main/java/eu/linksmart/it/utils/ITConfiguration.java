@@ -1,7 +1,5 @@
 package eu.linksmart.it.utils;
 
-import org.apache.log4j.Logger;
-import org.ops4j.pax.exam.Constants;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
@@ -10,8 +8,6 @@ import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.UUID;
-
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
@@ -34,16 +30,12 @@ public class ITConfiguration {
 	private static int DEBUG_PORT = 8889;
 	
 	private static int HTTP_PORT = 8882;
-
-    private static Logger mLogger = Logger.getLogger((ITConfiguration.class.getName()));
 	
 	private static final String CORE_FEATURES_REPOSITORY_URL = "mvn:eu.linksmart.features/linksmart-features/" + LINKSMART_VERSION + "/xml/features";
 	
 	private static final String TESTING_FEATURES_REPOSITORY_URL = "mvn:eu.linksmart.features/linksmart-testing-features/" + LINKSMART_VERSION + "/xml/features";
 	
 	private static final String SERVICES_FEATURES_REPOSITORY_URL = "mvn:eu.linksmart.features/linksmart-services-features/" + LINKSMART_VERSION + "/xml/features";
-
-
 	
 	public static Option regressionDefaults() {
         return regressionDefaults(OSGI_CONTAINER_KARAF);
@@ -67,16 +59,7 @@ public class ITConfiguration {
     	setOSGiContainer(osgiContainerType);
     	DEBUG = debugFlag;
     	DEBUG_PORT = debugPort;
-
-        String workingDir;
-        if(unpackDir==null) {
-            workingDir = UUID.randomUUID().toString();
-            workingDir = "target/" + workingDir;
-            mLogger.debug("working directory :" + workingDir);
-        }else {
-            workingDir=unpackDir;
-        }
-
+    	
         return composite(
 
         		/*
@@ -87,13 +70,9 @@ public class ITConfiguration {
         			.frameworkUrl(mvnKarafDist())
         			.karafVersion(KARAF_DISTRO_VERSION)
         			.name(KARAF_DISTRO_NAME)
-        			.unpackDirectory(workingDir == null ? null : new File(workingDir))
+        			.unpackDirectory(unpackDir == null ? null : new File(unpackDir))
         			.useDeployFolder(false),
-
-                /*
-                *  setup working directory
-                */
-                workingDirectory(workingDir),
+            
                 /*
                  * keeping container sticks around after the test so we can check the contents
                    of the data directory when things go wrong.        
