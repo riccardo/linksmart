@@ -33,11 +33,7 @@ public class  BackboneSOAPIT  {
         public Option[] config() {
         	return new Option[] {
             		ITConfiguration.regressionDefaults(),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8105"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1121"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44467"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8087"),
-            		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-soap-it"),  
+            		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-soap-it"),
         	};
         }
 

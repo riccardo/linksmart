@@ -33,11 +33,7 @@ public class  BackboneOSGIIT  {
         public Option[] config() {
         	return new Option[] {
             		ITConfiguration.regressionDefaults(),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8103"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1119"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44465"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8085"),
-            		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-osgi-it"),  
+            		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-osgi-it"),
             };
         }
 

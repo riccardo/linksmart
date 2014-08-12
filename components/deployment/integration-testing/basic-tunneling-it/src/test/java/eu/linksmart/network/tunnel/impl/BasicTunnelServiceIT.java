@@ -41,11 +41,7 @@ public class BasicTunnelServiceIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8106"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1122"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44468"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8088"),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"basic-tunnel-it"),                      
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"basic-tunnel-it"),
         };
     }
     

@@ -24,11 +24,7 @@ public class  CryptoManagerIT  {
         public Option[] config() {
             return new Option[] {
             		ITConfiguration.regressionDefaults(),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8110"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1126"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44472"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8092"),
-            		features(ITConfiguration.getFeaturesRepositoryURL(),"crypto-manager-it"),  
+            		features(ITConfiguration.getFeaturesRepositoryURL(),"crypto-manager-it"),
             };
         }
 

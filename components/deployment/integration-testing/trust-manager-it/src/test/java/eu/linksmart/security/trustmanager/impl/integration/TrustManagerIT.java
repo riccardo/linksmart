@@ -27,11 +27,7 @@ public class TrustManagerIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8116"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1132"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44478"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8098"),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"trust-manager-it"),                    
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"trust-manager-it"),
         };
     }
     

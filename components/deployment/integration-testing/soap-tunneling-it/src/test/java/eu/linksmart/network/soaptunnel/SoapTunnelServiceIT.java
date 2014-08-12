@@ -25,10 +25,6 @@ public class SoapTunnelServiceIT {
     public Option[] config() {
         return new Option[] {
         		ITConfiguration.regressionDefaults(),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8114"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1130"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44476"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8096"),
         		features(ITConfiguration.getFeaturesRepositoryURL(),"soap-tunnel-it"),
         };
     }

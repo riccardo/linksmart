@@ -46,11 +46,7 @@ public class  BackboneRouterIT  {
         public Option[] config() {
     		return new Option[] {
         		ITConfiguration.regressionDefaults(),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8104"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1120"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44466"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8086"),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-router-it"),  
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-router-it"),
     		};
         }
 

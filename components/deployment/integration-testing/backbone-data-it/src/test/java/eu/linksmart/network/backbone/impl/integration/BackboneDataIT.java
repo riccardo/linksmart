@@ -50,11 +50,7 @@ public class BackboneDataIT {
     public Option[] config() {
     	return new Option[] {
         		ITConfiguration.regressionDefaults(),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8101"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1117"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44463"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8083"),
-        		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-data-it"),  
+        		features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-data-it"),
         };
     }
 

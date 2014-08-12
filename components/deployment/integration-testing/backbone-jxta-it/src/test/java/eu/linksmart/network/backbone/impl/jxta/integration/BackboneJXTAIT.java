@@ -42,11 +42,6 @@ public class  BackboneJXTAIT  {
     public Option[] config() {
         return new Option[] {
                 ITConfiguration.regressionDefaults(),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", "8102"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "1118"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "44464"),
-                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", "8084"),
-                //features(ITConfiguration.getFeaturesRepositoryURL(),"jxta-integration-feature"),
                 features(ITConfiguration.getFeaturesRepositoryURL(),"backbone-jxta-it"),
         };
     }
