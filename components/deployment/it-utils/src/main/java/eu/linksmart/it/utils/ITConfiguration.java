@@ -74,7 +74,7 @@ public class ITConfiguration {
         			.useDeployFolder(false),
 
                 /*
-                 * disable remote SSH port for integration tests
+                 * disable remote SSH port for integration tests (speedup)
                  */
                 systemProperty("karaf.startRemoteShell").value("false"),
                 /*
@@ -99,6 +99,9 @@ public class ITConfiguration {
                 
                 // extend feature repositories list with linksmart-services-features
                 KarafDistributionOption.editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresRepositories", SERVICES_FEATURES_REPOSITORY_URL),
+
+                // disable the shutdown port (speedup)
+                KarafDistributionOption.editConfigurationFilePut("etc/custom.properties", "karaf.shutdown.port", "-1"),
                 
                 /*
                  * activates debugging on the Karaf container using the provided port and holds
