@@ -72,7 +72,11 @@ public class ITConfiguration {
         			.name(KARAF_DISTRO_NAME)
         			.unpackDirectory(unpackDir == null ? null : new File(unpackDir))
         			.useDeployFolder(false),
-            
+
+                /*
+                 * disable remote SSH port for integration tests
+                 */
+                systemProperty("karaf.startRemoteShell").value("false"),
                 /*
                  * keeping container sticks around after the test so we can check the contents
                    of the data directory when things go wrong.        
