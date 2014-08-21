@@ -1,6 +1,6 @@
 package eu.linksmart.${artifactId};
 
 
-public interface  ${artifactId}{
+public interface  I${artifactId}{
 
 }
