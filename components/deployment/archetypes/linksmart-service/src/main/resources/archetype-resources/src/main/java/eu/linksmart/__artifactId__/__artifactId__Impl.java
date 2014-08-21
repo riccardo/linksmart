@@ -15,18 +15,18 @@ import org.osgi.service.component.ComponentContext;
 
 @Component(name="${artifactId}", immediate=true)
 @Service
-public class ${artifactId}{
+public class ${artifactId}Impl implements I${artifactId}{
 
-    private Logger mLogger = Logger.getLogger(${artifactId}.class.getName());
+    private Logger mLogger = Logger.getLogger(${artifactId}Impl.class.getName());
     protected ComponentContext mContext;
 
     @Activate
     protected void activate(ComponentContext context) {
-        mLogger.info("${artifactId} activated");
+        mLogger.info("${artifactId}Impl activated");
     }
 
     @Deactivate
     protected void deactivate(ComponentContext context) {
-        mLogger.info("${artifactId} deactivated");
+        mLogger.info("${artifactId}Impl deactivated");
     }
 }
