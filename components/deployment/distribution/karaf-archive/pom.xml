@@ -18,7 +18,7 @@
     
     <properties>
         <karaf.maven.version>3.0.1</karaf.maven.version>
-        <features.repository.url>mvn:eu.linksmart/linksmart-features/2.2.0-SNAPSHOT/xml/features</features.repository.url>
+        <features.repository.url>mvn:eu.linksmart.features/linksmart-features/2.2.0-SNAPSHOT/xml/features</features.repository.url>
     </properties>
 
     <build>
