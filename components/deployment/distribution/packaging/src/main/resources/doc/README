@@ -1,5 +1,5 @@
 LinkSmart 2.2.0-SNAPSHOT
--------------------
+------------------------------------------------------------
 
 Requirements
 ------------
@@ -7,7 +7,7 @@ Java 1.7
 
 
 Starting and Stopping LinkSmart
-------------------------------
+------------------------------------------------------------
 
 To start the server, run the following command in Windows:
 
@@ -47,7 +47,7 @@ or simply
 shutdown -f
 
 LinkSmart Features
-------------------------------
+------------------------------------------------------------
 LinkSmart provides different deployment modes with the help of Karaf's feature concept. Following are the current features:
 
 - linksmart-core
