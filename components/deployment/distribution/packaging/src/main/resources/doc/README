@@ -4,6 +4,7 @@ LinkSmart 2.2.0-SNAPSHOT
 Requirements
 ------------
 Java 1.7
+JCE unlimited strength
 
 
 Starting and Stopping LinkSmart
