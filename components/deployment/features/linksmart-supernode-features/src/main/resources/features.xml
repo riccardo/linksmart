@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<features name="${project.artifactId}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+    <!-- LinkSmart Supernode Service -->
+    <feature name="linksmart-supernode" version="${linksmart.supernode.version}">
+    	<bundle>mvn:eu.linksmart/eu.linksmart.network.supernode/${linksmart.supernode.version}</bundle>
+    </feature>
+       
+</features>
