@@ -13,7 +13,7 @@
 	<groupId>eu.linksmart.features</groupId>
 	<artifactId>linksmart-deployment-features</artifactId>
 	
-	<name>LinkSmart OSGi Deployment Features</name>
+	<name>LinkSmart OSGi Deployment Features Suite</name>
     
     <packaging>pom</packaging>
      
@@ -21,11 +21,13 @@
     	<module>linksmart-features</module>
     	<module>linksmart-testing-features</module>
     	<module>linksmart-services-features</module>
+        <module>linksmart-supernode-features</module>
     </modules>
     
     <properties>
     	<linksmart.version>2.2.0-SNAPSHOT</linksmart.version>
     	<linksmart.example.version>2.2.0-SNAPSHOT</linksmart.example.version>
+        <linksmart.supernode.version>2.2.0-SNAPSHOT</linksmart.supernode.version>
     	<build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
     	<commons-codec.version>1.3_2</commons-codec.version>
         <commons-httpclient.version>3.1_7</commons-httpclient.version>
