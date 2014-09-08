@@ -5,20 +5,20 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>eu.linksmart.distribution</groupId>
-        <artifactId>linksmart-distribution-suite</artifactId>
+        <artifactId>supernode-distribution</artifactId>
         <version>2.2.0-SNAPSHOT</version>
     </parent>
 
     <!--<groupId>eu.linksmart.distribution</groupId>-->
-    <artifactId>linksmart-karaf-archive</artifactId>
+    <artifactId>supernode-kar</artifactId>
 
-    <name>LinksSmart KAR</name>
+    <name>LinkSmart supernode KAR</name>
     
     <packaging>kar</packaging>
     
     <properties>
         <karaf.maven.version>3.0.1</karaf.maven.version>
-        <features.repository.url>mvn:eu.linksmart.features/linksmart-features/2.2.0-SNAPSHOT/xml/features</features.repository.url>
+        <features.repository.url>mvn:eu.linksmart.features/linksmart-supernode-features/2.2.0-SNAPSHOT/xml/features</features.repository.url>
     </properties>
 
     <build>
