@@ -23,7 +23,7 @@
     <dependencies>
     	<dependency>
             <groupId>eu.linksmart.distribution</groupId>
-            <artifactId>linksmart-karaf-archive</artifactId>
+            <artifactId>supernode-kar</artifactId>
             <version>${linksmart.kar.version}</version>
             <type>kar</type>
         </dependency>
@@ -94,11 +94,11 @@
 					            	<artifactItems>
 										<artifactItem>
 											<groupId>eu.linksmart.distribution</groupId>
-											<artifactId>linksmart-karaf-archive</artifactId>
+											<artifactId>supernode-kar</artifactId>
 											<version>${linksmart.kar.version}</version>
 											<type>kar</type>
 											<outputDirectory>target/linksmart-resources</outputDirectory>
-											<destFileName>linksmart-karaf-archive.zip</destFileName>
+											<destFileName>linksmart-supernode-archive.zip</destFileName>
 										</artifactItem>
 									</artifactItems>
 					            </configuration>
@@ -115,8 +115,8 @@
 		                        <phase>process-resources</phase>
 		                        <configuration>
 		                            <tasks>
-		                                <echo message="unpack linksmart-karaf-archive" />
-		                                <unzip src="target/linksmart-resources/linksmart-karaf-archive.zip" dest="target/linksmart-resources/unpacked-resources" />
+		                                <echo message="unpack linksmart-supernode-archive" />
+		                                <unzip src="target/linksmart-resources/linksmart-supernode-archive.zip" dest="target/linksmart-resources/unpacked-resources" />
 		                            </tasks>
 		                        </configuration>
 		                        <goals>

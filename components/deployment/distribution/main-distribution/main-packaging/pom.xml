@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>eu.linksmart.distribution</groupId>
-    <artifactId>linksmart-distribution</artifactId>
+    <artifactId>main-packaging</artifactId>
     
     <name>LinkSmart main zip archive</name>
     <description>Delivers a LinkSmart Server distribution as ZIP and GZIP</description>
@@ -23,7 +23,7 @@
     <dependencies>
     	<dependency>
             <groupId>eu.linksmart.distribution</groupId>
-            <artifactId>linksmart-karaf-archive</artifactId>
+            <artifactId>main-kar</artifactId>
             <version>${linksmart.kar.version}</version>
             <type>kar</type>
         </dependency>
@@ -94,7 +94,7 @@
 					            	<artifactItems>
 										<artifactItem>
 											<groupId>eu.linksmart.distribution</groupId>
-											<artifactId>linksmart-karaf-archive</artifactId>
+											<artifactId>main-kar</artifactId>
 											<version>${linksmart.kar.version}</version>
 											<type>kar</type>
 											<outputDirectory>target/linksmart-resources</outputDirectory>

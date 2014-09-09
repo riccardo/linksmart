@@ -10,7 +10,7 @@
     </parent>
 
     <!--<groupId>eu.linksmart.distribution</groupId>-->
-    <artifactId>linksmart-karaf-archive</artifactId>
+    <artifactId>main-kar</artifactId>
 
     <name>LinkSmart main KAR</name>
     <description>Triggers assembly of Karaf archive of LS main distribution</description>
