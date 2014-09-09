@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>main-distribution</artifactId>
+    <artifactId>main-packaging-parent</artifactId>
     <packaging>pom</packaging>
 
     <name>LS suite - main distribution</name>
