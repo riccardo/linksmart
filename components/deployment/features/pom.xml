@@ -13,7 +13,7 @@
 	<groupId>eu.linksmart.features</groupId>
 	<artifactId>linksmart-deployment-features</artifactId>
 	
-	<name>LinkSmart OSGi Deployment Features Suite</name>
+	<name>LS suite - all features</name>
     
     <packaging>pom</packaging>
      
