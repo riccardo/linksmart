@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
 
-    <artifactId>supernode-distribution</artifactId>
+    <artifactId>supernode-packaging-parent</artifactId>
     <name>LS suite - supernode distribution</name>
     <description>Triggers KAR build and final assembly of LS supernode</description>
 
