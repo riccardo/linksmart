@@ -69,6 +69,7 @@ public class SupernodeIT {
      */
     @Configuration
     public Option[] config() {
+        switchPlatformEncodingToUTF8();
         return new Option[] {
                 karafDistributionConfiguration()
                         .frameworkUrl(mvnKarafDist())
