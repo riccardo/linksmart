@@ -48,6 +48,7 @@
         <log4j.version>1.2.16</log4j.version>
         <slf4j.version>1.4.3</slf4j.version>
         <!-- apache dependencies (misc) -->
+        <servicemix.json-lib.version>2.4_1</servicemix.json-lib.version>
         <servicemix.xmlsec.version>1.4.5_1</servicemix.xmlsec.version>
         <servicemix.commons-configuration.version>1.9_1</servicemix.commons-configuration.version>
         <servicemix.commons-lang.version>2.4_6</servicemix.commons-lang.version>
