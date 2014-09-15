@@ -90,7 +90,7 @@
             <scope>provided</scope>
 		</dependency>
         <dependency>
-            <groupId>eu.linksmart</groupId>
+            <groupId>eu.linksmart.features</groupId>
             <artifactId>linksmart-features</artifactId>
             <version>${parent.version}</version>
             <scope>provided</scope>

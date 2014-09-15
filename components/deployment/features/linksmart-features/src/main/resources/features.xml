@@ -188,7 +188,7 @@
     </feature>
     
     <feature name="linksmart-ws-provider" version="${linksmart.version}"> 
-		<feature>cxf-dosgi-discovery-distributed</feature>
+		<feature version="${cxf.dosgi.version}">cxf-dosgi-discovery-distributed</feature>
     </feature>
     
     <feature name="linksmart-core" version="${linksmart.version}">

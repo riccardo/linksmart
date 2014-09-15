@@ -14,11 +14,12 @@
     <artifactId>linksmart-distribution-suite</artifactId>
     <version>2.2.0-SNAPSHOT</version>
     <modules>
-        <module>karaf-archive</module>
-        <module>packaging</module>
+        <module>main-distribution</module>
+        <module>supernode-distribution</module>
     </modules>
 
-    <name>LS distribution suite</name>
+    <name>LS suite - all distributions</name>
+    <description>Triggers full distribution building process for all subprojects (LS main, LS supernode)</description>
     <packaging>pom</packaging>
 
 </project>
