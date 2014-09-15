@@ -13,7 +13,7 @@ public class NetworkManagerRestPort {
 	private static Logger LOG = Logger.getLogger(NetworkManagerRestPort.class.getName());
 
     @Reference(name="NetworkManager",
-            cardinality = ReferenceCardinality.OPTIONAL_UNARY,
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
             bind="bindNetworkManager",
             unbind="unbindNetworkManager",
             policy= ReferencePolicy.DYNAMIC)
@@ -40,7 +40,7 @@ public class NetworkManagerRestPort {
 		HttpService http = (HttpService) context.locateService("HttpService");
 
 		try {
-			http.unregister("/Tunneling");
+			http.unregister("/NetworkManager");
 		} catch (Exception e) {
 			LOG.error("Error unregistering servlet", e);
 		}	

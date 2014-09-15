@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.ServiceAttribute;
