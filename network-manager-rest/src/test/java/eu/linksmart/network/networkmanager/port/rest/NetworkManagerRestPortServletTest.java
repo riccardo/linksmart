@@ -32,7 +32,7 @@ public class NetworkManagerRestPortServletTest {
 	private static final String CALCULATOR_DESCRIPTION = "Calculator";
 	private static final String ENDPOINT = "http://localhost:9090/cxf/services/Calculator";
 	private static final String BACKBONE_NAME = "eu.linksmart.network.grand.backbone.BackboneGrandImpl";
-	private static final String GET_RESPONSE_JSON = "[{\"VirtualAddress\":\"" + vadString + "\",\"Attributes\":{\"DESCRIPTION\":\"Calculator\"}}]";
+	private static final String GET_RESPONSE_JSON = "[{\"Attributes\":{\"DESCRIPTION\":\"Calculator\"},\"VirtualAddress\":\"" + vadString + "\"}]";
 	private static final String POST_REQUEST_JSON = "{\"Attributes\":{\"DESCRIPTION\":\"Calculator\"}, \"Endpoint\":\"" + ENDPOINT + "\", \"BackboneName\":\"" + BACKBONE_NAME + "\"}";
 	private NetworkManager nmCore;
 	private HttpServletResponse response;

@@ -10,9 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
+
+/*import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import net.sf.json.JSONObject;*/
 
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.VirtualAddress;
@@ -71,7 +75,7 @@ public class NetworkManagerRestPortServlet extends HttpServlet {
 					attributesJson.put(p.getKey(), p.getValue());
 				}
 				regJson.put(KEY_ATTRIBUTES, attributesJson);
-				regsJson.add(regJson);
+				regsJson.put(regJson);
 			}
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -111,7 +115,7 @@ public class NetworkManagerRestPortServlet extends HttpServlet {
 		String endpoint = null;
 		String backboneName = null;
 		try {
-			JSONObject registrationJson = JSONObject.fromObject(requestBuilder.toString());
+			JSONObject registrationJson = new JSONObject(requestBuilder.toString());
 			endpoint = registrationJson.getString(KEY_ENDPOINT);
 			backboneName = registrationJson.getString(KEY_BACKBONE_NAME);
 			JSONObject attributesJson = registrationJson.getJSONObject(KEY_ATTRIBUTES);

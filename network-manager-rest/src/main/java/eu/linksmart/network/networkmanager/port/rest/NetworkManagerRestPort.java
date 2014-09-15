@@ -19,15 +19,20 @@ public class NetworkManagerRestPort {
             policy= ReferencePolicy.DYNAMIC)
 	protected NetworkManager nmCore;
 
+    @Reference(name="HttpService",
+            cardinality = ReferenceCardinality.MANDATORY_UNARY,
+            bind="bindHttpServlet",
+            unbind="unbindHttpServlet",
+            policy=ReferencePolicy.STATIC)
+    private HttpService http;
+
 	protected NetworkManager getNM() {
 		return this.nmCore;
 	}
 
     @Activate
 	protected void activate(ComponentContext context) {
-		HttpService http = (HttpService) context.locateService("HttpService");
-
-		try {
+        try {
 			http.registerServlet("/NetworkManager", new NetworkManagerRestPortServlet(this),
 					null, null);
 		} catch (Exception e) {
@@ -53,4 +58,14 @@ public class NetworkManagerRestPort {
 	protected void unbindNetworkManager(NetworkManager nmCore) {
 		this.nmCore = null;
 	}
+
+    protected void bindHttpServlet(HttpService http) {
+        LOG.debug("StandardTunnelService::binding http-service");
+        this.http = http;
+    }
+
+    protected void unbindHttpServlet(HttpService http) {
+        LOG.debug("StandardTunnelService::un-binding http-service");
+        this.http = null;
+    }
 }
