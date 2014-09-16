@@ -46,7 +46,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
 
                 clients.clear();
             } catch (MqttException e) {
-                //TODO: debug info
+              mLogger.error(e.getStackTrace());
 
             }
 
@@ -82,10 +82,9 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
             connOpts.setCleanSession(true);
             client.connect(connOpts);
 
-            //TODO: debug info
 
-        } catch(MqttException me) {
-            //TODO: debug info
+        } catch(MqttException e) {
+            mLogger.error(e.getStackTrace());
             /// throw new RemoteException("MQTT Error No. "+me.getReasonCode()+" located "+me.getLocalizedMessage()+':'+me.getMessage(), me.getCause() );
 
         }
@@ -129,7 +128,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         try {
             clients.get(serviceID).disconnect();
         } catch (MqttException e) {
-            e.printStackTrace();
+            mLogger.error(e.getStackTrace());
         }
     }
     @Override
@@ -138,8 +137,8 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
             clients.get(serviceID).subscribe(topic, 2);
 
         } catch (MqttException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+            mLogger.error(e.getStackTrace());
         }
 
     }
@@ -148,8 +147,8 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         try {
             clients.get(serviceID).unsubscribe(topic);
         } catch (MqttException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+            mLogger.error(e.getStackTrace());
         }
 
     }
@@ -158,15 +157,14 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         try {
             clients.get(serviceID).unsubscribe("*");
         } catch (MqttException e) {
-            // TODO Auto-generated catch block
-
+            mLogger.error(e.getStackTrace());
 
         }
     }
     /// =======================================================================================================================
     private static final String CXF_SERVICES_PATH = "http://localhost:9090/cxf/services/";
 
-    protected Logger LOG = Logger.getLogger(this.getClass().getName());
+
     protected ComponentContext context;
     @Reference(name="NetworkManager",
             cardinality = ReferenceCardinality.MANDATORY_UNARY,
@@ -188,12 +186,12 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
 
         registerService();
 
-        mLogger.info("Client activated");
+        mLogger.info(this.getClass()+" activated");
     }
     @Deactivate
     protected void deactivate(ComponentContext context) throws Exception {
         shutdown();
-        mLogger.info("Client deactivated");
+        mLogger.info(this.getClass()+" deactivated");
     }
 
     private VirtualAddress createService(String endpoint, String serviceDescription) {
@@ -203,7 +201,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
                             serviceDescription) }, endpoint, backbone);
             return registration.getVirtualAddress();
         } catch (RemoteException e) {
-            LOG.error(e.getMessage(), e.getCause());
+            mLogger.error(e.getStackTrace());
             return null;
         }
     }
@@ -221,7 +219,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
                 backbone = "eu.linksmart.network.backbone.impl.soap.BackboneSOAPImpl";
             }
         } catch (RemoteException e) {
-            LOG.error(e.getMessage(), e.getCause());
+            mLogger.error(e.getStackTrace());
         }
     }
     private void registerService(){
@@ -267,7 +265,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
             networkManager.removeService(myVirtualAddressSubscriber);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            mLogger.error(e.getStackTrace());
         }
         //TODO: cuando se va el core todo debe morir!
     }
