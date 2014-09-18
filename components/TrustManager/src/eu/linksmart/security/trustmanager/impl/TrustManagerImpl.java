@@ -63,7 +63,7 @@ import eu.linksmart.security.trustmanager.TrustManagerConfiguration;
  * This class encapsulates the web service used to verify the authenticity of
  * trust tokens.
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * @author Mark Vinkovits (mark.vinkovits@fit.fraunhofer.de)
  */

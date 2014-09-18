@@ -8,7 +8,7 @@
 	<property name="ivy.local.default.artifact.pattern"
 		value="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"
 		override="false" />
-	<property name="ivy.shared.default.root" value="http://hydra.fit.fraunhofer.de/librepo"
+	<property name="ivy.shared.default.root" value="http://linksmart.eu/librepo"
 		override="false" />
 	<property name="ivy.shared.default.artifact.pattern" value="[artifact]-[revision].[type]"
 		override="false" />

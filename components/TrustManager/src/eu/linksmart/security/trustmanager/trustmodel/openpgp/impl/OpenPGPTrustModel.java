@@ -60,7 +60,7 @@ import eu.linksmart.security.trustmanager.trustmodel.TrustModel;
  * NR_OF_NEEDED_MARGINALLY_TRUSTED_INTRODUCERS).
  * 
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * 
  */

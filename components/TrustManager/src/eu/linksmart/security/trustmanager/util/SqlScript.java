@@ -48,7 +48,7 @@ import java.sql.Statement;
  * It is only needed for testing the X509 Model, and for cleaning up the
  * database
  * 
- * @author Julian Schütte (julian.schuette@sit.fraunhofer.de)
+ * @author Julian Schuette (julian.schuette@sit.fraunhofer.de)
  * @author Stephan Heuser (stephan.heuser@sit.fraunhofer.de)
  * 
  */
