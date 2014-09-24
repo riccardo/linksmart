@@ -85,8 +85,6 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
 
         } catch(MqttException e) {
             mLogger.error(e.getStackTrace());
-            /// throw new RemoteException("MQTT Error No. "+me.getReasonCode()+" located "+me.getLocalizedMessage()+':'+me.getMessage(), me.getCause() );
-
         }
 
         return client;
@@ -99,7 +97,6 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
             if (clients.get(serviceID).isConnected()){
                 MqttMessage message = new MqttMessage(new Gson().toJson(valueParts).getBytes());
                 message.setQos(2);
-
                 clients.get(serviceID).publish(topic, message);
             }else
                 throw new RemoteException("Error the conection with ID "+serviceID+ " is broken");
@@ -108,7 +105,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         } catch(MqttException me) {
             throw new RemoteException("MQTT Error No. "+me.getReasonCode()+" located "+me.getLocalizedMessage()+':'+me.getMessage(), me.getCause() );
         }
-        return false;
+        return true;
     }
 
 

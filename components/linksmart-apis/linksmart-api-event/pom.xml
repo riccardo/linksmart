@@ -24,7 +24,7 @@
 
     <packaging>bundle</packaging>
 
-    <name>EventAPI</name>
+    <name>LinkSmart Event API</name>
     <description>Set of interfaces to access the eventing legacy API</description>
 
     <build>
