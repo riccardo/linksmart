@@ -155,6 +155,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
     @Override
     public void unsubscribeAllTopics(String serviceID) {
         try {
+            clients.get("").close();
             clients.get(serviceID).unsubscribe("*");
         } catch (MqttException e) {
             mLogger.error(e.getStackTrace());
@@ -286,6 +287,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         @Override
         public void messageArrived(String topic, MqttMessage message)
                 throws Exception {
+             message.getPayload();
 
             subscriber.notify(topic, new Gson().fromJson(message.toString(),Part[].class));
 
@@ -293,6 +295,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
+
             // TODO Auto-generated method stub
 
         }
