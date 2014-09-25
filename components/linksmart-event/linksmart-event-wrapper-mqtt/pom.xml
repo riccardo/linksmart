@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.linksmart</groupId>
+        <artifactId>linksmart-osgi-component</artifactId>
+        <version>2.2.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>eu.linksmart</groupId>
+    <artifactId>eu.linksmart.event.wrapper.mqtt</artifactId>
+    <version>2.2.0-SNAPSHOT</version>
+
+    <packaging>bundle</packaging>
+
+    <name>MQTTServiceProvider</name>
+    <description>MQTTServiceProvider</description>
+    <dependencies>
+        <dependency>
+            <groupId>eu.linksmart</groupId>
+            <artifactId>eu.linksmart.api.event</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.linksmart</groupId>
+            <artifactId>eu.linksmart.api.utils</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.linksmart</groupId>
+            <artifactId>eu.linksmart.api.networkmanager</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>mqtt-client</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>eu.linksmart.event.wrapper.mqtt</Bundle-SymbolicName>
+                        <Embed-Dependency>mqtt-client</Embed-Dependency>
+                        <Embed-Transitive>false</Embed-Transitive>
+                    </instructions>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+   
+</project>

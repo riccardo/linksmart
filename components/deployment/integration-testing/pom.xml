@@ -40,6 +40,7 @@
     	<module>trust-manager-it</module>
 <!--     	<module>policy-pdp-it</module> -->
 <!--     	<module>policy-pep-it</module> -->
+        <module>event-wrapper-mqtt-it</module>
   </modules>
 
     <scm>

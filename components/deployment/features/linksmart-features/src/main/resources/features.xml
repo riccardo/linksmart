@@ -190,8 +190,15 @@
     <feature name="linksmart-ws-provider" version="${linksmart.version}"> 
 		<feature version="${cxf.dosgi.version}">cxf-dosgi-discovery-distributed</feature>
     </feature>
+	
+    <feature name="linksmart-event" version="${linksmart.version}"> 
+		<feature version="${linksmart.version}">linksmart-boot</feature>
+		<bundle>mvn:eu.linksmart/eu.linksmart.api.event/${linksmart.version}</bundle>
+        <bundle>mvn:com.google.code.gson/gson/1.7.1</bundle>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.event.wrapper.mqtt/${linksmart.version}</bundle>
+    </feature>
     
-    <feature name="linksmart-core" version="${linksmart.version}">
+	<feature name="linksmart-core" version="${linksmart.version}">
     	<feature version="${linksmart.version}">network-manager</feature>
         <feature version="${linksmart.version}">trust-manager</feature>
         <feature version="${linksmart.version}">basic-tunnel</feature>
@@ -211,6 +218,8 @@
     	<feature version="${linksmart.version}">linksmart-core</feature>
         <feature version="${linksmart.version}">linksmart-ws-provider</feature>
     </feature>
+	
+	
     
     <feature name="linksmart-light" version="${linksmart.version}">
     	<feature version="${linksmart.version}">osgi-http</feature>
