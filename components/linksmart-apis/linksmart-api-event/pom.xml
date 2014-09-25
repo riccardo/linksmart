@@ -33,6 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Export-Package>${project.artifactId}</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
