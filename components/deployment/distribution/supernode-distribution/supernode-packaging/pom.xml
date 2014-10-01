@@ -18,6 +18,7 @@
     
     <properties>
         <linksmart.kar.version>${parent.version}</linksmart.kar.version>
+        <linksmart.version>${parent.version}</linksmart.version>
     </properties>
     
     <dependencies>
