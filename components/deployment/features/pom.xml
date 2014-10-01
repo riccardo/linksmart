@@ -25,9 +25,9 @@
     </modules>
     
     <properties>
-    	<linksmart.version>2.2.0-SNAPSHOT</linksmart.version>
-    	<linksmart.example.version>2.2.0-SNAPSHOT</linksmart.example.version>
-        <linksmart.supernode.version>2.2.0-SNAPSHOT</linksmart.supernode.version>
+    	<linksmart.version>${parent.version}</linksmart.version>
+    	<linksmart.example.version>${parent.version}</linksmart.example.version>
+        <linksmart.supernode.version>${parent.version}</linksmart.supernode.version>
     	<build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
     	<commons-codec.version>1.3_2</commons-codec.version>
         <commons-httpclient.version>3.1_7</commons-httpclient.version>
