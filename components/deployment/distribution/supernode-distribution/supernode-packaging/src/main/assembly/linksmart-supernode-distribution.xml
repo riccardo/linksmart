@@ -32,6 +32,7 @@
             <source>src/main/resources/doc/README</source>
             <outputDirectory>/</outputDirectory>
             <destName>README-LS</destName>
+            <filtered>true</filtered>
         </file>
 
     </files>
