@@ -113,7 +113,7 @@
 	    <repository>
     		<id>linksmart-repo</id>
     		<name>liksmart artifacts repository</name>
-    		<url>http://dockerus.fit.fraunhofer.de:8081/content/groups/public</url>
+    		<url>http://loki.fit.fraunhofer.de:8081/content/groups/public/</url>
     		<snapshots>
     			<enabled>true</enabled>
     			<updatePolicy>daily</updatePolicy>
@@ -129,7 +129,7 @@
         <pluginRepository>
             <id>linksmart-repo</id>
             <name>linksmart (maven) plugins repository</name>
-            <url>http://dockerus.fit.fraunhofer.de:8081/content/repositories/central</url>
+            <url>http://loki.fit.fraunhofer.de:8081/content/groups/public/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
@@ -146,21 +146,21 @@
         <repository>
             <id>releases</id>
             <name>Releases</name>
-            <url>http://dockerus.fit.fraunhofer.de:8081/content/repositories/releases</url>
+            <url>http://loki.fit.fraunhofer.de:8081/content/repositories/releases/</url>
         </repository>
         <!-- For snapshots , do not change id otherwise deployment will fail -->
         <snapshotRepository>
             <id>snapshots</id>
             <name>Snapshots</name>
-            <url>http://dockerus.fit.fraunhofer.de:8081/content/repositories/snapshots</url>
+            <url>http://loki.fit.fraunhofer.de:8081/content/repositories/snapshots/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
         <!-- site generation -->
-        <site>
-            <id>repo</id>
-            <name>linksmart-site-repository</name>
-            <url>dav:https://fit.fraunhofer.de/linksmart</url>
-        </site>
+<!--         <site> -->
+<!--             <id>repo</id> -->
+<!--             <name>linksmart-site-repository</name> -->
+<!--             <url>dav:https://fit.fraunhofer.de/linksmart</url> -->
+<!--         </site> -->
     </distributionManagement>
 
     <ciManagement>
