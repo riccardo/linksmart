@@ -24,6 +24,8 @@ import eu.linksmart.utils.Part;
 
 public class NetworkManagerRestPortServlet extends HttpServlet {
 
+	private static final long serialVersionUID = -4744376293497392430L;
+	
 	private static final String KEY_ENDPOINT = "Endpoint";
 	private static final String KEY_BACKBONE_NAME = "BackboneName";
 	private static final String KEY_ATTRIBUTES = "Attributes";
