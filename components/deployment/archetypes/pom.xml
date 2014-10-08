@@ -7,26 +7,20 @@
     <parent>
         <groupId>eu.linksmart</groupId>
         <artifactId>linksmart-parent</artifactId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>2.2.0</version>
     </parent>
 
-    <artifactId>linksmart-archetypes</artifactId>
     <groupId>eu.linksmart.archetypes</groupId>
-
+    <artifactId>linksmart-archetypes</artifactId>
+    
     <name>LinkSmart Archetypes Suite</name>
 
     <packaging>pom</packaging>
 
     <modules>
         <module>linksmart-component</module>
-        <module>linksmart-service</module>
         <module>linksmart-component-it</module>
+<!--         <module>linksmart-service</module> -->
     </modules>
     
-    <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/archetypes</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/archetypes</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/archetypes</url>
-    </scm>
-
 </project>
