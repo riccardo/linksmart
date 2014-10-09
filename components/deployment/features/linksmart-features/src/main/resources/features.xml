@@ -187,17 +187,32 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.policy.pep/${linksmart.version}</bundle>
     </feature>
     
+    <feature name="policy-pip" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">policy-pep</feature>
+    	<feature version="${linksmart.version}">identity-manager-crypto</feature>
+    	<bundle>mvn:eu.linksmart/eu.linksmart.api.identitymanager/${linksmart.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.api.policy/${linksmart.version}</bundle>
+        <bundle>mvn:org.wso2.balana/org.wso2.balana/${xacml-wso2-balana.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.identitymanager.pip/${linksmart.version}</bundle>
+    </feature>
+    
+    <feature name="linksmart-xacml-policy" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">policy-pdp</feature>
+    	<feature version="${linksmart.version}">policy-pep</feature>
+    	<feature version="${linksmart.version}">policy-pip</feature>
+    </feature>
+    
     <feature name="linksmart-ws-provider" version="${linksmart.version}"> 
 		<feature version="${cxf.dosgi.version}">cxf-dosgi-discovery-distributed</feature>
     </feature>
-	
-    <feature name="linksmart-event" version="${linksmart.version}"> 
-		<feature version="${linksmart.version}">linksmart-boot</feature>
-		<bundle>mvn:eu.linksmart/eu.linksmart.api.event/${linksmart.version}</bundle>
-        <bundle>mvn:com.google.code.gson/gson/1.7.1</bundle>
-    	<bundle>mvn:eu.linksmart/eu.linksmart.event.wrapper.mqtt/${linksmart.version}</bundle>
-    </feature>
     
+    <feature name="network-manager-rest" version="${linksmart.version}">
+        <feature version="${linksmart.version}">network-manager</feature> 
+    	<feature version="${linksmart.version}">osgi-http</feature>
+        <bundle>mvn:org.json/com.springsource.org.json/${org-json.version}</bundle>
+        <bundle>mvn:eu.linksmart/eu.linksmart.network.networkmanager.port.rest/${linksmart.version}</bundle>
+    </feature>
+	
 	<feature name="linksmart-core" version="${linksmart.version}">
     	<feature version="${linksmart.version}">network-manager</feature>
         <feature version="${linksmart.version}">trust-manager</feature>
@@ -210,8 +225,6 @@
         <feature version="${linksmart.version}">backbone-data</feature>
         <feature version="${linksmart.version}">grand-message-handler</feature>
         <feature version="${linksmart.version}">configurator-manager</feature>
-<!--         <feature version="${linksmart.version}">policy-pdp</feature> -->
-<!--         <feature version="${linksmart.version}">policy-pep</feature> -->
     </feature>
     
     <feature name="linksmart" version="${linksmart.version}">
@@ -219,8 +232,6 @@
         <feature version="${linksmart.version}">linksmart-ws-provider</feature>
     </feature>
 	
-	
-    
     <feature name="linksmart-light" version="${linksmart.version}">
     	<feature version="${linksmart.version}">osgi-http</feature>
     	<feature version="${linksmart.version}">linksmart-boot</feature>

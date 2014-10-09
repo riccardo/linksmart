@@ -25,7 +25,7 @@
     
     <feature name="backbone-router-it" version="${linksmart.version}">
 		<feature version="${linksmart.version}">backbone-router</feature>	
-		<bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.impl.osgi/${parent.version}</bundle>	       
+		<bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.impl.osgi/${linksmart.version}</bundle>	       
     </feature>
     
     <feature name="network-manager-it" version="${linksmart.version}">  
@@ -86,12 +86,6 @@
     
     <feature name="policy-pep-it" version="${linksmart.version}">
         <feature version="${linksmart.version}">policy-pep</feature>
-    </feature>
-    <feature name="linksmart-event-it" version="${linksmart.version}">
-        <feature version="${linksmart.version}">network-manager</feature>
-        <bundle>mvn:eu.linksmart/eu.linksmart.api.event/${linksmart.version}</bundle>
-        <bundle>mvn:com.google.code.gson/gson/1.7.1</bundle>
-        <bundle>mvn:eu.linksmart/eu.linksmart.event.wrapper.mqtt/${linksmart.version}</bundle>
     </feature>
        
 </features>
