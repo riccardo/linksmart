@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>eu.linksmart</groupId>
 		<artifactId>linksmart-parent</artifactId>
-		<version>2.2.0-SNAPSHOT</version>
+		<version>2.2.0</version>
 	</parent>
 
 	<groupId>eu.linksmart.testing</groupId>
@@ -26,7 +26,7 @@
     	<module>identity-manager-crypto-it</module>
         <module>basic-tunneling-it</module>
         <module>standard-tunneling-it</module>
-        <!--<module>soap-tunneling-it</module>-->
+        <module>soap-tunneling-it</module>
         <module>backbone-soap-it</module>
         <module>backbone-osgi-it</module>
         <module>backbone-jxta-it</module>
@@ -40,14 +40,7 @@
     	<module>trust-manager-it</module>
 <!--     	<module>policy-pdp-it</module> -->
 <!--     	<module>policy-pep-it</module> -->
-        <module>event-wrapper-mqtt-it</module>
-  </modules>
-
-    <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/integration-testing</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/integration-testing</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/integration-testing</url>
-    </scm>
+	</modules>
 
 	<dependencyManagement>
 		<dependencies>
@@ -67,6 +60,13 @@
 			<artifactId>integration-testing-utils</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- Features -->
+<!-- 		<dependency> -->
+<!--             <groupId>eu.linksmart.features</groupId> -->
+<!--             <artifactId>linksmart-features</artifactId> -->
+<!--             <version>${parent.version}</version> -->
+<!--             <scope>provided</scope> -->
+<!--         </dependency> -->
 		<!-- PaxExam dependencies -->
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
@@ -90,12 +90,6 @@
 			<artifactId>slf4j-log4j12</artifactId>
             <scope>provided</scope>
 		</dependency>
-        <dependency>
-            <groupId>eu.linksmart.features</groupId>
-            <artifactId>linksmart-features</artifactId>
-            <version>${parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
 	</dependencies>
 
 	<build>
