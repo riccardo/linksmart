@@ -2,15 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
     <parent>
         <artifactId>linksmart-distribution-suite</artifactId>
         <groupId>eu.linksmart.distribution</groupId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>2.2.0</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <packaging>pom</packaging>
-
+    
     <artifactId>supernode-packaging-parent</artifactId>
+    
+    <packaging>pom</packaging>
+    
     <name>LS suite - supernode distribution</name>
     <description>Triggers KAR build and final assembly of LS supernode</description>
 
@@ -18,6 +21,12 @@
         <module>supernode-kar</module>
         <module>supernode-packaging</module>
     </modules>
-
+    
+    <properties>
+        <karaf.maven.version>3.0.1</karaf.maven.version>
+        <linksmart.kar.version>${parent.version}</linksmart.kar.version>
+        <linksmart.version>${parent.version}</linksmart.version>
+        <super.node.features.repository.url>mvn:eu.linksmart.features/linksmart-supernode-features/${parent.version}/xml/features</super.node.features.repository.url>
+    </properties>
 
 </project>

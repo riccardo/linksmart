@@ -4,7 +4,7 @@
     <parent>
         <groupId>eu.linksmart.distribution</groupId>
         <artifactId>supernode-packaging-parent</artifactId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>2.2.0</version>
     </parent>
 
     <groupId>eu.linksmart.distribution</groupId>
@@ -14,12 +14,6 @@
     <description>LinkSmart Supernode standalone distribution</description>
     
     <packaging>pom</packaging>
-<!--     <packaging>karaf-assembly</packaging> -->
-    
-    <properties>
-        <linksmart.kar.version>${parent.version}</linksmart.kar.version>
-        <linksmart.version>${parent.version}</linksmart.version>
-    </properties>
     
     <dependencies>
     	<dependency>
