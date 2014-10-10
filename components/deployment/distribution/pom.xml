@@ -20,7 +20,7 @@
     
     <modules>
         <module>main-distribution</module>
-<!--         <module>supernode-distribution</module> -->
+        <module>supernode-distribution</module>
     </modules>
 
 </project>
