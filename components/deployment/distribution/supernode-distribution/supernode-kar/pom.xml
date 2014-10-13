@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.linksmart.distribution</groupId>
         <artifactId>supernode-packaging-parent</artifactId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>2.2.1-SNAPSHOT</version>
     </parent>
 
     <!--<groupId>eu.linksmart.distribution</groupId>-->
@@ -18,7 +18,7 @@
     
     <properties>
         <karaf.maven.version>3.0.1</karaf.maven.version>
-        <features.repository.url>mvn:eu.linksmart.features/linksmart-supernode-features/2.2.0-SNAPSHOT/xml/features</features.repository.url>
+        <features.repository.url>mvn:eu.linksmart.features/linksmart-supernode-features/2.2.1-SNAPSHOT/xml/features</features.repository.url>
     </properties>
 
     <build>

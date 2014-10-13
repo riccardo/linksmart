@@ -77,11 +77,11 @@ public class SupernodeIT {
                         .name(KARAF_DISTRO_NAME)
                         .unpackDirectory(new File("target/paxexam/unpack/"))
                         .useDeployFolder(false),
-                //features(maven().groupId("eu.linksmart.features").artifactId("linksmart-supernode-features").version("2.2.0-SNAPSHOT").type("xml").classifier("features").versionAsInProject(), "linksmart-supernode"),
+                //features(maven().groupId("eu.linksmart.features").artifactId("linksmart-supernode-features").version("2.2.1-SNAPSHOT").type("xml").classifier("features").versionAsInProject(), "linksmart-supernode"),
                 // Force the log level to INFO so we have more details during the test.  It defaults to WARN.
                 logLevel(LogLevelOption.LogLevel.INFO),
                 features(
-                        "mvn:eu.linksmart.features/linksmart-supernode-features/2.2.0-SNAPSHOT/xml/features",
+                        "mvn:eu.linksmart.features/linksmart-supernode-features/2.2.1-SNAPSHOT/xml/features",
                         "linksmart-supernode"),
         };
     }
