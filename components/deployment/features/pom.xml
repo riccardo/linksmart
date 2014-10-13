@@ -15,7 +15,7 @@
 	
 	<name>LS suite - all features</name>
     
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
      
     <modules>
     	<module>linksmart-features</module>
