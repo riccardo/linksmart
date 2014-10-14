@@ -7,20 +7,13 @@
         <version>2.2.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>eu.linksmart.distribution</groupId>
     <artifactId>linksmart-main-distribution</artifactId>
     
     <name>LinkSmart main zip archive</name>
     <description>Delivers a LinkSmart Server distribution as ZIP and GZIP</description>
     
     <packaging>pom</packaging>
-<!--     <packaging>karaf-assembly</packaging> -->
-    
-    <properties>
-        <linksmart.kar.version>${parent.version}</linksmart.kar.version>
-        <linksmart.version>${parent.version}</linksmart.version>
-    </properties>
-    
+     
     <dependencies>
     	<dependency>
             <groupId>eu.linksmart.distribution</groupId>
@@ -47,7 +40,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2</version>
+						<version>${maven-assembly-plugin.version}</version>
 						<executions>
 							<execution>
 								<id>default</id>

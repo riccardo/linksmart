@@ -10,9 +10,9 @@
         <version>2.2.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>linksmart-archetypes</artifactId>
     <groupId>eu.linksmart.archetypes</groupId>
-
+    <artifactId>linksmart-archetypes</artifactId>
+    
     <name>LinkSmart Archetypes Suite</name>
 
     <packaging>pom</packaging>
@@ -23,10 +23,8 @@
         <module>linksmart-component-it</module>
     </modules>
     
-    <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/archetypes</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/archetypes</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/archetypes</url>
-    </scm>
-
+    <properties>
+        <maven.archetype.packaging.version>2.1</maven.archetype.packaging.version>
+    </properties>
+    
 </project>

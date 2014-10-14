@@ -20,6 +20,11 @@
         <module>main-packaging</module>
     </modules>
 
-
+	<properties>
+        <karaf.maven.plugin.version>3.0.2</karaf.maven.plugin.version>
+        <features.repository.url>mvn:eu.linksmart.features/linksmart-features/${parent.version}/xml/features</features.repository.url>
+        <linksmart.kar.version>${parent.version}</linksmart.kar.version>
+        <maven-assembly-plugin.version>2.4.1</maven-assembly-plugin.version>
+    </properties>
 
 </project>

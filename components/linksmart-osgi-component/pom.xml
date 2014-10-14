@@ -15,12 +15,6 @@
     
     <packaging>pom</packaging>
 
-    <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-osgi-component</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-osgi-component</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-osgi-component</url>
-    </scm>
-
 	<!-- this section define only the versions used by dependencies and not the dependencies itself -->
     <dependencyManagement>
         <dependencies>
