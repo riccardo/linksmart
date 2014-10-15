@@ -21,7 +21,6 @@
     	<module>linksmart-features</module>
     	<module>linksmart-testing-features</module>
     	<module>linksmart-services-features</module>
-        <module>linksmart-supernode-features</module>
     </modules>
     
     <properties>
