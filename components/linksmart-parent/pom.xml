@@ -6,7 +6,7 @@
     <groupId>eu.linksmart</groupId>
     <artifactId>linksmart-parent</artifactId>
     
-    <version>2.2.1</version>
+    <version>2.2.2-SNAPSHOT</version>
 
     <name>LinkSmart Parent</name>
     <url>http://www.fit.fraunhofer.de/linksmart</url>
@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- versions for LINKSMART dependencies -->
-        <linksmart.version>2.2.1</linksmart.version>
+        <linksmart.version>2.2.2-SNAPSHOT</linksmart.version>
         <!-- versions for OSGi dependencies -->
         <felix.osgi.core.version>1.4.0</felix.osgi.core.version>
         <felix.osgi.configadmin.version>1.8.0</felix.osgi.configadmin.version>
@@ -30,7 +30,7 @@
         <!-- versions for maven and java compiler plugins -->
         <java.compiler.version>1.7</java.compiler.version>
         <maven.compiler.version>3.1</maven.compiler.version>
-        <maven.source.version>2.2.1</maven.source.version>
+        <maven.source.version>2.2.2-SNAPSHOT</maven.source.version>
         <maven.enforcer.version>1.3.1</maven.enforcer.version>
         <maven.resources.version>2.4.3</maven.resources.version>
         <!-- versions for testing plugins -->
