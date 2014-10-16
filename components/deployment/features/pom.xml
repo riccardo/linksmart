@@ -24,8 +24,8 @@
     </modules>
     
     <properties>
-    	<linksmart.example.version>${parent.version}</linksmart.example.version>
-        <linksmart.supernode.version>${parent.version}</linksmart.supernode.version>
+    	<linksmart.example.version>${linksmart.version}</linksmart.example.version>
+        <linksmart.supernode.version>${linksmart.version}</linksmart.supernode.version>
     	<build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
     	<commons-codec.version>1.3_2</commons-codec.version>
         <commons-httpclient.version>3.1_7</commons-httpclient.version>

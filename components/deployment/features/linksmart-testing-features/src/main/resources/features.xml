@@ -25,7 +25,7 @@
     
     <feature name="backbone-router-it" version="${linksmart.version}">
 		<feature version="${linksmart.version}">backbone-router</feature>	
-		<bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.impl.osgi/${parent.version}</bundle>	       
+		<bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.impl.osgi/${linksmart.version}</bundle>	       
     </feature>
     
     <feature name="network-manager-it" version="${linksmart.version}">  
