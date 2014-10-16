@@ -16,11 +16,10 @@
     <packaging>pom</packaging>
     
     <name>LS suite - all distributions</name>
-    <description>Triggers full distribution building process for all subprojects (LS main, LS supernode)</description>
+    <description>Triggers full distribution building process for all subprojects (LS main, other)</description>
     
     <modules>
         <module>main-distribution</module>
-<!--         <module>supernode-distribution</module> -->
     </modules>
     
 </project>

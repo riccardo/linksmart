@@ -15,14 +15,14 @@
     <name>LinkSmart main KAR</name>
     <description>Triggers assembly of Karaf archive of LS main distribution</description>
 
-    <packaging>kar</packaging>
-
+	<packaging>kar</packaging>
+	
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
-                <version>${karaf.maven.plugin.version}</version>
+                <version>${karaf.version}</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>

@@ -10,7 +10,7 @@
 
     <fileSets>
         <fileSet>
-            <directory>target/linksmart-resources/apache-karaf-3.0.1</directory>
+            <directory>target/linksmart-resources/apache-karaf-${karaf.version}</directory>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>755</fileMode>
 			<excludes>

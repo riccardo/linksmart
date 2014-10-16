@@ -18,13 +18,11 @@
     	<dependency>
             <groupId>eu.linksmart.distribution</groupId>
             <artifactId>main-kar</artifactId>
-            <version>${linksmart.kar.version}</version>
             <type>kar</type>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf</groupId>
             <artifactId>apache-karaf</artifactId>
-            <version>${karaf.version}</version>
             <type>tar.gz</type>
         </dependency>
     </dependencies>
@@ -40,7 +38,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>${maven-assembly-plugin.version}</version>
 						<executions>
 							<execution>
 								<id>default</id>
@@ -89,7 +86,6 @@
 										<artifactItem>
 											<groupId>eu.linksmart.distribution</groupId>
 											<artifactId>main-kar</artifactId>
-											<version>${linksmart.kar.version}</version>
 											<type>kar</type>
 											<outputDirectory>target/linksmart-resources</outputDirectory>
 											<destFileName>linksmart-karaf-archive.zip</destFileName>
@@ -102,7 +98,6 @@
 					<plugin>
 		                <groupId>org.apache.maven.plugins</groupId>
 		                <artifactId>maven-antrun-plugin</artifactId>
-		                <version>1.6</version>
 		                <executions>
 		                    <execution>
 		                        <id>unzip-linksmart-archive</id>
