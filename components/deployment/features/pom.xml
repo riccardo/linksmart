@@ -24,12 +24,10 @@
     </modules>
     
     <properties>
-    	<linksmart.example.version>${linksmart.version}</linksmart.example.version>
         <linksmart.supernode.version>${linksmart.version}</linksmart.supernode.version>
     	<build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
     	<commons-codec.version>1.3_2</commons-codec.version>
         <commons-httpclient.version>3.1_7</commons-httpclient.version>
-        
         <commons-jexl.version>2.1.1</commons-jexl.version>
         <javax.transaction.version>1.1.0</javax.transaction.version>
         <commons-configuration.version>1.9</commons-configuration.version>

@@ -20,12 +20,13 @@ public class ITConfiguration {
 	private static String KARAF_DISTRO_GROUP_ID = "org.apache.karaf"; 
 	private static String KARAF_DISTRO_ARTIFACT_ID = "apache-karaf";  
 	private static String KARAF_DISTRO_BINARY_TYPE = "zip";
-    // the version will be filtered by maven plugin
-	private static String KARAF_DISTRO_VERSION = "${karaf.version}";
 	private static String KARAF_DISTRO_NAME = "Apache Karaf";
     // the version will be filtered by maven plugin
-    private static String LINKSMART_VERSION = "${project.version}";
-	
+    private static String LINKSMART_VERSION = "${linksmart.version}";
+    private static String KARAF_DISTRO_VERSION = "${karaf.version}";
+    private static String CXF_VERSION = "${cxf.version}";
+    private static String CXF_DOSGI_VERSION = "${cxf.dosgi.version}";
+    
 	private static boolean DEBUG = false;
 	private static int DEBUG_PORT = 8889;
 	
@@ -36,6 +37,10 @@ public class ITConfiguration {
 	private static final String TESTING_FEATURES_REPOSITORY_URL = "mvn:eu.linksmart.features/linksmart-testing-features/" + LINKSMART_VERSION + "/xml/features";
 	
 	private static final String SERVICES_FEATURES_REPOSITORY_URL = "mvn:eu.linksmart.features/linksmart-services-features/" + LINKSMART_VERSION + "/xml/features";
+	
+	private static final String CXF_FEATURES_REPOSITORY_URL = "mvn:org.apache.cxf.karaf/apache-cxf/" + CXF_VERSION + "/xml/features";
+	
+	private static final String CXF_DOSGI_FEATURES_REPOSITORY_URL = "mvn:org.apache.cxf.dosgi/cxf-dosgi/" + CXF_DOSGI_VERSION + "/xml/features";
 	
 	public static Option regressionDefaults() {
         return regressionDefaults(OSGI_CONTAINER_KARAF);
@@ -99,6 +104,10 @@ public class ITConfiguration {
                 
                 // extend feature repositories list with linksmart-services-features
                 KarafDistributionOption.editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresRepositories", SERVICES_FEATURES_REPOSITORY_URL),
+                
+                KarafDistributionOption.editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresRepositories", CXF_FEATURES_REPOSITORY_URL),
+                
+                KarafDistributionOption.editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresRepositories", CXF_DOSGI_FEATURES_REPOSITORY_URL),
 
                 // disable the shutdown port (speedup)
                 KarafDistributionOption.editConfigurationFilePut("etc/custom.properties", "karaf.shutdown.port", "-1"),
@@ -136,11 +145,11 @@ public class ITConfiguration {
     }
     
     public static String getCoreFeaturesRepositoryURL() {
-    	return TESTING_FEATURES_REPOSITORY_URL;
+    	return CORE_FEATURES_REPOSITORY_URL;
     }
     
     public static String getServicesFeaturesRepositoryURL() {
-    	return TESTING_FEATURES_REPOSITORY_URL;
+    	return SERVICES_FEATURES_REPOSITORY_URL;
     }
     
     private static void setOSGiContainer(String osgiContainerType) {
