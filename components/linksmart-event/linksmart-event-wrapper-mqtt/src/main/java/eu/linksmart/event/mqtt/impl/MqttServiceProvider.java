@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import eu.linksmart.api.event.EventPublicationWrapper;
 import eu.linksmart.api.event.EventSubscriber;
 import eu.linksmart.api.event.EventSubscriptionWrapper;
-import eu.linksmart.api.mqtt.dummy.dummy;
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.VirtualAddress;
