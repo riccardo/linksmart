@@ -38,7 +38,7 @@ package eu.linksmart.security.trustmanager.util;
  * <p> Change Log: </p> <ul> <li>v2.2.2 - Fixed encodeFileToFile and
  * decodeFileToFile to use the Base64.InputStream class to encode and decode on
  * the fly which uses less memory than encoding/decoding an entire file into
- * memory before writing.</li> <li>v2.2.1 - Fixed bug using URL_SAFE and ORDERED
+ * memory before writing.</li> <li>v2.2.2-SNAPSHOT - Fixed bug using URL_SAFE and ORDERED
  * encodings. Fixed bug when using very small files (~< 40 bytes).</li> <li>v2.2
  * - Added some helper methods for encoding/decoding directly from one file to
  * the next. Also added a main() method to support command line
@@ -1251,7 +1251,7 @@ public class Base64 {
 			// on
 			// small
 			// files
-			// (v2.2.1)
+			// (v2.2.2-SNAPSHOT)
 			int length = 0;
 			int numBytes = 0;
 

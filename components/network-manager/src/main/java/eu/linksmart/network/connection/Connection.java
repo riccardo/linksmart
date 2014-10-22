@@ -105,76 +105,72 @@ public class Connection {
 	public Message processData(VirtualAddress senderVirtualAddress, VirtualAddress receiverVirtualAddress, byte[] data) {
 		SecurityProtocol securityProtocol = getSecurityProtocol(senderVirtualAddress, receiverVirtualAddress);
 		Message message = null;
-		//check if application data has to be unprotected
-		if (securityProtocol != null && securityProtocol.isInitialized()) {
-			// if protocol is initialized than open message with it
-			try {
-				message = MessageSerializerUtiliy.unserializeMessage(
-						data, false, senderVirtualAddress, receiverVirtualAddress, true);
-				message = securityProtocol.unprotectMessage(message);
-				//use data field of message to reconstruct original message
-				if(!message.getTopic().
-						equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
-					message = MessageSerializerUtiliy.unserializeMessage(
-							message.getData(), true, senderVirtualAddress, receiverVirtualAddress, true);
-				}
-			} catch (Exception e) {
-				logger.debug("Cannot unprotect message from VirtualAddress: "
-						+ senderVirtualAddress.toString());
-				message = new ErrorMessage(ErrorMessage.ERROR,
-						message.getSenderVirtualAddress(), 
-						message.getReceiverVirtualAddress(), 
-						e.getMessage().getBytes());
-			}
-		} else { 
-			message = MessageSerializerUtiliy.unserializeMessage(
-					data, true, senderVirtualAddress, receiverVirtualAddress, true);
-			//check if this is the handshake message which created this connection 
-			//because then we have to respond to it with an accept message
-			if(message.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
-				String usedSecurity = ConnectionManager.HANDSHAKE_ACCEPT + " ";
-				usedSecurity = usedSecurity.concat(
-						(comSecMgr != null) ? 
-								comSecMgr.getClass().getName() :
-									SecurityProperty.NoSecurity.name());
-				Message msg = new Message(
-						Message.TOPIC_CONNECTION_HANDSHAKE,
-						receiverVirtualAddress,
-						senderVirtualAddress,
-						usedSecurity.getBytes());
+        //while opening message we have to know whether its a protected or an unprotected message
+        boolean protectionActive = securityProtocol != null && securityProtocol.isInitialized();
+        //if protection is active there are no properties to consider
+        message = MessageSerializerUtiliy.unserializeMessage(
+                data, !protectionActive, senderVirtualAddress, receiverVirtualAddress, true);
+        //decide how to handle message
+        if(message.getTopic().equals(Message.TOPIC_CONNECTION_HANDSHAKE)) {
+            //if this is the message that created this connection, we have to respond to it
+            String usedSecurity = ConnectionManager.HANDSHAKE_ACCEPT + " ";
+            usedSecurity = usedSecurity.concat(
+                    (comSecMgr != null) ?
+                            comSecMgr.getClass().getName() :
+                            SecurityProperty.NoSecurity.name());
+            Message msg = new Message(
+                    Message.TOPIC_CONNECTION_HANDSHAKE,
+                    receiverVirtualAddress,
+                    senderVirtualAddress,
+                    usedSecurity.getBytes());
 
-				if(sessionId != null) {
-					msg.setProperty(Message.SESSION_ID_KEY, sessionId);
-				}
-				return msg;
-			}
-			if (securityProtocol != null
-					&& !securityProtocol.isInitialized()) {
-				// if protocol not initialized then pass it for processing			
-				// Process message by Security Protocol
-				try {
-					message = securityProtocol.processMessage(message);
-				} catch (CryptoException e) {
-					logger.error("Error during cryptographic operation", e);
-					message = new ErrorMessage(ErrorMessage.ERROR,
-							message.getSenderVirtualAddress(), 
-							message.getReceiverVirtualAddress(), 
-							e.getMessage().getBytes());
-				} catch (VerificationFailureException e) {
-					logger.error("Error during cryptographic operation", e);
-					message = new ErrorMessage(ErrorMessage.ERROR,
-							message.getSenderVirtualAddress(), 
-							message.getReceiverVirtualAddress(), 
-							e.getMessage().getBytes());
-				} catch (IOException e) {
-					logger.error("Error during cryptographic operation", e);
-					message = new ErrorMessage(ErrorMessage.ERROR,
-							message.getSenderVirtualAddress(), 
-							message.getReceiverVirtualAddress(), 
-							e.getMessage().getBytes());
-				}
-			}
-		}
+            if(sessionId != null) {
+                msg.setProperty(Message.SESSION_ID_KEY, sessionId);
+            }
+            return msg;
+        } else if (protectionActive) {
+            // if protocol is initialized than open message with it
+            try {
+                message = securityProtocol.unprotectMessage(message);
+                //use data field of message to reconstruct original message
+                if (!message.getTopic().
+                        equals(CommunicationSecurityManager.SECURITY_PROTOCOL_TOPIC)) {
+                    message = MessageSerializerUtiliy.unserializeMessage(
+                            message.getData(), true, senderVirtualAddress, receiverVirtualAddress, true);
+                }
+            } catch (Exception e) {
+                logger.debug("Cannot unprotect message from VirtualAddress: "
+                        + senderVirtualAddress.toString());
+                message = new ErrorMessage(ErrorMessage.ERROR,
+                        message.getSenderVirtualAddress(),
+                        message.getReceiverVirtualAddress(),
+                        e.getMessage().getBytes());
+            }
+        } else if (securityProtocol != null) {
+            // if protocol not initialized then pass it for processing
+            // Process message by Security Protocol
+            try {
+                message = securityProtocol.processMessage(message);
+            } catch (CryptoException e) {
+                logger.error("Error during cryptographic operation", e);
+                message = new ErrorMessage(ErrorMessage.ERROR,
+                        message.getSenderVirtualAddress(),
+                        message.getReceiverVirtualAddress(),
+                        e.getMessage().getBytes());
+            } catch (VerificationFailureException e) {
+                logger.error("Error during cryptographic operation", e);
+                message = new ErrorMessage(ErrorMessage.ERROR,
+                        message.getSenderVirtualAddress(),
+                        message.getReceiverVirtualAddress(),
+                        e.getMessage().getBytes());
+            } catch (IOException e) {
+                logger.error("Error during cryptographic operation", e);
+                message = new ErrorMessage(ErrorMessage.ERROR,
+                        message.getSenderVirtualAddress(),
+                        message.getReceiverVirtualAddress(),
+                        e.getMessage().getBytes());
+            }
+        }
 		return message;
 	}
 

@@ -30,14 +30,14 @@
     <feature name="crypto-manager" version="${linksmart.version}">
     	<feature version="${linksmart.version}">linksmart-boot</feature>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.cryptomanager/${linksmart.version}</bundle>
-        <bundle dependency="true">mvn:org.bouncycastle/bcprov-jdk16/1.46</bundle>
-        <bundle dependency="true">mvn:org.bouncycastle/bcpg-jdk16/1.46</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/1.1_4</bundle>
-        <bundle>mvn:org.apache.commons/commons-jexl/2.1.1</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.derby/10.9.1.0_1</bundle>
-        <bundle>mvn:javax.transaction/com.springsource.javax.transaction/1.1.0</bundle>
-        <bundle>mvn:commons-configuration/commons-configuration/1.9</bundle>
+        <bundle dependency="true">mvn:org.bouncycastle/bcprov-jdk16/${bcprov-jdk16.version}</bundle>
+        <bundle dependency="true">mvn:org.bouncycastle/bcpg-jdk16/${bcpg-jdk16.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/${servicemix.xmlsec.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/${jdom.version}</bundle>
+        <bundle>mvn:org.apache.commons/commons-jexl/${commons-jexl.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.derby/${derby.version}</bundle>
+        <bundle>mvn:javax.transaction/com.springsource.javax.transaction/${javax.transaction.version}</bundle>
+        <bundle>mvn:commons-configuration/commons-configuration/${commons-configuration.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.security.cryptomanager/${linksmart.version}</bundle>
     </feature>
     
@@ -46,7 +46,7 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${linksmart.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${linksmart.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${linksmart.version}</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/${servicemix.xmlsec.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.security.communicationsecuritymanager.sym/${linksmart.version}</bundle>
     </feature>
     
@@ -55,7 +55,7 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.api.security.communication/${linksmart.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${linksmart.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${linksmart.version}</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/${servicemix.xmlsec.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.security.communicationsecuritymanager.asym/${linksmart.version}</bundle>
     </feature>
     
@@ -78,7 +78,7 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${linksmart.version}</bundle>
     	<bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${linksmart.version}</bundle>
     	<bundle>mvn:eu.linksmart/eu.linksmart.api.policy/${linksmart.version}</bundle>
-    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/1.4.5_1</bundle>
+    	<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/${servicemix.xmlsec.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.network.identitymanager.crypto/${linksmart.version}</bundle>
     </feature>
     
@@ -111,8 +111,8 @@
     	<feature version="${linksmart.version}">network-manager</feature>
         <bundle>mvn:eu.linksmart/eu.linksmart.api.trustmanager/${linksmart.version}</bundle>
     	<bundle>mvn:eu.linksmart/eu.linksmart.api.clients/${linksmart.version}</bundle>
-    	<bundle>mvn:org.bouncycastle/bcprov-jdk16/1.46</bundle>
-        <bundle>mvn:org.bouncycastle/bcpg-jdk16/1.46</bundle>
+    	<bundle>mvn:org.bouncycastle/bcprov-jdk16/${bcprov-jdk16.version}</bundle>
+        <bundle>mvn:org.bouncycastle/bcpg-jdk16/${bcpg-jdk16.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.security.trustmanager/${linksmart.version}</bundle>
     </feature>
     
@@ -147,8 +147,8 @@
     
     <feature name="backbone-jxta" version="${linksmart.version}">
         <feature version="${linksmart.version}">backbone-router</feature>
-        <bundle dependency="true">mvn:org.bouncycastle/bcprov-jdk16/1.46</bundle>
-        <bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/4.2.22</bundle>
+        <bundle dependency="true">mvn:org.bouncycastle/bcprov-jdk16/${bcprov-jdk16.version}</bundle>
+        <bundle>mvn:org.mortbay.jetty/com.springsource.org.mortbay.jetty/${org.mortbay.jetty.version}</bundle>
         <bundle>mvn:eu.linksmart/eu.linksmart.network.backbone.jxta/${linksmart.version}</bundle>
     </feature>
     
@@ -187,6 +187,28 @@
         <bundle>mvn:eu.linksmart/eu.linksmart.policy.pep/${linksmart.version}</bundle>
     </feature>
     
+    <feature name="policy-pip" version="${linksmart.version}">
+		<feature version="${linksmart.version}">policy-pep</feature>
+		<feature version="${linksmart.version}">identity-manager-crypto</feature>
+		<bundle>mvn:eu.linksmart/eu.linksmart.api.identitymanager/${linksmart.version}</bundle>
+		<bundle>mvn:eu.linksmart/eu.linksmart.api.policy/${linksmart.version}</bundle>
+		<bundle>mvn:org.wso2.balana/org.wso2.balana/${xacml-wso2-balana.version}</bundle>
+		<bundle>mvn:eu.linksmart/eu.linksmart.network.identitymanager.pip/${linksmart.version}</bundle>
+	</feature>
+	
+	<feature name="linksmart-xacml-policy" version="${linksmart.version}">
+		<feature version="${linksmart.version}">policy-pdp</feature>
+		<feature version="${linksmart.version}">policy-pep</feature>
+		<feature version="${linksmart.version}">policy-pip</feature>
+	</feature>
+    
+    <feature name="network-manager-rest" version="${linksmart.version}">
+		<feature version="${linksmart.version}">network-manager</feature>
+		<feature version="${linksmart.version}">osgi-http</feature>
+		<bundle>mvn:org.json/com.springsource.org.json/${org-json.version}</bundle>
+		<bundle>mvn:eu.linksmart/eu.linksmart.network.networkmanager.port.rest/${linksmart.version}</bundle>
+	</feature>
+
     <feature name="linksmart-ws-provider" version="${linksmart.version}"> 
 		<feature version="${cxf.dosgi.version}">cxf-dosgi-discovery-distributed</feature>
     </feature>
@@ -210,8 +232,6 @@
         <feature version="${linksmart.version}">backbone-data</feature>
         <feature version="${linksmart.version}">grand-message-handler</feature>
         <feature version="${linksmart.version}">configurator-manager</feature>
-<!--         <feature version="${linksmart.version}">policy-pdp</feature> -->
-<!--         <feature version="${linksmart.version}">policy-pep</feature> -->
     </feature>
     
     <feature name="linksmart" version="${linksmart.version}">
@@ -219,8 +239,6 @@
         <feature version="${linksmart.version}">linksmart-ws-provider</feature>
     </feature>
 	
-	
-    
     <feature name="linksmart-light" version="${linksmart.version}">
     	<feature version="${linksmart.version}">osgi-http</feature>
     	<feature version="${linksmart.version}">linksmart-boot</feature>

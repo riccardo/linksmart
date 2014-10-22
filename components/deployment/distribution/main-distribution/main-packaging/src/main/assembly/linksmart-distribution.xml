@@ -10,20 +10,22 @@
 
     <fileSets>
         <fileSet>
-            <directory>src/main/resources/config</directory>
-            <outputDirectory>/etc</outputDirectory>
-            <fileMode>775</fileMode>
-        </fileSet>
-        <fileSet>
-			<!--<directory>src/main/resources/osgi-container/apache-karaf-3.0.1</directory>-->
-            <directory>target/linksmart-resources/apache-karaf-3.0.1</directory>
+            <directory>target/linksmart-resources/apache-karaf-${karaf.version}</directory>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>755</fileMode>
+			<excludes>
+        		<exclude>/etc/org.apache.karaf.features.cfg</exclude>
+      		</excludes>
 		</fileSet>
 		<fileSet>
 			<directory>target/linksmart-resources/unpacked-resources/repository</directory>
 			<outputDirectory>system</outputDirectory>
-		</fileSet>    
+		</fileSet>
+		<fileSet>
+            <directory>src/main/resources/config</directory>
+            <outputDirectory>/etc</outputDirectory>
+            <filtered>true</filtered>
+        </fileSet>    
     </fileSets>
 
     <files>
@@ -31,7 +33,8 @@
             <source>src/main/resources/doc/README</source>
             <outputDirectory>/</outputDirectory>
             <destName>README-LS</destName>
+            <filtered>true</filtered>
         </file>
-
     </files>
+    
 </assembly>
