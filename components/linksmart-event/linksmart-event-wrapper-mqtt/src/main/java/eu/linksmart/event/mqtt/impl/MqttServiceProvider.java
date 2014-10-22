@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import eu.linksmart.api.event.EventPublicationWrapper;
 import eu.linksmart.api.event.EventSubscriber;
 import eu.linksmart.api.event.EventSubscriptionWrapper;
+import eu.linksmart.api.mqtt.dummy.dummy;
 import eu.linksmart.network.Registration;
 import eu.linksmart.network.ServiceAttribute;
 import eu.linksmart.network.VirtualAddress;
@@ -20,19 +21,21 @@ import java.util.Hashtable;
 import java.util.Map;
 
 @Component(name="MqttServiceProvider", immediate=true)
-@Service
-public class MqttServiceProvider implements EventSubscriptionWrapper, EventPublicationWrapper {
+@Service({dummy.class})
+public class MqttServiceProvider implements dummy, EventPublicationWrapper,EventSubscriptionWrapper {
 
     private Logger mLogger = Logger.getLogger(MqttServiceProvider.class.getName());
     protected ComponentContext mContext;
 
 
 
-    Map<String,MqttClient> clients;
+    private Map<String,MqttClient> clients;
 
+    private Gson parser=null;
     protected boolean init() {
+        System.out.println("hola");
         clients = new Hashtable<String,MqttClient>();
-
+        parser = new Gson();
 
         // TODO Auto-generated method stub
         return true;
@@ -59,7 +62,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         // Create a new connection
         if(!clients.containsKey(clientId)){
 
-            if (brokerPID == "")
+            if (brokerPID == "" || brokerPID == null)
                 brokerPID = "tcp://localhost:1883";
             clients.put(clientId, connect(clientId, brokerPID) );
 
@@ -116,14 +119,16 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
     @Override
     public void registerCallback(EventSubscriber subscriber,
                                  String serviceID) {
-        clients.get(serviceID).setCallback(new CallBackerImpl(subscriber));
 
+        clients.get(serviceID).setCallback(new CallBackerImpl(subscriber));
 
     }
     @Override
     public void deregisterCallback(String serviceID) {
         try {
-            clients.get(serviceID).disconnect();
+            if(clients != null)
+                if(clients.containsKey(serviceID))
+                    clients.get(serviceID).disconnect();
         } catch (MqttException e) {
             mLogger.error(e.getStackTrace());
         }
@@ -260,7 +265,6 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         try {
             networkManager.removeService(myVirtualAddressPublicator);
 
-            networkManager.removeService(myVirtualAddressSubscriber);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             mLogger.error(e.getStackTrace());
@@ -284,9 +288,20 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         @Override
         public void messageArrived(String topic, MqttMessage message)
                 throws Exception {
-             message.getPayload();
 
-            subscriber.notify(topic, new Gson().fromJson(message.toString(),Part[].class));
+
+            String msg = new String(message.getPayload(),"UTF-8");
+            Part [] partload= null;
+
+
+            try {
+                 partload = parser.fromJson(msg,Part[].class);
+            }catch (Exception e){
+                mLogger.info("Event is not a part array!");
+            }
+            subscriber.notify(topic,  partload);
+
+            subscriber.notifyXmlEvent(topic, msg);
 
         }
 
