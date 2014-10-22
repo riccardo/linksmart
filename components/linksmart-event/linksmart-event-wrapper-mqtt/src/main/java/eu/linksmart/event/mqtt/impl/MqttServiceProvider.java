@@ -21,8 +21,8 @@ import java.util.Hashtable;
 import java.util.Map;
 
 @Component(name="MqttServiceProvider", immediate=true)
-@Service({dummy.class})
-public class MqttServiceProvider implements dummy, EventPublicationWrapper,EventSubscriptionWrapper {
+@Service({EventPublicationWrapper.class})
+public class MqttServiceProvider implements EventPublicationWrapper,EventSubscriptionWrapper {
 
     private Logger mLogger = Logger.getLogger(MqttServiceProvider.class.getName());
     protected ComponentContext mContext;
@@ -227,24 +227,13 @@ public class MqttServiceProvider implements dummy, EventPublicationWrapper,Event
     }
     private void registerService(){
 
-        String subscriberURL = CXF_SERVICES_PATH + EventPublicationWrapper.class.getSimpleName();
-        // Save HID associated to service ID
-        myVirtualAddressPublicator = createService(subscriberURL, EventPublicationWrapper.class.getSimpleName());
-
-
-        // Publish as Web Service
-        Hashtable props = new Hashtable();
-        props.put("service.exported.interfaces", "*");
-        props.put("service.exported.configs", "org.apache.cxf.ws");
-        props.put("org.apache.cxf.ws.address", subscriberURL);
-        context.getBundleContext().registerService(	EventPublicationWrapper.class.getName(), this, props);
-
-        subscriberURL = CXF_SERVICES_PATH + EventSubscriptionWrapper.class.getSimpleName();
+        String subscriberURL = CXF_SERVICES_PATH + EventSubscriptionWrapper.class.getSimpleName();
 
         myVirtualAddressSubscriber = createService(subscriberURL, EventSubscriptionWrapper.class.getSimpleName());
 
 
         // Publish as Web Service
+        Hashtable props = new Hashtable();
        props = new Hashtable();
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.ws");
