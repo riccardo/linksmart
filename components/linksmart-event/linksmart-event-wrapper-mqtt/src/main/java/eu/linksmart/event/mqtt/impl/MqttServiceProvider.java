@@ -20,19 +20,21 @@ import java.util.Hashtable;
 import java.util.Map;
 
 @Component(name="MqttServiceProvider", immediate=true)
-@Service
-public class MqttServiceProvider implements EventSubscriptionWrapper, EventPublicationWrapper {
+@Service({EventPublicationWrapper.class})
+public class MqttServiceProvider implements EventPublicationWrapper,EventSubscriptionWrapper {
 
     private Logger mLogger = Logger.getLogger(MqttServiceProvider.class.getName());
     protected ComponentContext mContext;
 
 
 
-    Map<String,MqttClient> clients;
+    private Map<String,MqttClient> clients;
 
+    private Gson parser=null;
     protected boolean init() {
+        System.out.println("hola");
         clients = new Hashtable<String,MqttClient>();
-
+        parser = new Gson();
 
         // TODO Auto-generated method stub
         return true;
@@ -59,7 +61,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         // Create a new connection
         if(!clients.containsKey(clientId)){
 
-            if (brokerPID == "")
+            if (brokerPID == "" || brokerPID == null)
                 brokerPID = "tcp://localhost:1883";
             clients.put(clientId, connect(clientId, brokerPID) );
 
@@ -116,14 +118,16 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
     @Override
     public void registerCallback(EventSubscriber subscriber,
                                  String serviceID) {
-        clients.get(serviceID).setCallback(new CallBackerImpl(subscriber));
 
+        clients.get(serviceID).setCallback(new CallBackerImpl(subscriber));
 
     }
     @Override
     public void deregisterCallback(String serviceID) {
         try {
-            clients.get(serviceID).disconnect();
+            if(clients != null)
+                if(clients.containsKey(serviceID))
+                    clients.get(serviceID).disconnect();
         } catch (MqttException e) {
             mLogger.error(e.getStackTrace());
         }
@@ -152,6 +156,7 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
     @Override
     public void unsubscribeAllTopics(String serviceID) {
         try {
+            clients.get("").close();
             clients.get(serviceID).unsubscribe("*");
         } catch (MqttException e) {
             mLogger.error(e.getStackTrace());
@@ -221,24 +226,13 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
     }
     private void registerService(){
 
-        String subscriberURL = CXF_SERVICES_PATH + EventPublicationWrapper.class.getSimpleName();
-        // Save HID associated to service ID
-        myVirtualAddressPublicator = createService(subscriberURL, EventPublicationWrapper.class.getSimpleName());
-
-
-        // Publish as Web Service
-        Hashtable props = new Hashtable();
-        props.put("service.exported.interfaces", "*");
-        props.put("service.exported.configs", "org.apache.cxf.ws");
-        props.put("org.apache.cxf.ws.address", subscriberURL);
-        context.getBundleContext().registerService(	EventPublicationWrapper.class.getName(), this, props);
-
-        subscriberURL = CXF_SERVICES_PATH + EventSubscriptionWrapper.class.getSimpleName();
+        String subscriberURL = CXF_SERVICES_PATH + EventSubscriptionWrapper.class.getSimpleName();
 
         myVirtualAddressSubscriber = createService(subscriberURL, EventSubscriptionWrapper.class.getSimpleName());
 
 
         // Publish as Web Service
+        Hashtable props = new Hashtable();
        props = new Hashtable();
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.ws");
@@ -259,7 +253,6 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         try {
             networkManager.removeService(myVirtualAddressPublicator);
 
-            networkManager.removeService(myVirtualAddressSubscriber);
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             mLogger.error(e.getStackTrace());
@@ -284,12 +277,25 @@ public class MqttServiceProvider implements EventSubscriptionWrapper, EventPubli
         public void messageArrived(String topic, MqttMessage message)
                 throws Exception {
 
-            subscriber.notify(topic, new Gson().fromJson(message.toString(),Part[].class));
+
+            String msg = new String(message.getPayload(),"UTF-8");
+            Part [] partload= null;
+
+
+            try {
+                 partload = parser.fromJson(msg,Part[].class);
+            }catch (Exception e){
+                mLogger.info("Event is not a part array!");
+            }
+            subscriber.notify(topic,  partload);
+
+            subscriber.notifyXmlEvent(topic, msg);
 
         }
 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
+
             // TODO Auto-generated method stub
 
         }

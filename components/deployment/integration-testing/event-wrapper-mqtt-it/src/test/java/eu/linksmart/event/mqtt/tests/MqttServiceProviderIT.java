@@ -98,7 +98,7 @@ public class  MqttServiceProviderIT  {
                     }
 
                     @Override
-                    public Boolean notifyXmlEvent(String xmlEventString) throws RemoteException {
+                    public Boolean notifyXmlEvent(String topic, String xmlEventString) throws RemoteException {
                         return null;
                     }
                 }, subscriberID);

@@ -40,6 +40,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.felix.scr.annotations.*;
 import org.apache.log4j.Logger;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
@@ -56,14 +57,6 @@ import eu.linksmart.network.networkmanager.NetworkManager;
 import eu.linksmart.policy.pdp.PolicyDecisionPoint;
 import eu.linksmart.policy.pip.PolicyInformationPoint;
 
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.ReferenceCardinality;
-import org.apache.felix.scr.annotations.ReferencePolicy;
-import org.apache.felix.scr.annotations.Service;
-
 /**
  * Default LinkSmart {@link PolicyDecisionPoint} implementation
  * 
@@ -73,6 +66,11 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component(name="eu.linksmart.policy.pdp", immediate=true)
 @Service({PolicyDecisionPoint.class})
+@org.apache.felix.scr.annotations.Properties({
+        @Property(name="service.exported.interfaces", value="*"),
+        @Property(name="service.exported.configs", value="org.apache.cxf.ws"),
+        @Property(name="org.apache.cxf.ws.address", value="http://0.0.0.0:9090/cxf/services/PolicyDecisionPoint")
+})
 public class PdpApplication implements PolicyDecisionPoint {
 
 	/** logger */
@@ -98,7 +96,7 @@ public class PdpApplication implements PolicyDecisionPoint {
 		PERMITTED_REPOSITORIES.add("file");
 	}
 
-	/** {@link PluginLinkSmartPDP} */
+	/** The PDP implementation used **/
 	private PDP pdp = null;
 
 	/** {@link LinkSmartServiceManager} */

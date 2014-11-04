@@ -6,7 +6,7 @@
     <groupId>eu.linksmart</groupId>
     <artifactId>linksmart-parent</artifactId>
     
-    <version>2.2.0-SNAPSHOT</version>
+    <version>2.2.2-SNAPSHOT</version>
 
     <name>LinkSmart Parent</name>
     <url>http://www.fit.fraunhofer.de/linksmart</url>
@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- versions for LINKSMART dependencies -->
-        <linksmart.version>2.2.0-SNAPSHOT</linksmart.version>
+        <linksmart.version>2.2.2-SNAPSHOT</linksmart.version>
         <!-- versions for OSGi dependencies -->
         <felix.osgi.core.version>1.4.0</felix.osgi.core.version>
         <felix.osgi.configadmin.version>1.8.0</felix.osgi.configadmin.version>
@@ -110,26 +110,26 @@
     </organization>
 
     <repositories>
-	    <repository>
-    		<id>linksmart-repo</id>
-    		<name>liksmart artifacts repository</name>
-    		<url>http://greatfool.fit.fraunhofer.de:8081/nexus/content/groups/public</url>
-    		<snapshots>
-    			<enabled>true</enabled>
-    			<updatePolicy>daily</updatePolicy>
-    		</snapshots>
-    		<releases>
-    			<enabled>true</enabled>
-    			<updatePolicy>never</updatePolicy>
-    		</releases>
-    	</repository>
+        <repository>
+            <id>linksmart-repo</id>
+            <name>liksmart artifacts repository</name>
+            <url>https://linksmart.eu/repo/content/groups/public/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+        </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
             <id>linksmart-repo</id>
             <name>linksmart (maven) plugins repository</name>
-            <url>http://greatfool.fit.fraunhofer.de:8081/nexus/content/repositories/central</url>
+            <url>https://linksmart.eu/repo/content/repositories/central/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
@@ -145,22 +145,16 @@
         <!-- For releases , do not change id otherwise deployment will fail -->
         <repository>
             <id>releases</id>
-            <name>LinkSmartReleases</name>
-            <url>http://greatfool.fit.fraunhofer.de:8081/nexus/content/repositories/releases</url>
+            <name>Releases</name>
+            <url>https://linksmart.eu/repo/content/repositories/releases/</url>
         </repository>
         <!-- For snapshots , do not change id otherwise deployment will fail -->
         <snapshotRepository>
             <id>snapshots</id>
-            <name>LinkSmartSnapshots</name>
-            <url>http://greatfool.fit.fraunhofer.de:8081/nexus/content/repositories/snapshots</url>
+            <name>Snapshots</name>
+            <url>https://linksmart.eu/repo/content/repositories/snapshots/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
-        <!-- site generation -->
-        <site>
-            <id>repo</id>
-            <name>linksmart-site-repository</name>
-            <url>dav:https://fit.fraunhofer.de/linksmart</url>
-        </site>
     </distributionManagement>
 
     <ciManagement>
@@ -184,9 +178,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-parent</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-parent</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/linksmart-parent</url>
+        <connection>scm:git:https://linksmart.eu/redmine/linksmart.git</connection>
+        <developerConnection>scm:git:https://linksmart.eu/redmine/linksmart.git</developerConnection>
+        <url>scm:git:https://linksmart.eu/redmine/linksmart.git</url>
     </scm>
 
 	<!-- this section define only the versions used by dependencies and not the dependencies itself -->

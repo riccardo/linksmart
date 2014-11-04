@@ -2,9 +2,13 @@
 <features name="${project.artifactId}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
     <!-- Calculator Example Service -->
-    <feature name="linksmart-example-service" version="${linksmart.example.version}">
-    	<bundle>mvn:eu.linksmart.examples/calculator-service/${linksmart.example.version}</bundle>
-        <bundle>mvn:eu.linksmart.examples/calculator-consumer/${linksmart.example.version}</bundle>
+    <feature name="linksmart-example-service" version="${linksmart.version}">
+    	<feature version="${linksmart.version}">network-manager</feature> 
+    	<bundle>mvn:eu.linksmart.examples/calculator-service/${linksmart.version}</bundle>
+     	<bundle>mvn:eu.linksmart.examples/calculator-ws-client/${linksmart.version}</bundle>
+    	<feature version="${linksmart.version}">linksmart-ws-provider</feature>
+    	<!--         <bundle>mvn:eu.linksmart.examples/calculator-consumer/${linksmart.version}</bundle> -->
+    	
     </feature>
        
 </features>

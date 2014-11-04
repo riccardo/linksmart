@@ -43,5 +43,5 @@ import eu.linksmart.utils.Part;
 
 public interface EventSubscriber extends java.rmi.Remote {
     public Boolean notify(String topic, Part[] parts) throws java.rmi.RemoteException;
-    public Boolean notifyXmlEvent(String xmlEventString) throws java.rmi.RemoteException;
+    public Boolean notifyXmlEvent(String topic,String xmlEventString) throws java.rmi.RemoteException;
 }

@@ -6,24 +6,17 @@
 	<parent>
 		<groupId>eu.linksmart</groupId>
 		<artifactId>linksmart-parent</artifactId>
-		<version>2.2.0-SNAPSHOT</version>
+		<version>2.2.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>eu.linksmart.testing</groupId>
 	<artifactId>integration-testing-utils</artifactId>
-    <version>${project.parent.version}</version>
-
+   
 	<packaging>jar</packaging>
 
 	<name>LinkSmart Integration Testing Utils</name>
 	<description>LinkSmart Integration Testing Utils</description>
 	
-	<scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/it-utils</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/it-utils</developerConnection>
-        <url>https://svn.code.sf.net/p/linksmart/code/trunk/components/deployment/it-utils</url>
-    </scm>
-    
     <dependencies>
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
