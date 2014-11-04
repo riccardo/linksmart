@@ -11,6 +11,8 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
@@ -73,8 +75,10 @@ public class  PdpApplicationIT  {
         @Configuration
         public Option[] config() {
             return new Option[] {
-            		ITConfiguration.regressionDefaults(),
+            		ITConfiguration.regressionDefaults(true),
             		features(ITConfiguration.getFeaturesRepositoryURL(),"policy-pdp-it"),
+ //                   mavenBundle("eu.linksmart.component", "pdp-fragment", "2.2.1-SNAPSHOT"),
+ //                   mavenBundle("mvn:eu.linksmart.features/supernode/2.2.1-SNAPSHOT"),
             };
         }
 
@@ -104,16 +108,20 @@ public class  PdpApplicationIT  {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 
-                AttributeValue av = new StringAttribute( "read");
+                AttributeValue av = new StringAttribute( "CalculatorForBeginners");
                 Set<Attribute> attrs = new HashSet<Attribute>();
                 attrs.add(new Attribute(
-                        URI.create(LinkSmartXacmlConstants.ACTION_ACTION_ID.getUrn()),
+//                        URI.create(LinkSmartXacmlConstants.ACTION_ACTION_ID.getUrn()),
+                        URI.create(LinkSmartXacmlConstants.RESOURCE_RESOURCE_ID.getUrn()),
+//                        URI.create(LinkSmartXacmlConstants.SUBJECT_SUBJECT_ID.getUrn()),
                         null,
                         new DateTimeAttribute(),
                         av,
                         true,
                         XACMLConstants.XACML_VERSION_3_0));
-                Attributes actionAttrs = new Attributes(URI.create(XACMLConstants.ACTION_CATEGORY), attrs);
+//                Attributes actionAttrs = new Attributes(URI.create(XACMLConstants.ACTION_CATEGORY), attrs);
+                Attributes actionAttrs = new Attributes(URI.create(XACMLConstants.RESOURCE_CATEGORY), attrs);
+//                Attributes actionAttrs = new Attributes(URI.create(XACMLConstants.SUBJECT_CATEGORY), attrs);
                 Set<Attributes> attributes = new HashSet<>();
                 attributes.add(actionAttrs);
 
