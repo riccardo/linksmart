@@ -3,12 +3,12 @@ package eu.linksmart.security.cryptomanager.tests;
 import eu.linksmart.it.utils.ITConfiguration;
 import eu.linksmart.security.cryptomanager.CryptoManager;
 import junit.framework.Assert;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 
 import javax.inject.Inject;
 

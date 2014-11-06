@@ -9,7 +9,8 @@
     <version>2.2.2-SNAPSHOT</version>
 
     <name>LinkSmart Parent</name>
-    <url>http://www.fit.fraunhofer.de/linksmart</url>
+    
+    <url>https://linksmart.eu</url>
 
     <packaging>pom</packaging>
 
@@ -35,18 +36,18 @@
         <maven.resources.version>2.4.3</maven.resources.version>
         <!-- versions for testing plugins -->
         <maven.surefire.version>2.16</maven.surefire.version>
-        <surefire-report.version>2.13</surefire-report.version>
+        <surefire-report.version>2.17</surefire-report.version>
         <junit.version>4.8.2</junit.version>
         <maven.failsafe.version>2.16</maven.failsafe.version>
         <mockito.version>1.9.5</mockito.version>
         <!-- versions for integration test plugins -->
-        <pax.exam.version>3.4.0</pax.exam.version>
-        <karaf.tooling.exam.version>1.9.6</karaf.tooling.exam.version>
+        <pax.exam.version>4.3.0</pax.exam.version>
+        <karaf.tooling.exam.version>2.3.8</karaf.tooling.exam.version> 
         <karaf.version>3.0.1</karaf.version>
         <karaf.tooling.features.version>2.3.3</karaf.tooling.features.version>
         <!-- versions for logging -->
         <log4j.version>1.2.16</log4j.version>
-        <slf4j.version>1.4.3</slf4j.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <!-- apache dependencies (misc) -->
         <servicemix.xmlsec.version>1.4.5_1</servicemix.xmlsec.version>
         <servicemix.commons-configuration.version>1.9_1</servicemix.commons-configuration.version>
@@ -59,6 +60,10 @@
         <!-- apache cxf dependencies>-->
         <cxf.version>2.7.9</cxf.version>
         <cxf.dosgi.version>1.6.0</cxf.dosgi.version>
+        <!-- site plugins -->
+        <project-info-reports.version>2.7</project-info-reports.version>
+        <site.plugin.version>3.4</site.plugin.version>
+        <maven.javadoc.version>2.10</maven.javadoc.version>
         <!-- other -->
 		<org-json.version>1.0.0</org-json.version>
         <javadoc-plugin.version>2.9</javadoc-plugin.version>
@@ -73,7 +78,6 @@
             <roles>
                 <role>Java developer</role>
             </roles>
-            <timezone>UTC+1</timezone>
             <organization>Fraunhofer FIT</organization>
             <organizationUrl>http://www.fit.fraunhofer.de/</organizationUrl>
             <url>http://www.fit.fraunhofer.de/</url>
@@ -85,19 +89,6 @@
             <roles>
                 <role>Java developer</role>
             </roles>
-            <timezone>UTC+1</timezone>
-            <organization>Fraunhofer FIT</organization>
-            <organizationUrl>http://www.fit.fraunhofer.de/</organizationUrl>
-            <url>http://www.fit.fraunhofer.de/</url>
-        </developer>
-        <developer>
-            <id>mvinkovits</id>
-            <name>Mark Vinkovits</name>
-            <email>mark.vinkovits&lt;at&gt;fit.fraunhofer.de</email>
-            <roles>
-                <role>Java developer</role>
-            </roles>
-            <timezone>UTC+1</timezone>
             <organization>Fraunhofer FIT</organization>
             <organizationUrl>http://www.fit.fraunhofer.de/</organizationUrl>
             <url>http://www.fit.fraunhofer.de/</url>
@@ -108,6 +99,19 @@
         <name>Fraunhofer Institute FIT</name>
         <url>http://www.fit.fraunhofer.de</url>
     </organization>
+    
+	<prerequisites>
+		<maven>3.0.4</maven>
+	</prerequisites>
+
+	<licenses>
+		<license>
+			<name>GNU license</name>
+			<url>https://linksmart.eu/repo/content/sites/doc/license.txt</url>
+			<distribution>linksmart-repo</distribution>
+			<comments>LinkSmart is released under the GNU license.</comments>
+		</license>
+	</licenses>
 
     <repositories>
         <repository>
@@ -142,19 +146,22 @@
     </pluginRepositories>
 
     <distributionManagement>
-        <!-- For releases , do not change id otherwise deployment will fail -->
         <repository>
             <id>releases</id>
             <name>Releases</name>
             <url>https://linksmart.eu/repo/content/repositories/releases/</url>
         </repository>
-        <!-- For snapshots , do not change id otherwise deployment will fail -->
         <snapshotRepository>
             <id>snapshots</id>
             <name>Snapshots</name>
             <url>https://linksmart.eu/repo/content/repositories/snapshots/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
+        <site>
+			<id>linksmart-repo</id>
+			<name>linksmart-site-repository</name>
+ 			<url>dav:https://linksmart.eu/repo/content/sites/doc/</url> 
+		</site>
     </distributionManagement>
 
     <ciManagement>
@@ -333,6 +340,12 @@
                 <artifactId>eu.linksmart.security.trustmanager</artifactId>
                 <version>${linksmart.version}</version>
             </dependency>
+            <!-- LinkSmart policy dependencies -->
+            <dependency>
+                <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.identitymanager.pip</artifactId>
+                <version>${linksmart.version}</version>
+            </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.policy.pdp</artifactId>
@@ -351,17 +364,17 @@
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
+                <artifactId>eu.linksmart.network.networkmanager.port.rest</artifactId>
+                <version>${linksmart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.config.managerconfigurator</artifactId>
                 <version>${linksmart.version}</version>
             </dependency>
             <dependency>
                 <groupId>eu.linksmart</groupId>
                 <artifactId>eu.linksmart.network.grand</artifactId>
-                <version>${linksmart.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>eu.linksmart</groupId>
-                <artifactId>eu.linksmart.tools.log4jfragment</artifactId>
                 <version>${linksmart.version}</version>
             </dependency>
 			<!-- LinkSmart backbone dependencies -->
@@ -469,7 +482,23 @@
                 	<groupId>org.apache.karaf.tooling</groupId>
                 	<artifactId>features-maven-plugin</artifactId>
                 	<version>${karaf.tooling.features.version}</version>
-	            </plugin>    
+	            </plugin>
+	            <!-- Site related plugins -->
+	            <plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>${project-info-reports.version}</version>
+				</plugin>   
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>${site.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven.javadoc.version}</version>
+				</plugin>
             </plugins>
         </pluginManagement>
         <!-- plugins inherited in all projects -->
@@ -494,7 +523,101 @@
                     <target>${java.compiler.version}</target>
                 </configuration>
             </plugin>
+            <!-- site plugin and webdav dependency for deployment of site onto Nexus repository -->
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<dependencies>
+          			<dependency>
+            			<groupId>org.apache.maven.wagon</groupId>
+            			<artifactId>wagon-webdav-jackrabbit</artifactId>
+            			<version>2.6</version>
+          			</dependency>
+        		</dependencies>
+			</plugin>
         </plugins>
     </build>
-
+    <!-- maven Site related configuration -->
+	<reporting>
+		<excludeDefaults>true</excludeDefaults>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${project-info-reports.version}</version>
+				<inherited>true</inherited>
+				<reportSets>
+					<reportSet>
+						<id>aggregate</id>
+						<inherited>true</inherited>
+						<reports>
+							<report>index</report>
+							<report>summary</report>
+							<report>scm</report>
+							<report>cim</report>
+							<report>issue-tracking</report>
+							<report>project-team</report>
+							<report>mailing-list</report>
+							<report>license</report>
+							<report>modules</report>
+							<report>distribution-management</report>
+							<report>plugin-management</report>
+							<report>plugins</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<!-- generate dependency reports only for the main pom -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${project-info-reports.version}</version>
+				<inherited>false</inherited>
+				<reportSets>
+					<reportSet>
+						<id>aggregate</id>
+						<reports>
+							<report>dependencies</report>
+							<report>dependency-info</report>
+							<report>dependency-management</report>
+							<report>dependency-convergence</report>
+						</reports>
+						<inherited>false</inherited>
+						<configuration>
+							<remoteRepositories>
+								<repository>
+									<id>linksmart-repo</id>
+									<name>LinkSmart - Nexus Managed Snapshot Repository</name>
+									<url>https://linksmart.eu/repo/content/repositories/snapshots/</url>
+									<releases>
+										<enabled>true</enabled>
+										<updatePolicy>never</updatePolicy>
+									</releases>
+									<snapshots>
+										<enabled>true</enabled>
+										<updatePolicy>daily</updatePolicy>
+									</snapshots>
+								</repository>
+							</remoteRepositories>
+						</configuration>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>${surefire-report.version}</version>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
+			<plugin>
+        		<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-javadoc-plugin</artifactId>
+        		<version>${maven.javadoc.version}</version>
+        		<configuration>
+        		</configuration>
+      		</plugin>
+		</plugins>
+	</reporting>
 </project>

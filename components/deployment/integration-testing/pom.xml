@@ -18,6 +18,7 @@
     
     <properties>
         <commons-httpclient.version>3.1_7</commons-httpclient.version>
+        <javax.inject.version>1</javax.inject.version>
     </properties>     
     
     <modules>
@@ -26,7 +27,7 @@
     	<module>identity-manager-crypto-it</module>
         <module>basic-tunneling-it</module>
         <module>standard-tunneling-it</module>
-        <!--<module>soap-tunneling-it</module>-->
+        <module>soap-tunneling-it</module>
         <module>backbone-soap-it</module>
         <module>backbone-osgi-it</module>
         <module>backbone-jxta-it</module>
@@ -40,7 +41,7 @@
     	<module>trust-manager-it</module>
 <!--     	<module>policy-pdp-it</module> -->
 <!--     	<module>policy-pep-it</module> -->
-        <module>event-wrapper-mqtt-it</module>
+<!--         <module>event-wrapper-mqtt-it</module> -->
   </modules>
 
     <scm>
@@ -77,6 +78,11 @@
 			<groupId>org.ops4j.pax.exam</groupId>
 			<artifactId>pax-exam-link-mvn</artifactId>
             <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>${javax.inject.version}</version>
 		</dependency>
 		<!-- PaxExam decides on a specific OSGi Container for testing based on the 
 			maven dependecies, we are using Apache Karaf for in-container OSGi testing -->
