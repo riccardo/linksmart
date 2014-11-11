@@ -217,8 +217,29 @@ public class PdpApplication implements PolicyDecisionPoint {
 		//	logger.warn("Only file based policy store supported at the moment");
 		//}
 		// using file based policy repository. so set the policy location as system property
-		logger.debug("Using file policy repository");
-		createDirectory(PDP_FILEFOLDER_LOC);
+
+        // RR - this code is reused from CryptoManagerAdminImpl.java
+        // TODO this should be refactored in to a resource bundle
+        // suggested loading sequence
+        // resource bundle -> CryptoManagerAdminImpl -> CryptoManagerImpl
+        Hashtable<String, String> HashFilesExtract =
+                new Hashtable<String, String>();
+        logger.debug("Deploying PDP config and policy files");
+        //HashFilesExtract.put(PdpConfigurator.CONFIGURATION_FILE + SEPARATOR + "/pdpconfig.properties",
+        //        "resources/pdpconfig.properties");
+        HashFilesExtract.put(PDP_FILEFOLDER_LOC + SEPARATOR + "policy.xml",
+                "policies/policy.xml");
+        try {
+            //JarUtil.createDirectory(PdpConfigurator.CONFIGURATION_FILE);
+            JarUtil.createDirectory(PDP_FILEFOLDER_LOC);
+            JarUtil.extractFilesJar(HashFilesExtract);
+        } catch (IOException e) {
+            logger.error("Needed folder has not been created...", e);
+        }
+
+
+        logger.debug("Using file policy repository");
+//		createDirectory(PDP_FILEFOLDER_LOC);
 		System.setProperty(FileBasedPolicyFinderModule.POLICY_DIR_PROPERTY, PDP_FILEFOLDER_LOC);
 
 		balana = Balana.getInstance();
