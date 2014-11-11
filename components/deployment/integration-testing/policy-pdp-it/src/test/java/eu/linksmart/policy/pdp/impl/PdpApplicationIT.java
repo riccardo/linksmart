@@ -1,11 +1,8 @@
 package eu.linksmart.policy.pdp.impl;
 
 import eu.linksmart.it.utils.ITConfiguration;
-import eu.linksmart.network.Registration;
-import eu.linksmart.network.VirtualAddress;
 import eu.linksmart.policy.LinkSmartXacmlConstants;
 import eu.linksmart.policy.pdp.PolicyDecisionPoint;
-import eu.linksmart.utils.Part;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -26,8 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.wso2.balana.attr.AttributeValue;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+
 
 import static org.w3c.dom.Node.ATTRIBUTE_NODE;
 import static org.w3c.dom.Node.CDATA_SECTION_NODE;
@@ -52,8 +48,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 
 import static org.junit.Assert.fail;
@@ -62,79 +60,59 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 @RunWith(PaxExam.class)
 public class  PdpApplicationIT  {
 
-    private static final Part ATTR_1 = new Part("One", "Eins");
-    private static final Part ATTR_2 = new Part("Two", "Zwei");
-    private static final VirtualAddress VIRTUAL_ADDRESS = new VirtualAddress("0.0.0.0");
-    private static final VirtualAddress VIRTUAL_ADDRESS2 = new VirtualAddress("1.1.1.1");
-    private static Registration MY_REGISTRATION;
-    private static Registration OTHER_REGISTRATION;
-
     @Inject
-        private PolicyDecisionPoint pdp;
+    private PolicyDecisionPoint pdp;
 
         @Configuration
         public Option[] config() {
             return new Option[] {
-            		ITConfiguration.regressionDefaults(true),
+                    ITConfiguration.regressionDefaults(),
+            		//ITConfiguration.regressionDefaults(true),
             		features(ITConfiguration.getFeaturesRepositoryURL(),"policy-pdp-it"),
  //                   mavenBundle("eu.linksmart.component", "pdp-fragment", "2.2.1-SNAPSHOT"),
  //                   mavenBundle("mvn:eu.linksmart.features/supernode/2.2.1-SNAPSHOT"),
             };
         }
 
+// Short Remark:
+// Please notice, that the policy.xml file is located inside of the PDP bundle (policy-pdp\src\main\resources\policies).
+// To test with a different policy you have to change the PDP bundle.
+
 
     @Test
     public void testPolicyPDP() {
-    	try {
-        	System.out.println("starting policy-pdp test");
-        	Assert.assertEquals("eu.linksmart.policy.pdp.impl.PdpApplication", pdp.getClass().getName());
+        try {
 
-            MY_REGISTRATION = new Registration(VIRTUAL_ADDRESS, new Part[]{ATTR_1});
-            OTHER_REGISTRATION = new Registration(VIRTUAL_ADDRESS2, new Part[]{ATTR_2});
+            System.out.println("starting policy-pdp test");
+            Assert.assertEquals("eu.linksmart.policy.pdp.impl.PdpApplication", pdp.getClass().getName());
 
             //create requests
-//            Set<Attribute> attrs = new HashSet<>();
-//            Attribute attr = new Attribute(
- //                   URI.create(LinkSmartXacmlConstants.RESOURCE_RESOURCE_ID.getUrn()),
-//                    null,
-//                    new DateTimeAttribute(),
-//                    new StringAttribute(MY_REGISTRATION.getVirtualAddress().toString()),
-//                    true,
-//                    XACMLConstants.XACML_VERSION_3_0);
-//            attrs.add(attr);
-//            Attributes attrResource = new Attributes(URI.create(XACMLConstants.RESOURCE_CATEGORY), attrs);
-//            Set<Attributes> attributes = new HashSet<>();
-//            attributes.add(attrResource);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 
-                AttributeValue av = new StringAttribute( "CalculatorForBeginners");
-                Set<Attribute> attrs = new HashSet<Attribute>();
-                attrs.add(new Attribute(
-//                        URI.create(LinkSmartXacmlConstants.ACTION_ACTION_ID.getUrn()),
-                        URI.create(LinkSmartXacmlConstants.RESOURCE_RESOURCE_ID.getUrn()),
-//                        URI.create(LinkSmartXacmlConstants.SUBJECT_SUBJECT_ID.getUrn()),
-                        null,
-                        new DateTimeAttribute(),
-                        av,
-                        true,
-                        XACMLConstants.XACML_VERSION_3_0));
-//                Attributes actionAttrs = new Attributes(URI.create(XACMLConstants.ACTION_CATEGORY), attrs);
-                Attributes actionAttrs = new Attributes(URI.create(XACMLConstants.RESOURCE_CATEGORY), attrs);
-//                Attributes actionAttrs = new Attributes(URI.create(XACMLConstants.SUBJECT_CATEGORY), attrs);
-                Set<Attributes> attributes = new HashSet<>();
-                attributes.add(actionAttrs);
+            AttributeValue av = new StringAttribute("CalculatorForBeginners");
+            Set<Attribute> attrs = new HashSet<Attribute>();
+            attrs.add(new Attribute(
+                    URI.create(LinkSmartXacmlConstants.RESOURCE_RESOURCE_PID.getUrn()),
+                    null,
+                    new DateTimeAttribute(),
+                    av,
+                    true,
+                    XACMLConstants.XACML_VERSION_3_0));
+            Attributes actionAttrs = new Attributes(URI.create(XACMLConstants.RESOURCE_CATEGORY), attrs);
+            Set<Attributes> attributes = new HashSet<>();
+            attributes.add(actionAttrs);
 
             RequestCtx req = new RequestCtx(attributes, null);
             req.encode(baos);
             String reqXml = baos.toString();
-            System.out.println( "request: "+reqXml);
+            System.out.println("request: " + reqXml);
 
             String response = pdp.evaluate(reqXml);
 
             System.out.println("response: " + response);
 
-            if(response != null) {
+            if (response != null) {
                 try {
                     //parse string into xml
                     Document xmlDoc = DocumentBuilderFactory
@@ -143,8 +121,18 @@ public class  PdpApplicationIT  {
                             .parse(new ByteArrayInputStream(response.getBytes()));
                     Element node = xmlDoc.getDocumentElement();
 //                    listNodes(node,"");
+
                     String tagName = node.getTagName();
                     Assert.assertEquals("No response returned!", tagName, "Response");
+
+                    NodeList list = node.getElementsByTagName("Decision");
+                    Assert.assertNotNull("No Decision Tag found!", list);
+                    node = (Element)list.item(0);
+                    Assert.assertNotNull("No Decision Tag found!", node);
+
+                    String decision = node.getTextContent();
+                    System.out.println("Returned Decision: " + decision);
+                    Assert.assertEquals("Not Permitted!", decision, "Permit");
 
                     System.out.println("policy-pdp test successfully completed");
 
@@ -153,9 +141,9 @@ public class  PdpApplicationIT  {
                 }
             }
 
-        } catch(Exception e) {
-        	e.printStackTrace();
-        	fail(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
         }
     }
 
