@@ -66,7 +66,7 @@
 		<dependency>
 			<groupId>eu.linksmart.testing</groupId>
 			<artifactId>integration-testing-utils</artifactId>
-			<version>${project.version}</version>
+			<version>${linksmart.version}</version>
 		</dependency>
 		<!-- PaxExam dependencies -->
 		<dependency>
@@ -99,7 +99,7 @@
         <dependency>
             <groupId>eu.linksmart.features</groupId>
             <artifactId>linksmart-features</artifactId>
-            <version>${parent.version}</version>
+            <version>${linksmart.version}</version>
             <scope>provided</scope>
         </dependency>
 	</dependencies>
